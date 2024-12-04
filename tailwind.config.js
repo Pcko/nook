@@ -17,6 +17,15 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.btn': {
+          '@apply hover:bg-primary-hover mx-auto mt-5 bg-primary font-bold py-2 px-4 rounded-full':{},
+          transition: 'background-color 0.2s ease',
+        },
+      });
+    },
+  ],
 }
 

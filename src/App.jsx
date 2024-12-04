@@ -11,7 +11,7 @@ function App() {
     <DndProvider backend={HTML5Backend}>
     <div>  
       <main>    
-        <Login />
+        <Login/>
       </main>
     </div>
     </DndProvider>
