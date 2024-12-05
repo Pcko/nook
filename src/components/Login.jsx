@@ -1,7 +1,29 @@
 import logo from '../assets/resources/Image.png'
-import BackgroundText from '../components/loginBackground'
+import BackgroundText from './NookBackground'
+import {useState} from 'react'
+
+
 
 function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (event) => {
+        //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
+        event.preventDefault();
+
+        try{
+            //hier übertragen lieber julien und moritze
+            //variablen heißen username und password
+
+        }catch(ex){
+            console.error('Error during submission:', error);
+        }
+
+        // password zurücksetzen (kann man auch in reject passwort geben
+        document.getElementById('password').value='';
+    };
+
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText/>
@@ -10,50 +32,55 @@ function Login() {
                     <img src={logo} alt="App Logo" className="w-1/2" />
                 </div>
 
-                {/* Username Field */}
-                <label htmlFor="username" className="block mb-1">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    required
-                    minLength="2"
-                    placeholder="Enter your username"
-                    className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1 mb-3"
-                />
+                <form onSubmit={handleSubmit}>
+                    {/* Username Field */}
+                    <label htmlFor="username" className="block mb-1">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        minLength="2"
+                        placeholder="Enter your username"
+                        className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1 mb-3"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
 
-                {/* Password Field */}
-                <label htmlFor="password" className="block mb-1">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    minLength="10"
-                    placeholder="Enter your password"
-                    className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1"
-                />
+                    {/* Password Field */}
+                    <label htmlFor="password" className="block mb-1">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        minLength="10"
+                        placeholder="Enter your password"
+                        className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
-                    <div className={"flex justify-center"}>
-                        {/* Sign-in Button */}
-                        <button
-                            id="sign-up"
-                            className="btn"
-                        >
-                            Sign in
-                        </button>
+                    <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
+                        <div className={"flex justify-center"}>
+                            {/* Sign-in Button */}
+                            <input
+                                type={"submit"}
+                                id="sign-up"
+                                className="btn"
+                                value="Sign in"
+                            >
+                            </input>
+                        </div>
+                        <div className={"flex justify-center"}>
+                            {/* Register Button*/}
+                            <button
+                                id="register"
+                                className={"btn"}
+                            >
+                                Register
+                            </button>
+                        </div>
                     </div>
-                    <div className={"flex justify-center"}>
-                        {/* Register Button*/}
-                        <button
-                            id="register"
-                            className={"btn"}
-                        >
-                            Register
-                        </button>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     );
