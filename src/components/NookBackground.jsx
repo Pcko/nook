@@ -15,7 +15,8 @@ const BackgroundWithText = () => {
             textElement.classList.add(
                 'text-xl',
                 'font-bold',
-                'text-gray-800',
+                'text-secondary',
+                'opacity-65',
                 'transform',
                 'rotate-[-45deg]',
                 'absolute'
@@ -28,8 +29,8 @@ const BackgroundWithText = () => {
             textElement.style.fontSize = '3rem';
 
             // Fill the screen with repeated "nook" text
-            while (yPos < window.innerHeight*10) {
-                while (xPos < window.innerWidth*10) {
+            while (yPos < window.innerHeight*18) {
+                while (xPos < window.innerWidth*18) {
                     const clone = textElement.cloneNode(true);
                     clone.style.left = `${xPos}px`;
                     clone.style.top = `${yPos}px`;

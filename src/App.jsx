@@ -9,8 +9,8 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 function App() {
   return (
     <DndProvider backend={HTML5Backend}>
-    <div>  
-      <main>    
+    <div className={'h-full'}>
+      <main className={'h-full'}>
         <Login/>
       </main>
     </div>
@@ -18,4 +18,4 @@ function App() {
   );
 }
 
-export default Login;
+export default App;

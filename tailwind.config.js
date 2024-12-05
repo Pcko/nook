@@ -12,9 +12,6 @@ module.exports = {
         "website-bg":"#202020",
         "ui-bg":"#303030"
       },
-      spacing:{
-
-      }
     },
   },
   plugins: [
