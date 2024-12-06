@@ -1,5 +1,7 @@
 import BuilderLayout from "./components/BuilderLayout";
-import Login from "./components/Login"
+import Login from "./components/Login";
+
+import './index.css';
 
 
 import { DndProvider } from "react-dnd";
