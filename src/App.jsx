@@ -9,13 +9,13 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 function App() {
   return (
     <DndProvider backend={HTML5Backend}>
-    <div>  
-      <main>    
-        <Login />
+    <div className={'h-full'}>
+      <main className={'h-full'}>
+        <Login/>
       </main>
     </div>
     </DndProvider>
   );
 }
 
-export default Login;
+export default App;
