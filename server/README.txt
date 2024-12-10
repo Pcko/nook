@@ -7,4 +7,6 @@
 <server> npm run prod
 
 #DEV
+<client> npm i
+<server> npm i
 <server> npm run dev
