@@ -15,7 +15,7 @@ function Login() {
             //hier übertragen lieber julien und moritze
             //variablen heißen username und password
 
-            const response = await axios.post('http://localhost/login', {
+            const response = await axios.post('http://localhost:8080/login', {
                 username,
                 password
             },{
@@ -27,7 +27,7 @@ function Login() {
                 console.log('done')
             })
             .catch((err)=>{
-                console.error(err); //wirft error
+                console.error(err.message); //wirft error
             });
 
         }catch(ex){
