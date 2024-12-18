@@ -1,23 +1,35 @@
 import logo from '../assets/resources/Image.png'
 import BackgroundText from './NookBackground'
 import {useState} from 'react'
-
-
+import axios from 'axios'
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
         event.preventDefault();
+
+        console.log('data submitted');//--dev
 
         try{
             //hier übertragen lieber julien und moritze
             //variablen heißen username und password
 
-        }catch(ex){
-            console.error('Error during submission:', error);
+            const response = await axios.post('http://localhost:8080/login', {
+                username,
+                password
+            },{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            console.log(response.data);//--dev
+
+        }catch(err){
+            console.error('Error during submission:', err);
         }
 
         // password zurücksetzen (kann man auch in reject passwort geben
