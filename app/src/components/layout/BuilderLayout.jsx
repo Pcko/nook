@@ -1,7 +1,7 @@
-import ComponentsList from "./ComponentsList.jsx";
+import ComponentsList from "../editor/ComponentList.jsx";
 import BuilderNav from "./BuilderNav.jsx"
-import EditorArea from "./EditorArea.jsx"
-import PropertyPanel from "./PropertyPanel.jsx";
+import EditorArea from "../editor/EditorArea.jsx"
+import PropertyPanel from "../editor/PropertyPanel.jsx";
 
 function BuilderLayout(){
     return (    

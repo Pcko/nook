@@ -1,5 +1,5 @@
-import logo from '../assets/resources/Image.png'
-import BackgroundText from './NookBackground'
+import logo from '../../assets/resources/Image.png'
+import BackgroundText from '../general/NookBackground'
 import { useState } from 'react'
 import axios from 'axios'
 
