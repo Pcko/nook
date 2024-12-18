@@ -1,5 +1,5 @@
-import BuilderLayout from "./components/BuilderLayout";
-import Login from "./components/Login";
+import BuilderLayout from "./components/layout/BuilderLayout";
+import Login from "./components/auth/Login";
 
 import './index.css';
 
