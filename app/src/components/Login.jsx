@@ -10,7 +10,9 @@ function Login() {
     const handleSubmit = async (event) => {
         //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
         event.preventDefault();
-        console.log('data submitted');
+
+        console.log('data submitted');//--dev
+
         try{
             //hier übertragen lieber julien und moritze
             //variablen heißen username und password
@@ -23,15 +25,11 @@ function Login() {
                     'Content-Type': 'application/json'
                 }
             })
-            .then(() => {
-                console.log('done')
-            })
-            .catch((err)=>{
-                console.error(err.message); //wirft error
-            });
 
-        }catch(ex){
-            console.error('Error during submission:', ex);
+            console.log(response.data);//--dev
+
+        }catch(err){
+            console.error('Error during submission:', err);
         }
 
         // password zurücksetzen (kann man auch in reject passwort geben

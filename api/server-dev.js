@@ -15,7 +15,7 @@ async function startServer() {
 
   const vite = await createViteServer({
     server: { middlewareMode: 'html' },
-    root: '../client'
+    root: '../app'
   });
 
   // Example API route

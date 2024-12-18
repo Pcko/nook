@@ -1,7 +1,7 @@
 {
-  "name": "server",
-  "version": "0.0.0",
-  "description": "",
+  "name": "api",
+  "version": "0.1.0",
+  "description": "<server> npm i\r <client> npm i\r <client> npm run build\r <server> npm run prod",
   "main": "server-dev.js",
   "type": "module",
   "scripts": {
@@ -15,5 +15,6 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "vite": "^6.0.3"
-  }
+  },
+  "devDependencies": {}
 }
