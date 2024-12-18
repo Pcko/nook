@@ -17,10 +17,6 @@ function Login() {
             const response = await axios.post('/api/login', {
                 username,
                 password
-            },{
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             })
 
             console.log(response.data);//--dev
