@@ -1,6 +1,6 @@
 import logo from '../assets/resources/Image.png'
 import BackgroundText from './NookBackground'
-import {useState} from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 
 function Login() {
@@ -13,32 +13,30 @@ function Login() {
 
         console.log('data submitted');//--dev
 
-        try{
-            //hier übertragen lieber julien und moritze
-            //variablen heißen username und password
-
-            const response = await axios.post('http://localhost:8080/login', {
+        try {
+            const response = await axios.post('/api/login', {
                 username,
                 password
-            },{
+            }, {
+
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            })
+            });
 
             console.log(response.data);//--dev
 
-        }catch(err){
+        } catch (err) {
             console.error('Error during submission:', err);
-        }
+        };
 
         // password zurücksetzen (kann man auch in reject passwort geben
-        document.getElementById('password').value='';
+        document.getElementById('password').value = '';
     };
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <BackgroundText/>
+            <BackgroundText />
             <div id="Window" className="h-[410px] w-[300px] p-5 text-white bg-ui-bg rounded-xl z-10">
                 <div className="flex items-center justify-center mt-5 mb-10">
                     <img src={logo} alt="App Logo" className="w-1/2" />
