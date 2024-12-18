@@ -14,10 +14,7 @@ function Login() {
         console.log('data submitted');//--dev
 
         try{
-            //hier übertragen lieber julien und moritze
-            //variablen heißen username und password
-
-            const response = await axios.post('http://localhost:8080/login', {
+            const response = await axios.post('/api/login', {
                 username,
                 password
             },{
