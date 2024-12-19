@@ -1,4 +1,4 @@
-import logo from '../../assets/resources/Image.png'
+import logo from '../../assets/resources/image.png'
 import BackgroundText from '../general/NookBackground'
 import { useState } from 'react'
 import axios from 'axios'
