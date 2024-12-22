@@ -1,6 +1,12 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-const uri = process.env.ATLAS_URI || "mongodb+srv://admin:BPVgLKuKKvtexlKS@nook.rmygo.mongodb.net/?retryWrites=true&w=majority&ssl=true&authSource=admin";
+import dotenv from 'dotenv';
+dotenv.config({ path: './config.env' });
+
+const uri = process.env.ATLAS_URI;
+if (!uri) {
+    console.error('Environment variable missing!');
+}
 
 const client = new MongoClient(uri, {
     serverApi: {

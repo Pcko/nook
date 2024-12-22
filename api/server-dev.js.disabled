@@ -5,9 +5,6 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-const devUsername = 'admin'
-const devPassword = '1234567890'
-
 async function startServer() {
 
   app.use(cors())
@@ -23,12 +20,12 @@ async function startServer() {
     const data = req.body; // Extract data from the request body
     console.log(data);
 
-    if(data.username === devUsername || data.password == devPassword){
-      res.status(401).send({message: 'Username or password incorrect'})
+    if (data.username === undefined || data.password === undefined) {
+      res.status(401).send({ message: 'Username or password incorrect' })
       return;
     }
-    
-    res.status(200).send({message: 'Usercredentials valid'})
+
+    res.status(200).send({ message: 'Usercredentials valid' })
   });
 
   // Use Vite's middleware to serve frontend files
