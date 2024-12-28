@@ -25,7 +25,7 @@ To use the project, follow these instructions:
 /nook/app> cd ../api
 
 # Run the express server
-/nook/app> npm run start
+/nook/api> npm run start
 ```
 
 Now the server should be running on Port 8080!
