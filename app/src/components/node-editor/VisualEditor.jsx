@@ -1,25 +1,35 @@
-import {useEffect, useRef, useState} from "react";
-import {clean, create, editor, engine} from "./editor_custom";
+import { useEffect, useRef, useState } from "react";
+import { clean, create, editor, engine, fetchNodeTypes } from "./editor";
 import SidePanel from "./SidePanel";
-import {ClickTriggerNode, MessageTriggerNode} from './Nodes/trigger-nodes'
+import { ClickTriggerNode } from './Nodes/nodes'
 
 function VisualEditor() {
     const editorInitialized = useRef(false);
-    const [nodeList, setNodeList] = useState([]);
+    const [hierarchyList, setHierarchyList] = useState([]);
+    const [nodeTypes, setNodeTypes] = useState(new Map());
 
     useEffect(() => {
+        // Creates the rete-editor
         const container = document.querySelector("#editor-container");
         if (container && !editorInitialized.current) {
             create(container)
                 .then(() => {
                     editorInitialized.current = true; // Mark as initialized
-                    updateNodeList(); // Update hierarchy after initialization
+                    updateHierarchy(); // Update hierarchy after initialization
                 })
                 .catch((err) => {
                     console.error("Error initializing editor:", err.message);
                 });
         }
 
+        // Fetches all available node types dynamically when the component loads
+        async function getNodeTypes() {
+            let newMap = await fetchNodeTypes();
+            setNodeTypes(newMap);
+        }
+        getNodeTypes();
+
+        // Returns cleanup function
         return () => {
             if (editorInitialized.current) {
                 clean()
@@ -33,24 +43,28 @@ function VisualEditor() {
         };
     }, []);
 
-    function updateNodeList() {
+    // Updates the hierarchyList
+    function updateHierarchy() {
         const nodes = editor.getNodes();
-        setNodeList(nodes.map((node) => ({id: node.id, name: node.label || node.name})));
+        setHierarchyList(
+            nodes.map((node) =>
+                ({ id: node.id, name: node.label })
+            )
+        );
     }
 
+    // Adds a Node to the editor
     async function addNode(type, name) {
-        let newNode;
-        if (type === "ClickTrigger") {
-            newNode = new ClickTriggerNode(name);
-        } else if (type === "MessageTrigger") {
-            newNode = new MessageTriggerNode(name);
-        }
-        if (newNode) {
-            await editor.addNode(newNode);
-            updateNodeList(); // Update hierarchy after adding the node
-        }
+        // Nimmt den gewollten Typ aus den importierten typen
+        const NewNodeClass = nodeTypes.get(type);
+        // Erstellt eine Instanz mit den Typen (name: wenn gegeben, sonst Typenname)
+        const newNode = new NewNodeClass(name || type);
+
+        await editor.addNode(newNode);
+        updateHierarchy();
     }
 
+    // Triggeres the Nodes execution (needs to be dynamic; currently hardcoded; maybe look if it has no input and based on that execute them)
     function trigger() {
         editor.getNodes()
             .filter((node) => node instanceof ClickTriggerNode)
@@ -58,13 +72,13 @@ function VisualEditor() {
     }
 
     return (
-        <div style={{display: "flex", height: "100vh"}}>
+        <div style={{ display: "flex", height: "100vh" }}>
             {/* Side Panel Component */}
-            <SidePanel nodeList={nodeList} onAddNode={addNode} onTrigger={trigger}/>
+            <SidePanel hierarchyList={hierarchyList} updateHierarchy={updateHierarchy} onAddNode={addNode} onTrigger={trigger} />
 
             {/* Editor Container */}
-            <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
-                <div id="editor-container" style={{height: "100%"}}/>
+            <div style={{ flex: 1, position: "relative" }} className={'bg-website-bg'}>
+                <div id="editor-container" style={{ height: "100%" }} />
             </div>
         </div>
     );

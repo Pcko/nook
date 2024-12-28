@@ -1,0 +1,47 @@
+import { ClassicPreset, GetSchemes, NodeEditor } from "rete";
+import { createRoot } from "react-dom/client";
+import { AreaPlugin } from "rete-area-plugin";
+import { Presets, ReactArea2D, ReactPlugin } from "rete-react-plugin";
+
+type Schemes = GetSchemes<
+    ClassicPreset.Node,
+    ClassicPreset.Connection<ClassicPreset.Node, ClassicPreset.Node>
+>;
+
+export const editor = new NodeEditor<Schemes>();
+
+let area: AreaPlugin<Schemes, AreaExtra>;
+let render: ReactPlugin<Schemes, AreaExtra>;
+type AreaExtra = ReactArea2D<Schemes>;
+
+export async function create(container: HTMLElement) {
+    area = new AreaPlugin<Schemes, AreaExtra>(container);
+    render = new ReactPlugin<Schemes, AreaExtra>({ createRoot });
+
+    render.addPreset(Presets.classic.setup());
+    editor.use(area);
+    area.use(render);
+
+    // Example of adding nodes (ensure this happens only once)
+    await addNode("Node A", 0, 0);
+    await addNode("Node B", 0, 200);
+}
+
+export async function clean() {
+    console.log("clean called");
+    await editor.clear();
+}
+
+export async function addNode(name: string, x: number, y: number) {
+    try {
+        // Create a socket and node
+        const socket = new ClassicPreset.Socket("socket");
+        const node = new ClassicPreset.Node(name);
+        node.addControl("a", new ClassicPreset.InputControl("text", {}));
+        node.addOutput("a", new ClassicPreset.Output(socket));
+        await editor.addNode(node)
+        await area.translate(node.id, { x: x, y: y });
+    } catch (err) {
+        console.log(err);
+    }
+}
