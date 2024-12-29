@@ -1,5 +1,5 @@
-import { ClickTriggerNode } from "./Nodes/click-trigger-node";
-import { MessageTriggerNode } from "./Nodes/message-trigger-node";
+import { ClickTriggerNode } from "./Nodes/PerformClickNode";
+import { MessageTriggerNode } from "./Nodes/LogNode";
 import { Connection } from "./connection";
 import { GetSchemes } from "rete";
 

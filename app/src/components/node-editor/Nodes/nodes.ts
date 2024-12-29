@@ -1,4 +1,4 @@
 //alle TriggerNode-Typen
 
-export { ClickTriggerNode } from './click-trigger-node';
-export { MessageTriggerNode } from './message-trigger-node';
+export { PerformClickNode } from './PerformClickNode';
+export { LogNode } from './LogNode';

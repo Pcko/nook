@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { clean, create, editor, engine, fetchNodeTypes } from "./editor";
 import SidePanel from "./SidePanel";
-import { ClickTriggerNode } from './Nodes/nodes'
+import { PerformClickNode } from './Nodes/nodes'
 
 function VisualEditor() {
     const editorInitialized = useRef(false);
@@ -67,7 +67,7 @@ function VisualEditor() {
     // Triggeres the Nodes execution (needs to be dynamic; currently hardcoded; maybe look if it has no input and based on that execute them)
     function trigger() {
         editor.getNodes()
-            .filter((node) => node instanceof ClickTriggerNode)
+            .filter((node) => node instanceof PerformClickNode)
             .forEach((node) => engine.execute(node.id));
     }
 

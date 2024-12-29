@@ -3,7 +3,7 @@ import BasicNookNode from "./BasicNookNode";
 
 const socket = new ClassicPreset.Socket("socket");
 
-class MessageTriggerNode extends BasicNookNode {
+class LogNode extends BasicNookNode {
 
     constructor(name: string) {
         super(name);
@@ -26,4 +26,4 @@ class MessageTriggerNode extends BasicNookNode {
     }
 }
 
-export { MessageTriggerNode };
+export { LogNode };

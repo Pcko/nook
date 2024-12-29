@@ -6,7 +6,6 @@ import { ControlFlowEngine } from "rete-engine";
 import { Schemes } from "./types";
 import { ConnectionPlugin, Presets as ConnectionPresets } from "rete-connection-plugin";
 import { MinimapExtra, MinimapPlugin } from "rete-minimap-plugin";
-import { ClickTriggerNode, MessageTriggerNode } from './Nodes/nodes';
 import { Connection } from "./connection";
 import { ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets } from "rete-context-menu-plugin";
 import Preset from "./contextMenu";
@@ -90,6 +89,7 @@ export async function forceClean(): Promise<void> {
 
 /**
  * Adds example nodes to the editor for demonstration/debuging purposes.
+ * IS DEPRECATED IMPORT MISSING
  */
 async function addNodes(): Promise<void> {
     let node1 = new ClickTriggerNode("Click Listener");

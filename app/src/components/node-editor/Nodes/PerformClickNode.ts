@@ -3,7 +3,7 @@ import BasicNookNode from "./BasicNookNode";
 
 const socket = new ClassicPreset.Socket("socket");
 
-class ClickTriggerNode extends BasicNookNode {
+class PerformClickNode extends BasicNookNode {
     constructor(name: string) {
         super(name);
         this.addOutput("exec", new ClassicPreset.Output(socket, "OnClick"));
@@ -15,4 +15,4 @@ class ClickTriggerNode extends BasicNookNode {
     }
 }
 
-export { ClickTriggerNode };
+export { PerformClickNode };
