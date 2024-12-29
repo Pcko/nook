@@ -39,7 +39,7 @@ function SidePanel({ hierarchyList, updateHierarchy, onAddNode, onTrigger }) {
             onAddNode(type, type); // Add node with the type as its name
             setName(""); // Clear the name input field
         }
-        console.log(`Added Node: ${name}`);
+        console.log(`Added Node: ${type}`);
     };
 
     // Triggers the play action
