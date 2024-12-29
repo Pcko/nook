@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Registration"
-import Dashboard from "./components/Dashboard"
+import Dashboard from "./components/general/Dashboard"
 
 import './index.css';
 
@@ -19,7 +19,6 @@ function App() {
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register/>} />
-
               <Route path="/dashboard" element={<Dashboard/>} />
             </Routes>
           </main>
