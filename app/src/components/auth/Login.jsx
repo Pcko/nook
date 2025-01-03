@@ -1,11 +1,13 @@
 import logo from '../../assets/resources/image.png'
 import BackgroundText from '../general/NookBackground'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate(); // Initialize the navigate function
 
     const handleSubmit = async (event) => {
         //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
@@ -24,8 +26,13 @@ function Login() {
                 }
             });
 
-            console.log(response.data);//--dev
-
+            if (response.status >= 200 && response.status < 300) {
+                console.log('Request was successful', response.data);
+                navigate('/dashboard');
+            } 
+            else {
+                console.log('Request failed with status', response.status);
+            }
         } catch (err) {
             console.error('Error during submission:', err);
         };
