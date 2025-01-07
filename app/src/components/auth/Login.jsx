@@ -29,22 +29,22 @@ function Login() {
             if (response.status >= 200 && response.status < 300) {
                 console.log('Request was successful', response.data);
                 navigate('/dashboard');
-            } 
-            else {
-                console.log('Request failed with status', response.status);
             }
         } catch (err) {
-            console.error('Error during submission:', err);
-        };
+            if(err.status == 403) {
+                document.getElementById('authErrorDisplay').innerHTML = "Username or password is incorrect.";
+            }
+        }
 
         // password zurücksetzen (kann man auch in reject passwort geben
         document.getElementById('password').value = '';
+        document.getElementById('authErrorDisplay').innerHTML= '';
     };
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText />
-            <div id="Window" className="h-[410px] w-[300px] p-5 text-white bg-ui-bg rounded-xl z-10">
+            <div id="Window" className="min-h-[410px] w-[300px] p-5 text-white bg-ui-bg rounded-xl z-10">
                 <div className="flex items-center justify-center mt-5 mb-10">
                     <img src={logo} alt="App Logo" className="w-1/2" />
                 </div>
@@ -64,7 +64,7 @@ function Login() {
                     />
 
                     {/* Password Field */}
-                    <label htmlFor="password" className="block mb-1">Password</label>
+                    <label htmlFor="password" className="block">Password</label>
                     <input
                         type="password"
                         id="password"
@@ -75,6 +75,8 @@ function Login() {
                         className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1"
                         onChange={(e) => setPassword(e.target.value)}
                     />
+
+                    <p id={"authErrorDisplay"} className={"text-red-500 my-3"}></p>
 
                     <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
                         <div className={"flex justify-center"}>
