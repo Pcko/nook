@@ -14,25 +14,14 @@ router.post('/login', async (req, res) => {
   const match = await bcrypt.compare(data.password, result.password);
 
   if (!match) {
-    res.status(403);
-    return;
+    return res.status(403);
   }
 
   let userid = result._id;
+  const user = { id: userid };
+  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 
-  console.log('First') //dev
-  console.log(process.env.ACCESS_TOKEN_SECRET) //dev
-  const accessToken = jwt.sign(userid, process.env.ACCESS_TOKEN_SECRET)
-
-  console.log({ accessToken: accessToken })
-
-  console.log('Second')
-  const user = { id: userid }
-  const accessToken2 = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
-
-  console.log({ accessToken: accessToken2 })
-
-  //res.status(200).;
+  res.status(200).json({ accessToken: accessToken });
 });
 
 export default router;
