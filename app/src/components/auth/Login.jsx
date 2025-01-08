@@ -7,6 +7,7 @@ import axios from 'axios'
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorDisplay, setErrorDisplay] = useState('');
     const navigate = useNavigate(); // Initialize the navigate function
 
     const handleSubmit = async (event) => {
@@ -32,13 +33,19 @@ function Login() {
             }
         } catch (err) {
             if(err.status == 403) {
-                document.getElementById('authErrorDisplay').innerHTML = "Username or password is incorrect.";
+                setErrorDisplay("Username or password is incorrect.");
+                return;
             }
+
+
+            setErrorDisplay("Something went wrong when communicating with the server. Check your internet connection and try again.");
+            return;
         }
 
-        // password zurücksetzen (kann man auch in reject passwort geben
-        document.getElementById('password').value = '';
-        document.getElementById('authErrorDisplay').innerHTML= '';
+        // username, password und errorDisplay zurücksetzen, sobald der Login-Screen verlassen wird
+        setUsername('');
+        setPassword('');
+        setErrorDisplay('');
     };
 
     return (
@@ -59,8 +66,9 @@ function Login() {
                         required
                         minLength="2"
                         placeholder="Enter your username"
-                        className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1 mb-3"
+                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                         onChange={(e) => setUsername(e.target.value)}
+                        value={username}
                     />
 
                     {/* Password Field */}
@@ -72,13 +80,15 @@ function Login() {
                         required
                         minLength="10"
                         placeholder="Enter your password"
-                        className="w-full border-white border-[1px] bg-ui-bg pl-1 pr-1"
+                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                         onChange={(e) => setPassword(e.target.value)}
+                        value={password}
                     />
 
-                    <p id={"authErrorDisplay"} className={"text-red-500 my-3"}></p>
+                    {/* Conditionally render error message */}
+                    {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
 
-                    <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
+                    <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
                         <div className={"flex justify-center"}>
                             {/* Sign-in Button */}
                             <input
