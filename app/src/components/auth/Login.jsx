@@ -102,12 +102,13 @@
                             </div>
                             <div className={"flex justify-center"}>
                                 {/* Register Button*/}
-                                <button
+                                <input
+                                    type="button"
                                     id="register"
                                     className={"btn"}
-                                >
-                                    Register
-                                </button>
+                                    value="Register"
+                                    onClick={() => navigate('/register')}
+                                />
                             </div>
                         </div>
                     </form>
