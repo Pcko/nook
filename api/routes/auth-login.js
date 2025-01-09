@@ -8,12 +8,16 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   const data = req.body; // Extract data from the request body
 
-  if (!data) {
+  if (!data || !'username' in data || !'password' in data) {
     return res.sendStatus(400);
   }
 
   let collection = await db.collection('users');
   let result = await collection.findOne({ username: data.username });
+
+  if (!result) {
+    return res.status(403).send({ message: 'Username or password is invalid!' });
+  }
 
   const match = await bcrypt.compare(data.password, result.password);
 

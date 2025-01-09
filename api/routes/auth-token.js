@@ -17,4 +17,4 @@ function authenicateToken(req, res, next) {
     })
 }
 
-module.exports = authenicateToken;
+export default authenicateToken;
