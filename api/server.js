@@ -18,12 +18,13 @@ app.use(express.json());
 app.use(express.static(clientPath));
 
 
-import loginRoute from './routes/auth-login.js';
-app.use('/api', loginRoute); //<-- login authenticator route
+import authRoute from './routes/authenticator.js';
+app.use('/api', authRoute); //<-- account authenticator route (incl. registration)
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
+
 
 app.listen(PORT, () => {
     console.log('Server deployed at: ' + PORT);

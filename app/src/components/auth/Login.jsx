@@ -15,7 +15,6 @@
             //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
             event.preventDefault();
 
-            console.log('data submitted');//--dev
 
             try {
                 setLoading(true);
