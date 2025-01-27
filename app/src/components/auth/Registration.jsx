@@ -3,6 +3,7 @@ import logo from "../../assets/resources/image.png"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import createYourWebsitePanel from '../../assets/resources/create_your_own_website.png'
 
 
 function Registration() {
@@ -50,87 +51,112 @@ function Registration() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText/>
-            <div id="Window" className="min-h-[450px] w-[450px] p-5 text-white bg-ui-bg rounded-xl z-10">
+            <div id="Window" className="min-h-[650] w-[1000px] p-5 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
-                <h1 className="font-bold text-2xl mb-3">Create an Account</h1>
-                <form onSubmit={handleSubmit} className={"w-full"}>
-                    {/* First Name Field */}
-                    <label htmlFor="firstName" className="block mb-1">First Name</label>
-                    <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        required
-                        minLength="2"
-                        placeholder="Enter your first name"
-                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                        onChange={(e) => setFirstName(e.target.value)}
-                    />
 
-                    {/* Last Name Field */}
-                    <label htmlFor="lastName" className="block mb-1">Last Name</label>
-                    <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        required
-                        minLength="2"
-                        placeholder="Enter your last name"
-                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                        onChange={(e) => setLastName(e.target.value)}
-                    />
+                <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
+                    <div>
+                        <img src={createYourWebsitePanel} className={"h-max"}></img>
+                    </div>
+                    <div className={"m-[10%]"}>
+                        <h1 className="font-bold text-2xl mb-3">Create an Account</h1>
 
-                    {/* Username Field */}
-                    <label htmlFor="username" className="block mb-1">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        required
-                        minLength="2"
-                        placeholder="Enter your username"
-                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
+                        <span>Already have an account? </span>
+                        <a className={"text-blue-500 underline hover:cursor-pointer"} onClick={() => navigate('/login')}>Log in</a>
 
-                    {/* Password Field */}
-                    <label htmlFor="password" className="block mb-1">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        minLength="10"
-                        placeholder="Enter your password"
-                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1"
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
+                        <form onSubmit={handleSubmit} className={"w-full mt-3"}>
+                            {/* Username Field */}
+                            <label htmlFor="username" className="block mb-1">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                required
+                                minLength="2"
+                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
 
-                    {/* Email Field */}
-                    <label htmlFor="email" className="block mb-1">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        placeholder="Enter your email"
-                        className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                            {/* Password Field */}
+                            <label htmlFor="password" className="block mb-1">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                minLength="10"
+                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
 
-                    {/* Conditionally render error message */}
-                    {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
+                            <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
+                                <div>
+                                    {/* First Name Field */}
+                                    <label htmlFor="firstName" className="block mb-1">First Name</label>
+                                    <input
+                                        type="text"
+                                        id="firstName"
+                                        name="firstName"
+                                        required
+                                        minLength="2"
+                                        className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    {/* Last Name Field */}
+                                    <label htmlFor="lastName" className="block mb-1">Last Name</label>
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        name="lastName"
+                                        required
+                                        minLength="2"
+                                        className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        onChange={(e) => setLastName(e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
-                    <input
-                        type="submit"
-                        className={`btn mt-3 ${loading ? 'animate-spin' : ''}`}
-                        value="Register"
-                    >
-                    </input>
-                </form>
+
+                            {/* Email Field */}
+                            <label htmlFor="email" className="block mb-1">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+
+                            {/* Terms and Conditions checkbox */}
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                name="terms"
+                                required
+                                className={"mr-2"}
+                            />
+                            I agree to the <a className={"text-blue-500 underline hover:cursor-pointer"}
+                                              onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
+
+                            {/* Conditionally show error message */}
+                            {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
+
+                            <input
+                                type="submit"
+                                className={`btn w-full mt-3 ${loading ? 'animate-spin' : ''}`}
+                                value="Register"
+                            >
+                        </input>
+                    </form>
+                </div>
             </div>
         </div>
-    );
+</div>
+)
+    ;
 }
 
 export default Registration;
