@@ -3,7 +3,7 @@ import logo from "../../assets/resources/image.png"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import createYourWebsitePanel from '../../assets/resources/create_your_own_website.png'
+import ImageCarousel from "./ImageCarousel";
 
 
 function Registration() {
@@ -51,15 +51,13 @@ function Registration() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText/>
-            <div id="Window" className="min-h-[650] w-[1000px] p-5 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
+            <div id="Window" className="min-h-[650] w-[1000px] p-3 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
 
-                <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
-                    <div>
-                        <img src={createYourWebsitePanel} className={"h-max"}></img>
-                    </div>
+                <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
+                    <ImageCarousel/>
                     <div className={"m-[10%]"}>
-                        <h1 className="font-bold text-2xl mb-3">Create an Account</h1>
+                        <h1 className="text-3xl mb-2">Create an Account</h1>
 
                         <span>Already have an account? </span>
                         <a className={"text-blue-500 underline hover:cursor-pointer"} onClick={() => navigate('/login')}>Log in</a>

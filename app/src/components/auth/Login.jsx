@@ -1,9 +1,8 @@
-    import logo from '../../assets/resources/image.png'
     import BackgroundText from '../general/NookBackground'
     import { useState } from 'react'
     import { useNavigate } from 'react-router-dom'
     import axios from 'axios'
-    import createyourownwebsite from '../../assets/resources/create_your_own_website.png'
+    import ImageCarousel from "./ImageCarousel";
 
     function Login() {
         const [username, setUsername] = useState('');
@@ -52,10 +51,9 @@
         return (
             <div className="flex items-center justify-center bg-website-bg h-full w-full">
                 <BackgroundText />
-                <div id="Window" className="w-[1000px] text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
-                    <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-5">
-                        <img src={createyourownwebsite} className={"h-fit"}/>
-
+                <div id="Window" className="w-[1000px] text-white bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+                    <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
+                        <ImageCarousel/>
                         <div className="mx-[14%] my-[10%]">
                             <h1 className="text-4xl mb-3">Login</h1>
 
