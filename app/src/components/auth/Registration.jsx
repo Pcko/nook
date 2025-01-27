@@ -73,7 +73,7 @@ function Registration() {
                                 name="username"
                                 required
                                 minLength="2"
-                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
+                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
                                 onChange={(e) => setUsername(e.target.value)}
                             />
 
@@ -85,7 +85,7 @@ function Registration() {
                                 name="password"
                                 required
                                 minLength="10"
-                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
@@ -99,7 +99,7 @@ function Registration() {
                                         name="firstName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                         onChange={(e) => setFirstName(e.target.value)}
                                     />
                                 </div>
@@ -112,7 +112,7 @@ function Registration() {
                                         name="lastName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                         onChange={(e) => setLastName(e.target.value)}
                                     />
                                 </div>
@@ -126,7 +126,7 @@ function Registration() {
                                 id="email"
                                 name="email"
                                 required
-                                className="h-8 w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                 onChange={(e) => setEmail(e.target.value)}
                             />
 
