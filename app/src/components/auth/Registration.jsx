@@ -60,9 +60,9 @@ function Registration() {
                         <h1 className="text-3xl mb-2">Create an Account</h1>
 
                         <span>Already have an account? </span>
-                        <a className={"text-blue-500 underline hover:cursor-pointer"} onClick={() => navigate('/login')}>Log in</a>
+                        <a className={"text-ui-subtle underline hover:cursor-pointer"} onClick={() => navigate('/login')}>Log in</a>
 
-                        <form onSubmit={handleSubmit} className={"w-full mt-3"}>
+                        <form onSubmit={handleSubmit} className={"w-full mt-6"}>
                             {/* Username Field */}
                             <label htmlFor="username" className="block mb-1">Username</label>
                             <input
@@ -115,7 +115,7 @@ function Registration() {
                                     />
                                 </div>
                             </div>
-
+ 
 
                             {/* Email Field */}
                             <label htmlFor="email" className="block mb-1">Email</label>
@@ -136,7 +136,7 @@ function Registration() {
                                 required
                                 className={"mr-2"}
                             />
-                            I agree to the <a className={"text-blue-500 underline hover:cursor-pointer"}
+                            I agree to the <a className={"text-ui-subtle underline hover:cursor-pointer"}
                                               onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
 
                             {/* Conditionally show error message */}
