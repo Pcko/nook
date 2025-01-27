@@ -51,7 +51,7 @@
         return (
             <div className="flex items-center justify-center bg-website-bg h-full w-full">
                 <BackgroundText />
-                <div id="Window" className="min-h-[410px] w-[300px] p-5 text-white bg-ui-bg rounded-xl z-10">
+                <div id="Window" className="min-h-[410px] w-[300px] p-5 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                     <div className="flex items-center justify-center mt-5 mb-10">
                         <img src={logo} alt="App Logo" className={`w-1/2 ${loading ? 'animate-pulse' : ''}`} />
                     </div>
