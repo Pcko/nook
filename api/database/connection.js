@@ -28,6 +28,6 @@ try {
     console.error(err);
 }
 
-let db = client.db("NookDB");
+let db = client.db("NookTestDB");
 
 export default db;
