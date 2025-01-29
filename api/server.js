@@ -23,6 +23,9 @@ app.use(express.static(clientPath));
 import loginRoute from './routes/auth-login.js';
 app.use('/api', loginRoute); //<-- login authenticator route
 
+import tempRoute from './routes/temp.js'
+app.use('/temp', tempRoute); //<-- data serve route (Name pending)
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
