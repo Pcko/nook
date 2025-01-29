@@ -1,8 +1,8 @@
-    import logo from '../../assets/resources/image.png'
     import BackgroundText from '../general/NookBackground'
     import { useState } from 'react'
     import { useNavigate } from 'react-router-dom'
     import axios from 'axios'
+    import ImageCarousel from "./ImageCarousel";
 
     function Login() {
         const [username, setUsername] = useState('');
@@ -15,7 +15,6 @@
             //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
             event.preventDefault();
 
-            console.log('data submitted');//--dev
 
             try {
                 setLoading(true);
@@ -52,65 +51,60 @@
         return (
             <div className="flex items-center justify-center bg-website-bg h-full w-full">
                 <BackgroundText />
-                <div id="Window" className="min-h-[410px] w-[300px] p-5 text-white bg-ui-bg rounded-xl z-10">
-                    <div className="flex items-center justify-center mt-5 mb-10">
-                        <img src={logo} alt="App Logo" className={`w-1/2 ${loading ? 'animate-pulse' : ''}`} />
-                    </div>
+                <div id="Window" className="w-[1000px] text-white bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+                    <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
+                        <ImageCarousel/>
+                        <div className="mx-[14%] my-[10%]">
+                            <h1 className="text-4xl mb-3">Login</h1>
 
-                    <form onSubmit={handleSubmit}>
-                        {/* Username Field */}
-                        <label htmlFor="username" className="block mb-1">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            required
-                            minLength="2"
-                            placeholder="Enter your username"
-                            className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                            onChange={(e) => setUsername(e.target.value)}
-                            value={username}
-                        />
+                            <span>Don't have an account yet? </span>
+                            <a className={"text-ui-subtle underline hover:cursor-pointer"}
+                               onClick={() => navigate('/register')}>Sign up</a>
 
-                        {/* Password Field */}
-                        <label htmlFor="password" className="block">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            required
-                            minLength="10"
-                            placeholder="Enter your password"
-                            className="w-full border-white border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                            onChange={(e) => setPassword(e.target.value)}
-                            value={password}
-                        />
+                            <form onSubmit={handleSubmit}>
+                                {/* Username Field */}
+                                <label htmlFor="username" className="block mb-1 mt-6">Username</label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    required
+                                    minLength="2"
+                                    className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    value={username}
+                                />
 
-                        {/* Conditionally render error message */}
-                        {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
+                                {/* Password Field */}
+                                <label htmlFor="password" className="block">Password</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    minLength="10"
+                                    className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={password}
+                                />
 
-                        <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
-                            <div className={"flex justify-center"}>
+                                <a className={"text-ui-subtle text-xs underline hover:cursor-pointer"}
+                                   onClick={() => navigate('/register')}>Forgot your password?</a>
+
+                                {/* Conditionally render error message */}
+                                {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
+
                                 {/* Sign-in Button */}
                                 <input
                                     type={"submit"}
                                     id="sign-up"
-                                    className="btn"
+                                    className="btn w-full mt-10"
                                     value="Sign in"
                                 >
                                 </input>
-                            </div>
-                            <div className={"flex justify-center"}>
-                                {/* Register Button*/}
-                                <button
-                                    id="register"
-                                    className={"btn"}
-                                >
-                                    Register
-                                </button>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         );

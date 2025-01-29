@@ -11,8 +11,10 @@ module.exports = {
         "primary":"#6B439B",
         "secondary":"#8869AD",
         "primary-hover":"#5A3382",
-        "website-bg":"#202020",
-        "ui-bg":"#303030"
+        "website-bg":"#101012",
+        "ui-bg":"#17181B",
+        "ui-border":"#2D3036",
+        "ui-subtle":"#6D54B5"
       },
     },
   },
@@ -20,7 +22,7 @@ module.exports = {
     function ({ addComponents }) {
       addComponents({
         '.btn': {
-          '@apply hover:bg-primary-hover mx-auto bg-primary font-bold py-2 px-4 rounded-full':{},
+          '@apply hover:bg-primary-hover mx-auto bg-primary font-bold py-2 px-4 rounded-lg':{},
           transition: 'background-color 0.2s ease',
         },
       });
