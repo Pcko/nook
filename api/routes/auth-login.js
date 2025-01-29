@@ -8,33 +8,37 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   const data = req.body; // Extract data from the request body
 
-  if (!data || !'username' in data || !'password' in data) {
+  if (!data || !('username' in data) || !('password' in data)) {
     return res.sendStatus(400);
   }
 
 
-  let usercollection = await db.collection('users');
-  let result = await usercollection.findOne({ username: data.username });
+  const userCollection = await db.collection('users');
+  const userResult = await userCollection.findOne({ username: data.username });
 
-  if (!result) {
+  if (!userResult) {
     return res.status(403).send({ message: 'Username or password is invalid!' });
   }
 
-  const match = await bcrypt.compare(data.password, result.password);
+  const match = await bcrypt.compare(data.password, userResult.password);
 
   if (!match) {
     return res.status(403).send({ message: 'Username or password is invalid!' });
   }
 
 
-  let userid = result._id;
+  const userid = userResult._id;
   const user = { id: userid };
 
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 30 * 60 }); //valid for 30min after creation
   const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
-  let tokenCollection = await db.collection('refreshTokens');
-  result = await tokenCollection.insertOne({ token: refreshToken });
+  const tokenCollection = await db.collection('refreshTokens');
+  const tokenResult = await tokenCollection.insertOne({ token: refreshToken });
+
+  if (!tokenResult) {
+    return res.sendStatus(500);
+  }
 
   res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken });
 });
@@ -47,16 +51,16 @@ router.get('/token', async (req, res) => {
     return res.sendStatus(400);
   }
 
-  let tokenCollection = await db.collection('refreshTokens');
-  let result = await tokenCollection.findOne({ token: refreshToken });
+  const tokenCollection = await db.collection('refreshTokens');
+  const tokenResult = await tokenCollection.findOne({ token: refreshToken });
 
-  if (!result) {
+  if (!tokenResult) {
     return res.status(403);
   }
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     }
 
     const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 30 * 60 }); //valid for 30min after creation

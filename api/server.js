@@ -6,7 +6,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
 
-import authToken from './routes/auth-token.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,9 +21,6 @@ app.use(express.static(clientPath));
 
 import loginRoute from './routes/auth-login.js';
 app.use('/api', loginRoute); //<-- login authenticator route
-
-import tempRoute from './routes/temp.js'
-app.use('/temp', tempRoute); //<-- data serve route (Name pending)
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
