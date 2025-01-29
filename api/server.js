@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
