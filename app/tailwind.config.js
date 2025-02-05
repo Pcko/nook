@@ -11,10 +11,13 @@ module.exports = {
         "primary":"#6B439B",
         "secondary":"#8869AD",
         "primary-hover":"#5A3382",
+        "text-subtle":"#949597",
+        "far-bg":"#090909",
         "website-bg":"#101012",
         "ui-bg":"#17181B",
         "ui-border":"#2D3036",
-        "ui-subtle":"#6D54B5"
+        "ui-subtle":"#6D54B5",
+        "text":"#FFFFFF"
       },
     },
   },

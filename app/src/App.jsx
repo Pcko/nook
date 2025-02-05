@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-d
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Registration"
 import Dashboard from "./components/general/Dashboard"
+import Settings from "./components/settings/Settings";
 
 import './index.css';
 
@@ -14,12 +15,13 @@ function App() {
     <DndProvider backend={HTML5Backend}>
       <Router>
         <div className={'h-full'}>
-          <main className={'h-full'}>
+          <main className={'h-full bg-far-bg'}>
             <Routes>
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register/>} />
               <Route path="/dashboard" element={<Dashboard/>} />
+              <Route path="/settings" element={<Settings/>} />
             </Routes>
           </main>
         </div>
