@@ -6,6 +6,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
 
+import './database/connection.js'; //<-- database connection script
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,5 +30,5 @@ app.get('*', (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log('Server deployed at: ' + PORT);
+    console.log('✅Server deployed at: ' + PORT);
 });
