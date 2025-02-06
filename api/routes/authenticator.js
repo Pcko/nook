@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 
 import User from '../database/models/user-schema.js';
-//import RefreshToken from '../database/models/refreshToken-schema.js'; <-- NOT IMPLEMENTED (WIP)
+import RefreshToken from '../database/models/refreshToken-schema.js';
 
 const router = express.Router();
 
@@ -13,31 +13,38 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body; // Extract data from the request body
 
+    //make sure request body is not invalid
     if (!username || !password) {
       return res.sendStatus(400);
     }
 
 
-    const userResult = await User.findOne({ username }).lean();
+    //get user from the database
+    const userResult = await User.findOne({ _id: username }).lean();
 
     if (!userResult) {
       return res.status(403).send({ message: 'Username or password is invalid!' });
     }
 
+    //validate the password
     const match = await bcrypt.compare(password, userResult.password);
-
     if (!match) {
       return res.status(403).send({ message: 'Username or password is invalid!' });
     }
 
 
+    //create tokens for authentication
     const userid = userResult._id;
     const user = { id: userid };
 
     const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
     const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
-    //await RefreshToken.create({ token: refreshToken }); <-- NOT IMPLEMENTED (WIP)
+    //write refreshToken to the database
+    await RefreshToken.create({
+      _id: userid,
+      token: refreshToken,
+    });
 
     res.status(200).json({ accessToken, refreshToken });
   }
@@ -58,13 +65,13 @@ router.post('/register', async (req, res) => {
       return res.sendStatus(400);
     }
 
-    //search for username in db
+    //make sure username is not already used
     const userExists = await User.findOne({ _id: username }).lean();
     if (userExists) {
       return res.status(409).send({ message: 'This username is not available' });
     }
 
-    //create new user and inserting new user into db
+    //create new user and insert new user into the database
     await User.create({
       _id: username,
       username,
@@ -91,7 +98,7 @@ router.get('/token', async (req, res) => {
       return res.sendStatus(400);
     }
 
-    const tokenExists = await RefreshToken.findOne({ token: refreshToken }); //<-- NOT IMPLEMENTED (WIP)
+    const tokenExists = await RefreshToken.findOne({ token: refreshToken }).lean();
     if (!tokenExists) {
       return res.status(403);
     }
