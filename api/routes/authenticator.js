@@ -100,7 +100,7 @@ router.get('/token', async (req, res) => {
 
     const tokenExists = await RefreshToken.findOne({ token: refreshToken }).lean();
     if (!tokenExists) {
-      return res.status(403);
+      return res.sendStatus(403);
     }
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

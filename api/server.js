@@ -3,10 +3,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 
+import './database/connection.js'; //<-- database connection script
+import authRoute from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
+
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
-
-import './database/connection.js'; //<-- database connection script
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,9 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(clientPath));
 
-
-import authRoute from './routes/authenticator.js';
-app.use('/auth', authRoute); //<-- account authenticator route (incl. registration)
+app.use('/auth', authRoute);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));

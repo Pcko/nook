@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
@@ -6,7 +6,7 @@ dotenv.config({ path: './config.env' });
 const dbName = 'NookTestDB'; //change inbetween NookDB and NookTestDB to switch.
 const uri = process.env.ATLAS_URI;
 if (!uri) {
-    console.error('❌Environment variable missing!');
+    throw new Error('❌Environment variable missing!');
 }
 
 (async () => {
@@ -15,7 +15,6 @@ if (!uri) {
             console.log('✅Connected to database.');
         })
         .catch((err) => {
-            console.error('❌Database connection error:', err);
-            process.exit(1);
+            throw new Error('❌Database connection error:', err);
         })
 })();
