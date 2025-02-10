@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
     res.status(200).json({ user: userResult, accessToken, refreshToken });
   }
   catch (e) {
-    console.error("❌Login error:", e);
+    console.error("❌ Login error:", e);
     return res.sendStatus(500);
   }
 });
@@ -88,7 +88,7 @@ router.post('/register', async (req, res) => {
     res.sendStatus(201);
   }
   catch (e) {
-    console.error("❌Registration error:", e);
+    console.error("❌ Registration error:", e);
     return res.sendStatus(500);
   }
 });
@@ -118,7 +118,7 @@ router.get('/token', async (req, res) => {
     })
   }
   catch (e) {
-    console.error("❌Refresh token error:", e);
+    console.error("❌ Refresh token error:", e);
     return res.sendStatus(500);
   }
 });
