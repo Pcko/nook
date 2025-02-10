@@ -41,10 +41,14 @@ router.post('/login', async (req, res) => {
     const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
     //write refreshToken to the database
-    await RefreshToken.create({
-      _id: userid,
-      token: refreshToken,
-    });
+    const refreshTokenResult = await RefreshToken.findOne({ _id: userid })
+
+    if(!refreshTokenResult){
+      await RefreshToken.create({
+        _id: userid,
+        token: refreshToken,
+      });
+    }
 
     res.status(200).json({ user: userResult, accessToken, refreshToken });
   }
