@@ -19,10 +19,10 @@ function Registration() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        try{
+        try {
             setLoading(true);
 
-            const response = await axios.post('/api/register', {
+            const response = await axios.post('/auth/register', {
                 username,
                 password,
                 firstName,
@@ -40,22 +40,22 @@ function Registration() {
                 console.log('Account creation was successful! ', response.message);
                 navigate('/login');
             }
-        }catch(err){
+        } catch (err) {
             setErrorDisplay(err.message);
         }
-        finally{
+        finally {
             setLoading(false);
         }
     }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <BackgroundText/>
+            <BackgroundText />
             <div id="Window" className="min-h-[650] w-[1000px] p-3 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
 
                 <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
-                    <ImageCarousel/>
+                    <ImageCarousel />
                     <div className={"m-[10%]"}>
                         <h1 className="text-3xl mb-2">Create an Account</h1>
 
@@ -115,7 +115,7 @@ function Registration() {
                                     />
                                 </div>
                             </div>
- 
+
 
                             {/* Email Field */}
                             <label htmlFor="email" className="block mb-1">Email</label>
@@ -137,7 +137,7 @@ function Registration() {
                                 className={"mr-2"}
                             />
                             I agree to the <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                                              onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
+                                onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
 
                             {/* Conditionally show error message */}
                             {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
@@ -147,14 +147,13 @@ function Registration() {
                                 className={`btn w-full mt-3 ${loading ? 'animate-spin' : ''}`}
                                 value="Register"
                             >
-                        </input>
-                    </form>
+                            </input>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
-)
-    ;
+    );
 }
 
 export default Registration;

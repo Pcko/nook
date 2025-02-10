@@ -1,35 +1,20 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import mongoose from 'mongoose';
 
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
 
+const dbName = 'NookTestDB'; //change inbetween NookDB and NookTestDB to switch.
 const uri = process.env.ATLAS_URI;
 if (!uri) {
-    console.error('Environment variable missing!');
+    throw new Error('❌Environment variable missing!');
 }
 
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true
-    },
-});
-
 (async () => {
-    try {
-        // Connect the client to the server
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log(
-            "Pinged your deployment. You successfully connected to MongoDB!"
-        );
-    } catch (err) {
-        console.error(err);
-    }
-})()
-
-const db = client.db("NookTestDB"); //change inbetween NookDB and NookTestDB to switch.
-
-export default db;
+    mongoose.connect(uri, { dbName })
+        .then(() => {
+            console.log('✅Connected to database.');
+        })
+        .catch((err) => {
+            throw new Error('❌Database connection error:', err);
+        })
+})();
