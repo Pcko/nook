@@ -40,15 +40,12 @@ router.post('/login', async (req, res) => {
     const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
     const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
-    //write refreshToken to the database
-    const refreshTokenResult = await RefreshToken.findOne({ _id: userid })
-
-    if(!refreshTokenResult){
-      await RefreshToken.create({
-        _id: userid,
-        token: refreshToken,
-      });
-    }
+    //delete any old token and write new refreshToken to the database
+    await RefreshToken.findByIdAndDelete(userid);
+    await RefreshToken.create({
+      _id: userid,
+      token: refreshToken,
+    });
 
     res.status(200).json({ user: userResult, accessToken, refreshToken });
   }
@@ -104,18 +101,12 @@ router.get('/token', async (req, res) => {
 
     const tokenExists = await RefreshToken.findOne({ token: refreshToken }).lean();
     if (!tokenExists) {
-      return res.sendStatus(403);
+      return res.status(401).json({error: 'invalid_token'});
     }
 
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(401);
-      }
+    const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
 
-      const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
-
-      res.status(200).json({ accessToken });
-    })
+    res.status(200).json({ accessToken });
   }
   catch (e) {
     console.error("❌ Refresh token error:", e);
