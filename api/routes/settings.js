@@ -2,28 +2,30 @@ import express from 'express';
 
 const router = express.Router();
 
-router.patch('/user', async (req, res) => {
+router.patch('/', async (req, res) => {
     try {
-        const body = req.body;
-    
-        //make sure request body is not invalid
-        if (!body.username) {
-          return res.sendStatus(400);
-        }
+        const {account} = req.body;
 
-        //find user and alter the corresponding userdata
-        const user = await User.findOne({ _id: body.username });
-        Object.keys(body).forEach(key => {
-            if(key !== 'username'){
-                user[key] = body[key];
+        if(account){
+            //make sure request body is not invalid
+            if (!account.username) {
+              return res.sendStatus(400);
             }
-        });
-        user.save();
+    
+            //find user and alter the corresponding userdata
+            const user = await User.findOne({ _id: account.username });
+            Object.keys(account).forEach(key => {
+                if(key !== 'username'){
+                    user[key] = account[key];
+                }
+            });
+            user.save();
+        }
 
         res.sendStatus(200);
       }
       catch (e) {
-        console.error("❌ Alter user error:", e);
+        console.error("❌ Alter settings error:", e);
         return res.sendStatus(500);
       }
 })
