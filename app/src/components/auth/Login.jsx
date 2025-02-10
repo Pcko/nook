@@ -51,7 +51,7 @@ function Login() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText />
-            <div id="Window" className="w-[1000px] text-white bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+            <div id="Window" className="w-[1000px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
                 <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
                     <ImageCarousel />
                     <div className="mx-[14%] my-[10%]">
@@ -70,7 +70,7 @@ function Login() {
                                 name="username"
                                 required
                                 minLength="2"
-                                className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                                 onChange={(e) => setUsername(e.target.value)}
                                 value={username}
                             />
@@ -83,7 +83,7 @@ function Login() {
                                 name="password"
                                 required
                                 minLength="10"
-                                className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg"
+                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg"
                                 onChange={(e) => setPassword(e.target.value)}
                                 value={password}
                             />

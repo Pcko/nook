@@ -8,16 +8,18 @@ module.exports = {
   theme: {
     extend: {
       colors:{
-        "primary":"#6B439B",
-        "secondary":"#8869AD",
-        "primary-hover":"#5A3382",
-        "text-subtle":"#949597",
-        "far-bg":"#090909",
-        "website-bg":"#101012",
-        "ui-bg":"#17181B",
-        "ui-border":"#2D3036",
-        "ui-subtle":"#6D54B5",
-        "text":"#FFFFFF"
+        "primary": "var(--primary)",
+        "secondary": "var(--secondary)",
+        "primary-hover": "var(--primary-hover)",
+        "text-subtle": "var(--text-subtle)",
+        "far-bg": "var(--far-bg)",
+        "website-bg": "var(--website-bg)",
+        "ui-bg": "var(--ui-bg)",
+        "ui-bg-selected": "var(--ui-bg-selected)",
+        "ui-border": "var(--ui-border)",
+        "ui-border-selected": "var(--ui-border-selected)",
+        "ui-subtle": "var(--ui-subtle)",
+        "text": "var(--text)"
       },
     },
   },
