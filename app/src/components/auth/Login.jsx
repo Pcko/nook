@@ -33,6 +33,12 @@ function Login() {
             if (response.status >= 200 && response.status < 300) {
                 console.log('Request was successful', response.data);
 
+                sessionStorage.setItem('accessToken', response.data.accessToken);
+                sessionStorage.setItem('refreshToken', response.data.refreshToken);
+                for(let setting in response.data.user){
+                    sessionStorage.setItem(setting, response.data.user[setting]);
+                }
+
                 // username, password und errorDisplay zurücksetzen, sobald der Login-Screen verlassen wird
                 setUsername('');
                 setPassword('');

@@ -5,30 +5,29 @@ import AccountSettings from "./AccountSettings";
 import AppearanceSettings from "./AppearanceSettings";
 import SecuritySettings from "./SecuritySettings";
 
-function fetchSettings() {
+function loadSettings() {
     // add axios request here
 
-    const response = {
+    const settings = {
         'account':{
-            'username':'güntherG',
-            'firstName':'Günther',
-            'lastName':'Gesund',
-            'email':'guenther.gesund@gmail.com',
+            'username':sessionStorage.getItem('username'),
+            'firstName':sessionStorage.getItem('firstName'),
+            'lastName':sessionStorage.getItem('lastName'),
+            'email':sessionStorage.getItem('email'),
         },
         'appearance':{
-            'theme':'dark',
-            'accessibility':'placeholder',
+            'accessibility':localStorage.getItem('accessibility') || 'normal',
         },
     }
 
-    return response;
+    return settings;
 }
 
 function Settings() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('account');
 
-    const originalSettings = fetchSettings();
+    const originalSettings = loadSettings();
     const [changes, setChanges] = useState({});
 
     const handleSettingsChange = (category, setting, data) => {
