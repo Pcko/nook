@@ -6,13 +6,20 @@ import darkThemeIcon from '../../assets/resources/icons/dark-theme.jpg';
 import lightThemeIcon from '../../assets/resources/icons/light-theme.jpg';
 
 function AppearanceSettings({changeHandler, options}){
-    const {accessibility:originalAccessibility, theme:originalTheme} = options;
+    const {accessibility:originalAccessibility} = options;
+    const originalTheme = localStorage.getItem('theme') || 'system';
     const [selectedTheme, setSelectedTheme] = useState(originalTheme);
+    const handleThemeChange = (selectedOption) => {
+        setSelectedTheme(selectedOption);
+        //changeHandler('theme', selectedOption);
 
-    const handleThemeChange = (event) => {
-        const selectedOption = event.target.value;
-        setSelectedTheme(selectedOption); // Update the selected value
-        changeHandler('theme', selectedOption); // Call changeHandler with 'theme' and the selected value
+        localStorage.setItem('theme', selectedOption);
+
+        if(selectedOption === 'light' || (selectedOption === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)){
+            document.documentElement.classList.add('light');
+        }else{
+            document.documentElement.classList.remove('light');
+        }
     };
 
     return (
@@ -24,32 +31,32 @@ function AppearanceSettings({changeHandler, options}){
                 <h2 className="mb-3">Interface Theme</h2>
 
                 <div className="grid grid-cols-3 mx-10">
-                    <img src={systemThemeIcon} onClick={()=>{setSelectedTheme('system'); changeHandler('theme', 'system');}}/>
-                    <img src={darkThemeIcon} onClick={()=>{setSelectedTheme('dark'); changeHandler('theme', 'dark');}}/>
-                    <img src={lightThemeIcon} onClick={()=>{setSelectedTheme('light'); changeHandler('theme', 'light');}}/>
+                    <img src={systemThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('system')}}/>
+                    <img src={darkThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('dark')}}/>
+                    <img src={lightThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('light')}}/>
 
-                    <label>
+                    <label className="w-10/12 m-auto">
                         <input type="radio"
                                value="system"
-                               onChange={handleThemeChange}
+                               onChange={(e)=>{handleThemeChange(e.target.value)}}
                                checked={selectedTheme === 'system'}
                                className="mr-1"
                         />
                         System
                     </label>
-                    <label>
+                    <label className="w-10/12 m-auto">
                         <input type="radio"
                                value="dark"
-                               onChange={handleThemeChange}
+                               onChange={(e)=>{handleThemeChange(e.target.value)}}
                                checked={selectedTheme === 'dark'}
                                className="mr-1"
                         />
                         Dark
                     </label>
-                    <label>
+                    <label className="w-10/12 m-auto">
                         <input type="radio"
                                value="light"
-                               onChange={handleThemeChange}
+                               onChange={(e)=>{handleThemeChange(e.target.value)}}
                                checked={selectedTheme === 'light'}
                                className="mr-1"
                         />
