@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import './database/connection.js'; //<-- database connection script
 import authRoute from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
+import settingsRoute from './routes/settings.js';
 
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(express.static(clientPath));
 
 app.use('/auth', authRoute);
+app.use('/api/settings', settingsRoute);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
@@ -29,5 +31,5 @@ app.get('*', (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log('✅Server deployed at: ' + PORT);
+    console.log('✅ Server deployed at: ' + PORT);
 });
