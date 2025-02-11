@@ -4,7 +4,7 @@
 <api> npm i
 <app> npm i
 <app> npm run build
-<api> npm run prod
+<api> npm run start
 
 #DEV
 <app> npm i
