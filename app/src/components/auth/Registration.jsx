@@ -2,7 +2,7 @@ import BackgroundText from "../general/NookBackground"
 import logo from "../../assets/resources/image.png"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
 
 

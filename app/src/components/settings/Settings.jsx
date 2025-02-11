@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import AccountSettings from "./AccountSettings";
 import AppearanceSettings from "./AppearanceSettings";
 import SecuritySettings from "./SecuritySettings";
+import axios from "../auth/AxiosInstance";
 
 function loadSettings() {
-    // add axios request here
-
     const settings = {
         'account':{
             'username':sessionStorage.getItem('username'),
@@ -38,7 +37,35 @@ function Settings() {
                 [setting]: data,
             }
         }));
-    }
+    };
+
+    const applyChanges = async()=>{
+        // this loop removes any values in changes that are the same as the original
+        for (const category in changes) {
+            for (const settingKey in changes[category]) {
+                if(changes[category][settingKey] === originalSettings[category][settingKey]){
+                    delete changes[category][settingKey];
+                    if(Object.keys(changes[category]).length===0){
+                        delete changes[category];
+                    }
+                }
+            }
+        }
+
+        console.log(changes)
+
+        if(Object.keys(changes).length===0){
+            console.log('nothing to save');
+            return;
+        }
+
+        const accessToken = sessionStorage.getItem('accessToken');
+        const refreshToken = sessionStorage.getItem('refreshToken');
+        const response = await axios.patch(
+            '/api/settings',
+            changes
+        );
+    };
 
     const settingsHaveChanges = () => {
         for (const category in changes) {
@@ -54,7 +81,7 @@ function Settings() {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'account':
-                return <AccountSettings options={originalSettings['account']} changeHandler={(setting, data) => handleSettingsChange('account', setting, data)}/>;
+                return <AccountSettings options={{...originalSettings['account'], ...changes['account']}} changeHandler={(setting, data) => handleSettingsChange('account', setting, data)}/>;
             case 'appearance':
                 return <AppearanceSettings options={originalSettings['appearance']} changeHandler={(setting, data) => handleSettingsChange('appearance', setting, data)}/>;
             case 'security':
@@ -66,13 +93,6 @@ function Settings() {
 
     return(
         <div>
-            {settingsHaveChanges() ?
-                <div className="absolute py-1 px-3 bottom-2 left-1/2 transform -translate-x-1/2 bg-ui-bg rounded-lg border-[1px] border-ui-border">
-                    <div className="mb-2 text-text">You have unsaved changes!</div>
-                    <div className="btn text-center">Save</div>
-                </div>
-                : ''}
-
             <div className="ml-[5%] grid grid-cols-[20%_80%] gap-[2vw] text-text">
                 <div className="w-full min-h-[100vh] py-[15vh]">
                     <div
@@ -122,7 +142,19 @@ function Settings() {
                     </div>
                 </div>
                 <div className="w-full min-h-[100vh] px-[15%] py-[15vh] bg-website-bg border-l-ui-border border-l-[1px] ">
-                    {renderTabContent()}
+                    <form>
+                        {renderTabContent()}
+                        {settingsHaveChanges() ?
+                            <div className="absolute h-[60px] py-1 px-3 bottom-2 left-1/2 transform -translate-x-1/2 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
+                                <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
+                                <input type="submit"
+                                       className="btn text-center h-3/4 my-auto"
+                                       onClick={applyChanges}
+                                       value="Save"
+                                />
+                            </div>
+                            : ''}
+                    </form>
                 </div>
             </div>
         </div>
