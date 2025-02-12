@@ -1,0 +1,21 @@
+.box-block {
+    padding: 24px;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.custom-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white; 
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.custom-button:hover {
+    background-color: #38803c;
+}
