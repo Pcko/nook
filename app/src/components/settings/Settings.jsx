@@ -39,7 +39,9 @@ function Settings() {
         }));
     };
 
-    const applyChanges = async()=>{
+    const applyChanges = async(e)=>{
+        e.preventDefault();
+
         // this loop removes any values in changes that are the same as the original
         for (const category in changes) {
             for (const settingKey in changes[category]) {
@@ -52,19 +54,24 @@ function Settings() {
             }
         }
 
-        console.log(changes)
-
         if(Object.keys(changes).length===0){
             console.log('nothing to save');
             return;
         }
 
-        const accessToken = sessionStorage.getItem('accessToken');
-        const refreshToken = sessionStorage.getItem('refreshToken');
-        const response = await axios.patch(
-            '/api/settings',
-            changes
-        );
+        try{
+            const response = await axios.patch(
+                '/api/settings',
+                changes
+            );
+
+            if(response.status===200 || true){
+                console.log('settings have been changed');
+                setChanges({});
+            }
+        }catch(e){
+            console.log(e.status)
+        }
     };
 
     const settingsHaveChanges = () => {
@@ -142,14 +149,13 @@ function Settings() {
                     </div>
                 </div>
                 <div className="w-full min-h-[100vh] px-[15%] py-[15vh] bg-website-bg border-l-ui-border border-l-[1px] ">
-                    <form>
+                    <form onSubmit={applyChanges}>
                         {renderTabContent()}
                         {settingsHaveChanges() ?
                             <div className="absolute h-[60px] py-1 px-3 bottom-2 left-1/2 transform -translate-x-1/2 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
                                 <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
                                 <input type="submit"
                                        className="btn text-center h-3/4 my-auto"
-                                       onClick={applyChanges}
                                        value="Save"
                                 />
                             </div>

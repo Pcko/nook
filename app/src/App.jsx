@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Registration"
+import ProtectedRoute from "./components/auth/ProtectedRoute"
+import AuthRedirect from "./components/general/AuthRedirect";
 import Dashboard from "./components/general/Dashboard"
 import Settings from "./components/settings/Settings";
 
@@ -19,6 +21,12 @@ function App() {
     if(theme === 'light' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)){
       document.documentElement.classList.add('light');
     }
+
+    const accessibilityMode = localStorage.getItem('accessibility');
+
+    if(accessibilityMode === 'high-contrast'){
+      document.documentElement.classList.add('high-contrast');
+    }
   }, [])
 
   return (
@@ -27,11 +35,14 @@ function App() {
         <div className={'h-full'}>
           <main className={'h-full bg-far-bg'}>
             <Routes>
-              <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/" element={<AuthRedirect/>}/>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register/>} />
-              <Route path="/dashboard" element={<Dashboard/>} />
-              <Route path="/settings" element={<Settings/>} />
+
+              <Route element={<ProtectedRoute/>}>
+                <Route path="/settings" element={<Settings/>} />
+                <Route path="/dashboard" element={<Dashboard/>} />
+              </Route>
             </Routes>
           </main>
         </div>

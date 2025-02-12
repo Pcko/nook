@@ -27,3 +27,18 @@
     --ui-subtle: #A99CD9;
     --text: #2E2E2E;
 }
+
+.high-contrast {
+    --primary: #FF0000 !important;
+    --secondary: #FFFF00 !important;
+    --primary-hover: #00FF00 !important;
+    --text-subtle: #FFFFFF !important;
+    --far-bg: #000000 !important;
+    --website-bg: #000000 !important;
+    --ui-bg: #000000 !important;
+    --ui-bg-selected: #FF0000 !important;
+    --ui-border: #FFFFFF !important;
+    --ui-border-selected: #00FF00 !important;
+    --ui-subtle: #FFFF00 !important;
+    --text: #FFFFFF !important;
+}
