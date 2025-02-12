@@ -1,15 +1,15 @@
-import Login from "./components/auth/Login";
-import VisualEditor from "./components/node-editor/VisualEditor";
-import './index.css';
-
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import WebsiteBuilder from "./components/website-builder/WebsiteBuilder";
+import NodeEditor from "./components/node-editor/NodeEditor";
 function App() {
-  return (
-    <div className={'h-full'}>
-      <main className={'h-full'}>
-        <VisualEditor/>
-      </main>
-    </div>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<WebsiteBuilder/>}/>
+                <Route path="/editor/:element" element={<NodeEditor/>}/>
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

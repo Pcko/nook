@@ -1,0 +1,198 @@
+.GrapesJsApp {
+    background-color: #f4f4f4;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+
+    .Editor {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        width: 100%;
+
+        .TopPanel {
+            width: 100%;
+            background-color: #292929;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            justify-content: space-between;
+        }
+
+        .clear-canvas-button {
+            background-color: #5C40AD;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 12px;
+            margin-right: 31px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .clear-canvas-button:hover {
+            background-color: #e04343;
+        }
+
+        .top-button {
+            background-color: #3c3c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 5px;
+            margin-right: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .top-button:hover {
+            background-color: #464545;
+        }
+
+        .top-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .device-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .top-button,
+        .device-button {
+            background-color: #292929;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .top-button:hover,
+        .device-button:hover {
+            background-color: #5C40AD;
+        }
+
+
+        .MainContent {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: hidden;
+
+            #gjs {
+                flex: 5;
+                height: 100vh;
+                background-color: #ffffff;
+            }
+
+            #blocks {
+                flex: 1;
+                padding: 16px;
+                background-color: #292929;
+                color: white;
+                border-top: #454545 solid 2px;
+                overflow-y: auto;
+
+                scrollbar-width: thin;
+                scrollbar-color: #555 transparent; 
+            }
+
+            #blocks::-webkit-scrollbar {
+                width: 6px; 
+            }
+            
+            #blocks::-webkit-scrollbar-thumb {
+                background: #555; 
+                border-radius: 3px;
+            }
+            
+            #blocks::-webkit-scrollbar-thumb:hover {
+                background: #777; 
+            }
+            
+            #blocks::-webkit-scrollbar-track {
+                background: transparent; 
+            }
+
+
+            #right-panel {
+                flex: 1;
+                padding: 16px;
+                background-color: #292929;
+                overflow-y: auto;
+                border-top: #454545 solid 2px;
+            }
+        }
+
+        .gjs-cv-canvas {
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent !important;
+        }
+
+        .gjs-frame {
+            background-color: #ffffff !important;
+        }
+
+
+
+
+        #blocks .gjs-block {
+            background-color: #1a1a1a; /* Darker background for individual blocks */
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        #blocks .gjs-block:hover {
+            background-color: #5C40AD;
+            transform: scale(1.03);
+        }
+        
+        #blocks .gjs-block-label {
+            color: #ffffff;
+        }
+        
+        #blocks .gjs-block-category {
+            padding: 8px;
+            background-color: #292929;
+            color: white;
+            border-radius: 3px;
+            text-transform: uppercase;
+            font-size: 12px;
+            border: none;
+        }
+
+
+
+
+
+
+
+
+
+    .gjs-toolbar {
+        background-color: #5C40AD;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    }
+}
