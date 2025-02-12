@@ -31,5 +31,5 @@ app.get('*', (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log('✅ Server deployed at: ' + PORT);
+    console.log('✅ Server deployed at: http://localhost:' + PORT);
 });
