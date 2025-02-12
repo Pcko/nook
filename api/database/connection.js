@@ -15,6 +15,6 @@ if (!uri) {
             console.log('✅ Connected to database.');
         })
         .catch((err) => {
-            throw new Error('❌ Database connection error:', err);
+            throw new Error('❌ Database connection error: ', err);
         })
 })();
