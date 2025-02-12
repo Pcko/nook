@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-function authenicateToken(req, res, next) {
+function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -10,7 +10,7 @@ function authenicateToken(req, res, next) {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
-            return res.status(401).json({error: 'invalid_token'});
+            return res.status(401).json({ error: 'invalid_token' });
         };
         req.user = user;
         next();

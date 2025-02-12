@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 
 import './database/connection.js'; //<-- database connection script
+import authenticateToken from './routes/auth-token.js';
 import authRoute from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRoute from './routes/settings.js';
 
@@ -23,7 +24,7 @@ app.use(express.json());
 app.use(express.static(clientPath));
 
 app.use('/auth', authRoute);
-app.use('/api/settings', settingsRoute);
+app.use('/api/settings', authenticateToken, settingsRoute);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
