@@ -101,18 +101,18 @@ function Settings() {
     return(
         <div>
             <div className="ml-[5%] grid grid-cols-[20%_80%] gap-[2vw] text-text">
-                <div className="w-full min-h-[100vh] py-[15vh]">
+                <div className="w-full min-h-[100vh] py-[10vh]">
                     <div
                         className="flex items-center mb-8 p-2 cursor-pointer text-text-subtle"
                         onClick={() => navigate('/dashboard')}>
-                        <div className="h-5 mr-1">
+                        <div className="h-6 mr-1">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                                  stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
                             </svg>
                         </div>
 
-                        <span className="my-auto">back to dashboard</span>
+                        <span className="my-auto">Back To App</span>
                     </div>
                     <div
                         className={`flex items-center w-full mb-5 p-2 cursor-pointer rounded ${activeTab === 'account' ? 'bg-ui-bg-selected' : 'bg-transparent'}`}
@@ -148,11 +148,11 @@ function Settings() {
                         <span>Security</span>
                     </div>
                 </div>
-                <div className="w-full min-h-[100vh] px-[15%] py-[15vh] bg-website-bg border-l-ui-border border-l-[1px] ">
-                    <form onSubmit={applyChanges}>
+                <div className="w-full h-screen px-[15%] py-[10vh] bg-website-bg border-l-ui-border border-l-[1px] ">
+                    <form onSubmit={applyChanges} className="h-full">
                         {renderTabContent()}
                         {settingsHaveChanges() ?
-                            <div className="absolute h-[60px] py-1 px-3 bottom-2 left-1/2 transform -translate-x-1/2 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
+                            <div className="absolute h-[60px] py-1 px-3 top-5 right-5 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
                                 <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
                                 <input type="submit"
                                        className="btn text-center h-3/4 my-auto"

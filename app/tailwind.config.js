@@ -19,7 +19,8 @@ module.exports = {
         "ui-border": "var(--ui-border)",
         "ui-border-selected": "var(--ui-border-selected)",
         "ui-subtle": "var(--ui-subtle)",
-        "text": "var(--text)"
+        "text": "var(--text)",
+        "dangerous": "var(--dangerous)",
       },
     },
   },

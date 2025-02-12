@@ -84,7 +84,7 @@ function AppearanceSettings({changeHandler, options}){
                     <h2>Accessibility</h2>
                     <select defaultValue={originalAccessibility}
                             onChange={(e)=>handleAccessibilityModeChange(e.target.value)}
-                            className="w-1/2 ml-auto mr-0 p-1 rounded text-white text-center bg-ui-bg border-ui-border border-[1px]">
+                            className="w-1/2 ml-auto mr-0 p-1 rounded text-text text-center bg-ui-bg border-ui-border border-[1px]">
                         <option value="normal">Normal</option>
                         <option value="high-contrast">High Contrast</option>
                     </select>
