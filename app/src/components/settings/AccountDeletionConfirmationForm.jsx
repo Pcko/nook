@@ -23,7 +23,7 @@ function AccountDeletionConfirmationForm(){
               <input
                   type="button"
                   value="Cancel"
-                  className="btn hover:bg-ui-bg-selected bg-ui-border w-[35%] ml-[25%]"
+                  className="btn hover:bg-ui-button-hover bg-ui-button border-ui-border border-[1px] w-[35%] ml-[25%]"
               />
               <input
                   type="button"

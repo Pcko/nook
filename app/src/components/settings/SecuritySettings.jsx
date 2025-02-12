@@ -68,7 +68,7 @@ function SecuritySettings({changeHandler}){
 
                     <div className="my-auto">Two-factor authentication</div>
 
-                    <div className="btn bg-ui-border ml-auto mr-0">coming soon...</div>
+                    <div className="btn bg-ui-button border-[1px] border-ui-border ml-auto mr-0">coming soon...</div>
                 </div>
             </form>
         </div>
