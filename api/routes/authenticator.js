@@ -47,7 +47,15 @@ router.post('/login', async (req, res) => {
       token: refreshToken,
     });
 
-    return res.status(200).json({ user: user, accessToken, refreshToken });
+    //create new user to return for settings
+    const newUser = {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    }
+
+    return res.status(200).json({ newUser, accessToken, refreshToken });
   }
   catch (e) {
     console.error("❌ Login error: ", e);
@@ -89,40 +97,6 @@ router.post('/register', async (req, res) => {
     return res.sendStatus(500);
   }
 });
-
-// ACCOUNT DELETION REQUEST
-router.delete('/deleteuser', async (req, res) => { // add token middleware?
-  try {
-    const { username, password } = req.body;
-
-    //make sure request body has all required information
-    if (![username, password].every(Boolean)) {
-      return res.sendStatus(400);
-    }
-
-
-    const user = await User.findOne({ _id: username });
-
-    //make sure username exists
-    if (!user) {
-      return res.sendStatus(404);
-    }
-
-    //validate password
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(403).send({ message: 'Password is invalid!' });
-    }
-
-    await user.deleteOne();
-
-    return res.sendStatus(200);
-  }
-  catch (e) {
-    console.error("❌ Account deletion error: ", e);
-    return res.sendStatus(500);
-  }
-})
 
 // REFRESH TOKEN REQUEST
 router.get('/token', async (req, res) => {
