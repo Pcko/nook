@@ -2,13 +2,15 @@ import axios from '../auth/AxiosInstance';
 import { useNavigate } from "react-router-dom";
 
 function AccountDeletionConfirmationForm() {
+    const navigate = useNavigate();
+
     const handleAccountDeletion = async () => {
         try {
             const response = await axios.delete('/api/settings/delete-account', JSON.parse(localStorage.getItem('user')).username);
 
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            useNavigate()('/login');
+            navigate('/login');
         }
         catch (e) {
             alert('There was an error trying to delete your account. Please contact our support team for help.')

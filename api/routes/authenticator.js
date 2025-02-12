@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
       email: user.email,
     }
 
-    return res.status(200).json({ newUser, accessToken, refreshToken });
+    return res.status(200).json({ user:newUser, accessToken, refreshToken });
   }
   catch (e) {
     console.error("❌ Login error: ", e);
@@ -99,7 +99,7 @@ router.post('/register', async (req, res) => {
 });
 
 // REFRESH TOKEN REQUEST
-router.get('/token', async (req, res) => {
+router.post('/token', async (req, res) => {
   try {
     const { token: refreshToken } = req.body;
 
@@ -112,7 +112,7 @@ router.get('/token', async (req, res) => {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const accessToken = jwt.sign({ id: user.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
+    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
 
     return res.status(200).json({ accessToken });
   }

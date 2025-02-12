@@ -8,7 +8,9 @@ function SecuritySettings({changeHandler}){
 
     const sendPasswordChangeRequest = async () =>{
         try{
-            const response = await axios.post('/api/change-password', {'password': currentPassword, newPassword});
+            const username = JSON.parse(localStorage.getItem('user')).username;
+
+            const response = await axios.patch('/api/settings', {username, 'changes': {'account': {'password':newPassword} } });
 
             if(response.status>=200 && response.status < 300){
                 alert('password change accepted');

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import axios from 'axios';
+import { Navigate, useNavigate } from 'react-router-dom';
+import axios from '../auth/AxiosInstance';
 
 function AuthRedirect(){
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect( ()=>{
         const checkAuthStatus = async ()=>{
@@ -20,18 +21,27 @@ function AuthRedirect(){
                 return;
             }
 
-            const response = await axios.post('/auth/token', {accessToken, refreshToken});
+            try{
+                const response = await axios.post('/auth/token', { 'token': refreshToken});
 
-            if(response.status === 200){
-                setLoading(false);
-                setIsAuthenticated(true);
+                if(response.status === 200){
+                    setLoading(false);
+                    setIsAuthenticated(true);
+                }
+                else{
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    setLoading(false);
+                    setIsAuthenticated(false);
+                    setError(response.status);
+                }
             }
-            else{
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                setLoading(false);
-                setIsAuthenticated(false);
-                setError(response.status);
+            catch(e){
+                if(e.response){
+                    if(e.response.status===401){
+                        navigate('/login');
+                    }
+                }
             }
         }
 

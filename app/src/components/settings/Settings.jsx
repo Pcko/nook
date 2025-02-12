@@ -13,7 +13,6 @@ function loadSettings() {
             'accessibility':localStorage.getItem('accessibility') || 'normal',
         },
     }
-    console.log(settings);
 
     return settings;
 }
@@ -56,15 +55,16 @@ function Settings() {
         }
 
         try{
+            const { username } = JSON.parse(localStorage.getItem('user'));
             const response = await axios.patch(
                 '/api/settings',
                 {
-                    'username': localStorage.getItem('user').username,
+                    username,
                     changes,
                 }
             );
 
-            if(response.status===200 || true){
+            if(response.status===200){
                 console.log('settings have been changed');
                 setChanges({});
 
@@ -72,10 +72,10 @@ function Settings() {
 
                 const newUserObject = { ...oldUserObject, ...changes.account };
 
-                localStorage.setItem('user', JSON.parse(newUserObject));
+                localStorage.setItem('user', JSON.stringify(newUserObject));
             }
         }catch(e){
-            console.log(e.status)
+            console.log(e)
         }
     };
 

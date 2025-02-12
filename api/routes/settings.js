@@ -1,11 +1,13 @@
 import express from 'express';
 
 const router = express.Router();
+import User from '../database/models/user-schema.js';
 
 // SAVE SETTINGS REQUEST
 router.patch('/', async (req, res) => {
   try {
-    const { username, account } = req.body;
+    const { username, changes } = req.body;
+    const { account } = changes;
 
     //make sure request body is not invalid
     if (!username) {
