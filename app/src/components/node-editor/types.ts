@@ -1,10 +1,10 @@
-import { ClickTriggerNode } from "./Nodes/PerformClickNode";
-import { MessageTriggerNode } from "./Nodes/LogNode";
+import { PerformClickNode } from "./Nodes/PerformClickNode";
+import { LogNode } from "./Nodes/LogNode";
 import { Connection } from "./connection";
 import { GetSchemes } from "rete";
 
-export type NodeProps = ClickTriggerNode | MessageTriggerNode;
+export type NodeProps = PerformClickNode | LogNode;
 
-export type ConnProps = Connection<ClickTriggerNode, MessageTriggerNode>;
+export type ConnProps = Connection<PerformClickNode, LogNode>;
 
 export type Schemes = GetSchemes<NodeProps, ConnProps>;

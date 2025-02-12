@@ -11,7 +11,6 @@ class LogNode extends BasicNookNode {
 
         let initial: string = "Message"; //Hilfsvariable "initial" wird benötigt um einen Default-Wert zu setzen
         this.addControl("message", new ClassicPreset.InputControl("text", { initial }));
-        this.id = Math.random().toString(36).substring(2); // Generate unique ID
     }
 
     /**
