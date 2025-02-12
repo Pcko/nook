@@ -8,16 +8,12 @@ import axios from "../auth/AxiosInstance";
 
 function loadSettings() {
     const settings = {
-        'account':{
-            'username':sessionStorage.getItem('username'),
-            'firstName':sessionStorage.getItem('firstName'),
-            'lastName':sessionStorage.getItem('lastName'),
-            'email':sessionStorage.getItem('email'),
-        },
+        'account':JSON.parse(localStorage.getItem('user')),
         'appearance':{
             'accessibility':localStorage.getItem('accessibility') || 'normal',
         },
     }
+    console.log(settings);
 
     return settings;
 }
@@ -62,12 +58,21 @@ function Settings() {
         try{
             const response = await axios.patch(
                 '/api/settings',
-                changes
+                {
+                    'username': localStorage.getItem('user').username,
+                    changes,
+                }
             );
 
             if(response.status===200 || true){
                 console.log('settings have been changed');
                 setChanges({});
+
+                const oldUserObject = JSON.parse(localStorage.getItem('user'));
+
+                const newUserObject = { ...oldUserObject, ...changes.account };
+
+                localStorage.setItem('user', JSON.parse(newUserObject));
             }
         }catch(e){
             console.log(e.status)
