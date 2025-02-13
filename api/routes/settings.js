@@ -2,6 +2,7 @@ import express from 'express';
 
 const router = express.Router();
 import User from '../database/models/user-schema.js';
+import RefreshToken from '../database/models/refreshToken-schema.js';
 
 // SAVE SETTINGS REQUEST
 router.patch('/', async (req, res) => {
@@ -36,10 +37,10 @@ router.patch('/', async (req, res) => {
 // ACCOUNT DELETION REQUEST
 router.delete('/delete-account', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username } = req.body;
 
     //make sure request body has all required information
-    if (![username, password].every(Boolean)) {
+    if (!username) {
       return res.sendStatus(400);
     }
 
@@ -51,7 +52,7 @@ router.delete('/delete-account', async (req, res) => {
       return res.sendStatus(404);
     }
 
-
+    await RefreshToken.findOneAndDelete({ _id: user.username });
     await user.deleteOne();
 
     return res.sendStatus(200);

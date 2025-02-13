@@ -6,7 +6,14 @@ function AccountDeletionConfirmationForm() {
 
     const handleAccountDeletion = async () => {
         try {
-            const response = await axios.delete('/api/settings/delete-account', JSON.parse(localStorage.getItem('user')).username);
+            const user = JSON.parse(localStorage.getItem('user'));
+            const response = await axios({
+                'method':'delete',
+                'url':'/api/settings/delete-account', 
+                'data': {
+                    'username': user.username
+                }
+            });
 
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
