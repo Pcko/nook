@@ -1,7 +1,7 @@
 import BackgroundText from '../general/NookBackground'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
 
 function Login() {
@@ -33,6 +33,10 @@ function Login() {
             if (response.status >= 200 && response.status < 300) {
                 console.log('Request was successful', response.data);
 
+                localStorage.setItem('accessToken', response.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.refreshToken);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+
                 // username, password und errorDisplay zurücksetzen, sobald der Login-Screen verlassen wird
                 setUsername('');
                 setPassword('');
@@ -51,7 +55,7 @@ function Login() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText />
-            <div id="Window" className="w-[1000px] text-white bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+            <div id="Window" className="w-[1000px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
                 <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
                     <ImageCarousel />
                     <div className="mx-[14%] my-[10%]">
@@ -70,7 +74,7 @@ function Login() {
                                 name="username"
                                 required
                                 minLength="2"
-                                className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                                 onChange={(e) => setUsername(e.target.value)}
                                 value={username}
                             />
@@ -83,7 +87,7 @@ function Login() {
                                 name="password"
                                 required
                                 minLength="10"
-                                className="w-full h-8 px-2 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg"
+                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg"
                                 onChange={(e) => setPassword(e.target.value)}
                                 value={password}
                             />

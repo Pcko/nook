@@ -8,13 +8,21 @@ module.exports = {
   theme: {
     extend: {
       colors:{
-        "primary":"#6B439B",
-        "secondary":"#8869AD",
-        "primary-hover":"#5A3382",
-        "website-bg":"#101012",
-        "ui-bg":"#17181B",
-        "ui-border":"#2D3036",
-        "ui-subtle":"#6D54B5"
+        "primary": "var(--primary)",
+        "secondary": "var(--secondary)",
+        "primary-hover": "var(--primary-hover)",
+        "text-subtle": "var(--text-subtle)",
+        "far-bg": "var(--far-bg)",
+        "website-bg": "var(--website-bg)",
+        "ui-bg": "var(--ui-bg)",
+        "ui-bg-selected": "var(--ui-bg-selected)",
+        "ui-button": "var(--ui-button)",
+        "ui-button-hover": "var(--ui-button-hover)",
+        "ui-border": "var(--ui-border)",
+        "ui-border-selected": "var(--ui-border-selected)",
+        "ui-subtle": "var(--ui-subtle)",
+        "text": "var(--text)",
+        "dangerous": "var(--dangerous)",
       },
     },
   },
@@ -22,7 +30,7 @@ module.exports = {
     function ({ addComponents }) {
       addComponents({
         '.btn': {
-          '@apply hover:bg-primary-hover mx-auto bg-primary font-bold py-2 px-4 rounded-lg':{},
+          '@apply hover:bg-primary-hover hover:cursor-pointer mx-auto bg-primary font-bold py-2 px-4 rounded-lg':{},
           transition: 'background-color 0.2s ease',
         },
       });

@@ -2,7 +2,7 @@ import BackgroundText from "../general/NookBackground"
 import logo from "../../assets/resources/image.png"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
 
 
@@ -51,7 +51,7 @@ function Registration() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <BackgroundText />
-            <div id="Window" className="min-h-[650] w-[1000px] p-3 text-white bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
+            <div id="Window" className="min-h-[650] w-[1000px] p-3 text-text bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
 
                 <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
@@ -71,7 +71,7 @@ function Registration() {
                                 name="username"
                                 required
                                 minLength="2"
-                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
+                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
                                 onChange={(e) => setUsername(e.target.value)}
                             />
 
@@ -83,7 +83,7 @@ function Registration() {
                                 name="password"
                                 required
                                 minLength="10"
-                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
                                 onChange={(e) => setPassword(e.target.value)}
                             />
 
@@ -97,7 +97,7 @@ function Registration() {
                                         name="firstName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                         onChange={(e) => setFirstName(e.target.value)}
                                     />
                                 </div>
@@ -110,7 +110,7 @@ function Registration() {
                                         name="lastName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                        className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                         onChange={(e) => setLastName(e.target.value)}
                                     />
                                 </div>
@@ -124,7 +124,7 @@ function Registration() {
                                 id="email"
                                 name="email"
                                 required
-                                className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
+                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
                                 onChange={(e) => setEmail(e.target.value)}
                             />
 
