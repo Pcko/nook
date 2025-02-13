@@ -1,8 +1,8 @@
 import express from 'express';
-
-const router = express.Router();
 import User from '../database/models/user-schema.js';
 import RefreshToken from '../database/models/refreshToken-schema.js';
+
+const router = express.Router();
 
 // SAVE SETTINGS REQUEST
 router.patch('/', async (req, res) => {

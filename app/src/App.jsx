@@ -17,12 +17,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 function App() {
   useEffect(()=>{
     const theme = localStorage.getItem('theme');
+    const accessibilityMode = localStorage.getItem('accessibility');
 
     if(theme === 'light' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)){
       document.documentElement.classList.add('light');
     }
-
-    const accessibilityMode = localStorage.getItem('accessibility');
 
     if(accessibilityMode === 'high-contrast'){
       document.documentElement.classList.add('high-contrast');

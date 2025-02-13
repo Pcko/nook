@@ -7,7 +7,6 @@ import RefreshToken from '../database/models/refreshToken-schema.js';
 
 const router = express.Router();
 
-
 // LOGIN AUTHENTICATOR REQUEST
 router.post('/login', async (req, res) => {
   try {
@@ -17,7 +16,6 @@ router.post('/login', async (req, res) => {
     if (![username, password].every(Boolean)) {
       return res.sendStatus(400);
     }
-
 
     const user = await User.findOne({ _id: username }).lean();
 
@@ -31,7 +29,6 @@ router.post('/login', async (req, res) => {
     if (!match) {
       return res.status(403).send({ message: 'Username or password is invalid!' });
     }
-
 
     //create tokens for authentication
     const userid = user._id;
@@ -73,7 +70,6 @@ router.post('/register', async (req, res) => {
       return res.sendStatus(400);
     }
 
-
     //make sure username is not already used
     const userExists = await User.findOne({ _id: username }).lean();
     if (userExists) {
@@ -112,7 +108,7 @@ router.post('/token', async (req, res) => {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
+    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' });
 
     return res.status(200).json({ accessToken });
   }
@@ -121,6 +117,5 @@ router.post('/token', async (req, res) => {
     return res.sendStatus(500);
   }
 });
-
 
 export default router;

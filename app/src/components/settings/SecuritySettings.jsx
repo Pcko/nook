@@ -31,7 +31,6 @@ function SecuritySettings({changeHandler}){
                 <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                     <div className="text-lg">Change password</div>
 
-
                     <input type="submit"
                            className="btn ml-auto mr-0 mb-1"
                            value="Update Password"/>

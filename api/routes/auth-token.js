@@ -11,7 +11,7 @@ function authenticateToken(req, res, next) {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.status(401).json({ error: 'invalid_token' });
-        };
+        }
         req.user = user;
         next();
     })

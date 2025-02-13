@@ -20,9 +20,9 @@ function loadSettings() {
 function Settings() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('account');
+    const [changes, setChanges] = useState({});
 
     const originalSettings = loadSettings();
-    const [changes, setChanges] = useState({});
 
     const handleSettingsChange = (category, setting, data) => {
         setChanges(prev => ({
@@ -69,9 +69,7 @@ function Settings() {
                 setChanges({});
 
                 const oldUserObject = JSON.parse(localStorage.getItem('user'));
-
                 const newUserObject = { ...oldUserObject, ...changes.account };
-
                 localStorage.setItem('user', JSON.stringify(newUserObject));
             }
         }catch(e){

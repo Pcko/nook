@@ -35,7 +35,6 @@ function Login() {
 
                 localStorage.setItem('accessToken', response.data.accessToken);
                 localStorage.setItem('refreshToken', response.data.refreshToken);
-
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 // username, password und errorDisplay zurücksetzen, sobald der Login-Screen verlassen wird
