@@ -59,6 +59,12 @@ function App() {
         editorInstance.BlockManager.add(block.id, block);
       });
 
+
+      const savedContent = JSON.parse(localStorage.getItem("MyPage"))
+      if(savedContent) {
+        editorInstance.setComponents(savedContent.components);
+      }
+
       editorRef.current = editorInstance;
       setEditor(editorInstance);
     }
@@ -78,6 +84,13 @@ function App() {
     editorRef.current?.setDevice(device);
   };
 
+  const handleSave = () => {
+    const components = editorRef.current.getComponents();
+    const savedContent = {
+      components: components.toJSON(),
+    };
+    localStorage.setItem("MyPage", JSON.stringify(savedContent))
+  }
   return (
     <div className="GrapesJsApp">
       <div className="Editor">
@@ -107,8 +120,8 @@ function App() {
             </button>
           </div>
 
-          <button className="clear-canvas-button" onClick={clearCanvas}>
-            Clear Canvas
+          <button className="clear-canvas-button" onClick={handleSave}>
+            Save-Canvas
           </button>
         </div>
         
