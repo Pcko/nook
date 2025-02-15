@@ -14,7 +14,6 @@ const ProjectSchema = new Schema(
         },
         pageCount: {
             type: Number,
-            default: 0,
         },
         author: {
             type: String,

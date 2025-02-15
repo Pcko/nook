@@ -1,15 +1,14 @@
 import express from 'express';
 
 import Project from '../database/models/project-schema.js';
-import { version } from 'mongoose';
 
 const router = express.Router();
 
 //CREATE
 router.post('/', async (req, res) => {
     try {
-        const { projectName } = req.body;
         const { userId } = req;
+        const { projectName } = req.body;
 
         //make sure request body has all required information
         if (![projectName].every(Boolean)) {
@@ -17,7 +16,7 @@ router.post('/', async (req, res) => {
         }
 
         let newProjectName = projectName;
-        let duplicateNumber = 0;
+        let duplicateNumber = 1;
 
         let projectExists = await Project.findOne({ name: newProjectName, author: userId });
         while (projectExists) {
@@ -49,12 +48,20 @@ router.get('/', async (req, res) => {
         const { userId } = req;
 
         const projects = await Project.find({ author: userId });
-
         if (projects.length === 0) {
             return res.status(404).send({ message: 'No projects found!' });
         }
 
-        return res.status(200).send(projects);
+        const projectObject = {};
+        projects.forEach(project => {
+            projectObject[project.name] = {
+                pageCount: project.pageCount,
+                createdAt: project.createdAt,
+                updatedAt: project.updatedAt,
+            }
+        });
+
+        return res.status(200).json(projectObject);
     }
     catch (e) {
         console.error('❌ Read all projects error: ', e);
@@ -63,8 +70,23 @@ router.get('/', async (req, res) => {
 });
 
 //READ ONE
-router.get('/:pojectName', (req, res) => {
+router.get('/:projectName', async (req, res) => {
+    try {
+        const { userId } = req;
+        const projectName = req.params.projectName;
 
+        const project = await Project.findOne({ name: projectName, author: userId }).lean();
+
+        if (!project) {
+            return res.sendStatus(404);
+        }
+
+        return res.status(200).json(project);
+    }
+    catch (e) {
+        console.error('❌ Read specific project error: ', e);
+        return res.sendStatus(500);
+    }
 });
 
 //UPDATE
@@ -73,8 +95,23 @@ router.patch('/', (req, res) => {
 });
 
 //DELETE
-router.delete('/', (req, res) => {
+router.delete('/:projectName', async (req, res) => {
+    try {
+        const { userId } = req;
+        const projectName = req.params.projectName;
 
+        const project = await Project.findOneAndDelete({ name: projectName, author: userId }).lean();
+
+        if (!project) {
+            return res.sendStatus(404);
+        }
+
+        return res.sendStatus(200);
+    }
+    catch (e) {
+        console.error('❌ Read specific project error: ', e);
+        return res.sendStatus(500);
+    }
 })
 
 export default router;
