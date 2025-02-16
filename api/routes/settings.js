@@ -23,7 +23,7 @@ router.patch('/', async (req, res) => {
           user[key] = account[key];
         }
       });
-      user.save();
+      await user.save();
     }
 
     res.sendStatus(200);

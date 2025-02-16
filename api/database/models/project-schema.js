@@ -8,12 +8,13 @@ const ProjectSchema = new Schema(
             type: String,
             required: true,
         },
-        project: {
+        pages: {
             type: Object,
             required: true,
         },
         pageCount: {
             type: Number,
+            required: true,
         },
         author: {
             type: String,
@@ -21,7 +22,10 @@ const ProjectSchema = new Schema(
             required: true,
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        minimize: false,
+    }
 );
 
 ProjectSchema.index({ name: 1, author: 1 }, { unique: true });

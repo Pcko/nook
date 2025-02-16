@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
         const project = await Project.create({
             name: newProjectName,
-            project: {},
+            pages: {},
             author: userId,
         });
 
@@ -109,9 +109,15 @@ router.patch('/:projectName', async (req, res) => {
         }
 
         project.name = newProjectName;
-        project.save();
+        await project.save();
 
-        return res.sendStatus(200);
+        const projectObject = {
+            pageCount: project.pageCount,
+            createdAt: project.createdAt,
+            updatedAt: project.updatedAt,
+        };
+
+        return res.status(200).json(projectObject);
     }
     catch (e) {
         console.error('❌ Update project error: ', e);
@@ -134,7 +140,7 @@ router.delete('/:projectName', async (req, res) => {
         return res.sendStatus(200);
     }
     catch (e) {
-        console.error('❌ Read specific project error: ', e);
+        console.error('❌ Delete project error: ', e);
         return res.sendStatus(500);
     }
 });
