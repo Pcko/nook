@@ -8,6 +8,7 @@ abstract class BasicNookNode extends ClassicPreset.Node {
         this.position = { x: 0, y: 0 }
         this.id = Math.random().toString(36).substring(2); // Generate unique ID
     }
+
 }
 
-export default BasicNookNode
+export default BasicNookNode;

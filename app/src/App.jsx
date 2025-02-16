@@ -1,11 +1,8 @@
-import EditorHub from "./components/builder-hub/EditorHub";
-import {BuilderProvider} from "./components/builder-hub/BuilderContext";
+import EditorHub from "./components/editor-hub/EditorHub";
 
 function App() {
     return (
-        <BuilderProvider>
-            <EditorHub />
-        </BuilderProvider>
+        <EditorHub/>
     );
 }
 

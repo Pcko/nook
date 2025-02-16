@@ -17,11 +17,11 @@ class LogNode extends BasicNookNode {
      * changes the Value of the "Message" control
      */
     public changeValue(newValue: string) {
-        this.controls.message.setValue(newValue)
+        this.controls.message?.setValue(newValue)
     }
 
     execute() {
-        console.log(this.controls.message.value);
+        console.log(this.controls.message?.value);
     }
 }
 
