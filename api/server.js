@@ -26,7 +26,7 @@ app.use(express.static(clientPath));
 
 app.use('/auth', authRoute);
 app.use('/api/settings', authenticateToken, settingsRoute);
-app.use('/api/project', authenticateToken, projectRoute);
+app.use('/api/projects', authenticateToken, projectRoute);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
