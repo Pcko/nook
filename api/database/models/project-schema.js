@@ -14,7 +14,6 @@ const ProjectSchema = new Schema(
         },
         pageCount: {
             type: Number,
-            required: true,
         },
         author: {
             type: String,
@@ -31,7 +30,7 @@ const ProjectSchema = new Schema(
 ProjectSchema.index({ name: 1, author: 1 }, { unique: true });
 
 ProjectSchema.pre('save', function (next) {
-    this.pageCount = Object.keys(this.project).length;
+    this.pageCount = Object.keys(this.pages).length;
     next();
 })
 
