@@ -10,7 +10,7 @@ import {Connection} from "./connection";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import Preset from "./contextMenu";
 
-type AreaExtra = ReactArea2D<Schemes>;
+export type AreaExtra = ReactArea2D<Schemes>;
 
 /**
  * Creates a new instance of the Visual Editor.
@@ -104,13 +104,13 @@ export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes
  */
 export async function load(saveState: { nodes: [], connections: [] }, editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<void> {
     const promises = [];
-    const nodeMap = await fetchNodeTypes(); // Fetch available node types
+    const nodeMap = await fetchNodeTypes(); //Fetch available node types
 
     try {
         // Restore nodes
         if (Array.isArray(saveState.nodes)) {
             for (const nodeData of saveState.nodes) {
-                const NodeClass = nodeMap.get(nodeData.type); // Get class by type
+                const NodeClass = nodeMap.get(nodeData.type); //Get class by type
                 const node = new NodeClass(nodeData.label);
 
                 node.id = nodeData.id;
@@ -142,7 +142,7 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
                 if (nodeData.controls) {
                     for (const [key, controlData] of Object.entries(nodeData.controls)) {
                         node.addControl(controlData.id, controlData.options);
-                        if (controlData.value) node.changeValue(controlData.value); // Restore user-defined value
+                        if (controlData.value) node.changeValue(controlData.value); //Restore user-defined value
                     }
                 }
 

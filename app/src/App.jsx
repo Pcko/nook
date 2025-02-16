@@ -1,14 +1,11 @@
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import WebsiteBuilder from "./components/website-builder/WebsiteBuilder";
-import NodeEditor from "./components/node-editor/NodeEditor";
+import EditorHub from "./components/builder-hub/EditorHub";
+import {BuilderProvider} from "./components/builder-hub/BuilderContext";
+
 function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<WebsiteBuilder/>}/>
-                <Route path="/editor/:element" element={<NodeEditor/>}/>
-            </Routes>
-        </Router>
+        <BuilderProvider>
+            <EditorHub />
+        </BuilderProvider>
     );
 }
 
