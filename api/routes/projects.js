@@ -4,7 +4,7 @@ import Project from '../database/models/project-schema.js';
 
 const router = express.Router();
 
-//CREATE
+//CREATE PROJECT
 router.post('/', async (req, res) => {
     try {
         const { userId } = req;
@@ -34,13 +34,13 @@ router.post('/', async (req, res) => {
             author: userId,
         });
 
-        const projectObject = {
+        const projectDetails = {
             pageCount: project.pageCount,
             createdAt: project.createdAt,
             updatedAt: project.updatedAt,
         };
 
-        return res.status(200).json(projectObject);
+        return res.status(200).json(projectDetails);
     }
     catch (e) {
         console.error('❌ Create project error: ', e);
@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-//READ ALL
+//READ ALL PROJECTS
 router.get('/', async (req, res) => {
     try {
         const { userId } = req;
@@ -58,16 +58,17 @@ router.get('/', async (req, res) => {
             return res.status(404).send({ message: 'No projects found!' });
         }
 
-        const projectObject = {};
+        //Object parsing for return
+        const projectDetails = {};
         projects.forEach(project => {
-            projectObject[project.name] = {
+            projectDetails[project.name] = {
                 pageCount: project.pageCount,
                 createdAt: project.createdAt,
                 updatedAt: project.updatedAt,
             }
         });
 
-        return res.status(200).json(projectObject);
+        return res.status(200).json(projectDetails);
     }
     catch (e) {
         console.error('❌ Read all projects error: ', e);
@@ -75,7 +76,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-//READ ONE
+//READ ONE PROJECT
 router.get('/:projectName', async (req, res) => {
     try {
         const { userId } = req;
@@ -95,29 +96,38 @@ router.get('/:projectName', async (req, res) => {
     }
 });
 
-//UPDATE
+//UPDATE PROJECT
 router.patch('/:projectName', async (req, res) => {
     try {
         const { userId } = req;
         const projectName = req.params.projectName;
-        const { newProjectName } = req.body;
+        const { newProjectName, pages } = req.body;
 
         const project = await Project.findOne({ name: projectName, author: userId });
-
         if (!project) {
             return res.sendStatus(404);
         }
 
-        project.name = newProjectName;
+        //Rename
+        if (newProjectName) {
+            project.name = newProjectName;
+        }
+
+        //Save project data
+        if (pages) {
+            project.pages = pages;
+        }
+
         await project.save();
 
-        const projectObject = {
+        //Object parsing for return
+        const projectDetails = {
             pageCount: project.pageCount,
             createdAt: project.createdAt,
             updatedAt: project.updatedAt,
         };
 
-        return res.status(200).json(projectObject);
+        return res.status(200).json(projectDetails);
     }
     catch (e) {
         console.error('❌ Update project error: ', e);
@@ -125,7 +135,7 @@ router.patch('/:projectName', async (req, res) => {
     }
 });
 
-//DELETE
+//DELETE PROJECT
 router.delete('/:projectName', async (req, res) => {
     try {
         const { userId } = req;
