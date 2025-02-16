@@ -23,7 +23,7 @@ function Dashboard ()  {
         loadedProjects = response.data;
         setProjects(loadedProjects);
       }catch(e){
-        console.log(e.message);
+        console.error(e.message);
       }
     }
 
@@ -47,14 +47,13 @@ function Dashboard ()  {
         sessionStorage.clear();
         navigate('/');
     } catch(e){
-        console.log(e.message);
+        console.error(e.message);
     }
   };
 
 
   {/* Navigation to the Project Details Tab with the clicked-on project selected */}
   const switchToProjectDetails = (projectId) => {
-    console.log('switching to project ', projectId);
     setSelectedProject(projectId)
     setActiveTab('projectDetails');
   }

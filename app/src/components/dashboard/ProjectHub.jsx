@@ -61,7 +61,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 return updatedProjects;
             });
         } catch (e){
-            console.log(e);
+            console.error(e);
         }
     };
 

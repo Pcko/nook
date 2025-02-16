@@ -17,22 +17,20 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
             while(!projects[selectedProjectId].pages){
                 try{
                     const response = await axios.get(`/api/projects/${selectedProjectId}`);
-
                     const { pages } = response.data;
 
                     if(!pages){
-                        throw Error('wrong answer');
+                        throw Error('bad server response');
                     }
 
                     projects[selectedProjectId].pages = pages;
+                    setPages(projects[selectedProjectId].pages);
                 }catch (e) {
-                    console.log(e.message);
+                    console.error(e.message);
 
                     {/* retry after 2.5 seconds */}
                     await new Promise(resolve => setTimeout(resolve, 2500));
                 }
-
-                setPages(projects[selectedProjectId].pages);
             }
         };
 
@@ -46,7 +44,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
 
     const PageCard = ({children}) => {
         return (
-            <div>
+            <div>   
                 <div className="flex items-center p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg">
                     <img src={pagePreview} alt="page preview" className="m-auto"/>
                 </div>

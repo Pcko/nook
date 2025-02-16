@@ -16,7 +16,7 @@ function ProjectCreationForm({ closeForm, setProjects }){
                 return updatedProjects;
             });
         }catch (e) {
-            console.log(e.message);
+            console.error(e.message);
         }
 
         closeForm();

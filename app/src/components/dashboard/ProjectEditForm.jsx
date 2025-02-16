@@ -20,7 +20,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
 
             onProjectEdit(newProjectName, response.data);
         }catch (e) {
-            console.log(e.message);
+            console.error(e.message);
         }
 
         closeForm();
