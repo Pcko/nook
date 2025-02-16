@@ -63,4 +63,23 @@ router.delete('/delete-account', async (req, res) => {
   }
 });
 
+// LOGOUT REQUEST
+router.post('/logout', async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const tokenEntry = await RefreshToken.findOneAndDelete({ _id: userId });
+
+    if (!tokenEntry) {
+      return res.sendStatus(404);
+    }
+
+    return res.sendStatus(200);
+  }
+  catch (e) {
+    console.error("❌ Logout error:", e);
+    return res.sendStatus(500);
+  }
+});
+
 export default router;
