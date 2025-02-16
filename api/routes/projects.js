@@ -28,13 +28,19 @@ router.post('/', async (req, res) => {
             }
         }
 
-        await Project.create({
+        const project = await Project.create({
             name: newProjectName,
             project: {},
             author: userId,
-        })
+        });
 
-        return res.sendStatus(200);
+        const projectObject = {
+            pageCount: project.pageCount,
+            createdAt: project.createdAt,
+            updatedAt: project.updatedAt,
+        };
+
+        return res.status(200).json(projectObject);
     }
     catch (e) {
         console.error('❌ Create project error: ', e);
@@ -90,8 +96,27 @@ router.get('/:projectName', async (req, res) => {
 });
 
 //UPDATE
-router.patch('/', (req, res) => {
+router.patch('/:projectName', async (req, res) => {
+    try {
+        const { userId } = req;
+        const projectName = req.params.projectName;
+        const { newProjectName } = req.body;
 
+        const project = await Project.findOne({ name: projectName, author: userId });
+
+        if (!project) {
+            return res.sendStatus(404);
+        }
+
+        project.name = newProjectName;
+        project.save();
+
+        return res.sendStatus(200);
+    }
+    catch (e) {
+        console.error('❌ Update project error: ', e);
+        return res.sendStatus(500);
+    }
 });
 
 //DELETE
@@ -112,6 +137,6 @@ router.delete('/:projectName', async (req, res) => {
         console.error('❌ Read specific project error: ', e);
         return res.sendStatus(500);
     }
-})
+});
 
 export default router;
