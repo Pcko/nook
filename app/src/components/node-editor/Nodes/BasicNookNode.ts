@@ -1,4 +1,4 @@
-import { ClassicPreset } from "rete";
+import { ClassicPreset, getUID } from "rete";
 
 abstract class BasicNookNode extends ClassicPreset.Node {
     position: { x : Number, y: Number };
@@ -6,7 +6,7 @@ abstract class BasicNookNode extends ClassicPreset.Node {
     protected constructor(name: string) {
         super(name);
         this.position = { x: 0, y: 0 }
-        this.id = Math.random().toString(36).substring(2); // Generate unique ID
+        this.id = getUID();
     }
 
 }

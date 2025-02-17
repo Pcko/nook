@@ -9,7 +9,7 @@ class LogNode extends BasicNookNode {
         super(name);
         this.addInput("onTrigger", new ClassicPreset.Input(socket, "Log"));
 
-        let initial: string = "Message"; //Hilfsvariable "initial" wird benötigt um einen Default-Wert zu setzen
+        let initial: string = "Message";
         this.addControl("message", new ClassicPreset.InputControl("text", { initial }));
     }
 

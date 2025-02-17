@@ -1,20 +1,27 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Tab} from "@headlessui/react";
+import {Button, Dialog, Tab} from "@headlessui/react";
 import NodeEditorPage from "./NodeEditorPage";
 
 function NodeEditor({element, goBack}) {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedTabForImport, setSelectedTabForImport] = useState(null);
     const [tabList, setTabList] = useState([]);
-    const tabListRef = useRef(null);
+    const [isImportMenuOpen, setIsImportMenuOpen] = useState(false);
 
+    const tabListRef = useRef(null);
     const isDragging = useRef(false);
     const startX = useRef(0);
     const scrollLeft = useRef(0);
 
     useEffect(() => {
         const givenElement = element?.current;
-        const tabName = givenElement.getName() || givenElement.get('tagName');
-        const loadedTabs = sessionStorage.getItem('tabs');
+        const tabName = givenElement?.getName() || givenElement?.get('tagName');
+        const loadedTabs = JSON.parse(sessionStorage.getItem('tabs') || '[]');
+
+        if (tabList.length === 0) {
+            setTabList(loadedTabs);
+            setSelectedTabForImport(tabList[selectedIndex]);
+        }
 
         document.addEventListener("keydown", function (event) {
             if (event.ctrlKey && event.shiftKey && event.key === "Q") {
@@ -22,14 +29,12 @@ function NodeEditor({element, goBack}) {
                 goBack();
             }
         });
-
-        setTabList(loadedTabs ? JSON.parse(loadedTabs) : []);
         addTab(tabName, givenElement);
-
-        return () => {
-            sessionStorage.setItem('tabs', JSON.stringify(tabList));
-        };
     }, []);
+
+    useEffect(() => {
+        sessionStorage.setItem('tabs', JSON.stringify(tabList));
+    }, [tabList]);
 
     function addTab(name, givenElement) {
         if (!givenElement) return;
@@ -82,6 +87,57 @@ function NodeEditor({element, goBack}) {
         }
     };
 
+    const exportGraph = () => {
+        const graphState = selectedTabForImport?.element.get('graph');
+        console.log(selectedTabForImport.element)
+        const jsonString = JSON.stringify(graphState, null, 2);
+
+        //Create a Blob with the JSON string and trigger the download
+        const blob = new Blob([jsonString], {type: 'application/json'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'graph_state.json';
+        link.click();
+    };
+
+    function importGraph(graphState) {
+        selectedTabForImport.element.graph = graphState;
+        setTabList(tabList);
+        setIsImportMenuOpen(false);
+    }
+
+    const handleFileInput = (event) => {
+        const file = event.target.files[0];
+
+        if (file && file.type === 'application/json') {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const graphState = JSON.parse(e?.target?.result);
+                    importGraph(graphState);
+                } catch (error) {
+                    console.error('Error parsing the graph file:', error);
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please upload a valid JSON file.');
+        }
+    };
+
+    const createFileInput = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json'; // Accept only .json files
+        input.onchange = handleFileInput; // Call handleFileInput when file is selected
+        return input;
+    };
+
+    const triggerFileInput = () => {
+        const fileInput = createFileInput();
+        fileInput.click();
+    };
+
     return (
         <div className="h-screen flex flex-col bg-gray-200">
             <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
@@ -105,14 +161,16 @@ function NodeEditor({element, goBack}) {
                                       d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                             </svg>
                         </Button>
-                        <Button className="bg-[#2D2E30] mr-5 text-white rounded p-2 hover:bg-gray-400">
+                        <Button className="bg-[#2D2E30] mr-5 text-white rounded p-2 hover:bg-gray-400"
+                                onClick={() => exportGraph()}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                                  stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round"
                                       d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"/>
                             </svg>
                         </Button>
-                        <Button className="bg-[#2D2E30] mr-5 text-white rounded p-2 hover:bg-gray-400">
+                        <Button className="bg-[#2D2E30] mr-5 text-white rounded p-2 hover:bg-gray-400"
+                                onClick={() => triggerFileInput()}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                                  stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round"
@@ -150,9 +208,32 @@ function NodeEditor({element, goBack}) {
                         <Tab.Panel key={tab.id}>
                             <NodeEditorPage tabId={tab.id} element={tab.element}/>
                         </Tab.Panel>
-                    ))}
+                    ))}s
                 </Tab.Panels>
             </Tab.Group>
+            {/* Import Overlay */}
+            <Dialog open={isImportMenuOpen} onClose={() => setIsImportMenuOpen(false)} className="relative z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-lg shadow-lg w-96">
+                        <h2 className="text-lg font-semibold mb-4">Select Tab for Import</h2>
+                        <div className="space-y-2">
+                            {tabList.map((tab) => (
+                                <div key={tab.id}
+                                     className={`p-2 cursor-pointer rounded ${selectedTabForImport === tab.id ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
+                                     onClick={() => setSelectedTabForImport(tab.id)}>
+                                    {tab.name}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 flex justify-end space-x-2">
+                            <Button className="bg-gray-500 text-white px-3 py-1 rounded"
+                                    onClick={() => setIsImportMenuOpen(false)}>Cancel</Button>
+                            <Button className="bg-blue-500 text-white px-3 py-1 rounded" onClick={triggerFileInput}>Upload
+                                JSON</Button>
+                        </div>
+                    </div>
+                </div>
+            </Dialog>
         </div>
     );
 }

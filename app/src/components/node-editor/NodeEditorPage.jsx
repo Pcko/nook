@@ -14,7 +14,7 @@ function NodeEditorPage({element}) {
     const editorInitialized = useRef(false);
 
     useEffect(() => {
-        const container = document.querySelector(`#editor-container`);
+        const container = document.querySelector('#editor-container');
         if (container && !editorInitialized.current) {
             create(container).then(({editor, engine, area}) => {
                 editorRef.current = editor;
@@ -46,12 +46,11 @@ function NodeEditorPage({element}) {
         };
     }, []);
 
-    async function addNode(type, name) {
-        if (!editorRef.current) return;
-        const NewNodeClass = nodeTypes.get(type);
-        const newNode = new NewNodeClass(name || type);
-        await editorRef.current.addNode(newNode);
-    }
+    useEffect(() => {
+        setTimeout(() => {
+            buildHierarchy();
+        }, 10);
+    }, [hierarchyList]);
 
     function saveState() {
         if (!editorRef.current || !areaRef.current) return;
@@ -67,12 +66,10 @@ function NodeEditorPage({element}) {
         try {
             const savedState = grapesjsElement.current.get('graph');
             if (savedState) {
-                load(savedState, editorRef.current, areaRef.current).then(() => {
-                    buildHierarchy();
-                });
+                load(savedState, editorRef.current, areaRef.current)
             }
         } catch (err) {
-            console.error("Error initializing editor:", err.message);
+            console.warn("Error initializing editor:", err.message);
         }
     }
 
@@ -96,36 +93,64 @@ function NodeEditorPage({element}) {
 
         // Create hierarchy list
         const hierarchy = chains.map((chain) => ({
-            header: chain[0].name,
-            children: chain.slice(1).map((node) => ({
-                id: node.id,
-                name: node.name,
-            })),
+            header: chain[0].label,
+            children:
+                chain.length >= 2 ?
+                    chain.slice(1).map((node) => ({
+                        id: node.id,
+                        name: node.label,
+                    }))
+                    :
+                    [],
         }));
 
         setHierarchyList(hierarchy);
     }
 
-    // Function to find connected nodes
     function findConnectedNodes(startNode) {
-        const connections = editorRef.current.getConnections().length !== 0
-            ? editorRef.current.getConnections()
-            : editorRef.current.connections;
+        let rawConnections = editorRef.current.connections;
+        const connections = Array.isArray(rawConnections) ? [...rawConnections] : Array.from(rawConnections);
         let connectedNodes = [];
-        console.log(connections);
 
-        for (const connection of connections) {
-            console.log(connection.source !== startNode.id);
-            if (connection.source !== startNode.id && !connectedNodes.find((node) => node.id === connection.source)) {
-                return [];
-            }
-
-            const connectedNode = editorRef.current.getNode(connection.source);
-            if (connectedNode) {
-                connectedNodes.push(connectedNode);
-            }
+        if (!connections || connections.length === 0) {
+            return [];
         }
 
+        connections.forEach((connection) => {
+            if (connection.source === startNode.id || connectedNodes.find(node => node.id === connection.source)) {
+                const connectedNode = editorRef.current.getNode(connection.target);
+                if (connectedNode) {
+                    connectedNodes.push(connectedNode);
+                }
+            }
+        });
+
+        return connectedNodes;
+    }
+
+    function findConnectedNodesRecursiv(startNode, visited = new Set()) {
+        let rawConnections = editorRef.current.connections;
+        if (!rawConnections || rawConnections.length === 0) return [];
+
+        const connections = Array.isArray(rawConnections) ? [...rawConnections] : Array.from(rawConnections);
+        let connectedNodes = [];
+
+        function dfs(node) {
+            if (visited.has(node.id)) return;
+            visited.add(node.id);
+
+            connections.forEach((connection) => {
+                if (connection.source === node.id) {
+                    const targetNode = editorRef.current.getNode(connection.target);
+                    if (targetNode && !visited.has(targetNode.id)) {
+                        connectedNodes.push(targetNode);
+                        dfs(targetNode);
+                    }
+                }
+            });
+        }
+
+        dfs(startNode);
         return connectedNodes;
     }
 
@@ -133,7 +158,7 @@ function NodeEditorPage({element}) {
         <div style={{display: "flex", height: "100vh"}}>
             <SidePanel hierarchyList={hierarchyList}/>
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
-                <div id={`editor-container`} style={{height: "100%"}}/>
+                <div id={'editor-container'} style={{height: "100%"}}/>
             </div>
         </div>
     );

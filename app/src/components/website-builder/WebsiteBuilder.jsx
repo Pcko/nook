@@ -68,6 +68,7 @@ function WebsiteBuilder({editor, openNodeEditor}) {
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
+            localStorage.setItem('tabs','[]');
         };
     }, []);
 
