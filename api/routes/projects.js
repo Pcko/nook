@@ -18,8 +18,8 @@ router.post('/', async (req, res) => {
         let newProjectName = projectName;
         let duplicateNumber = 1;
 
-        let projectExists = await Project.findOne({ name: newProjectName, author: userId });
-        while (projectExists) {
+        let projectExists = undefined;
+        do {
             projectExists = await Project.findOne({ name: newProjectName, author: userId });
 
             if (projectExists) {
@@ -27,6 +27,7 @@ router.post('/', async (req, res) => {
                 newProjectName = `${projectName} (${duplicateNumber})`;
             }
         }
+        while (projectExists);
 
         const project = await Project.create({
             name: newProjectName,
