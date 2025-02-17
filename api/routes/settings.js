@@ -23,7 +23,7 @@ router.patch('/', async (req, res) => {
           user[key] = account[key];
         }
       });
-      user.save();
+      await user.save();
     }
 
     res.sendStatus(200);
@@ -59,6 +59,25 @@ router.delete('/delete-account', async (req, res) => {
   }
   catch (e) {
     console.error("❌ Account deletion error: ", e);
+    return res.sendStatus(500);
+  }
+});
+
+// LOGOUT REQUEST
+router.post('/logout', async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const tokenEntry = await RefreshToken.findOneAndDelete({ _id: userId });
+
+    if (!tokenEntry) {
+      return res.sendStatus(404);
+    }
+
+    return res.sendStatus(200);
+  }
+  catch (e) {
+    console.error("❌ Logout error:", e);
     return res.sendStatus(500);
   }
 });

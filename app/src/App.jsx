@@ -5,7 +5,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Registration"
 import ProtectedRoute from "./components/auth/ProtectedRoute"
 import AuthRedirect from "./components/general/AuthRedirect";
-import Dashboard from "./components/general/Dashboard"
+import Dashboard from "./components/dashboard/Dashboard"
 import Settings from "./components/settings/Settings";
 
 import './index.css';
@@ -26,13 +26,13 @@ function App() {
     if(accessibilityMode === 'high-contrast'){
       document.documentElement.classList.add('high-contrast');
     }
-  }, [])
+  }, []);
 
   return (
     <DndProvider backend={HTML5Backend}>
       <Router>
         <div className={'h-full'}>
-          <main className={'h-full bg-far-bg'}>
+          <main className={'h-full bg-far-bg text-text'}>
             <Routes>
               <Route path="/" element={<AuthRedirect/>}/>
               <Route path="/login" element={<Login />} />

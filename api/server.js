@@ -7,6 +7,7 @@ import './database/connection.js'; //<-- database connection script
 import authenticateToken from './routes/auth-token.js';
 import authRoute from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRoute from './routes/settings.js';
+import projectRoute from './routes/projects.js';
 
 import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
@@ -25,6 +26,7 @@ app.use(express.static(clientPath));
 
 app.use('/auth', authRoute);
 app.use('/api/settings', authenticateToken, settingsRoute);
+app.use('/api/projects', authenticateToken, projectRoute);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
