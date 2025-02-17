@@ -36,8 +36,8 @@ router.post('/', async (req, res) => {
 
         const projectDetails = {
             pageCount: project.pageCount,
-            createdAt: project.createdAt,
-            updatedAt: project.updatedAt,
+            createdAt: new Date(project.createdAt),
+            updatedAt: new Date(project.updatedAt),
         };
 
         return res.status(200).json(projectDetails);
@@ -63,8 +63,8 @@ router.get('/', async (req, res) => {
         projects.forEach(project => {
             projectDetails[project.name] = {
                 pageCount: project.pageCount,
-                createdAt: project.createdAt,
-                updatedAt: project.updatedAt,
+                createdAt: new Date(project.createdAt),
+                updatedAt: new Date(project.updatedAt),
             }
         });
 
@@ -83,9 +83,8 @@ router.get('/:projectName', async (req, res) => {
         const projectName = req.params.projectName;
 
         const project = await Project.findOne({ name: projectName, author: userId }).lean();
-
         if (!project) {
-            return res.sendStatus(404);
+            return res.status(404).send('Project not found!');
         }
 
         return res.status(200).json(project);
@@ -105,7 +104,7 @@ router.patch('/:projectName', async (req, res) => {
 
         const project = await Project.findOne({ name: projectName, author: userId });
         if (!project) {
-            return res.sendStatus(404);
+            return res.status(404).send('Project not found!');
         }
 
         //Rename
@@ -123,8 +122,8 @@ router.patch('/:projectName', async (req, res) => {
         //Object parsing for return
         const projectDetails = {
             pageCount: project.pageCount,
-            createdAt: project.createdAt,
-            updatedAt: project.updatedAt,
+            createdAt: new Date(project.createdAt),
+            updatedAt: new Date(project.updatedAt),
         };
 
         return res.status(200).json(projectDetails);
@@ -144,7 +143,7 @@ router.delete('/:projectName', async (req, res) => {
         const project = await Project.findOneAndDelete({ name: projectName, author: userId }).lean();
 
         if (!project) {
-            return res.sendStatus(404);
+            return res.status(404).send('Project not found!');
         }
 
         return res.sendStatus(200);
