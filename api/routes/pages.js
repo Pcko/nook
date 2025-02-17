@@ -40,7 +40,7 @@ router.post('/:projectName/pages', async (req, res) => {
 
         pages[updatedPageName] = {};
         project.pages = pages;
-        await project.save;
+        await project.save();
 
         return res.status(200).json({pageName: updatedPageName});
     }
@@ -126,6 +126,9 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
         }
 
         delete pages[pageName];
+
+        project.pages = pages;
+        await project.save();
 
         return res.sendStatus(200);
     }
