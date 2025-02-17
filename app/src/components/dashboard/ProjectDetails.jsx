@@ -3,14 +3,25 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 import axios from '../auth/AxiosInstance';
 
 import pagePreview from '../../assets/resources/page_preview.png';
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
+import PageCreationForm from "./PageCreationForm";
+import PageEditForm from "./PageEditForm";
 
 function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [pages, setPages] = useState(projects[selectedProjectId].pages);
     const [searchQuery, setSearchQuery] = useState('');
+    const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
+    const [pageNameToEdit, setPageNameToEdit] = useState();
 
     useEffect(() => {
         setPages(projects[selectedProjectId].pages)
     }, [selectedProjectId]);
+
+    useEffect(()=>{
+        if(pages){
+            projects[selectedProjectId].pages = pages;
+        }
+    }, [pages]);
 
     useEffect(()=>{
         const getProjectInfo = async () => {
@@ -37,11 +48,6 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
         getProjectInfo();
     }, [selectedProjectId]);
 
-    {/*  */}
-    const handleEditPage = async (pageName) => {
-
-    };
-
     const PageCard = ({children}) => {
         return (
             <div>   
@@ -51,6 +57,19 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                 {children}
             </div>
         );
+    };
+
+    const handlePageDelete = async (pageName) =>{
+        try{
+            const response = await axios.delete(`/api/projects/${selectedProjectId}/pages/${pageName}`);
+            setPages((prevPages)=>{
+                const updatedPages = { ...prevPages };
+                delete updatedPages[pageName];
+                return updatedPages;
+            })
+        } catch (e){
+            console.error(e.message);
+        }
     };
 
     return (
@@ -100,7 +119,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               </div>
 
               {/* Create New Page Button */}
-              <input type="button" className="btn rounded ml-auto mr-0" value="+ New Page"/>
+              <input type="button" className="btn rounded ml-auto mr-0" value="+ New Page" onClick={()=>setPageCreationFormActive(true)}/>
           </div>
 
           {/* Horizontal Rule between Top Bar and Content */}
@@ -136,7 +155,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                                               {/* Edit-Option */}
                                               <ListboxOption value="editProject">
                                                   <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      >
+                                                      onClick={()=>setPageNameToEdit(pageName)}>
                                                       Edit Page
                                                   </div>
                                               </ListboxOption>
@@ -144,7 +163,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                                               {/* Delete-Option */}
                                               <ListboxOption value="deleteProject">
                                                   <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      >
+                                                      onClick={()=>handlePageDelete(pageName)}>
                                                       Delete Page
                                                   </div>
                                               </ListboxOption>
@@ -162,6 +181,30 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               loading pages...
           </div>
           }
+
+          {/* Page Creation Form */}
+          {pageCreationFormActive?
+              <CenteredWindowWithBackgroundBlur>
+                  <PageCreationForm
+                      pages={pages}
+                      setPages={setPages}
+                      projects={projects}
+                      selectedProjectId={selectedProjectId}
+                      closeForm={()=>{setPageCreationFormActive(false)}}/>
+              </CenteredWindowWithBackgroundBlur>
+          :''}
+
+          {/* Page Edit Form */}
+          {pageNameToEdit?
+            <CenteredWindowWithBackgroundBlur>
+                <PageEditForm
+                    pages={pages}
+                    pageName={pageNameToEdit}
+                    projects={projects}
+                    selectedProjectId={selectedProjectId}
+                    closeForm={()=>{setPageNameToEdit(undefined)}}/>
+            </CenteredWindowWithBackgroundBlur>
+          :''}
       </div>
     );
 }

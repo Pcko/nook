@@ -15,20 +15,30 @@ function Dashboard ()  {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getProjects = async ()=>{
-      let loadedProjects;
+    if(activeTab === 'projects'){
+      const getProjects = async ()=>{
+        let loadedProjects;
 
-      try{
-        const response = await axios.get('/api/projects');
-        loadedProjects = response.data;
-        setProjects(loadedProjects);
-      }catch(e){
-        console.error(e.message);
+        try{
+          const response = await axios.get('/api/projects');
+          loadedProjects = response.data;
+
+          {/* Update the dates and page count without deleting the pages cache */}
+          setProjects((prevProjects)=>{
+            const newProjects = {}
+            for(let key in loadedProjects){
+              newProjects[key] = {...prevProjects[key], ...loadedProjects[key]};
+            }
+            return newProjects;
+          });
+        }catch(e){
+          console.error(e.message);
+        }
       }
-    }
 
-    getProjects();
-  }, []);
+      getProjects();
+    }
+  }, [activeTab]);
 
   useEffect(()=>{
     if(!selectedProject && Object.keys(projects).length !== 0) {

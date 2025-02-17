@@ -22,7 +22,7 @@ router.post('/:projectName/pages', async (req, res) => {
             return res.status(404).send('Project not found!');
         }
 
-        const pages = project.pages;
+        const pages = { ...project.pages };
 
         let updatedPageName = pageName;
         let duplicateNumber = 1;
@@ -42,7 +42,7 @@ router.post('/:projectName/pages', async (req, res) => {
         project.pages = pages;
         await project.save();
 
-        return res.status(200).json({pageName: updatedPageName});
+        return res.status(200).json({pageName: updatedPageName, pageDetails: {}});
     }
     catch (e) {
         console.error('❌ Create project error: ', e);
@@ -62,7 +62,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
             return res.status(404).send('Project not found!');
         }
 
-        const pages = project.pages;
+        const pages = { ...project.pages };
 
         const selectedPage = pages[pageName];
         if(!selectedPage){
@@ -118,7 +118,7 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
             return res.status(404).send('Project not found!');
         }
 
-        const pages = project.pages;
+        const pages = { ...project.pages };
         const pageExists = pages[pageName];
 
         if(!pageExists){
