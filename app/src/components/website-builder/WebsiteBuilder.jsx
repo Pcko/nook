@@ -1,5 +1,4 @@
-import {useNavigate} from "react-router-dom";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef} from "react";
 import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
@@ -9,11 +8,9 @@ import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 
-function WebsiteBuilder() {
-    const [editor, setEditor] = useState(null);
-    const [selectedElement, setSelectedElement] = useState(null);
+function WebsiteBuilder({editor, openNodeEditor}) {
+    const selectedElementRef = useRef(null);
     const editorRef = useRef(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (!editorRef.current) {
@@ -44,33 +41,44 @@ function WebsiteBuilder() {
             });
 
             editorRef.current = editorInstance;
-            setEditor(editorInstance);
 
-            // Corrected Selection Event Listener
-            editorInstance.on("component:selected", () => {
-                const selected = editorInstance.getSelected();
-                console.log("Selected Component:", selected);
-                setSelectedElement(selected || null); // Ensure state is updated correctly
+            editorInstance.on("component:selected", component => {
+                selectedElementRef.current = component;
             });
 
             editorInstance.on("component:deselected", () => {
-                console.log("Deselected Component");
-                setSelectedElement(null);
+                selectedElementRef.current = null;
             });
-        }
 
-        document.addEventListener("keydown", function (event) {
-            if (event.ctrlKey && event.shiftKey && event.key === "E") {
-                openVisualEditor();
-                event.preventDefault();
+            document.addEventListener("keydown", function (event) {
+                if (event.ctrlKey && event.shiftKey && event.key === "E" && selectedElementRef.current) {
+                    openNodeEditor(selectedElementRef);
+                    event.preventDefault();
+                }
+            });
+
+            const state = localStorage.getItem("MyPage");
+            if (state) {
+                editorInstance.setComponents(JSON.parse(state));
             }
-        });
+
+            editor.current = editorInstance;
+        }
 
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
+            localStorage.setItem('tabs','[]');
         };
     }, []);
+
+    const handleSave = () => {
+        const components = editorRef.current.getComponents();
+        const savedContent = {
+            components: components.toJSON(),
+        };
+        localStorage.setItem("MyPage", JSON.stringify(savedContent))
+    }
 
     const clearCanvas = () => {
         const wrapper = editorRef.current?.DomComponents.getWrapper();
@@ -79,12 +87,6 @@ function WebsiteBuilder() {
 
     const setDevice = (device) => {
         editorRef.current?.setDevice(device);
-    };
-
-    const openVisualEditor = () => {
-        if (selectedElement) {
-            navigate(`/editor/${JSON.stringify(selectedElement)}`);
-        }
     };
 
     return (
@@ -115,9 +117,14 @@ function WebsiteBuilder() {
                         </button>
                     </div>
 
-                    <button className="clear-canvas-button" onClick={clearCanvas}>
-                        Clear Canvas
-                    </button>
+                    <div>
+                        <button className="clear-canvas-button" onClick={clearCanvas}>
+                            Clear Canvas
+                        </button>
+                        <button className="clear-canvas-button" onClick={handleSave}>
+                            Save Canvas
+                        </button>
+                    </div>
                 </div>
 
                 <div className="MainContent">
@@ -128,9 +135,6 @@ function WebsiteBuilder() {
                         {/* Editor contents will be rendered here */}
                     </div>
                     <div id="right-panel">,
-                        <button className="clear-canvas-button" onClick={openVisualEditor}>
-                            VisualEditor
-                        </button>
                         {/* Layers Manager */}
                     </div>
                 </div>

@@ -1,16 +1,16 @@
-import {ClassicPreset, NodeEditor} from "rete";
+import {NodeEditor} from "rete";
 import {createRoot} from "react-dom/client";
 import {AreaExtensions, AreaPlugin} from "rete-area-plugin";
 import {Presets, ReactArea2D, ReactPlugin} from "rete-react-plugin";
 import {ControlFlowEngine} from "rete-engine";
-import {NodeProps, Schemes} from "./types";
+import {Schemes} from "./types";
 import {ConnectionPlugin, Presets as ConnectionPresets} from "rete-connection-plugin";
 import {MinimapPlugin} from "rete-minimap-plugin";
 import {Connection} from "./connection";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import Preset from "./contextMenu";
 
-type AreaExtra = ReactArea2D<Schemes>;
+export type AreaExtra = ReactArea2D<Schemes>;
 
 /**
  * Creates a new instance of the Visual Editor.
@@ -51,7 +51,7 @@ export async function create(container: HTMLElement) {
     area.use(contextMenu);
     area.use(connection);
     area.use(render);
-    // area.use(minimap); // Uncomment if minimap is needed
+    // area.use(minimap);
 
     return {editor, engine, area};
 }
@@ -62,37 +62,39 @@ export async function create(container: HTMLElement) {
  * @returns {Promise<JSON>} - A promise that resolves to a JSON representation of the editor's state.
  */
 export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<{ nodes: [], connections: [] }> {
-    const data = {
-        nodes: [],
-        connections: []
-    };
-
-    // Serialize nodes
-    editor.getNodes().forEach(node => {
-        const serializedNode = {
-            id: node.id,
-            type: node.constructor.name,
-            label: node.label,
-            position: area.nodeViews.get(node.id)?.position,
-            inputs: node.inputs,
-            outputs: node.outputs,
-            controls: node.controls
+    return new Promise((resolve) => {
+        const data = {
+            nodes: [],
+            connections: []
         };
-        data.nodes.push(serializedNode);
-    });
 
-    // Serialize connections
-    editor.getConnections().forEach(connection => {
-        const serializedConnection = {
-            source: connection.source,
-            sourceOutput: connection.sourceOutput,
-            target: connection.target,
-            targetInput: connection.targetInput
-        };
-        data.connections.push(serializedConnection);
-    });
+        // Serialize nodes
+        editor.getNodes().forEach(node => {
+            const serializedNode = {
+                id: node.id,
+                type: node.constructor.name,
+                label: node.label,
+                position: area.nodeViews.get(node.id)?.position,
+                inputs: node.inputs,
+                outputs: node.outputs,
+                controls: node.controls
+            };
+            data.nodes.push(serializedNode);
+        });
 
-    return Promise.resolve(data);
+        // Serialize connections
+        editor.getConnections().forEach(connection => {
+            const serializedConnection = {
+                source: connection.source,
+                sourceOutput: connection.sourceOutput,
+                target: connection.target,
+                targetInput: connection.targetInput
+            };
+            data.connections.push(serializedConnection);
+        });
+
+        resolve(data);
+    });
 }
 
 /**
@@ -104,13 +106,13 @@ export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes
  */
 export async function load(saveState: { nodes: [], connections: [] }, editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<void> {
     const promises = [];
-    const nodeMap = await fetchNodeTypes(); // Fetch available node types
+    const nodeMap = await fetchNodeTypes(); //Fetch available node types
 
     try {
         // Restore nodes
         if (Array.isArray(saveState.nodes)) {
             for (const nodeData of saveState.nodes) {
-                const NodeClass = nodeMap.get(nodeData.type); // Get class by type
+                const NodeClass = nodeMap.get(nodeData.type); //Get class by type
                 const node = new NodeClass(nodeData.label);
 
                 node.id = nodeData.id;
@@ -140,10 +142,7 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
 
                 // Restore controls
                 if (nodeData.controls) {
-                    for (const [key, controlData] of Object.entries(nodeData.controls)) {
-                        node.addControl(controlData.id, controlData.options);
-                        if (controlData.value) node.changeValue(controlData.value); // Restore user-defined value
-                    }
+                    node.controls = nodeData.controls;
                 }
 
                 promises.push(editor.addNode(node).then(() => area.translate(node.id, node.position)));
@@ -178,7 +177,8 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
             }
         }
     } catch (error) {
-        console.error("Error loading state:", error);
+        console.warn(error)
+        throw error;
     }
 }
 
