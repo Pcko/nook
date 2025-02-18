@@ -17,7 +17,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
 
             setPages((prevPages)=>{
                 const updatedPages = { ...prevPages };
-                updatedPages[response.data.pageName] = response.data.details;
+                updatedPages[response.data.pageName] = response.data.pageDetails;
                 return updatedPages;
             })
         }catch (e) {

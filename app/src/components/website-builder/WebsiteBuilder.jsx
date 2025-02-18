@@ -7,8 +7,9 @@ import "./WebsiteBuilder.css";
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
+import axios from "../auth/AxiosInstance";
 
-function WebsiteBuilder({editor, openNodeEditor}) {
+function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const selectedElementRef = useRef(null);
     const editorRef = useRef(null);
 
@@ -57,9 +58,8 @@ function WebsiteBuilder({editor, openNodeEditor}) {
                 }
             });
 
-            const state = localStorage.getItem("MyPage");
             if (state) {
-                editorInstance.setComponents(JSON.parse(state));
+                editorInstance.setComponents(state);
             }
 
             editor.current = editorInstance;
@@ -68,16 +68,16 @@ function WebsiteBuilder({editor, openNodeEditor}) {
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
-            localStorage.setItem('tabs','[]');
+            localStorage.setItem('tabs', '[]');
         };
     }, []);
 
-    const handleSave = () => {
-        const components = editorRef.current.getComponents();
-        const savedContent = {
-            components: components.toJSON(),
-        };
-        localStorage.setItem("MyPage", JSON.stringify(savedContent))
+    const handleSave = async () => {
+        try {
+            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {pageContent: editor.current.getComponents()});
+        }catch (err){
+            console.error(err);
+        }
     }
 
     const clearCanvas = () => {

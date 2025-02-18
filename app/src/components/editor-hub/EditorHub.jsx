@@ -1,11 +1,15 @@
 import {useRef, useState} from "react";
 import WebsiteBuilder from "../website-builder/WebsiteBuilder";
 import NodeEditor from "../node-editor/NodeEditor";
+import {useLocation, useParams} from "react-router-dom";
 
 function EditorHub() {
     const [selectedElement, setSelectedElement] = useState(null);
     const [isOverlayOpen, setIsOverlayOpen] = useState(false);
     const gjsEditorRef = useRef(null);
+    const location = useLocation();
+    const data = location.state;
+    const { projectName, pageName } = useParams();
 
     /**
      * Opens a tab in the NodeEditor for the selected grapesjs component
@@ -30,7 +34,7 @@ function EditorHub() {
     return (
         <div className="h-screen w-screen relative">
             {/* WebsiteBuilder is always there */}
-            <WebsiteBuilder editor={gjsEditorRef} openNodeEditor={openNodeEditor}/>
+            <WebsiteBuilder state={data} pageInfo={{ projectName, pageName }} editor={gjsEditorRef} openNodeEditor={openNodeEditor}/>
 
             {/* Overlay for NodeEditor */}
             {isOverlayOpen ?

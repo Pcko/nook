@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
+import { useNavigate } from "react-router-dom";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import axios from '../auth/AxiosInstance';
 
@@ -12,6 +13,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [searchQuery, setSearchQuery] = useState('');
     const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
     const [pageNameToEdit, setPageNameToEdit] = useState();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setPages(projects[selectedProjectId].pages)
@@ -48,11 +50,17 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
         getProjectInfo();
     }, [selectedProjectId]);
 
-    const PageCard = ({children}) => {
+    const PageCard = ({ children, pageName }) => {
         return (
             <div>   
                 <div className="flex items-center p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg">
-                    <img src={pagePreview} alt="page preview" className="m-auto"/>
+                    <img
+                        src={pagePreview}
+                        alt="page preview"
+                        className="m-auto hover:cursor-pointer"
+                        onClick={()=>{
+                            navigate(`/editor/${selectedProjectId}/${pageName}`, { state: pages[pageName].data });
+                        }}/>
                 </div>
                 {children}
             </div>
@@ -80,7 +88,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               <Listbox value={selectedProjectId} onChange={setSelectedProjectId}>
                   {/* Selected Sorting Option */}
                   <ListboxButton className="flex mr-[2vw] w-[200px] px-2">
-                      <div className="flex-1 my-auto mr-2 overflow-hidden whitespace-nowrap text-ellipsis">{selectedProjectId}</div>
+                      <div className="flex-1 my-auto mr-2 text-2xl overflow-hidden whitespace-nowrap text-ellipsis">{selectedProjectId}</div>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                            stroke="currentColor" className="size-5 my-auto ml-auto mr-0">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
@@ -133,7 +141,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                   .map(([pageName, pageDetails], index, filteredPages) => {
                       return(
                           <Fragment key={pageName}>
-                              {<PageCard>
+                              {<PageCard pageName={pageName}>
                                   <div className="flex mt-1 mx-3">
                                       <div className="my-auto">
                                           {pageName}

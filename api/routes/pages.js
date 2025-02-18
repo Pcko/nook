@@ -38,11 +38,11 @@ router.post('/:projectName/pages', async (req, res) => {
         }
         while (pageExists);
 
-        pages[updatedPageName] = {};
+        pages[updatedPageName] = { data: {} };
         project.pages = pages;
         await project.save();
 
-        return res.status(200).json({pageName: updatedPageName, pageDetails: {}});
+        return res.status(200).json({pageName: updatedPageName, pageDetails: pages[updatedPageName]});
     }
     catch (e) {
         console.error('❌ Create project error: ', e);
@@ -92,7 +92,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
 
         //Save data
         if (pageContent) {
-            pages[pageName] = pageContent;
+            pages[pageName] = { ...pages[pageName], data: pageContent };
         }
 
         project.pages = pages;

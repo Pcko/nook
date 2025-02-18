@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute"
 import AuthRedirect from "./components/general/AuthRedirect";
 import Dashboard from "./components/dashboard/Dashboard"
 import Settings from "./components/settings/Settings";
+import EditorHub from "./components/editor-hub/EditorHub";
 
 import './index.css';
 
@@ -41,6 +42,7 @@ function App() {
               <Route element={<ProtectedRoute/>}>
                 <Route path="/settings" element={<Settings/>} />
                 <Route path="/dashboard" element={<Dashboard/>} />
+                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
               </Route>
             </Routes>
           </main>
