@@ -1,5 +1,5 @@
 .GrapesJsApp {
-    background-color: #f4f4f4;
+    background-color: var(--website-bg);
     width: 100%;
     min-height: 100vh;
     overflow-x: hidden;
@@ -12,8 +12,8 @@
 
         .TopPanel {
             width: 100%;
-            background-color: #292929;
-            color: white;
+            background-color: var(--ui-bg);
+            color: var(--text);
             display: flex;
             align-items: center;
             padding: 8px 16px;
@@ -22,8 +22,8 @@
         }
 
         .clear-canvas-button {
-            background-color: #5C40AD;
-            color: white;
+            background-color: var(--primary);
+            color: var(--text);
             border: none;
             border-radius: 5px;
             padding: 6px 12px;
@@ -34,12 +34,12 @@
         }
 
         .clear-canvas-button:hover {
-            background-color: #e04343;
+            background-color: var(--dangerous);
         }
 
         .top-button {
-            background-color: #3c3c3c;
-            color: white;
+            background-color: var(--ui-button);
+            color: var(--text);
             border: none;
             border-radius: 5px;
             padding: 2px 5px;
@@ -50,7 +50,7 @@
         }
 
         .top-button:hover {
-            background-color: #464545;
+            background-color: var(--ui-button-hover);
         }
 
         .top-left {
@@ -65,8 +65,8 @@
 
         .top-button,
         .device-button {
-            background-color: #292929;
-            color: white;
+            background-color: var(--ui-bg);
+            color: var(--text);
             border: none;
             border-radius: 5px;
             padding: 6px;
@@ -80,9 +80,8 @@
 
         .top-button:hover,
         .device-button:hover {
-            background-color: #5C40AD;
+            background-color: var(--primary-hover);
         }
-
 
         .MainContent {
             display: flex;
@@ -94,45 +93,44 @@
             #gjs {
                 flex: 5;
                 height: 100vh;
-                background-color: #ffffff;
+                background-color: var(--text);
             }
 
             #blocks {
                 flex: 1;
                 padding: 16px;
-                background-color: #292929;
-                color: white;
-                border-top: #454545 solid 2px;
+                background-color: var(--ui-bg);
+                color: var(--text);
+                border-top: var(--ui-border) solid 2px;
                 overflow-y: auto;
 
                 scrollbar-width: thin;
-                scrollbar-color: #555 transparent; 
+                scrollbar-color: var(--ui-subtle) transparent;
             }
 
             #blocks::-webkit-scrollbar {
-                width: 6px; 
-            }
-            
-            #blocks::-webkit-scrollbar-thumb {
-                background: #555; 
-                border-radius: 3px;
-            }
-            
-            #blocks::-webkit-scrollbar-thumb:hover {
-                background: #777; 
-            }
-            
-            #blocks::-webkit-scrollbar-track {
-                background: transparent; 
+                width: 6px;
             }
 
+            #blocks::-webkit-scrollbar-thumb {
+                background: var(--ui-subtle);
+                border-radius: 3px;
+            }
+
+            #blocks::-webkit-scrollbar-thumb:hover {
+                background: var(--primary);
+            }
+
+            #blocks::-webkit-scrollbar-track {
+                background: transparent;
+            }
 
             #right-panel {
                 flex: 1;
                 padding: 16px;
-                background-color: #292929;
+                background-color: var(--ui-bg);
                 overflow-y: auto;
-                border-top: #454545 solid 2px;
+                border-top: var(--ui-border) solid 2px;
             }
         }
 
@@ -145,54 +143,42 @@
         }
 
         .gjs-frame {
-            background-color: #ffffff !important;
+            background-color: var(--text) !important;
         }
 
-
-
-
         #blocks .gjs-block {
-            background-color: #1a1a1a; /* Darker background for individual blocks */
-            color: white;
+            background-color: var(--far-bg);
+            color: var(--text);
             padding: 8px;
             border-radius: 5px;
             cursor: pointer;
             text-align: center;
             transition: background-color 0.2s, transform 0.1s;
         }
-        
+
         #blocks .gjs-block:hover {
-            background-color: #5C40AD;
+            background-color: var(--primary);
             transform: scale(1.03);
         }
-        
+
         #blocks .gjs-block-label {
-            color: #ffffff;
+            color: var(--text);
         }
-        
+
         #blocks .gjs-block-category {
             padding: 8px;
-            background-color: #292929;
-            color: white;
+            background-color: var(--ui-bg);
+            color: var(--text);
             border-radius: 3px;
             text-transform: uppercase;
             font-size: 12px;
             border: none;
         }
 
-
-
-
-
-
-
-
-
-    .gjs-toolbar {
-        background-color: #5C40AD;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
+        .gjs-toolbar {
+            background-color: var(--primary);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
     }
 }

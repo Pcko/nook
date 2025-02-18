@@ -134,7 +134,7 @@ function WebsiteBuilder({editor, openNodeEditor}) {
                     <div id="gjs" style={{height: "100%"}}>
                         {/* Editor contents will be rendered here */}
                     </div>
-                    <div id="right-panel">,
+                    <div id="right-panel">
                         {/* Layers Manager */}
                     </div>
                 </div>
