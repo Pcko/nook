@@ -163,10 +163,10 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                                 </Listbox>
                             </div>
                             <div className="p-4 bg-ui-bg border-ui-border border-[1px]">
-                                {projectDetails.createdAt.toLocaleString()}
+                                {new Date(projectDetails.createdAt).toLocaleString(navigator.language)}
                             </div>
                             <div className="p-4 bg-ui-bg border-ui-border border-[1px]">
-                                {projectDetails.updatedAt.toLocaleString()}
+                                {new Date(projectDetails.updatedAt).toLocaleString(navigator.language)}
                             </div>
                             <div className={`p-4 bg-ui-bg border-ui-border border-[1px] ${index === filteredProjects.length - 1 ? 'rounded-br-lg' : ''}`}>
                                 {projectDetails.pageCount}
