@@ -57,6 +57,12 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     event.preventDefault();
                 }
             });
+            document.addEventListener("keydown", function (event) {
+                if (event.ctrlKey && event.key === "S" && selectedElementRef.current) {
+                    handleSave();
+                    event.preventDefault();
+                }
+            });
 
             if (state) {
                 editorInstance.setComponents(state);
