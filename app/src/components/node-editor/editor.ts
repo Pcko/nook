@@ -9,6 +9,10 @@ import {MinimapPlugin} from "rete-minimap-plugin";
 import {Connection} from "./connection";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import Preset from "./contextMenu";
+import SliderComponent, {SliderControl} from "./Controls/SliderControl";
+import ColorPickerComponent, {ColorPickerControl} from "./Controls/ColorPickerControl";
+import {TextInputComponent, TextInputControl} from "./Controls/TextInputControl";
+import {DropdownComponent, DropdownControl} from "./Controls/DropdownControl";
 
 export type AreaExtra = ReactArea2D<Schemes>;
 
@@ -42,6 +46,20 @@ export async function create(container: HTMLElement) {
 
     // Add visual presets
     render.addPreset(Presets.classic.setup());
+    // WIP React Controls for better integration!
+    render.addPreset(
+        Presets.classic.setup({
+            customize: {
+                control(data) {
+                    if (data.payload instanceof SliderControl) return SliderComponent;
+                    if (data.payload instanceof ColorPickerControl) return ColorPickerComponent;
+                    if (data.payload instanceof TextInputControl) return TextInputComponent;
+                    if (data.payload instanceof DropdownControl) return DropdownComponent;
+                    return null;
+                }
+            }
+        })
+    );
     render.addPreset(Preset);
     connection.addPreset(ConnectionPresets.classic.setup());
 
@@ -193,7 +211,7 @@ export async function clean(editor: NodeEditor<Schemes>): Promise<void> {
  * Fetches all available node types from the nodes module.
  */
 export async function fetchNodeTypes() {
-    const module = await import("./Nodes/nodes");
+    const module = await import("./Nodes/_nodes");
     let newMap = new Map();
     Object.entries(module).forEach(([key, value]) => newMap.set(key, value));
     return newMap;

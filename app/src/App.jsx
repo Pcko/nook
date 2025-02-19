@@ -12,6 +12,7 @@ import './index.css';
 
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import EditorHub from "./components/editor-hub/EditorHub";
 
 
 function App() {
@@ -29,24 +30,7 @@ function App() {
   }, []);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <Router>
-        <div className={'h-full'}>
-          <main className={'h-full bg-far-bg text-text'}>
-            <Routes>
-              <Route path="/" element={<AuthRedirect/>}/>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register/>} />
-
-              <Route element={<ProtectedRoute/>}>
-                <Route path="/settings" element={<Settings/>} />
-                <Route path="/dashboard" element={<Dashboard/>} />
-              </Route>
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </DndProvider>
+      <EditorHub/>
   );
 }
 
