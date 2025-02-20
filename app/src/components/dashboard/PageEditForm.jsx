@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
+import {isValidStringForURL} from "../general/FormChecks";
 
 function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
     const [newPageName, setNewPageName] = useState('');
@@ -7,9 +8,13 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(pageName in Object.keys(pages)){
+        if(newPageName in Object.keys(pages)){
             console.error('page name must be unique');
             return;
+        }
+
+        if(!isValidStringForURL(newPageName)){
+            return console.error('The page name must not contain any of these characters: / ? # &');
         }
 
         try{

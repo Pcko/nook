@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
+import {isValidStringForURL} from "../general/FormChecks";
 
 function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
     const [newProjectName, setNewProjectName] = useState(projectName);
@@ -9,6 +10,10 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
 
         if(projectName === newProjectName){
             return;
+        }
+
+        if(!isValidStringForURL(projectName)){
+            return console.error('The project name must not contain any of these characters: / ? # &');
         }
 
         try{

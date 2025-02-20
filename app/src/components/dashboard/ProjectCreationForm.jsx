@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
+import {isValidStringForURL} from "../general/FormChecks";
 
 function ProjectCreationForm({ closeForm, setProjects }){
     const [projectName, setProjectName] = useState('');
@@ -7,12 +8,16 @@ function ProjectCreationForm({ closeForm, setProjects }){
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
+        if(!isValidStringForURL(projectName)){
+            return console.error('The project name must not contain any of these characters: / ? # &');
+        }
+
         try{
             const response = await axios.post('/api/projects', { projectName });
 
             setProjects((prevProjects) => {
                 const updatedProjects = { ...prevProjects };
-                updatedProjects[projectName] = response.data;
+                updatedProjects[response.data.projectName] = response.data.projectDetails;
                 return updatedProjects;
             });
         }catch (e) {
