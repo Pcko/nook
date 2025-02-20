@@ -1,3 +1,10 @@
+/**
+ * @file WebsiteBuilder.js
+ *
+ * @module WebsiteBuilder
+ */
+
+
 import React, {useEffect, useRef} from "react";
 import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
@@ -9,9 +16,23 @@ import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 
 function WebsiteBuilder({editor, openNodeEditor}) {
+     /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
     const selectedElementRef = useRef(null);
+    
+    /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
+    /**
+     * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
+     * 
+     * <ul>
+     *   <li>Editor Initialization: Creates an instance of GrapesJS inside the container.</li>
+     *   <li>Custom Blocks & Commands: Loads pre-defined blocks and commands.</li>
+     *   <li>Keyboard Shortcuts: Binds a shortcut (Ctrl + Shift + E) to open the node editor.</li>
+     *   <li>State Restoration: Loads previously saved components from localStorage.</li>
+     * </ul>
+     * @function useEffect
+     */
     useEffect(() => {
         if (!editorRef.current) {
             const editorInstance = grapesjs.init({
@@ -72,6 +93,11 @@ function WebsiteBuilder({editor, openNodeEditor}) {
         };
     }, []);
 
+     /**
+     * Saves the current editor state to localStorage.
+     * 
+     * @function handleSave
+     */
     const handleSave = () => {
         const components = editorRef.current.getComponents();
         const savedContent = {
@@ -80,11 +106,23 @@ function WebsiteBuilder({editor, openNodeEditor}) {
         localStorage.setItem("MyPage", JSON.stringify(savedContent))
     }
 
+    /**
+     * Clears all content from the GrapesJS editor canvas.
+     * 
+     * @function clearCanvas
+     */
     const clearCanvas = () => {
         const wrapper = editorRef.current?.DomComponents.getWrapper();
         wrapper?.components().reset();
     };
 
+    /**
+     * Switches the editor view to a different device preview mode.
+     * 
+     * 
+     * @function setDevice
+     * @param {string} device - The target device name ("Desktop", "Tablet", "Mobile").
+     */
     const setDevice = (device) => {
         editorRef.current?.setDevice(device);
     };
