@@ -17,8 +17,7 @@ router.post('/', async (req, res) => {
 
         let newProjectName = projectName;
         let duplicateNumber = 1;
-
-        let projectExists = undefined;
+        let projectExists;
         do {
             projectExists = await Project.findOne({ name: newProjectName, author: userId });
 
@@ -41,7 +40,7 @@ router.post('/', async (req, res) => {
             updatedAt: new Date(project.updatedAt),
         };
 
-        return res.status(200).json(projectDetails);
+        return res.status(200).json({ projectName: newProjectName, projectDetails });
     }
     catch (e) {
         console.error('❌ Create project error: ', e);
@@ -109,8 +108,22 @@ router.patch('/:projectName', async (req, res) => {
         }
 
         //Rename
+        let updatedProjectName;
         if (newProjectName) {
-            project.name = newProjectName;
+            let projectExists;
+            let duplicateNumber = 1;
+            updatedProjectName = newProjectName;
+            do {
+                projectExists = await Project.findOne({ name: updatedProjectName, author: userId });
+    
+                if (projectExists) {
+                    duplicateNumber += 1;
+                    updatedProjectName = `${newProjectName} (${duplicateNumber})`;
+                }
+            }
+            while (projectExists);
+
+            project.name = updatedProjectName;
         }
 
         //Save project data
@@ -127,7 +140,7 @@ router.patch('/:projectName', async (req, res) => {
             updatedAt: new Date(project.updatedAt),
         };
 
-        return res.status(200).json(projectDetails);
+        return res.status(200).json({ projectName: updatedProjectName || projectName, projectDetails });
     }
     catch (e) {
         console.error('❌ Update project error: ', e);
