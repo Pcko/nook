@@ -46,12 +46,12 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                     onChange={(e) => setNewPageName(e.target.value)}
                     value={newPageName}
-                    placeholder="Example: My Project"
+                    placeholder="Example: My Page"
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="submit" value="Edit Page" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>

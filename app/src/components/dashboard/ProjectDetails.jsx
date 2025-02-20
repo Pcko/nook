@@ -52,7 +52,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
 
     const PageCard = ({ children, pageName }) => {
         return (
-            <div>   
+            <div className="w-[240px]">
                 <div className="flex items-center p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg">
                     <img
                         src={pagePreview}
@@ -143,7 +143,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                           <Fragment key={pageName}>
                               {<PageCard pageName={pageName}>
                                   <div className="flex mt-1 mx-3">
-                                      <div className="my-auto">
+                                      <div className="my-auto overflow-hidden text-ellipsis">
                                           {pageName}
                                       </div>
 
