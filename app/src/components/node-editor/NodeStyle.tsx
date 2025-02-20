@@ -1,85 +1,145 @@
-import { Presets } from "rete-react-plugin";
-import { css } from "styled-components";
+import * as React from 'react';
+import { ClassicScheme, RenderEmit } from '../types';
+import { RefControl } from './refs/RefControl';
+import { RefSocket } from './refs/RefSocket';
 
-const styles = css<{ selected?: boolean }>`
-    /* Node Container (Dark Mode) */
-    background: linear-gradient(145deg, #2f3136, #23272a); /* Dark gray background */
-    border: 2px solid ${(props) => (props.selected ? "#6B439B" : "#36393f")}; /* Primary color when selected, darker gray when not */
-    border-radius: 12px;
-    box-shadow: ${(props) =>
-            props.selected
-                    ? "0 8px 16px rgba(107, 67, 155, 0.3), 0 4px 8px rgba(107, 67, 155, 0.2)"  /* primary color */
-                    : "0 6px 12px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15)"};
-    transition: all 0.3s ease-in-out;
-    padding: 8px;
+type NodeExtraData = { width?: number; height?: number };
 
-    /* Title Section */
-    .title {
-        color: ${(props) => (props.selected ? "#ffffff" : "#b9bbbe")}; /* Light text color when selected */
-        font-weight: bold;
-        text-align: center;
-        padding: 10px;
-        background: ${(props) =>
-                props.selected
-                        ? "linear-gradient(145deg, #6B439B, #5A3382)"  /* primary color gradient for selected */
-                        : "linear-gradient(145deg, #3a3c42, #2e3136)"}; /* Darker gradient for non-selected */
-        border-radius: 8px;
-        border-bottom: 2px solid ${(props) => (props.selected ? "#6B439B" : "#444b53")}; /* Darker border when not selected */
-        font-size: 16px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+type Props<S extends ClassicScheme> = {
+    data: S['Node'] & NodeExtraData;
+    styles?: () => any;
+    emit: RenderEmit<S>;
+};
 
-    /* Text Content */
-    .text {
-        color: ${(props) => (props.selected ? "#b9bbbe" : "#6a6f77")}; /* Lighter gray for selected text, darker for normal */
-        font-size: 14px;
-        padding: 10px;
-        line-height: 1.5;
-    }
+export type NodeComponent<Scheme extends ClassicScheme> = (props: Props<Scheme>) => TSX.Element;
 
-    /* Hover Effects */
-    &:hover {
-        background: linear-gradient(145deg, #35383c, #2c2f34); /* Slightly lighter dark background on hover */
-        border-color: ${(props) => (props.selected ? "#5A3382" : "#444b53")}; /* Hover effect with primary color or darker border */
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.15); /* Darker shadow */
-    }
+function sortByIndex<T extends [string, undefined | { index?: number }][]>(entries: T) {
+    entries.sort((a, b) => {
+        const ai = a[1]?.index || 0;
+        const bi = b[1]?.index || 0;
+        return ai - bi;
+    });
+}
 
-    /* Output Socket (Green for active state) */
-    .output-socket {
-        margin-right: -6px;
-        background: #34c759; /* Green for active output socket */
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        transition: transform 0.2s ease, background 0.3s ease;
-    }
+export function <Scheme extends ClassicScheme>(props: Props<Scheme>) {
+    const inputs = Object.entries(props.data.inputs);
+    const outputs = Object.entries(props.data.outputs);
+    const controls = Object.entries(props.data.controls);
+    const selected = props.data.selected || false;
+    const { id, label, width, height } = props.data;
 
-    /* Input Socket (Red for active state) */
-    .input-socket {
-        margin-left: -6px;
-        background: #ff3b30; /* Red for active input socket */
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        transition: transform 0.2s ease, background 0.3s ease;
-    }
+    sortByIndex(inputs);
+    sortByIndex(outputs);
+    sortByIndex(controls);
 
-    /* Socket Hover Effects */
-    .output-socket:hover,
-    .input-socket:hover {
-        transform: scale(1.3);
-        background: ${(props) => (props.selected ? "#6B439B" : "#3385ff")}; /* Primary color or blue when hovered */
-    }
+    return (
+        <div
+            className={`
+        bg-ui-bg
+        border-2
+        ${selected ? 'border-ui-border-selected' : 'border-ui-border'}
+        rounded-lg
+        cursor-pointer
+        box-border
+        ${width ? `w-[${width}px]` : 'w-[200px]'}
+        ${height ? `h-[${height}px]` : 'h-auto'}
+        pb-1.5
+        relative
+        select-none
+        leading-none
+        font-sans
+        transition-all
+        duration-300
+        ease-in-out
+        hover:bg-ui-bg-selected
+        hover:border-ui-border-selected
+        ${props.styles ? props.styles() : ''}
+      `}
+            data-testid="node"
+        >
+            {/* Title */}
+            <div
+                className={`
+          text-white
+          font-sans
+          text-lg
+          p-2
+          ${selected ? 'bg-gradient-to-br from-primary to-primary-hover' : 'bg-gradient-to-br from-ui-subtle to-ui-bg'}
+          rounded-t-lg
+          border-b-2
+          ${selected ? 'border-primary' : 'border-ui-border'}
+          uppercase
+          text-sm
+          tracking-wide
+        `}
+                data-testid="title"
+            >
+                {label}
+            </div>
 
-    /* Connecting Lines */
-    .output-socket.active,
-    .input-socket.active {
-        background: #ffcc00; /* Yellow when socket is actively connected */
-        transform: scale(1.4);
-    }
-`;
+            {/* Outputs */}
+            {outputs.map(([key, output]) => (
+                output && (
+                    <div className="output text-right" key={key} data-testid={`output-${key}`}>
+                        <div className="output-title inline-block text-white font-sans text-sm mx-1" data-testid="output-title">
+                            {output?.label}
+                        </div>
+                        <RefSocket
+                            name="output-socket"
+                            side="output"
+                            socketKey={key}
+                            nodeId={id}
+                            emit={props.emit}
+                            payload={output.socket}
+                            data-testid="output-socket"
+                        />
+                    </div>
+                )
+            ))}
 
-export function NodeStyle(props: any) {
-    return <Presets.classic.Node styles={() => styles} {...props} />;
+            {/* Controls */}
+            {controls.map(([key, control]) =>
+                control ? (
+                    <RefControl
+                        key={key}
+                        name="control"
+                        emit={props.emit}
+                        payload={control}
+                        data-testid={`control-${key}`}
+                    />
+                ) : null
+            )}
+
+            {/* Inputs */}
+            {inputs.map(([key, input]) =>
+                    input && (
+                        <div className="input text-left" key={key} data-testid={`input-${key}`}>
+                            <RefSocket
+                                name="input-socket"
+                                side="input"
+                                socketKey={key}
+                                nodeId={id}
+                                emit={props.emit}
+                                payload={input.socket}
+                                data-testid="input-socket"
+                            />
+                            {input && (!input.control || !input.showControl) && (
+                                <div className="input-title inline-block text-white font-sans text-sm mx-1" data-testid="input-title">
+                                    {input?.label}
+                                </div>
+                            )}
+                            {input?.control && input?.showControl && (
+                                <RefControl
+                                    key={key}
+                                    name="input-control"
+                                    emit={props.emit}
+                                    payload={input.control}
+                                    data-testid="input-control"
+                                />
+                            )}
+                        </div>
+                    )
+            )}
+        </div>
+    );
 }
