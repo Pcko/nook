@@ -2,7 +2,7 @@
   "name": "api",
   "version": "0.1.0",
   "description": "<server> npm i\r <client> npm i\r <client> npm run build\r <server> npm run start",
-  "main": "server-dev.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

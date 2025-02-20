@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: process.env.API_URL || '/',
+    baseURL: process.env.API_URL || 'https://nook-server.vercel.app',
+    withCredentials: true,
     timeout: 1500
 });
 

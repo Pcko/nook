@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './config.env' });
 
 const dbName = 'NookDB'; //change inbetween NookDB and NookTestDB to switch.
-const uri = process.env.ATLAS_URI;
+const uri = process.env.MONGODB_URI;
 if (!uri) {
     throw new Error('❌ Environment variable missing!');
 }
