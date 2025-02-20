@@ -1,6 +1,8 @@
 import express from 'express';
+
 import User from '../database/models/user-schema.js';
 import RefreshToken from '../database/models/refreshToken-schema.js';
+import Project from '../database/models/project-schema.js';
 
 const router = express.Router();
 
@@ -45,15 +47,11 @@ router.delete('/delete-account', async (req, res) => {
     }
 
 
-    const user = await User.findOne({ _id: username });
-
+    const user = await User.findOneAndDelete({ _id: username });
     //make sure username exists
     if (!user) {
       return res.sendStatus(404);
     }
-
-    await RefreshToken.findOneAndDelete({ _id: user.username });
-    await user.deleteOne();
 
     return res.sendStatus(200);
   }
