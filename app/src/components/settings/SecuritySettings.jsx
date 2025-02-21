@@ -6,20 +6,22 @@ function SecuritySettings({changeHandler}){
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
 
-    const sendPasswordChangeRequest = async () =>{
+    const sendPasswordChangeRequest = async (e) =>{
+        e.preventDefault();
+
         try{
             const username = JSON.parse(localStorage.getItem('user')).username;
 
             const response = await axios.patch('/api/settings', {username, 'changes': {'account': {'password':newPassword} } });
 
             if(response.status>=200 && response.status < 300){
-                alert('password change accepted');
+                console.error('password change accepted');
             }
             else{
-                alert('password change rejected');
+                console.error('password change rejected');
             }
         }catch(e){
-            alert('there was an issue sending the request');
+            console.error('there was an issue sending the request');
         }
     };
 
@@ -27,7 +29,7 @@ function SecuritySettings({changeHandler}){
         <div>
             <h1 className="text-5xl mb-10">Security</h1>
 
-            <form  onSubmit={(e) => {e.preventDefault(); sendPasswordChangeRequest();}}>
+            <form onSubmit={sendPasswordChangeRequest}>
                 <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                     <div className="text-lg">Change password</div>
 
@@ -44,7 +46,7 @@ function SecuritySettings({changeHandler}){
                             name="currentPassword"
                             required
                             minLength="10"
-                            className="h-8 w-2/3 mb-3 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                            className="h-8 w-2/3 mb-3 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
                             onChange={(e) => setCurrentPassword(e.target.value)}
                         />
 
@@ -57,7 +59,7 @@ function SecuritySettings({changeHandler}){
                             required
                             autoComplete="off"
                             minLength="10"
-                            className="h-8 w-2/3 border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                            className="h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </div>
