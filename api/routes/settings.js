@@ -2,7 +2,6 @@ import express from 'express';
 
 import User from '../database/models/user-schema.js';
 import RefreshToken from '../database/models/refreshToken-schema.js';
-import Project from '../database/models/project-schema.js';
 
 const router = express.Router();
 
@@ -46,7 +45,6 @@ router.delete('/delete-account', async (req, res) => {
       return res.sendStatus(400);
     }
 
-
     const user = await User.findOneAndDelete({ _id: username });
     //make sure username exists
     if (!user) {
@@ -65,7 +63,6 @@ router.delete('/delete-account', async (req, res) => {
 router.post('/logout', async (req, res) => {
   try {
     const { userId } = req;
-
     const tokenEntry = await RefreshToken.findOneAndDelete({ _id: userId });
 
     if (!tokenEntry) {

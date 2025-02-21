@@ -1,36 +1,42 @@
 import HR from './SettingsHR';
-import { useState } from 'react';
+import {useState} from 'react';
 import axios from 'axios';
 
-function SecuritySettings({changeHandler}){
+function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
 
-    const sendPasswordChangeRequest = async (e) =>{
+    const sendPasswordChangeRequest = async (e) => {
         e.preventDefault();
 
-        try{
+        try {
             const username = JSON.parse(localStorage.getItem('user')).username;
+            const response = await axios.patch('/api/settings',
+                {
+                    username,
+                    changes: {account: {password: newPassword}}
+                },
+                {headers: {'Content-Type': 'application/json'}}
+            );
 
-            const response = await axios.patch('/api/settings', {username, 'changes': {'account': {'password':newPassword} } });
 
-            if(response.status>=200 && response.status < 300){
+            if (response.status >= 200 && response.status < 300) {
                 console.error('password change accepted');
-            }
-            else{
+            } else {
                 console.error('password change rejected');
             }
-        }catch(e){
+        } catch (e) {
             console.error('there was an issue sending the request');
         }
     };
 
-    return(
+    return (
         <div>
             <h1 className="text-5xl mb-10">Security</h1>
 
             <form onSubmit={sendPasswordChangeRequest}>
-                <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
+                <div
+                    className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                     <div className="text-lg">Change password</div>
 
                     <input type="submit"
