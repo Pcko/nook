@@ -49,6 +49,7 @@ function NodeEditorPage({element, doReload}) {
     useEffect(() => {
         setTimeout(() => {
             buildHierarchy();
+            saveState();
         }, 10);
     }, [hierarchyList]);
 
