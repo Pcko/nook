@@ -1,0 +1,53 @@
+:root{
+    --primary:#6B439B;
+    --secondary:#8869AD;
+    --primary-hover:#5A3382;
+    --text-subtle:#949597;
+    --far-bg:#090909;
+    --website-bg:#101012;
+    --ui-bg:#17181B;
+    --ui-bg-selected:#1E1F23;
+    --ui-button:#2D3036;
+    --ui-button-hover: #1E1F23;
+    --ui-border:#2D3036;
+    --ui-border-selected:#54585E;
+    --ui-subtle:#6D54B5;
+    --text:#FFFFFF;
+    --dangerous:#FF4d4d;
+}
+
+.light{
+    --primary: #9B70D5;
+    --secondary: #A79FCC;
+    --primary-hover: #A07CBE;
+    --text-subtle: #A1A4A7;
+    --far-bg: #D9D9D9;
+    --website-bg: #F2F2F5;
+    --ui-bg: #F5F5F7;
+    --ui-bg-selected: #B0B3B8;
+    --ui-button: #E1E4E8;
+    --ui-button-hover: #B0B3B8;
+    --ui-border: #E1E4E8;
+    --ui-border-selected:#9A9EA3;
+    --ui-subtle: #A99CD9;
+    --text: #2E2E2E;
+    --dangerous:#FF4d4d;
+}
+
+.high-contrast {
+    --primary: #FF0000 !important;
+    --secondary: #FFFF00 !important;
+    --primary-hover: #00FF00 !important;
+    --text-subtle: #FFFFFF !important;
+    --far-bg: #000000 !important;
+    --website-bg: #000000 !important;
+    --ui-bg: #000000 !important;
+    --ui-bg-selected: #FF0000 !important;
+    --ui-button: #000000 !important;
+    --ui-button-hover: #333333 !important;
+    --ui-border: #FFFFFF !important;
+    --ui-border-selected: #00FF00 !important;
+    --ui-subtle: #FFFF00 !important;
+    --text: #FFFFFF !important;
+    --dangerous:#FFA500 !important;
+}
