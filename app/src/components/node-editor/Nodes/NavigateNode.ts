@@ -9,6 +9,8 @@ class NavigateNode extends BasicNookNode {
     constructor(name: string) {
         super(name);
 
+        this.width = 200;
+        this.height = 150;
         this.urlControl = new ClassicPreset.InputControl("text");
         this.urlControl.setValue("https://example.com");
 

@@ -7,8 +7,10 @@ class LogNode extends BasicNookNode {
 
     constructor(name: string) {
         super(name);
-        this.addInput("onTrigger", new ClassicPreset.Input(socket, "Log"));
+        this.width = 200;
+        this.height = 120;
 
+        this.addInput("onTrigger", new ClassicPreset.Input(socket, "Log"));
         let initial: string = "Message";
         this.addControl("message", new ClassicPreset.InputControl("text", { initial }));
     }

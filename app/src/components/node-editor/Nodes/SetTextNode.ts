@@ -8,6 +8,8 @@ class SetTextNode extends BasicNookNode {
 
     constructor(name: string) {
         super(name);
+        this.width = 250;
+        this.height = 150;
 
         this.textControl = new ClassicPreset.InputControl("text");
         this.textControl.setValue("New Text");

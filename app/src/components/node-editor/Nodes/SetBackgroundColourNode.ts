@@ -8,6 +8,8 @@ class SetBackgroundColourNode extends BasicNookNode {
 
     constructor(name: string) {
         super(name);
+        this.width = 250;
+        this.height = 150;
 
         this.colorControl = new ClassicPreset.InputControl("text");
         this.colorControl.setValue("#ffffff");

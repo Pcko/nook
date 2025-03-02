@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {clean, create, fetchNodeTypes, load, save} from "./editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
+import {useRete} from "rete-react-plugin";
 
 function NodeEditorPage({element}) {
     const [hierarchyList, setHierarchyList] = useState([]);
@@ -12,14 +13,28 @@ function NodeEditorPage({element}) {
     const engineRef = useRef(null);
     const areaRef = useRef(null);
     const editorInitialized = useRef(false);
+    const arrangeNodes = useRef(null);
 
     useEffect(() => {
         const container = document.querySelector('#editor-container');
         if (container && !editorInitialized.current) {
-            create(container).then(({editor, engine, area}) => {
+            create(container).then(({editor, engine, area, arrangeGraph}) => {
+                // editor.addPipe((context)=>{
+                //     if(context.type=== 'nodecreate'){
+                //         console.log('Node added:', context.data);
+                //     }
+                //     return context;
+                // });
+                // editor.addPipe((context)=>{
+                //     if(context.type=== 'connectioncreate'){
+                //         console.log('Connection added:', context.data);
+                //     }
+                //     return context;
+                // });
                 editorRef.current = editor;
                 engineRef.current = engine;
                 areaRef.current = area;
+                arrangeNodes.current = arrangeGraph;
                 loadState();
 
                 editorInitialized.current = true;
@@ -32,6 +47,12 @@ function NodeEditorPage({element}) {
             let newMap = await fetchNodeTypes();
             setNodeTypes(newMap);
         }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'X' && arrangeNodes.current) {
+                arrangeNodes.current().then();
+            }
+        });
 
         getNodeTypes();
         return () => {
@@ -77,34 +98,37 @@ function NodeEditorPage({element}) {
         let chains = [];
         let atomNodes = [];
 
-        editorRef.current.getNodes().forEach((node) => {
-            if (node instanceof AtomNode) {
-                atomNodes.push(node);
-            }
-        });
+        try {
+            editorRef.current.getNodes().forEach((node) => {
+                if (node instanceof AtomNode) {
+                    atomNodes.push(node);
+                }
+            });
 
-        atomNodes.forEach((atomNode) => {
-            let chain = [atomNode];
-            let connectedNodes = findConnectedNodes(atomNode);
+            atomNodes.forEach((atomNode) => {
+                let chain = [atomNode];
+                let connectedNodes = findConnectedNodes(atomNode);
 
-            chain = [...chain, ...connectedNodes];
-            chains.push(chain);
-        });
+                chain = [...chain, ...connectedNodes];
+                chains.push(chain);
+            });
 
-        // Create hierarchy list
-        const hierarchy = chains.map((chain) => ({
-            header: chain[0].label,
-            children:
-                chain.length >= 2 ?
-                    chain.slice(1).map((node) => ({
-                        id: node.id,
-                        name: node.label,
-                    }))
-                    :
-                    [],
-        }));
+            // Create hierarchy list
+            const hierarchy = chains.map((chain) => ({
+                header: chain[0].label,
+                children:
+                    chain.length >= 2 ?
+                        chain.slice(1).map((node) => ({
+                            id: node.id,
+                            name: node.label,
+                        }))
+                        :
+                        [],
+            }));
 
-        setHierarchyList(hierarchy);
+            setHierarchyList(hierarchy);
+        } catch {
+        }
     }
 
     function findConnectedNodes(startNode) {
