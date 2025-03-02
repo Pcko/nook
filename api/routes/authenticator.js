@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
     const userid = user._id;
     const tokenUser = { id: userid };
 
-    const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
+    const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 60 }); //valid for 30min after creation
     const refreshToken = jwt.sign(tokenUser, process.env.REFRESH_TOKEN_SECRET);
 
     //delete any old token and write new refreshToken to database
@@ -108,7 +108,7 @@ router.post('/token', async (req, res) => {
       return res.status(401).json({ error: 'invalid_token' });
     }
 
-    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' });
+    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 60 });
 
     return res.status(200).json({ accessToken });
   }
