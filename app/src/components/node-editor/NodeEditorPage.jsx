@@ -2,9 +2,8 @@ import React, {useEffect, useRef, useState} from "react";
 import {clean, create, fetchNodeTypes, load, save} from "./editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
-import {useRete} from "rete-react-plugin";
 
-function NodeEditorPage({element}) {
+function NodeEditorPage({element, setArrangeNodes}) {
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
@@ -19,22 +18,11 @@ function NodeEditorPage({element}) {
         const container = document.querySelector('#editor-container');
         if (container && !editorInitialized.current) {
             create(container).then(({editor, engine, area, arrangeGraph}) => {
-                // editor.addPipe((context)=>{
-                //     if(context.type=== 'nodecreate'){
-                //         console.log('Node added:', context.data);
-                //     }
-                //     return context;
-                // });
-                // editor.addPipe((context)=>{
-                //     if(context.type=== 'connectioncreate'){
-                //         console.log('Connection added:', context.data);
-                //     }
-                //     return context;
-                // });
                 editorRef.current = editor;
                 engineRef.current = engine;
                 areaRef.current = area;
                 arrangeNodes.current = arrangeGraph;
+                setArrangeNodes(()=>arrangeGraph);
                 loadState();
 
                 editorInitialized.current = true;
