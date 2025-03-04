@@ -14,7 +14,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({path: './config.env'});
 
-const allowedOrigins = [process.env.APP_URL || 'https://nook-app-psi.vercel.app'];
+const allowedOrigins = [process.env.APP_URL];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
