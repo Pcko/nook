@@ -37,8 +37,10 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
 
-// app.listen(PORT, () => {
-//     console.log('✅ Server deployed at: http://localhost:' + PORT);
-// });
+if(process.env.DEVENV){
+    app.listen(PORT, () => {
+       console.log('✅ Server deployed at: http://localhost:' + PORT);
+    });
+}
 
 export default app;

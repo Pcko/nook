@@ -13,8 +13,7 @@ function SecuritySettings({changeHandler}) {
             const username = JSON.parse(localStorage.getItem('user')).username;
             const response = await axios.patch('/api/settings',
                 {
-                    username,
-                    changes: {account: {password: newPassword}}
+                    changes: {account: {password: newPassword}},
                 },
                 {headers: {'Content-Type': 'application/json'}}
             );
