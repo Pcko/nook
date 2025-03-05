@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: '/',
+    baseURL: process.env.API_URL,
+    withCredentials: true,
     timeout: 1500
 });
 

@@ -4,7 +4,6 @@ import NodeEditorPage from "./NodeEditorPage";
 
 function NodeEditor({element, goBack}) {
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedTabForImport, setSelectedTabForImport] = useState(null);
     const [tabList, setTabList] = useState([]);
     const [isImportMenuOpen, setIsImportMenuOpen] = useState(false);
 
@@ -21,7 +20,6 @@ function NodeEditor({element, goBack}) {
 
         if (tabList.length === 0) {
             setTabList(loadedTabs);
-            setSelectedTabForImport(tabList[selectedIndex]);
         }
 
         document.addEventListener("keydown", function (event) {
@@ -100,10 +98,9 @@ function NodeEditor({element, goBack}) {
         }
 
         const jsonString = JSON.stringify(graphState, null, 2);
-
-        // Create a Blob with the JSON string and trigger the download
         const blob = new Blob([jsonString], {type: 'application/json'});
         const link = document.createElement('a');
+
         link.href = URL.createObjectURL(blob);
         link.download = `${tabList[selectedIndex].name || 'graph'}.json`;
         document.body.appendChild(link);
@@ -112,7 +109,7 @@ function NodeEditor({element, goBack}) {
     };
 
     const importGraph = (graphState) => {
-        if (!tabList[selectedIndex]?.element) {
+        if (!tabList[selectedIndex]?.element) {  //
             console.error("No active tab to import into.");
             return;
         }
@@ -124,7 +121,9 @@ function NodeEditor({element, goBack}) {
             console.error("Error importing graph:", error);
         } finally {
             setIsImportMenuOpen(false);
-            setReloadPage(false);
+            setTimeout(() => {
+                setReloadPage(false);
+            }, 100);
         }
     };
 
@@ -236,8 +235,8 @@ function NodeEditor({element, goBack}) {
                         <div className="space-y-2">
                             {tabList.map((tab) => (
                                 <div key={tab.id}
-                                     className={`p-2 cursor-pointer rounded ${selectedTabForImport === tab.id ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
-                                     onClick={() => setSelectedTabForImport(tab.id)}>
+                                     className={`p-2 cursor-pointer rounded ${tabList[selectedIndex] === tab.id ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
+                                     onClick={() => setSelected(tabList.indexOf(tab))}>
                                     {tab.name}
                                 </div>
                             ))}

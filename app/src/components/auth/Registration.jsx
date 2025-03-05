@@ -144,7 +144,7 @@ function Registration() {
 
                             <input
                                 type="submit"
-                                className={`btn w-full mt-3 ${loading ? 'animate-spin' : ''}`}
+                                className={`btn w-full mt-3 ${loading ? 'animate-pulse' : ''}`}
                                 value="Register"
                             >
                             </input>
