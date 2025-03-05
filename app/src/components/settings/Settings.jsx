@@ -59,7 +59,6 @@ function Settings() {
             const response = await axios.patch(
                 '/api/settings',
                 {
-                    username,
                     changes,
                 }
             );

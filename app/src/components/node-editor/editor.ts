@@ -114,7 +114,7 @@ export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes
         };
 
         // Serialize nodes
-        editor.getNodes().forEach(node => {
+        editor?.getNodes().forEach(node => {
             const serializedNode = {
                 id: node.id,
                 type: node.constructor.name,
@@ -157,7 +157,7 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
         // Restore nodes
         if (Array.isArray(saveState.nodes)) {
             for (const nodeData of saveState.nodes) {
-                const NodeClass = nodeMap.get(nodeData.type); //Get class by type
+                const NodeClass = nodeMap.get(nodeData.label); //Get class by type
                 const node = new NodeClass(nodeData.label);
 
                 node.id = nodeData.id;

@@ -14,17 +14,18 @@ import "./WebsiteBuilder.css";
 import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
+import axios from "../auth/AxiosInstance";
 
-function WebsiteBuilder({editor, openNodeEditor}) {
-     /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
+function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
+    /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
     const selectedElementRef = useRef(null);
-    
+
     /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
-     * 
+     *
      * <ul>
      *   <li>Editor Initialization: Creates an instance of GrapesJS inside the container.</li>
      *   <li>Custom Blocks & Commands: Loads pre-defined blocks and commands.</li>
@@ -77,10 +78,15 @@ function WebsiteBuilder({editor, openNodeEditor}) {
                     event.preventDefault();
                 }
             });
+            document.addEventListener("keydown", function (event) {
+                if (event.ctrlKey && event.key === "S" && selectedElementRef.current) {
+                    handleSave();
+                    event.preventDefault();
+                }
+            });
 
-            const state = localStorage.getItem("MyPage");
             if (state) {
-                editorInstance.setComponents(JSON.parse(state));
+                editorInstance.setComponents(state);
             }
 
             editor.current = editorInstance;
@@ -93,22 +99,22 @@ function WebsiteBuilder({editor, openNodeEditor}) {
         };
     }, []);
 
-     /**
+    /**
      * Saves the current editor state to localStorage.
-     * 
+     *
      * @function handleSave
      */
-    const handleSave = () => {
-        const components = editorRef.current.getComponents();
-        const savedContent = {
-            components: components.toJSON(),
-        };
-        localStorage.setItem("MyPage", JSON.stringify(savedContent))
+    const handleSave = async () => {
+        try {
+            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {pageContent: editor.current.getComponents()});
+        }catch (err){
+            console.error(err);
+        }
     }
 
     /**
      * Clears all content from the GrapesJS editor canvas.
-     * 
+     *
      * @function clearCanvas
      */
     const clearCanvas = () => {
@@ -118,8 +124,8 @@ function WebsiteBuilder({editor, openNodeEditor}) {
 
     /**
      * Switches the editor view to a different device preview mode.
-     * 
-     * 
+     *
+     *
      * @function setDevice
      * @param {string} device - The target device name ("Desktop", "Tablet", "Mobile").
      */

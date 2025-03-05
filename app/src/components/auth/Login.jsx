@@ -15,7 +15,6 @@ function Login() {
         //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
         event.preventDefault();
 
-
         try {
             setLoading(true);
             const response = await axios.post('/auth/login', {
@@ -102,7 +101,7 @@ function Login() {
                             <input
                                 type={"submit"}
                                 id="sign-up"
-                                className="btn w-full mt-10"
+                                className={`btn w-full mt-10 ${loading ? 'animate-pulse' : ''}`}
                                 value="Sign in"
                             >
                             </input>

@@ -3,7 +3,7 @@ import {clean, create, fetchNodeTypes, load, save} from "./editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
 
-function NodeEditorPage({element, setArrangeNodes}) {
+function NodeEditorPage({element, setArrangeNodes, doReload}) {
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
@@ -58,8 +58,15 @@ function NodeEditorPage({element, setArrangeNodes}) {
     useEffect(() => {
         setTimeout(() => {
             buildHierarchy();
+            saveState();
         }, 10);
     }, [hierarchyList]);
+
+    useEffect(() => {
+        if(doReload){
+            loadState();
+        }
+    }, [doReload]);
 
     function saveState() {
         if (!editorRef.current || !areaRef.current) return;
@@ -75,7 +82,9 @@ function NodeEditorPage({element, setArrangeNodes}) {
         try {
             const savedState = grapesjsElement.current.get('graph');
             if (savedState) {
-                load(savedState, editorRef.current, areaRef.current)
+                clean(editorRef.current).then(() => {
+                    load(savedState, editorRef.current, areaRef.current)
+                })
             }
         } catch (err) {
             console.warn("Error initializing editor:", err.message);

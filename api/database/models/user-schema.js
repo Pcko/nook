@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
+import Project from './project-schema.js';
+import RefreshToken from './refreshToken-schema.js';
+
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -45,6 +48,16 @@ UserSchema.pre('save', async function (next) {
     };
 
     this.password = await bcrypt.hash(this.password, 10);
+
+    next();
+})
+
+UserSchema.pre('findOneAndDelete', async function (next){
+    const user = await this.model.findOne(this.getFilter());
+    if (!user) return next();
+
+    await Project.deleteMany({ author: user._id });
+    await RefreshToken.deleteOne({ _id: user._id });
 
     next();
 })

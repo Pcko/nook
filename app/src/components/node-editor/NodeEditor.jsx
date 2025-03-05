@@ -4,7 +4,6 @@ import NodeEditorPage from "./NodeEditorPage";
 
 function NodeEditor({element, goBack}) {
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedTabForImport, setSelectedTabForImport] = useState(null);
     const [tabList, setTabList] = useState([]);
     const [isImportMenuOpen, setIsImportMenuOpen] = useState(false);
     const [arrangeNodes, setArrangeNodes] = useState(()=>{});
@@ -13,6 +12,7 @@ function NodeEditor({element, goBack}) {
     const isDragging = useRef(false);
     const startX = useRef(0);
     const scrollLeft = useRef(0);
+    const [reloadPage, setReloadPage] = useState(false);
 
     useEffect(() => {
         const givenElement = element?.current;
@@ -21,7 +21,6 @@ function NodeEditor({element, goBack}) {
 
         if (tabList.length === 0) {
             setTabList(loadedTabs);
-            setSelectedTabForImport(tabList[selectedIndex]);
         }
 
         document.addEventListener("keydown", function (event) {
@@ -89,22 +88,45 @@ function NodeEditor({element, goBack}) {
     };
 
     const exportGraph = () => {
-        const graphState = selectedTabForImport?.element.get('graph');
-        const jsonString = JSON.stringify(graphState, null, 2);
+        if (!tabList[selectedIndex]?.element) {
+            console.error("No active tab to export.");
+            return;
+        }
 
-        //Create a Blob with the JSON string and trigger the download
+        const graphState = tabList[selectedIndex].element.get('graph');
+        if (!graphState) {
+            return;
+        }
+
+        const jsonString = JSON.stringify(graphState, null, 2);
         const blob = new Blob([jsonString], {type: 'application/json'});
         const link = document.createElement('a');
+
         link.href = URL.createObjectURL(blob);
-        link.download = 'graph_state.json';
+        link.download = `${tabList[selectedIndex].name || 'graph'}.json`;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     };
 
-    function importGraph(graphState) {
-        selectedTabForImport.element.graph = graphState;
-        setTabList(tabList);
-        setIsImportMenuOpen(false);
-    }
+    const importGraph = (graphState) => {
+        if (!tabList[selectedIndex]?.element) {  //
+            console.error("No active tab to import into.");
+            return;
+        }
+
+        try {
+            tabList[selectedIndex].element.set('graph', graphState);
+            setReloadPage(true);
+        } catch (error) {
+            console.error("Error importing graph:", error);
+        } finally {
+            setIsImportMenuOpen(false);
+            setTimeout(() => {
+                setReloadPage(false);
+            }, 100);
+        }
+    };
 
     const handleFileInput = (event) => {
         const file = event.target.files[0];
@@ -113,7 +135,7 @@ function NodeEditor({element, goBack}) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const graphState = JSON.parse(e?.target?.result);
+                    const graphState = JSON.parse(e.target.result);
                     importGraph(graphState);
                 } catch (error) {
                     console.error('Error parsing the graph file:', error);
@@ -121,20 +143,15 @@ function NodeEditor({element, goBack}) {
             };
             reader.readAsText(file);
         } else {
-            alert('Please upload a valid JSON file.');
+            console.error('Wrong type!');
         }
     };
 
-    const createFileInput = () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json'; // Accept only .json files
-        input.onchange = handleFileInput; // Call handleFileInput when file is selected
-        return input;
-    };
-
     const triggerFileInput = () => {
-        const fileInput = createFileInput();
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.addEventListener('change', handleFileInput);
         fileInput.click();
     };
 
@@ -214,7 +231,7 @@ function NodeEditor({element, goBack}) {
                 <Tab.Panels className="flex-1">
                     {tabList.map((tab) => (
                         <Tab.Panel key={tab.id}>
-                            <NodeEditorPage tabId={tab.id} element={tab.element} setArrangeNodes={setArrangeNodes}/>
+                            <NodeEditorPage tabId={tab.id} element={tab.element} doReload={reloadPage} setArrangeNodes={setArrangeNodes}/>
                         </Tab.Panel>
                     ))}s
                 </Tab.Panels>
@@ -227,8 +244,8 @@ function NodeEditor({element, goBack}) {
                         <div className="space-y-2">
                             {tabList.map((tab) => (
                                 <div key={tab.id}
-                                     className={`p-2 cursor-pointer rounded ${selectedTabForImport === tab.id ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
-                                     onClick={() => setSelectedTabForImport(tab.id)}>
+                                     className={`p-2 cursor-pointer rounded ${tabList[selectedIndex] === tab.id ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
+                                     onClick={() => setSelected(tabList.indexOf(tab))}>
                                     {tab.name}
                                 </div>
                             ))}

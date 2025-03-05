@@ -1,16 +1,29 @@
 import React, { useState, useEffect, Fragment } from 'react';
+import { useNavigate } from "react-router-dom";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import axios from '../auth/AxiosInstance';
 
 import pagePreview from '../../assets/resources/page_preview.png';
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
+import PageCreationForm from "./PageCreationForm";
+import PageEditForm from "./PageEditForm";
 
 function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [pages, setPages] = useState(projects[selectedProjectId].pages);
     const [searchQuery, setSearchQuery] = useState('');
+    const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
+    const [pageNameToEdit, setPageNameToEdit] = useState();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setPages(projects[selectedProjectId].pages)
     }, [selectedProjectId]);
+
+    useEffect(()=>{
+        if(pages){
+            projects[selectedProjectId].pages = pages;
+        }
+    }, [pages]);
 
     useEffect(()=>{
         const getProjectInfo = async () => {
@@ -37,20 +50,34 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
         getProjectInfo();
     }, [selectedProjectId]);
 
-    {/*  */}
-    const handleEditPage = async (pageName) => {
-
-    };
-
-    const PageCard = ({children}) => {
+    const PageCard = ({ children, pageName }) => {
         return (
-            <div>   
+            <div className="w-[240px]">
                 <div className="flex items-center p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg">
-                    <img src={pagePreview} alt="page preview" className="m-auto"/>
+                    <img
+                        src={pagePreview}
+                        alt="page preview"
+                        className="m-auto hover:cursor-pointer"
+                        onClick={()=>{
+                            navigate(`/editor/${selectedProjectId}/${pageName}`, { state: pages[pageName].data });
+                        }}/>
                 </div>
                 {children}
             </div>
         );
+    };
+
+    const handlePageDelete = async (pageName) =>{
+        try{
+            const response = await axios.delete(`/api/projects/${selectedProjectId}/pages/${pageName}`);
+            setPages((prevPages)=>{
+                const updatedPages = { ...prevPages };
+                delete updatedPages[pageName];
+                return updatedPages;
+            })
+        } catch (e){
+            console.error(e.message);
+        }
     };
 
     return (
@@ -61,7 +88,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               <Listbox value={selectedProjectId} onChange={setSelectedProjectId}>
                   {/* Selected Sorting Option */}
                   <ListboxButton className="flex mr-[2vw] w-[200px] px-2">
-                      <div className="flex-1 my-auto mr-2 overflow-hidden whitespace-nowrap text-ellipsis">{selectedProjectId}</div>
+                      <div className="flex-1 my-auto mr-2 text-2xl overflow-hidden whitespace-nowrap text-ellipsis">{selectedProjectId}</div>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                            stroke="currentColor" className="size-5 my-auto ml-auto mr-0">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
@@ -100,7 +127,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               </div>
 
               {/* Create New Page Button */}
-              <input type="button" className="btn rounded ml-auto mr-0" value="+ New Page"/>
+              <input type="button" className="btn rounded ml-auto mr-0" value="+ New Page" onClick={()=>setPageCreationFormActive(true)}/>
           </div>
 
           {/* Horizontal Rule between Top Bar and Content */}
@@ -114,9 +141,9 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                   .map(([pageName, pageDetails], index, filteredPages) => {
                       return(
                           <Fragment key={pageName}>
-                              {<PageCard>
+                              {<PageCard pageName={pageName}>
                                   <div className="flex mt-1 mx-3">
-                                      <div className="my-auto">
+                                      <div className="my-auto overflow-hidden text-ellipsis">
                                           {pageName}
                                       </div>
 
@@ -136,7 +163,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                                               {/* Edit-Option */}
                                               <ListboxOption value="editProject">
                                                   <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      >
+                                                      onClick={()=>setPageNameToEdit(pageName)}>
                                                       Edit Page
                                                   </div>
                                               </ListboxOption>
@@ -144,7 +171,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                                               {/* Delete-Option */}
                                               <ListboxOption value="deleteProject">
                                                   <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      >
+                                                      onClick={()=>handlePageDelete(pageName)}>
                                                       Delete Page
                                                   </div>
                                               </ListboxOption>
@@ -162,6 +189,30 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               loading pages...
           </div>
           }
+
+          {/* Page Creation Form */}
+          {pageCreationFormActive?
+              <CenteredWindowWithBackgroundBlur>
+                  <PageCreationForm
+                      pages={pages}
+                      setPages={setPages}
+                      projects={projects}
+                      selectedProjectId={selectedProjectId}
+                      closeForm={()=>{setPageCreationFormActive(false)}}/>
+              </CenteredWindowWithBackgroundBlur>
+          :''}
+
+          {/* Page Edit Form */}
+          {pageNameToEdit?
+            <CenteredWindowWithBackgroundBlur>
+                <PageEditForm
+                    pages={pages}
+                    pageName={pageNameToEdit}
+                    projects={projects}
+                    selectedProjectId={selectedProjectId}
+                    closeForm={()=>{setPageNameToEdit(undefined)}}/>
+            </CenteredWindowWithBackgroundBlur>
+          :''}
       </div>
     );
 }
