@@ -19,10 +19,16 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
         if (container && !editorInitialized.current) {
             create(container).then(({editor, engine, area, arrangeGraph}) => {
                 editorRef.current = editor;
+                editorRef.current.addPipe(context => {
+                    if (context.type.toLowerCase().includes('node') || context.type.toLowerCase().includes('connection')) {
+                        buildHierarchy();
+                    }
+                    return context;
+                })
                 engineRef.current = engine;
                 areaRef.current = area;
                 arrangeNodes.current = arrangeGraph;
-                setArrangeNodes(()=>arrangeGraph);
+                setArrangeNodes(() => arrangeGraph);
                 loadState();
 
                 editorInitialized.current = true;
@@ -57,13 +63,12 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
 
     useEffect(() => {
         setTimeout(() => {
-            buildHierarchy();
             saveState();
         }, 10);
     }, [hierarchyList]);
 
     useEffect(() => {
-        if(doReload){
+        if (doReload) {
             loadState();
         }
     }, [doReload]);
@@ -81,6 +86,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
 
         try {
             const savedState = grapesjsElement.current.get('graph');
+
             if (savedState) {
                 clean(editorRef.current).then(() => {
                     load(savedState, editorRef.current, areaRef.current)
