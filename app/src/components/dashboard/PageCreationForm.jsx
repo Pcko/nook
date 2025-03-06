@@ -24,7 +24,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                 updatedPages[response.data.pageName] = response.data.pageDetails;
                 return updatedPages;
             })
-        }catch (e) {
+        }catch (err) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }
 

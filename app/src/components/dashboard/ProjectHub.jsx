@@ -60,8 +60,8 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 delete updatedProjects[projectName];
                 return updatedProjects;
             });
-        } catch (e){
-            console.error(e);
+        } catch (err){
+            console.error(err);
         }
     };
 

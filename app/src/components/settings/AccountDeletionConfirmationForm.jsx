@@ -11,7 +11,7 @@ function AccountDeletionConfirmationForm() {
             const user = JSON.parse(localStorage.getItem('user'));
             const response = await axios({
                 'method':'delete',
-                'url':'/api/settings/delete-account', 
+                'url':'/api/settings/delete-account',
                 'data': {
                     'username': user.username
                 }
@@ -22,7 +22,7 @@ function AccountDeletionConfirmationForm() {
             showNotification('success', 'Successfully deleted your account.');
             navigate('/login');
         }
-        catch (e) {
+        catch (err) {
             showNotification('error', 'There was an error trying to delete your account. Please contact our support team for help.')
         }
     };

@@ -40,8 +40,8 @@ function Dashboard ()  {
             }
             return newProjects;
           });
-        }catch(e){
-          showNotification('error', e.response.data.message || 'There was an issue communicating with our server. Please try again later.');
+        }catch(err){
+          showNotification('error', err.response.data.message || 'There was an issue communicating with our server. Please try again later.');
         }
       }
 

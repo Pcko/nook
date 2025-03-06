@@ -27,7 +27,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
             }
 
             onProjectEdit(response.data.projectName, response.data.projectDetails);
-        }catch (e) {
+        }catch (err) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }
 

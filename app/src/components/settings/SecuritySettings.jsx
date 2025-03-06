@@ -34,7 +34,7 @@ function SecuritySettings({changeHandler}) {
             );
 
             showNotification('success', 'Your password was updated successfully.');
-        } catch (e) {
+        } catch (err) {
             showNotification('There was an error trying to change your password. Check your internet connection try again.');
         }
     };

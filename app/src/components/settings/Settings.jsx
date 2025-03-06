@@ -90,7 +90,7 @@ function Settings() {
             const oldUserObject = JSON.parse(localStorage.getItem('user'));
             const newUserObject = { ...oldUserObject, ...changes.account };
             localStorage.setItem('user', JSON.stringify(newUserObject));
-        }catch(e){
+        }catch(err){
             showNotification('error', 'Something went wrong trying to apply your changes. Check your internet connection and try again.');
         }
     };
