@@ -11,6 +11,7 @@
       "src": "/(.*)",
       "dest": "server.js",
       "headers": {
+        "Access-Control-Allow-Origin": "https://nook-app-psi.vercel.app",
         "Content-Security-Policy": "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src *; style-src * 'unsafe-inline';"
       }
     },
