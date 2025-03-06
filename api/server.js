@@ -10,9 +10,7 @@ import settingsRoute from './routes/settings.js';
 import projectRoute from './routes/projects.js';
 import pageRoute from './routes/pages.js';
 
-import dotenv from 'dotenv';
-
-dotenv.config({path: './config.env'});
+import dotenv from 'dotenv/config';
 
 const allowedOrigins = [process.env.APP_URL];
 const __filename = fileURLToPath(import.meta.url);
