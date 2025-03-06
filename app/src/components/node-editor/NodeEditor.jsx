@@ -6,6 +6,7 @@ function NodeEditor({element, goBack}) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [tabList, setTabList] = useState([]);
     const [isImportMenuOpen, setIsImportMenuOpen] = useState(false);
+    const [arrangeNodes, setArrangeNodes] = useState(()=>{});
 
     const tabListRef = useRef(null);
     const isDragging = useRef(false);
@@ -193,6 +194,14 @@ function NodeEditor({element, goBack}) {
                                       d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m-6 3.75 3 3m0 0 3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"/>
                             </svg>
                         </Button>
+                        <Button className="bg-[#2D2E30] mr-5 text-white rounded p-2 hover:bg-gray-400"
+                                onClick={() => arrangeNodes()}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                                 stroke="currentColor" className="size-6">
+                                <path strokeLinecap="round" strokeLinejoin="round"
+                                      d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"/>
+                            </svg>
+                        </Button>
                     </div>
 
                     {/* Draggable Tab List */}
@@ -222,7 +231,7 @@ function NodeEditor({element, goBack}) {
                 <Tab.Panels className="flex-1">
                     {tabList.map((tab) => (
                         <Tab.Panel key={tab.id}>
-                            <NodeEditorPage tabId={tab.id} element={tab.element} doReload={reloadPage}/>
+                            <NodeEditorPage tabId={tab.id} element={tab.element} doReload={reloadPage} setArrangeNodes={setArrangeNodes}/>
                         </Tab.Panel>
                     ))}s
                 </Tab.Panels>

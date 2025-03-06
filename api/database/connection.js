@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
-import dotenv from 'dotenv';
-dotenv.config({ path: './config.env' });
+import dotenv from 'dotenv/config';
 
 const dbName = 'NookDB'; //change inbetween NookDB and NookTestDB to switch.
 const uri = process.env.MONGODB_URI;

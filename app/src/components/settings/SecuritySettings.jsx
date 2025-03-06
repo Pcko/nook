@@ -1,6 +1,6 @@
 import HR from './SettingsHR';
 import {useState} from 'react';
-import axios from 'axios';
+import axios from '../auth/AxiosInstance.js'
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -13,8 +13,7 @@ function SecuritySettings({changeHandler}) {
             const username = JSON.parse(localStorage.getItem('user')).username;
             const response = await axios.patch('/api/settings',
                 {
-                    username,
-                    changes: {account: {password: newPassword}}
+                    changes: {account: {password: newPassword}},
                 },
                 {headers: {'Content-Type': 'application/json'}}
             );

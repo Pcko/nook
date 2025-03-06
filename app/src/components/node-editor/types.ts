@@ -1,11 +1,35 @@
-import {PerformClickNode} from "./Nodes/PerformClickNode";
-import {LogNode} from "./Nodes/LogNode";
 import {Connection} from "./connection";
 import {GetSchemes} from "rete";
-import {GetElementNode} from "./Nodes/GetElementNode";
+import {
+    ButtonClickNode,
+    GetElementNode,
+    LogNode,
+    NavigateNode,
+    PageLoadNode,
+    PerformClickNode,
+    SetBackgroundColourNode,
+    SetTextNode,
+    VariableNode
+} from './Nodes/_nodes'
 
-export type NodeProps = PerformClickNode | LogNode | GetElementNode;
+/**
+ * All usable Nook Nodes.
+ */
+export type NodeProps =
+    ButtonClickNode
+    | GetElementNode
+    | NavigateNode
+    | PageLoadNode
+    | PerformClickNode
+    | SetBackgroundColourNode
+    | SetTextNode
+    | VariableNode;
+/**
+ *  All possible Connections for Nook Nodes.
+ */
+export type ConnProps = Connection<PerformClickNode, LogNode> | Connection<PageLoadNode, LogNode> | Connection<ButtonClickNode, LogNode>;
 
-export type ConnProps = Connection<PerformClickNode, LogNode>;
-
+/**
+ * The Nook Node schemes.
+ */
 export type Schemes = GetSchemes<NodeProps, ConnProps>;

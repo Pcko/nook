@@ -10,11 +10,9 @@ import settingsRoute from './routes/settings.js';
 import projectRoute from './routes/projects.js';
 import pageRoute from './routes/pages.js';
 
-import dotenv from 'dotenv';
+import dotenv from 'dotenv/config';
 
-dotenv.config({path: './config.env'});
-
-const allowedOrigins = [process.env.APP_URL || 'https://nook-app-psi.vercel.app'];
+const allowedOrigins = [process.env.APP_URL];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
@@ -37,8 +35,10 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
 
-// app.listen(PORT, () => {
-//     console.log('✅ Server deployed at: http://localhost:' + PORT);
-// });
+if(process.env.DEVENV){
+    app.listen(PORT, () => {
+       console.log('✅ Server deployed at: http://localhost:' + PORT);
+    });
+}
 
 export default app;
