@@ -2,26 +2,33 @@ import BackgroundText from '../general/NookBackground'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
-import ImageCarousel from "./ImageCarousel";
+import ImageCarousel from './ImageCarousel';
+import { useNotifications } from '../general/NotificationContext';
+import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errorDisplay, setErrorDisplay] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate(); // Initialize the navigate function
+    const navigate = useNavigate();
+    const { showNotification } = useNotifications();
 
     const handleSubmit = async (event) => {
-        //läuft wenn der user nach eingeben von password und username enter oder auf sign in drückt
         event.preventDefault();
+        setLoading(true);
 
+        /* Form Checks */
+        const error = isInvalidStringForUsername(username) || isInvalidStringForPassword(password);
+        if(error){
+            return showNotification('error', error);
+        }
+
+        /* Axios Request */
         try {
-            setLoading(true);
             const response = await axios.post('/auth/login', {
                 username,
                 password
             }, {
-
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -29,23 +36,23 @@ function Login() {
                 timeoutErrorMessage: 'Server did not respond.',
             });
 
-            if (response.status >= 200 && response.status < 300) {
-                console.log('Request was successful', response.data);
+            showNotification('success', 'Login successfull');
 
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.refreshToken);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
 
-                // username, password und errorDisplay zurücksetzen, sobald der Login-Screen verlassen wird
-                setUsername('');
-                setPassword('');
-                setErrorDisplay('');
-
-                // Zum Dashboard navigieren
-                navigate('/dashboard');
-            }
+            // username und password zurücksetzen, sobald der Login-Screen verlassen wird
+            setUsername('');
+            setPassword('');
+            navigate('/dashboard');
         } catch (err) {
-            setErrorDisplay(err.message); // Error messages are set in responses
+            if(err.response.data.message){
+                showNotification('error', err.response.data.message);
+            }
+            else{
+                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
+            }
         } finally {
             setLoading(false);
         }
@@ -93,9 +100,6 @@ function Login() {
 
                             <a className={"text-ui-subtle text-xs underline hover:cursor-pointer"}
                                 onClick={() => navigate('/register')}>Forgot your password?</a>
-
-                            {/* Conditionally render error message */}
-                            {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
 
                             {/* Sign-in Button */}
                             <input

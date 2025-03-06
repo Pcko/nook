@@ -118,8 +118,8 @@ function NodeEditor({element, goBack}) {
         try {
             tabList[selectedIndex].element.set('graph', graphState);
             setReloadPage(true);
-        } catch (error) {
-            console.error("Error importing graph:", error);
+        } catch (err) {
+            console.error("Error importing graph:", err);
         } finally {
             setIsImportMenuOpen(false);
             setTimeout(() => {
@@ -137,8 +137,8 @@ function NodeEditor({element, goBack}) {
                 try {
                     const graphState = JSON.parse(e.target.result);
                     importGraph(graphState);
-                } catch (error) {
-                    console.error('Error parsing the graph file:', error);
+                } catch (err) {
+                    console.error('Error parsing the graph file:', err);
                 }
             };
             reader.readAsText(file);

@@ -5,6 +5,14 @@ import AccountSettings from "./AccountSettings";
 import AppearanceSettings from "./AppearanceSettings";
 import SecuritySettings from "./SecuritySettings";
 import axios from "../auth/AxiosInstance";
+import { useNotifications } from "../general/NotificationContext";
+import {
+    isInvalidStringForUsername,
+    isInvalidStringForEmail,
+    isInvalidStringForFirstName,
+    isInvalidStringForLastName,
+    isInvalidStringForPassword
+} from "../general/FormChecks";
 
 function loadSettings() {
     const settings = {
@@ -21,6 +29,7 @@ function Settings() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('account');
     const [changes, setChanges] = useState({});
+    const { showNotification } = useNotifications();
 
     const originalSettings = loadSettings();
 
@@ -50,8 +59,20 @@ function Settings() {
         }
 
         if(Object.keys(changes).length===0){
-            console.log('nothing to save');
+            showNotification('error', 'There are no changes to be saved.');
             return;
+        }
+
+        /* Form Checks */
+        const accountObject = changes['account'];
+        const result =
+            accountObject.username ? undefined : isInvalidStringForUsername(accountObject.username) ||
+            accountObject.password ? undefined : isInvalidStringForPassword(accountObject.password) ||
+            accountObject.firstName ? undefined : isInvalidStringForFirstName(accountObject.firstName) ||
+            accountObject.lastName ? undefined : isInvalidStringForLastName(accountObject.lastName) ||
+            accountObject.email ? undefined : isInvalidStringForEmail(accountObject.email);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -63,16 +84,14 @@ function Settings() {
                 }
             );
 
-            if(response.status===200){
-                console.log('settings have been changed');
-                setChanges({});
+            showNotification('success', 'settings have been changed');
+            setChanges({});
 
-                const oldUserObject = JSON.parse(localStorage.getItem('user'));
-                const newUserObject = { ...oldUserObject, ...changes.account };
-                localStorage.setItem('user', JSON.stringify(newUserObject));
-            }
-        }catch(e){
-            console.log(e)
+            const oldUserObject = JSON.parse(localStorage.getItem('user'));
+            const newUserObject = { ...oldUserObject, ...changes.account };
+            localStorage.setItem('user', JSON.stringify(newUserObject));
+        }catch(err){
+            showNotification('error', 'Something went wrong trying to apply your changes. Check your internet connection and try again.');
         }
     };
 

@@ -130,7 +130,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
             }));
 
             setHierarchyList(hierarchy);
-        } catch {
+        } catch (err) {
         }
     }
 
