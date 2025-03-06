@@ -1,3 +1,11 @@
+/**
+ * @file blocks.js
+ * @description Defines custom block components for GrapesJS.
+ * These blocks include various UI elements and layout structures.
+ *
+ * @module blocks
+ */
+
 export const customBlocks = [
   {
     id: "box-block",

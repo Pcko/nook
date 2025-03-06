@@ -1,6 +1,6 @@
 import HR from './SettingsHR';
 import {useState} from 'react';
-import axios from 'axios';
+import axios from '../auth/AxiosInstance.js'
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');

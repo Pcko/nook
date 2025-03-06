@@ -9,6 +9,11 @@ import {MinimapPlugin} from "rete-minimap-plugin";
 import {Connection} from "./connection";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import Preset from "./contextMenu";
+import SliderComponent, {SliderControl} from "./Controls/SliderControl";
+import ColorPickerComponent, {ColorPickerControl} from "./Controls/ColorPickerControl";
+import {TextInputComponent, TextInputControl} from "./Controls/TextInputControl";
+import {DropdownComponent, DropdownControl} from "./Controls/DropdownControl";
+import {AutoArrangePlugin, Presets as ArrangePresets, ArrangeAppliers} from "rete-auto-arrange-plugin";
 
 export type AreaExtra = ReactArea2D<Schemes>;
 
@@ -25,6 +30,7 @@ export async function create(container: HTMLElement) {
     const render = new ReactPlugin<Schemes, AreaExtra>({createRoot});
     const connection = new ConnectionPlugin<Schemes, AreaExtra>();
     const minimap = new MinimapPlugin<any>();
+    const arrange = new AutoArrangePlugin<Schemes, AreaExtra>();
 
     // Fetch node types
     const types = await fetchNodeTypes();
@@ -33,15 +39,32 @@ export async function create(container: HTMLElement) {
         items: ContextMenuPresets.classic.setup(context),
     });
 
-    // Add area extensions
-    AreaExtensions.simpleNodesOrder(area);
-    AreaExtensions.showInputControl(area);
-    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
-        accumulating: AreaExtensions.accumulateOnCtrl(),
+    // Arrange Plugin
+    const applier = new ArrangeAppliers.TransitionApplier<Schemes, never>({
+        duration: 500,
+        timingFunction: (t) => t,
+        async onTick() {
+            await AreaExtensions.zoomAt(area, editor.getNodes());
+        }
     });
+    arrange.addPreset(ArrangePresets.classic.setup());
 
     // Add visual presets
     render.addPreset(Presets.classic.setup());
+    // WIP React Controls for better integration!
+    render.addPreset(
+        Presets.classic.setup({
+            customize: {
+                control(data) {
+                    if (data.payload instanceof SliderControl) return SliderComponent;
+                    if (data.payload instanceof ColorPickerControl) return ColorPickerComponent;
+                    if (data.payload instanceof TextInputControl) return TextInputComponent;
+                    if (data.payload instanceof DropdownControl) return DropdownComponent;
+                    return null;
+                }
+            }
+        })
+    );
     render.addPreset(Preset);
     connection.addPreset(ConnectionPresets.classic.setup());
 
@@ -51,9 +74,31 @@ export async function create(container: HTMLElement) {
     area.use(contextMenu);
     area.use(connection);
     area.use(render);
-    // area.use(minimap);
+    area.use(arrange);
 
-    return {editor, engine, area};
+    // Add area extensions
+    AreaExtensions.simpleNodesOrder(area);
+    AreaExtensions.showInputControl(area);
+    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
+        accumulating: AreaExtensions.accumulateOnCtrl(),
+    });
+
+    const arrangeNodes = async () => {
+        await arrange.layout({
+            applier: applier,
+            options: {
+                "elk.algorithm": "layered",
+                "elk.spacing.nodeNode": "50",
+                "elk.layered.spacing.nodeNodeBetweenLayers": "50",
+            }
+        });
+        AreaExtensions.zoomAt(area, editor.getNodes());
+    };
+    arrangeNodes().then(() => AreaExtensions.zoomAt(area, editor.getNodes()));
+
+    return {
+        editor, engine, area, arrangeGraph: () => arrangeNodes(),
+    };
 }
 
 /**
@@ -74,7 +119,7 @@ export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes
                 id: node.id,
                 type: node.constructor.name,
                 label: node.label,
-                position: area.nodeViews.get(node.id)?.position,
+                position: area.nodeViews.get(node.id)?.position || {x: 0, y: 0},
                 inputs: node.inputs,
                 outputs: node.outputs,
                 controls: node.controls
@@ -141,11 +186,9 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
                 }
 
                 // Restore controls
-                if (nodeData.controls) {
-                    Object.entries(nodeData.controls).forEach(([key, value]) => {
-                        if (node.controls[key]) {
-                            node.controls[key].setValue(value.value); // Properly set control values
-                        }
+                if (Array.isArray(nodeData.controls)) {
+                    Object.entries(nodeData.controls).forEach(([key, control]) => {
+                        node.addControl(key, control); // This ensures controls get properly added
                     });
                 }
 
@@ -197,7 +240,7 @@ export async function clean(editor: NodeEditor<Schemes>): Promise<void> {
  * Fetches all available node types from the nodes module.
  */
 export async function fetchNodeTypes() {
-    const module = await import("./Nodes/nodes");
+    const module = await import("./Nodes/_nodes");
     let newMap = new Map();
     Object.entries(module).forEach(([key, value]) => newMap.set(key, value));
     return newMap;
