@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import { isValidStringForURL} from "../general/FormChecks";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
 function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     const [pageName, setPageName] = useState('');
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(!isValidStringForURL(pageName)){
-            return console.error('The page name must not contain any of these characters: / ? # &');
+        /* Form Checks */
+        const result = isInvalidStringForURL(pageName);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -21,7 +25,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                 return updatedPages;
             })
         }catch (e) {
-            console.log(e.message);
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();

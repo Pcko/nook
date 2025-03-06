@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import {isValidStringForURL} from "../general/FormChecks";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
 function ProjectCreationForm({ closeForm, setProjects }){
     const [projectName, setProjectName] = useState('');
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(!isValidStringForURL(projectName)){
-            return console.error('The project name must not contain any of these characters: / ? # &');
+        /* Form Checks */
+        const result = isInvalidStringForURL(projectName);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -21,7 +25,7 @@ function ProjectCreationForm({ closeForm, setProjects }){
                 return updatedProjects;
             });
         }catch (e) {
-            console.error(e.message);
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();

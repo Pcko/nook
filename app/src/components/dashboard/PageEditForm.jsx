@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import {isValidStringForURL} from "../general/FormChecks";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
 function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
     const [newPageName, setNewPageName] = useState('');
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
+        /* Form Checks */
         if(newPageName in Object.keys(pages)){
             console.error('page name must be unique');
             return;
         }
-
-        if(!isValidStringForURL(newPageName)){
-            return console.error('The page name must not contain any of these characters: / ? # &');
+        const result = isInvalidStringForURL(newPageName);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -24,7 +27,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
             delete pages[pageName];
             pages[response.data.newPageName] = page;
         }catch (e) {
-            console.log(e.message);
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();

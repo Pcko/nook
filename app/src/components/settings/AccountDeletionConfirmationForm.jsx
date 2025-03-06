@@ -1,8 +1,10 @@
 import axios from '../auth/AxiosInstance';
 import { useNavigate } from "react-router-dom";
+import { useNotifications } from "../general/NotificationContext"
 
 function AccountDeletionConfirmationForm() {
     const navigate = useNavigate();
+    const { showNotification } = useNotifications();
 
     const handleAccountDeletion = async () => {
         try {
@@ -17,10 +19,11 @@ function AccountDeletionConfirmationForm() {
 
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            showNotification('success', 'Successfully deleted your account.');
             navigate('/login');
         }
         catch (e) {
-            alert('There was an error trying to delete your account. Please contact our support team for help.')
+            showNotification('error', 'There was an error trying to delete your account. Please contact our support team for help.')
         }
     };
 

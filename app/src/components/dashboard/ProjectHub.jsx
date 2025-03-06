@@ -198,6 +198,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                             projects[newProjectName] = data;
                         }}
                         projectName={projectNameToEdit} closeForm={()=>{setProjectNameToEdit(undefined)}}
+                        projects={projects}
                     />
                 </CenteredWindowWithBackgroundBlur>
             : ''}

@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import {isValidStringForURL} from "../general/FormChecks";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
-function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
+function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
     const [newProjectName, setNewProjectName] = useState(projectName);
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(projectName === newProjectName){
-            return;
+        /* Form Checks */
+        if(newProjectName in Object.keys(projects)){
+            return showNotification('error', 'Project name already exists');
         }
-
-        if(!isValidStringForURL(projectName)){
-            return console.error('The project name must not contain any of these characters: / ? # &');
+        const result = isInvalidStringForURL(projectName);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -25,7 +28,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
 
             onProjectEdit(newProjectName, response.data);
         }catch (e) {
-            console.error(e.message);
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();
