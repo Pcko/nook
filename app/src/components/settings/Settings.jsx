@@ -66,11 +66,11 @@ function Settings() {
         /* Form Checks */
         const accountObject = changes['account'];
         const result =
-            isInvalidStringForUsername(accountObject.username) ||
-            isInvalidStringForPassword(accountObject.password) ||
-            isInvalidStringForFirstName(accountObject.firstName) ||
-            isInvalidStringForLastName(accountObject.lastName) ||
-            isInvalidStringForEmail(accountObject.email);
+            accountObject.username ? undefined : isInvalidStringForUsername(accountObject.username) ||
+            accountObject.password ? undefined : isInvalidStringForPassword(accountObject.password) ||
+            accountObject.firstName ? undefined : isInvalidStringForFirstName(accountObject.firstName) ||
+            accountObject.lastName ? undefined : isInvalidStringForLastName(accountObject.lastName) ||
+            accountObject.email ? undefined : isInvalidStringForEmail(accountObject.email);
         if(result){
             return showNotification('error', result);
         }

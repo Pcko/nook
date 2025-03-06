@@ -6,6 +6,7 @@ import axios from '../auth/AxiosInstance';
 import UserIcon from '../general/UserIcon';
 import ProjectHub from "./ProjectHub";
 import ProjectDetails from "./ProjectDetails";
+import { useNotifications } from "../general/NotificationContext"
 
 function Dashboard ()  {
   const [projects, setProjects] = useState({});
@@ -13,6 +14,14 @@ function Dashboard ()  {
   const [activeTab, setActiveTab] = useState('projects')
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
+  const { showNotification } = useNotifications();
+
+  useEffect(() => {
+    const keys = Object.keys(projects);
+    if(!keys.includes(selectedProject)){
+      setSelectedProject(Object.keys(projects)[0]);
+    }
+  }, [projects]);
 
   useEffect(() => {
     if(activeTab === 'projects'){
@@ -32,7 +41,7 @@ function Dashboard ()  {
             return newProjects;
           });
         }catch(e){
-          console.error(e.message);
+          showNotification('error', e.response.data.message || 'There was an issue communicating with our server. Please try again later.');
         }
       }
 

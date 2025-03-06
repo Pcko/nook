@@ -11,7 +11,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
         e.preventDefault();
 
         /* Form Checks */
-        if(newProjectName in Object.keys(projects)){
+        if(Object.keys(projects).includes(newProjectName)){
             return showNotification('error', 'Project name already exists');
         }
         const result = isInvalidStringForURL(projectName);
@@ -26,7 +26,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
                 throw Error('no response');
             }
 
-            onProjectEdit(newProjectName, response.data);
+            onProjectEdit(response.data.projectName, response.data.projectDetails);
         }catch (e) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }
@@ -60,7 +60,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="submit" value="Update Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>
