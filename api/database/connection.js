@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 
-import dotenv from 'dotenv';
-dotenv.config({ path: './config.env' });
+import dotenv from 'dotenv/config';
 
 const dbName = process.env.DB_NAME || 'NookTestDB';
-const uri = process.env.ATLAS_URI;
+const uri = process.env.MONGODB_URI;
 if (!uri) {
     throw new Error('❌ Environment variable missing!');
 }

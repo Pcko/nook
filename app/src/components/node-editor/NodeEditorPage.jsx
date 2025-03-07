@@ -3,7 +3,7 @@ import {clean, create, fetchNodeTypes, load, save} from "./editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
 
-function NodeEditorPage({element, doReload}) {
+function NodeEditorPage({element, setArrangeNodes, doReload}) {
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
@@ -12,14 +12,23 @@ function NodeEditorPage({element, doReload}) {
     const engineRef = useRef(null);
     const areaRef = useRef(null);
     const editorInitialized = useRef(false);
+    const arrangeNodes = useRef(null);
 
     useEffect(() => {
         const container = document.querySelector('#editor-container');
         if (container && !editorInitialized.current) {
-            create(container).then(({editor, engine, area}) => {
+            create(container).then(({editor, engine, area, arrangeGraph}) => {
                 editorRef.current = editor;
+                editorRef.current.addPipe(context => {
+                    if (context.type.toLowerCase().includes('node') || context.type.toLowerCase().includes('connection')) {
+                        buildHierarchy();
+                    }
+                    return context;
+                })
                 engineRef.current = engine;
                 areaRef.current = area;
+                arrangeNodes.current = arrangeGraph;
+                setArrangeNodes(() => arrangeGraph);
                 loadState();
 
                 editorInitialized.current = true;
@@ -32,6 +41,12 @@ function NodeEditorPage({element, doReload}) {
             let newMap = await fetchNodeTypes();
             setNodeTypes(newMap);
         }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'X' && arrangeNodes.current) {
+                arrangeNodes.current().then();
+            }
+        });
 
         getNodeTypes();
         return () => {
@@ -48,12 +63,12 @@ function NodeEditorPage({element, doReload}) {
 
     useEffect(() => {
         setTimeout(() => {
-            buildHierarchy();
+            saveState();
         }, 10);
     }, [hierarchyList]);
 
     useEffect(() => {
-        if(doReload){
+        if (doReload) {
             loadState();
         }
     }, [doReload]);
@@ -71,6 +86,7 @@ function NodeEditorPage({element, doReload}) {
 
         try {
             const savedState = grapesjsElement.current.get('graph');
+
             if (savedState) {
                 clean(editorRef.current).then(() => {
                     load(savedState, editorRef.current, areaRef.current)
@@ -85,34 +101,37 @@ function NodeEditorPage({element, doReload}) {
         let chains = [];
         let atomNodes = [];
 
-        editorRef.current.getNodes().forEach((node) => {
-            if (node instanceof AtomNode) {
-                atomNodes.push(node);
-            }
-        });
+        try {
+            editorRef.current.getNodes().forEach((node) => {
+                if (node instanceof AtomNode) {
+                    atomNodes.push(node);
+                }
+            });
 
-        atomNodes.forEach((atomNode) => {
-            let chain = [atomNode];
-            let connectedNodes = findConnectedNodes(atomNode);
+            atomNodes.forEach((atomNode) => {
+                let chain = [atomNode];
+                let connectedNodes = findConnectedNodes(atomNode);
 
-            chain = [...chain, ...connectedNodes];
-            chains.push(chain);
-        });
+                chain = [...chain, ...connectedNodes];
+                chains.push(chain);
+            });
 
-        // Create hierarchy list
-        const hierarchy = chains.map((chain) => ({
-            header: chain[0].label,
-            children:
-                chain.length >= 2 ?
-                    chain.slice(1).map((node) => ({
-                        id: node.id,
-                        name: node.label,
-                    }))
-                    :
-                    [],
-        }));
+            // Create hierarchy list
+            const hierarchy = chains.map((chain) => ({
+                header: chain[0].label,
+                children:
+                    chain.length >= 2 ?
+                        chain.slice(1).map((node) => ({
+                            id: node.id,
+                            name: node.label,
+                        }))
+                        :
+                        [],
+            }));
 
-        setHierarchyList(hierarchy);
+            setHierarchyList(hierarchy);
+        } catch (err) {
+        }
     }
 
     function findConnectedNodes(startNode) {

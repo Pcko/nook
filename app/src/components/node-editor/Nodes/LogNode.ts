@@ -8,6 +8,9 @@ class LogNode extends BasicNookNode {
 
     constructor(name: string) {
         super(name);
+        this.width = 200;
+        this.height = 120;
+
 
         this.messageControl = new ClassicPreset.InputControl("text");
         this.messageControl.setValue("Hello World!");

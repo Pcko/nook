@@ -60,7 +60,7 @@ export function <Scheme extends ClassicScheme>(props: Props<Scheme>) {
             {/* Title */}
             <div
                 className={`
-          text-white
+          text-black
           font-sans
           text-lg
           p-2

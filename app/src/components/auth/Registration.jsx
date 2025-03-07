@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
-
+import { isInvalidStringForUsername, isInvalidStringForPassword, isInvalidStringForFirstName, isInvalidStringForLastName, isInvalidStringForEmail } from '../general/FormChecks';
+import { useNotifications } from '../general/NotificationContext'
 
 function Registration() {
     const [username, setUsername] = useState('');
@@ -15,9 +16,21 @@ function Registration() {
     const [errorDisplay, setErrorDisplay] = useState('')
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { showNotification } = useNotifications();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        /* Form Checks */
+        const result =
+            isInvalidStringForUsername(username) ||
+            isInvalidStringForPassword(password) ||
+            isInvalidStringForFirstName(firstName) ||
+            isInvalidStringForLastName(lastName) ||
+            isInvalidStringForEmail(email);
+        if(result){
+            return showNotification('error', result);
+        }
 
         try {
             setLoading(true);
@@ -36,12 +49,15 @@ function Registration() {
                 timeoutErrorMessage: 'Server did not respond.',
             })
 
-            if (response.status >= 200 && response.status < 300) {
-                console.log('Account creation was successful! ', response.message);
-                navigate('/login');
-            }
+            showNotification('success', 'Account creation was successful!');
+            navigate('/login');
         } catch (err) {
-            setErrorDisplay(err.message);
+            if(err.response.data.message){
+                showNotification('error', err.response.data.message);
+            }
+            else{
+                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
+            }
         }
         finally {
             setLoading(false);
@@ -144,7 +160,7 @@ function Registration() {
 
                             <input
                                 type="submit"
-                                className={`btn w-full mt-3 ${loading ? 'animate-spin' : ''}`}
+                                className={`btn w-full mt-3 ${loading ? 'animate-pulse' : ''}`}
                                 value="Register"
                             >
                             </input>

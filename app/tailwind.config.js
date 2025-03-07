@@ -23,6 +23,7 @@ module.exports = {
         "ui-subtle": "var(--ui-subtle)",
         "text": "var(--text)",
         "dangerous": "var(--dangerous)",
+        "success": "var(--success)",
       },
     },
   },

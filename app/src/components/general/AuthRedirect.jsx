@@ -36,9 +36,9 @@ function AuthRedirect(){
                     setError(response.status);
                 }
             }
-            catch(e){
-                if(e.response){
-                    if(e.response.status===401){
+            catch(err){
+                if(err.response){
+                    if(err.response.status===401){
                         navigate('/login');
                     }
                 }
