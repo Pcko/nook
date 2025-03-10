@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import Project from './project-schema.js';
-import RefreshToken from './refreshToken-schema.js';
 
 const { Schema } = mongoose;
 
@@ -38,6 +37,10 @@ const UserSchema = new Schema({
         required: true,
         trim: true,
     },
+    tokenVersion: {
+        type: Number,
+        default: 0,
+    },
 },
     { timestamps: true }
 );
@@ -57,9 +60,14 @@ UserSchema.pre('findOneAndDelete', async function (next){
     if (!user) return next();
 
     await Project.deleteMany({ author: user._id });
-    await RefreshToken.deleteOne({ _id: user._id });
 
     next();
 })
+
+UserSchema.methods.updateTokenVersion = async function () {
+    this.tokenVersion += 1;
+    await this.save();
+}
+
 
 export default mongoose.model('User', UserSchema);

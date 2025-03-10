@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import RefreshToken from '../database/models/refreshToken-schema.js';
+import User from '../database/models/user-schema.js';
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -9,19 +9,19 @@ function authenticateToken(req, res, next) {
         return res.sendStatus(400);
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, tokenContent) => {
         if (err) {
             return res.status(401).json({ error: 'invalid_token' });
         }
-        req.userId = user.id;
 
-        //check if this user has a refreshToken in the db
-        const refreshToken = await RefreshToken.findOne({ _id: user.id }).lean();
-        if (!refreshToken) {
+        const { id, v } = tokenContent;
+        const user = await User.findOne({ _id: id }).lean();
+
+        if(user.tokenVersion !== v){
             return res.status(401).json({ error: 'invalid_token' });
         }
-        console.log(refreshToken);
 
+        req.userId = id;
         next();
     })
 }
