@@ -40,8 +40,15 @@ function Dashboard ()  {
             }
             return newProjects;
           });
+
+          showNotification('success', 'Successfully loaded your Projects');
         }catch(err){
-          showNotification('error', err.response.data.message || 'There was an issue communicating with our server. Please try again later.');
+          if(err.response.status === 404){
+            showNotification('error', 'No projects found.');
+          }
+          else{
+            showNotification('error', err.response.data.message || 'There was an issue loading your projects from our server. Please try again later.');
+          }
         }
       }
 
@@ -65,11 +72,17 @@ function Dashboard ()  {
         localStorage.clear();
         sessionStorage.clear();
         navigate('/');
-    } catch(e){
-        console.error(e.message);
+    } catch(err){
+      if(err.response.data){
+        showNotification('error', err.response.data.message);
+      }
+      else{
+        showNotification('error', 'There was an error logging out. Please contact our support team for help.')
+      }
     }
-  };
 
+    showNotification('success', 'Successfully logged out.');
+  };
 
   {/* Navigation to the Project Details Tab with the clicked-on project selected */}
   const switchToProjectDetails = (projectId) => {

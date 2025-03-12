@@ -24,6 +24,8 @@ function ProjectCreationForm({ closeForm, setProjects }){
                 updatedProjects[response.data.projectName] = response.data.projectDetails;
                 return updatedProjects;
             });
+
+            showNotification('success', 'Successfully added your new Project.');
         }catch (err) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }

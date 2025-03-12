@@ -84,7 +84,7 @@ function Settings() {
                 }
             );
 
-            showNotification('success', 'settings have been changed');
+            showNotification('success', 'Successfully applied the changes to your settings.');
             setChanges({});
 
             const oldUserObject = JSON.parse(localStorage.getItem('user'));

@@ -7,6 +7,7 @@ import pagePreview from '../../assets/resources/page_preview.png';
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
+import { useNotifications } from "../general/NotificationContext";
 
 function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [pages, setPages] = useState(projects[selectedProjectId].pages);
@@ -14,6 +15,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
     const [pageNameToEdit, setPageNameToEdit] = useState();
     const navigate = useNavigate();
+    const { showNotification } = useNotifications();
 
     useEffect(() => {
         setPages(projects[selectedProjectId].pages)
@@ -75,8 +77,14 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                 delete updatedPages[pageName];
                 return updatedPages;
             })
-        } catch (e){
-            console.error(e.message);
+
+            showNotification('success', 'Successfully deleted your page.');
+        } catch (err){
+            if(err.response.data){
+                showNotification('error', err.response.data.message);
+            }else{
+                showNotification('error', 'There was an issue trying to communicate with our server. Please try again later.')
+            }
         }
     };
 
