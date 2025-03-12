@@ -14,10 +14,10 @@ function authenticateToken(req, res, next) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 
-        const { id, v } = tokenContent;
+        const { id, version } = tokenContent;
         const user = await User.findOne({ _id: id }).lean();
 
-        if(user.tokenVersion !== v){
+        if (user.tokenVersion !== version) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 

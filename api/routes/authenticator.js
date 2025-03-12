@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
     await user.updateTokenVersion();
     const userid = user._id;
     const tokenVersion = Number(user.tokenVersion);
-    const tokenUser = { id: userid, v: tokenVersion };
+    const tokenUser = { id: userid, version: tokenVersion };
 
     const { accessToken, refreshToken } = createTokens(tokenUser);
 
@@ -101,15 +101,15 @@ router.post('/token', async (req, res) => {
         return res.status(401).json({ error: 'invalid_token' });
       }
 
-      const { id, v } = tokenContent;
+      const { id, version } = tokenContent;
       const user = await User.findOne({ _id: id });
 
-      if(user.tokenVersion !== v){
+      if (user.tokenVersion !== version) {
         return res.status(401).json({ error: 'invalid_token' });
       }
 
       await user.updateTokenVersion();
-      const tokens = createTokens({ id, v: user.tokenVersion });
+      const tokens = createTokens({ id, version: user.tokenVersion });
 
       return res.status(200).json(tokens);
     })
@@ -120,7 +120,7 @@ router.post('/token', async (req, res) => {
   }
 });
 
-function createTokens(tokenContent){
+function createTokens(tokenContent) {
   const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
   const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET);
 
