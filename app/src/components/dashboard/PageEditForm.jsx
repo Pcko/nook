@@ -26,6 +26,8 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
             const page = { ...pages[pageName] };
             delete pages[pageName];
             pages[response.data.newPageName] = page;
+
+            showNotification('success', 'Successfully applied changes to your page.');
         }catch (err) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }
