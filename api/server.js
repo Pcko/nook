@@ -3,14 +3,16 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import cors from 'cors';
 
+import 'dotenv/config';
 import './database/connection.js'; //<-- database connection script
+
 import authenticateToken from './routes/auth-token.js';
 import authRoute from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRoute from './routes/settings.js';
 import projectRoute from './routes/projects.js';
 import pageRoute from './routes/pages.js';
 
-import dotenv from 'dotenv/config';
+import 'dotenv/config';
 
 const allowedOrigins = [process.env.APP_URL];
 const __filename = fileURLToPath(import.meta.url);
