@@ -41,7 +41,7 @@ function Dashboard ()  {
             return newProjects;
           });
 
-          showNotification('success', 'Successfully loaded your Projects');
+          showNotification('success', 'Successfully loaded your projects');
         }catch(err){
           if(err.response.status === 404){
             showNotification('error', 'No projects found.');
@@ -105,7 +105,7 @@ function Dashboard ()  {
       }
     }
 
-    return <div>Loading Projects...</div>
+    return <div>Loading projects...</div>
   }
 
   return (

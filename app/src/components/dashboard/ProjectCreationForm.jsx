@@ -25,7 +25,7 @@ function ProjectCreationForm({ closeForm, setProjects }){
                 return updatedProjects;
             });
 
-            showNotification('success', 'Successfully added your new Project.');
+            showNotification('success', 'Successfully added your new project.');
         }catch (err) {
             return showNotification('error', 'There was an issue communicating with our servers.');
         }
