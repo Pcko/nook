@@ -15,6 +15,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {NotificationProvider} from "./components/general/NotificationContext";
 import NotificationOverlay from "./components/general/NotificationOverlay";
+import LoadingScreen from "./components/general/LoadingScreen";
 
 function App() {
     useEffect(()=>{
@@ -31,26 +32,7 @@ function App() {
     }, []);
 
     return (
-        <NotificationProvider>
-            <NotificationOverlay />
-            <Router>
-                <div className={'h-full'}>
-                    <main className={'h-full bg-far-bg text-text'}>
-                        <Routes>
-                            <Route path="/" element={<AuthRedirect/>}/>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register/>} />
-
-                            <Route element={<ProtectedRoute/>}>
-                                <Route path="/settings" element={<Settings/>} />
-                                <Route path="/dashboard" element={<Dashboard/>} />
-                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
-                            </Route>
-                        </Routes>
-                    </main>
-                </div>
-            </Router>
-        </NotificationProvider>
+        <LoadingScreen/>
     );
 }
 
