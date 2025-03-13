@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ressources/blocks.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ressources/blocks.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file blocks.js
+ * @description Defines custom block components for GrapesJS.
+ * These blocks include various UI elements and layout structures.
+ * 
+ * @module blocks
+ */
+
+export const customBlocks = [
+    /**
+   * A simple box block.
+   * @name Box-Block
+   */
+    {
+      id: "box-block",
+      label: "Box",
+      content: {
+        type: "Box",
+        components: [],
+        attributes: { class: "box-block" },
+      },
+      category: "Components",
+    },
+     /**
+   * A text block.
+   * @name Text-Block
+   */
+    {
+      id: "text-block",
+      label: "Text",
+      content: {
+        type: "text",
+        content: "Text",
+      },
+      category: "Components",
+    },
+    /**
+   * A button block with an action attribute.
+   * @name Button-Block
+   */
+    {
+      id: "button-block",
+      label: "Button",
+      content: {
+        type: "button",
+        content: "Click Me",
+        attributes: {
+          class: "custom-button",
+          "data-action": "run-code",
+        },
+      },
+      category: "Interactive",
+    },
+     /**
+   * A single-column layout block.
+   * @name column1
+   */
+    {
+      id: "column1",
+      label: "1 Column",
+      content: {
+        type: "div",
+        attributes: {
+          style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc; min-height: 50px;",
+        },
+        components: [
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+        ],
+      },
+      category: "Layout",
+    },
+    // Two columns
+    {
+      id: "column2",
+      label: "2 Columns",
+      content: {
+        type: "div",
+        attributes: {
+          style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        },
+        components: [
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+        ],
+      },
+      category: "Layout",
+    },
+    // Three columns
+    {
+      id: "column3",
+      label: "3 Columns",
+      content: {
+        type: "div",
+        attributes: {
+          style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        },
+        components: [
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+        ],
+      },
+      category: "Layout",
+    },
+    // Custom grid layout (3/7 ratio)
+    {
+      id: "column3-7",
+      label: "3/7 Grid",
+      content: {
+        type: "div",
+        attributes: {
+          style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        },
+        components: [
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 3; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+          {
+            type: "div",
+            attributes: {
+              style: "flex: 7; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            },
+            components: [],
+          },
+        ],
+      },
+      category: "Layout",
+    },
+    // Link block
+    {
+      id: "link",
+      label: "Link",
+      content: `
+        &lt;a href="#" style="color: blue; text-decoration: underline;">
+          Click Here
+        &lt;/a>`,
+      category: "Interactive",
+    },
+    // Image block
+    {
+      id: "image",
+      label: "Image",
+      content: {
+        type: "image",
+        src: "https://via.placeholder.com/150",
+        style: {
+          width: "100%",
+          height: "auto",
+        },
+      },
+      category: "Media",
+    },
+  ];
+  </code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-WebsiteBuilder.html">WebsiteBuilder</a></li><li><a href="module-blocks.html">blocks</a></li><li><a href="module-commands.html">commands</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Feb 20 2025 10:16:51 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
