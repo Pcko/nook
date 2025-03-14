@@ -148,7 +148,6 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               {Object.entries(Object.entries(pages)
                   .filter(([pageName]) => pageName.toLowerCase().includes(searchQuery.toLowerCase().trim()))
                   .reduce((accumulator, [currentName, currentValue])=>{
-                      console.log(currentValue);
                       const folder = currentValue.folderName;
                       if(!accumulator[folder]){
                           accumulator[folder] = {}

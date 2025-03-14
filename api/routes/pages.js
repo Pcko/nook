@@ -96,7 +96,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
         }
 
         //Update Folder
-        if(newFolderName){1
+        if(newFolderName){
             pages[updatedPageName] = { ...pages[updatedPageName], folderName: newFolderName };
         }
 

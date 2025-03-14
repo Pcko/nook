@@ -4,15 +4,15 @@ import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
 
 function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
-    const [newPageName, setNewPageName] = useState('');
-    const [newFolderName, setNewFolderName] = useState('');
+    const [newPageName, setNewPageName] = useState(pageName);
+    const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
     const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
         /* Form Checks */
-        if(newPageName in Object.keys(pages)){
+        if(newPageName !== pageName && pages[newPageName]){
             showNotification('error', 'Your page name must be unique.');
             return;
         }
@@ -29,7 +29,11 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
         }
 
         try{
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName: newPageName, newFolderName: trimmedFolderName });
+            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, 
+                { 
+                    newPageName: newPageName === pageName ? undefined : newPageName, 
+                    newFolderName: trimmedFolderName === pages[pageName].folderName ? undefined : trimmedFolderName, 
+                });
 
             if(trimmedFolderName){
                 pages[pageName].folderName = trimmedFolderName;
