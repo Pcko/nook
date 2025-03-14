@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/:projectName/pages', async (req, res) => {
     try {
         const { userId } = req;
-        const { pageName } = req.body;
+        const { pageName, folderName } = req.body;
         const { projectName } = req.params;
 
         //make sure request body has all required information
@@ -38,7 +38,7 @@ router.post('/:projectName/pages', async (req, res) => {
         }
         while (pageExists);
 
-        pages[updatedPageName] = { data: {} };
+        pages[updatedPageName] = { folderName:folderName || 'General', data: {} };
         project.pages = pages;
         await project.save();
 
@@ -55,7 +55,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
     try {
         const { userId } = req;
         const { projectName, pageName } = req.params;
-        const { newPageName, pageContent } = req.body;
+        const { newPageName, newFolderName, pageContent } = req.body;
 
         const project = await Project.findOne({ name: projectName, author: userId });
         if (!project) {
@@ -70,7 +70,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
         }
 
         //Rename
-        let updatedPageName = undefined;
+        let updatedPageName = pageName;
         if (newPageName) {
             updatedPageName = newPageName;
             let duplicateNumber = 1;
@@ -92,7 +92,12 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
 
         //Save data
         if (pageContent) {
-            pages[pageName] = { ...pages[pageName], data: pageContent };
+            pages[updatedPageName] = { ...pages[updatedPageName], data: pageContent };
+        }
+
+        //Update Folder
+        if(newFolderName){1
+            pages[updatedPageName] = { ...pages[updatedPageName], folderName: newFolderName };
         }
 
         project.pages = pages;

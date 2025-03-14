@@ -5,6 +5,7 @@ import { useNotifications } from "../general/NotificationContext";
 
 function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
     const [newPageName, setNewPageName] = useState('');
+    const [newFolderName, setNewFolderName] = useState('');
     const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
@@ -12,7 +13,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
 
         /* Form Checks */
         if(newPageName in Object.keys(pages)){
-            console.error('page name must be unique');
+            showNotification('error', 'Your page name must be unique.');
             return;
         }
         const result = isInvalidStringForURL(newPageName);
@@ -21,11 +22,17 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
         }
 
         try{
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName });
+            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName, newFolderName });
 
-            const page = { ...pages[pageName] };
-            delete pages[pageName];
-            pages[response.data.newPageName] = page;
+            if(newFolderName){
+                pages[pageName].folderName = newFolderName;
+            }
+
+            if(newPageName){
+                const page = { ...pages[pageName] };
+                delete pages[pageName];
+                pages[response.data.newPageName] = page;
+            }
 
             showNotification('success', 'Successfully applied changes to your page.');
         }catch (err) {
@@ -51,12 +58,22 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                     type="text"
                     id="newPageName"
                     name="newPageName"
-                    required
                     minLength="2"
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                     onChange={(e) => setNewPageName(e.target.value)}
                     value={newPageName}
                     placeholder="Example: My Page"
+                />
+                <label htmlFor="folderName" className="block mb-1">Folder</label>
+                <input
+                    type="text"
+                    id="newFolderName"
+                    name="newFolderName"
+                    minLength="2"
+                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    value={newFolderName}
+                    placeholder="Example: General"
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">

@@ -5,6 +5,7 @@ import { useNotifications } from "../general/NotificationContext";
 
 function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     const [pageName, setPageName] = useState('');
+    const [folderName, setFolderName] = useState('');
     const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
@@ -17,7 +18,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
         }
 
         try{
-            const response = await axios.post(`/api/projects/${selectedProjectId}/pages`, { pageName });
+            const response = await axios.post(`/api/projects/${selectedProjectId}/pages`, { pageName, folderName });
 
             setPages((prevPages)=>{
                 const updatedPages = { ...prevPages };
@@ -55,6 +56,17 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                     onChange={(e) => setPageName(e.target.value)}
                     value={pageName}
                     placeholder="Example: My Page"
+                />
+                <label htmlFor="folderName" className="block mb-1">Folder</label>
+                <input
+                    type="text"
+                    id="folderName"
+                    name="folderName"
+                    minLength="2"
+                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                    onChange={(e) => setFolderName(e.target.value)}
+                    value={folderName}
+                    placeholder="Default: General"
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">

@@ -166,7 +166,7 @@ function Dashboard ()  {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 m-6 mt-[50px] mr-[5vw]">
+      <main className="flex-1 ml-6 mt-[50px] mr-[5vw]">
         {/* Projects */}
         {renderTabContent()}
       </main>

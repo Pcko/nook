@@ -14,6 +14,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [searchQuery, setSearchQuery] = useState('');
     const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
     const [pageNameToEdit, setPageNameToEdit] = useState();
+    const [minimizedFolders, setMinimizedFolders] = useState(new Set([]));
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
 
@@ -89,7 +90,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     };
 
     return (
-      <div className="w-full h-full">
+      <div className="w-full h-full flex flex-col">
           {/* Top Bar */}
           <div className="flex">
               {/* Project Selector */}
@@ -143,52 +144,86 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
 
           {/* Conditionally render pages or 'loading' message */}
           {pages ?
-          <div className="flex flex-wrap gap-4">
-              {Object.entries(pages)
+          <div className="flex flex-wrap gap-4 overflow-y-scroll">
+              {Object.entries(Object.entries(pages)
                   .filter(([pageName]) => pageName.toLowerCase().includes(searchQuery.toLowerCase().trim()))
-                  .map(([pageName, pageDetails], index, filteredPages) => {
-                      return(
-                          <Fragment key={pageName}>
-                              {<PageCard pageName={pageName}>
-                                  <div className="flex mt-1 mx-3">
-                                      <div className="my-auto overflow-hidden text-ellipsis">
-                                          {pageName}
-                                      </div>
+                  .reduce((accumulator, [currentName, currentValue])=>{
+                      console.log(currentValue);
+                      const folder = currentValue.folderName;
+                      if(!accumulator[folder]){
+                          accumulator[folder] = {}
+                      }
+                      accumulator[folder][currentName] = currentValue;
+                      return accumulator;
+                  }, {}))
+                  .sort(([folderA], [folderB]) => {
+                      if (folderA === 'General') return -1;
+                      if (folderB === 'General') return 1;
+                      return folderA.localeCompare(folderB);
+                  })
+                  .map(([folder, pages])=>{
+                    return(
+                        <Fragment key={folder}>
+                            <h1 className="w-full bg-ui-bg px-2 py-1 text-2xl rounded hover:cursor-pointer" onClick={()=>{
+                                setMinimizedFolders(oldMinimizedFolders=>{
+                                    const newMinimizedFolders = new Set(oldMinimizedFolders);
+                                    if(newMinimizedFolders.has(folder)){
+                                        newMinimizedFolders.delete(folder);
+                                    }
+                                    else{
+                                        newMinimizedFolders.add(folder);
+                                    }
+                                    return newMinimizedFolders;
+                                });
+                            }}>{folder}</h1>
+                            {!minimizedFolders.has(folder) ? Object.entries(pages)
+                                .map(([pageName, pageDetails], index, filteredPages) => {
+                                    return(
+                                        <Fragment key={pageName}>
+                                            {<PageCard pageName={pageName}>
+                                                <div className="flex mt-1 mx-3">
+                                                    <div className="my-auto overflow-hidden text-ellipsis">
+                                                        {pageName}
+                                                    </div>
 
-                                      {/* Meatball-Menu for each Page*/}
-                                      <Listbox>
-                                          <ListboxButton className="my-auto ml-auto mr-0">
-                                              {/* Meatball-Icon */}
-                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                   strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                  <path strokeLinecap="round" strokeLinejoin="round"
-                                                        d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
-                                              </svg>
-                                          </ListboxButton>
+                                                    {/* Meatball-Menu for each Page*/}
+                                                    <Listbox>
+                                                        <ListboxButton className="my-auto ml-auto mr-0">
+                                                            {/* Meatball-Icon */}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                                 strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                                <path strokeLinecap="round" strokeLinejoin="round"
+                                                                      d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                                            </svg>
+                                                        </ListboxButton>
 
-                                          {/* Option-Container */}
-                                          <ListboxOptions anchor="bottom end" className="p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg text-text">
-                                              {/* Edit-Option */}
-                                              <ListboxOption value="editProject">
-                                                  <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      onClick={()=>setPageNameToEdit(pageName)}>
-                                                      Edit Page
-                                                  </div>
-                                              </ListboxOption>
+                                                        {/* Option-Container */}
+                                                        <ListboxOptions anchor="bottom end" className="p-2 bg-ui-bg border-[1px] border-ui-border rounded-lg text-text">
+                                                            {/* Edit-Option */}
+                                                            <ListboxOption value="editProject">
+                                                                <div className="btn bg-inherit hover:bg-ui-bg-selected"
+                                                                     onClick={()=>setPageNameToEdit(pageName)}>
+                                                                    Edit Page
+                                                                </div>
+                                                            </ListboxOption>
 
-                                              {/* Delete-Option */}
-                                              <ListboxOption value="deleteProject">
-                                                  <div className="btn bg-inherit hover:bg-ui-bg-selected"
-                                                      onClick={()=>handlePageDelete(pageName)}>
-                                                      Delete Page
-                                                  </div>
-                                              </ListboxOption>
-                                          </ListboxOptions>
-                                      </Listbox>
-                                  </div>
-                              </PageCard>}
-                          </Fragment>
-                      );
+                                                            {/* Delete-Option */}
+                                                            <ListboxOption value="deleteProject">
+                                                                <div className="btn bg-inherit hover:bg-ui-bg-selected"
+                                                                     onClick={()=>handlePageDelete(pageName)}>
+                                                                    Delete Page
+                                                                </div>
+                                                            </ListboxOption>
+                                                        </ListboxOptions>
+                                                    </Listbox>
+                                                </div>
+                                            </PageCard>}
+                                        </Fragment>
+                                    );
+                                }) : ''
+                            }
+                        </Fragment>
+                    )
                   })
               }
           </div>
