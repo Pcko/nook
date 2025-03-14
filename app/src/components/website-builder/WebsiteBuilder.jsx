@@ -5,7 +5,7 @@
  */
 
 
-import React, {useEffect, useRef} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
@@ -23,6 +23,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
+    const [activeTab, setActiveTab] = useState("layers");
+
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
      *
@@ -38,12 +40,13 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         if (!editorRef.current) {
             const editorInstance = grapesjs.init({
                 container: "#gjs",
+                height: '100%',
                 fromElement: false,
                 storageManager: false,
                 blockManager: {appendTo: "#blocks"},
                 panels: {defaults: []},
                 canvas: {styles: [{href: './src/components/website-builder/grapes.css'}]},
-                layerManager: {appendTo: "#right-panel", options: {open: true}},
+                layerManager: {appendTo: "#layers", options: {open: true}},
                 deviceManager: {
                     devices: [
                         {name: "Desktop", width: ""},
@@ -132,6 +135,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const setDevice = (device) => {
         editorRef.current?.setDevice(device);
     };
+    
 
     return (
         <div className="GrapesJsApp">
@@ -170,13 +174,39 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </button>
                     </div>
                 </div>
+           
+                <div className="MainContent">  
+                    <div id="left-panel">
+                   
+                    <div className="toggle-container">
+                            <input
+                                type="radio"
+                                id="layer"
+                                name="toggle"
+                                checked={activeTab === "layers"}
+                                onChange={() => setActiveTab("layers")}
+                            />
+                            <label htmlFor="layer">Layers</label>
 
-                <div className="MainContent">
-                    <div id="blocks">
-                        <div>Add</div>
+                            <input
+                                type="radio"
+                                id="block"
+                                name="toggle"
+                                checked={activeTab === "blocks"}
+                                onChange={() => setActiveTab("blocks")}
+                            />
+                            <label htmlFor="block">Blocks</label>
+                        </div>
+
+                        <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}>
+                        </div>
+                        <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}>
+                        </div>
                     </div>
-                    <div id="gjs" style={{height: "100%"}}>
-                        {/* Editor contents will be rendered here */}
+                    <div id="editor-container">
+                        <div id="gjs" style={{height: "100%"}}>
+                            {/* Editor contents will be rendered here */}
+                        </div>
                     </div>
                     <div id="right-panel">
                         {/* Layers Manager */}
