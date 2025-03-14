@@ -6,6 +6,7 @@ import axios from '../auth/AxiosInstance';
 import UserIcon from '../general/UserIcon';
 import ProjectHub from "./ProjectHub";
 import ProjectDetails from "./ProjectDetails";
+import { useNotifications } from "../general/NotificationContext"
 
 function Dashboard ()  {
   const [projects, setProjects] = useState({});
@@ -13,6 +14,14 @@ function Dashboard ()  {
   const [activeTab, setActiveTab] = useState('projects')
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
+  const { showNotification } = useNotifications();
+
+  useEffect(() => {
+    const keys = Object.keys(projects);
+    if(!keys.includes(selectedProject)){
+      setSelectedProject(Object.keys(projects)[0]);
+    }
+  }, [projects]);
 
   useEffect(() => {
     if(activeTab === 'projects'){
@@ -31,8 +40,15 @@ function Dashboard ()  {
             }
             return newProjects;
           });
-        }catch(e){
-          console.error(e.message);
+
+          showNotification('success', 'Successfully loaded your projects');
+        }catch(err){
+          if(err.response.status === 404){
+            showNotification('error', 'No projects found.');
+          }
+          else{
+            showNotification('error', err.response.data.message || 'There was an issue loading your projects from our server. Please try again later.');
+          }
         }
       }
 
@@ -56,11 +72,17 @@ function Dashboard ()  {
         localStorage.clear();
         sessionStorage.clear();
         navigate('/');
-    } catch(e){
-        console.error(e.message);
+    } catch(err){
+      if(err.response.data){
+        showNotification('error', err.response.data.message);
+      }
+      else{
+        showNotification('error', 'There was an error logging out. Please contact our support team for help.')
+      }
     }
-  };
 
+    showNotification('success', 'Successfully logged out.');
+  };
 
   {/* Navigation to the Project Details Tab with the clicked-on project selected */}
   const switchToProjectDetails = (projectId) => {
@@ -83,7 +105,7 @@ function Dashboard ()  {
       }
     }
 
-    return <div>Loading Projects...</div>
+    return <div>Loading projects...</div>
   }
 
   return (

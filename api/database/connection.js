@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
 
-import dotenv from 'dotenv/config';
+import 'dotenv/config';
 
-const dbName = 'NookDB'; //change inbetween NookDB and NookTestDB to switch.
 const uri = process.env.MONGODB_URI;
+const dbName = process.env.DB_NAME;
 if (!uri) {
-    throw new Error('❌ Environment variable missing!');
+    throw new Error('❌ Environment variable (MONGODB_URI) missing!');
+}
+if (!dbName) {
+    throw new Error('❌ Environment variable (DB_NAME) missing!');
 }
 
 (async () => {

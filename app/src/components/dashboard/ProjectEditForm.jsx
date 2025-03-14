@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import {isValidStringForURL} from "../general/FormChecks";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
-function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
+function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
     const [newProjectName, setNewProjectName] = useState(projectName);
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(projectName === newProjectName){
-            return;
+        /* Form Checks */
+        if(Object.keys(projects).includes(newProjectName)){
+            return showNotification('error', 'Project name already exists');
         }
-
-        if(!isValidStringForURL(projectName)){
-            return console.error('The project name must not contain any of these characters: / ? # &');
+        const result = isInvalidStringForURL(projectName);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -23,9 +26,10 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
                 throw Error('no response');
             }
 
-            onProjectEdit(newProjectName, response.data);
-        }catch (e) {
-            console.error(e.message);
+            onProjectEdit(response.data.projectName, response.data.projectDetails);
+            showNotification('success', 'Successfully applied changes your project.');
+        }catch (err) {
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();
@@ -57,7 +61,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit }){
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="submit" value="Update Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>

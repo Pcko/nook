@@ -35,10 +35,11 @@ axiosInstance.interceptors.response.use(
                     return Promise.reject(error);
                 }
 
-                const response = await axios.post('/auth/token', { 'token': refreshToken });
-                const { accessToken } = response.data;
+                const response = await axiosInstance.post('/auth/token', { 'token': refreshToken });
+                const { accessToken, refreshToken: newRefreshToken } = response.data;
 
                 localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', newRefreshToken);
 
                 originalRequest.headers['authorization'] = `Bearer ${accessToken}`;
 

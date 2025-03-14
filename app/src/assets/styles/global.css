@@ -14,6 +14,7 @@
     --ui-subtle:#6D54B5;
     --text:#FFFFFF;
     --dangerous:#FF4d4d;
+    --success: #4CAF50;
 }
 
 .light{
@@ -32,6 +33,7 @@
     --ui-subtle: #A99CD9;
     --text: #2E2E2E;
     --dangerous:#FF4d4d;
+    --success: #4CAF50;
 }
 
 .high-contrast {
@@ -50,4 +52,5 @@
     --ui-subtle: #FFFF00 !important;
     --text: #FFFFFF !important;
     --dangerous:#FFA500 !important;
+    --success: #00FF00 !important;
 }

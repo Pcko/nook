@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 
 import User from '../database/models/user-schema.js';
-import RefreshToken from '../database/models/refreshToken-schema.js';
 
 const router = express.Router();
 
@@ -17,7 +16,7 @@ router.post('/login', async (req, res) => {
       return res.sendStatus(400);
     }
 
-    const user = await User.findOne({ _id: username }).lean();
+    const user = await User.findOne({ _id: username });
 
     //make sure username exists
     if (!user) {
@@ -31,18 +30,12 @@ router.post('/login', async (req, res) => {
     }
 
     //create tokens for authentication
+    await user.updateTokenVersion();
     const userid = user._id;
-    const tokenUser = { id: userid };
+    const tokenVersion = Number(user.tokenVersion);
+    const tokenUser = { id: userid, version: tokenVersion };
 
-    const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' }); //valid for 30min after creation
-    const refreshToken = jwt.sign(tokenUser, process.env.REFRESH_TOKEN_SECRET);
-
-    //delete any old token and write new refreshToken to database
-    await RefreshToken.findByIdAndDelete(userid);
-    await RefreshToken.create({
-      _id: userid,
-      token: refreshToken,
-    });
+    const { accessToken, refreshToken } = createTokens(tokenUser);
 
     //create new user to return for settings
     const newUser = {
@@ -103,19 +96,35 @@ router.post('/token', async (req, res) => {
       return res.sendStatus(400);
     }
 
-    const tokenExists = await RefreshToken.findOne({ token: refreshToken }).lean();
-    if (!tokenExists) {
-      return res.status(401).json({ error: 'invalid_token' });
-    }
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, tokenContent) => {
+      if (err) {
+        return res.status(401).json({ error: 'invalid_token' });
+      }
 
-    const accessToken = jwt.sign({ id: tokenExists._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30min' });
+      const { id, version } = tokenContent;
+      const user = await User.findOne({ _id: id });
 
-    return res.status(200).json({ accessToken });
+      if (user.tokenVersion !== version) {
+        return res.status(401).json({ error: 'invalid_token' });
+      }
+
+      await user.updateTokenVersion();
+      const tokens = createTokens({ id, version: user.tokenVersion });
+
+      return res.status(200).json(tokens);
+    })
   }
   catch (e) {
     console.error("❌ Refresh token error: ", e);
     return res.sendStatus(500);
   }
 });
+
+function createTokens(tokenContent) {
+  const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
+  const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET);
+
+  return { accessToken, refreshToken };
+}
 
 export default router;

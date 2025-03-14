@@ -1,31 +1,41 @@
 import HR from './SettingsHR';
 import {useState} from 'react';
 import axios from '../auth/AxiosInstance.js'
+import { isInvalidStringForPassword } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const { showNotification } = useNotifications();
 
     const sendPasswordChangeRequest = async (e) => {
         e.preventDefault();
+
+        /* Form Checks */
+        const result =
+            isInvalidStringForPassword(currentPassword) ||
+            isInvalidStringForPassword(newPassword) ||
+            currentPassword === newPassword ? 'Your new password has to be unique!' : undefined;
+        if (result) {
+            showNotification('error', result);
+        }
 
         try {
             const username = JSON.parse(localStorage.getItem('user')).username;
             const response = await axios.patch('/api/settings',
                 {
-                    changes: {account: {password: newPassword}},
+                    'changes': {'account': {'password': newPassword}}
                 },
-                {headers: {'Content-Type': 'application/json'}}
+                {
+                    headers: {
+                        'Content-Type': 'application/json'}
+                }
             );
 
-
-            if (response.status >= 200 && response.status < 300) {
-                console.error('password change accepted');
-            } else {
-                console.error('password change rejected');
-            }
-        } catch (e) {
-            console.error('there was an issue sending the request');
+            showNotification('success', 'Your password was updated successfully.');
+        } catch (err) {
+            showNotification('There was an error trying to change your password. Check your internet connection try again.');
         }
     };
 
