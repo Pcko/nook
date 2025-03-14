@@ -16,16 +16,23 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
             showNotification('error', 'Your page name must be unique.');
             return;
         }
-        const result = isInvalidStringForURL(newPageName);
-        if(result){
-            return showNotification('error', result);
+        const trimmedFolderName = newFolderName?.trim();
+        if(!trimmedFolderName){
+            if(!newPageName.trim()){
+                return showNotification('error', 'At least one of the fields is required');
+            }
+
+            const result = isInvalidStringForURL(newPageName);
+            if(result){
+                return showNotification('error', result);
+            }
         }
 
         try{
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName, newFolderName });
+            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName: newPageName, newFolderName: trimmedFolderName });
 
-            if(newFolderName){
-                pages[pageName].folderName = newFolderName;
+            if(trimmedFolderName){
+                pages[pageName].folderName = trimmedFolderName;
             }
 
             if(newPageName){
@@ -62,7 +69,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                     onChange={(e) => setNewPageName(e.target.value)}
                     value={newPageName}
-                    placeholder="Example: My Page"
+                    placeholder="Default: keep previous"
                 />
                 <label htmlFor="folderName" className="block mb-1">Folder</label>
                 <input
@@ -73,7 +80,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                     onChange={(e) => setNewFolderName(e.target.value)}
                     value={newFolderName}
-                    placeholder="Example: General"
+                    placeholder="Default: keep previous"
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">

@@ -18,7 +18,8 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
         }
 
         try{
-            const response = await axios.post(`/api/projects/${selectedProjectId}/pages`, { pageName, folderName });
+            const trimmedFolderName = folderName?.trim();
+            const response = await axios.post(`/api/projects/${selectedProjectId}/pages`, { pageName, folderName: trimmedFolderName });
 
             setPages((prevPages)=>{
                 const updatedPages = { ...prevPages };
