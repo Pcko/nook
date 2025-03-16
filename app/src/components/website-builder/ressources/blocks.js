@@ -14,7 +14,7 @@ export const customBlocks = [
       type: "Box",
       components: [],
       attributes: {
-        style: "padding: 24px; border: 1px solid black; display: flex; flex-direction: column; flex: 1;",
+        style: "padding: 24px;display: flex; flex-direction: column; flex: 1;",
       },
     },
     category: "Components",
@@ -49,13 +49,13 @@ export const customBlocks = [
     content: {
       type: "div",
       attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc; min-height: 50px;",
+        style: "display: flex; flex-wrap: wrap; padding: 10px; min-height: 50px;",
       },
       components: [
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px;min-height: 50px;",
           },
           components: [],
         },
@@ -69,20 +69,20 @@ export const customBlocks = [
     content: {
       type: "div",
       attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        style: "display: flex; flex-wrap: wrap; padding: 10px;",
       },
       components: [
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
@@ -96,27 +96,27 @@ export const customBlocks = [
     content: {
       type: "div",
       attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        style: "display: flex; flex-wrap: wrap; padding: 10px;",
       },
       components: [
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
         {
           type: "div",
           attributes: {
-            style: "flex: 1; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 1; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
@@ -130,20 +130,20 @@ export const customBlocks = [
     content: {
       type: "div",
       attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px; border: 1px solid #ccc;",
+        style: "display: flex; flex-wrap: wrap; padding: 10px;",
       },
       components: [
         {
           type: "div",
           attributes: {
-            style: "flex: 3; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 3; padding: 10px; min-height: 50px;",
           },
           components: [],
         },
         {
           type: "div",
           attributes: {
-            style: "flex: 7; padding: 10px; border: 1px dashed #aaa; min-height: 50px; background-color: #f4f4f4;",
+            style: "flex: 7; padding: 10px; min-height: 50px;",
           },
           components: [],
         },

@@ -6,7 +6,7 @@
 
 
 import React, { useEffect, useRef, useState } from "react";
-import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
+import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineBorder } from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -23,7 +23,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
-    const [activeTab, setActiveTab] = useState("layers");
+    const [activeTab, setActiveTab, ] = useState("layers");
+    const [outlinesActive, setOutlinesActive] = useState(true);
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
@@ -58,7 +59,18 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 pluginsOpts: {
                     "grapesjs-blocks-basic": {blocks: ["row", "column", "image"], flexGrid: true}
                 },
+                canvasCss: `
+                    .gjs-selected {
+                    outline: 2px solid #6b439b !important; /* Red dashed outline for selected components */
+                    }
+     .gjs-dashed *[data-gjs-highlightable]  {
+      outline: 1px dashed #141c1c !important; /* Red solid outline for components */
+    }
+                `,
             });
+
+            // Run the component outline command to enable outlines by default
+            editorInstance.runCommand('core:component-outline');
 
             addCustomCommands(editorInstance);
             customBlocks.forEach((block) => {
@@ -136,6 +148,22 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         editorRef.current?.setDevice(device);
     };
     
+   /**
+     * Switches the layout outline visibility. 
+     *
+     *
+     * @function toggleOutlines
+     */
+    const toggleOutlines = () => {
+        console.log("hi")
+        if (outlinesActive) {
+          editorRef.current?.stopCommand("core:component-outline");
+        } else {
+          editorRef.current?.runCommand("core:component-outline");
+        }
+        setOutlinesActive(!outlinesActive);
+      };
+
 
     return (
         <div className="GrapesJsApp">
@@ -150,6 +178,9 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </button>
                         <button className="top-button" onClick={() => editorRef.current?.runCommand("show-code")}>
                             <AiOutlineCode size={20}/>
+                        </button>
+                        <button className="top-button" onClick={toggleOutlines}>
+                            <AiOutlineBorder size={20} />
                         </button>
                     </div>
 
