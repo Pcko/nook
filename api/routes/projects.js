@@ -7,19 +7,22 @@ const router = express.Router();
 //CREATE PROJECT
 router.post('/', async (req, res) => {
     try {
-        const { userId } = req;
-        const { projectName } = req.body;
+        const {userId} = req;
+        const {projectName} = req.body;
 
         //make sure request body has all required information
         if (![projectName].every(Boolean)) {
             return res.sendStatus(400);
         }
 
-        let newProjectName = projectName;
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        let newProjectName = projectNameTrimmed;
         let duplicateNumber = 1;
         let projectExists;
         do {
-            projectExists = await Project.findOne({ name: newProjectName, author: userId });
+            projectExists = await Project.findOne({name: newProjectName, author: userId});
 
             if (projectExists) {
                 duplicateNumber += 1;
@@ -40,9 +43,8 @@ router.post('/', async (req, res) => {
             updatedAt: new Date(project.updatedAt),
         };
 
-        return res.status(200).json({ projectName: newProjectName, projectDetails });
-    }
-    catch (e) {
+        return res.status(200).json({projectName: newProjectName, projectDetails});
+    } catch (e) {
         console.error('❌ Create project error: ', e);
         return res.sendStatus(500);
     }
@@ -51,11 +53,11 @@ router.post('/', async (req, res) => {
 //READ ALL PROJECTS
 router.get('/', async (req, res) => {
     try {
-        const { userId } = req;
+        const {userId} = req;
 
-        const projects = await Project.find({ author: userId });
+        const projects = await Project.find({author: userId});
         if (projects.length === 0) {
-            return res.status(404).send({ message: 'No projects found!' });
+            return res.status(404).send({message: 'No projects found!'});
         }
 
         //Object parsing for return
@@ -69,8 +71,7 @@ router.get('/', async (req, res) => {
         });
 
         return res.status(200).json(projectDetails);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Read all projects error: ', e);
         return res.sendStatus(500);
     }
@@ -79,17 +80,24 @@ router.get('/', async (req, res) => {
 //READ ONE PROJECT
 router.get('/:projectName', async (req, res) => {
     try {
-        const { userId } = req;
+        const {userId} = req;
         const projectName = req.params.projectName;
 
-        const project = await Project.findOne({ name: projectName, author: userId }).lean();
+        //make sure request body has all required information
+        if (!userId || !projectName) {
+            return res.sendStatus(400);
+        }
+
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        const project = await Project.findOne({name: projectNameTrimmed, author: userId}).lean();
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         return res.status(200).json(project);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Read specific project error: ', e);
         return res.sendStatus(500);
     }
@@ -98,24 +106,34 @@ router.get('/:projectName', async (req, res) => {
 //UPDATE PROJECT
 router.patch('/:projectName', async (req, res) => {
     try {
-        const { userId } = req;
+        const {userId} = req;
         const projectName = req.params.projectName;
-        const { newProjectName, pages } = req.body;
+        const {newProjectName, pages} = req.body;
 
-        const project = await Project.findOne({ name: projectName, author: userId });
+        //make sure request body has all required information
+        if (!userId || !projectName || !newProjectName || !pages) {
+            return res.sendStatus(400);
+        }
+
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+        const newProjectNameTrimmed = newProjectName.trim();
+        const pagesTrimmed = pages.trim();
+
+        const project = await Project.findOne({name: projectNameTrimmed, author: userId});
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         //Rename
-        let updatedProjectName;
+        let updatedProjectName = newProjectNameTrimmed;
         if (newProjectName) {
             let projectExists;
             let duplicateNumber = 1;
             updatedProjectName = newProjectName;
             do {
-                projectExists = await Project.findOne({ name: updatedProjectName, author: userId });
-    
+                projectExists = await Project.findOne({name: updatedProjectName, author: userId});
+
                 if (projectExists) {
                     duplicateNumber += 1;
                     updatedProjectName = `${newProjectName} (${duplicateNumber})`;
@@ -127,8 +145,8 @@ router.patch('/:projectName', async (req, res) => {
         }
 
         //Save project data
-        if (pages) {
-            project.pages = pages;
+        if (pagesTrimmed) {
+            project.pages = pagesTrimmed;
         }
 
         await project.save();
@@ -140,9 +158,8 @@ router.patch('/:projectName', async (req, res) => {
             updatedAt: new Date(project.updatedAt),
         };
 
-        return res.status(200).json({ projectName: updatedProjectName || projectName, projectDetails });
-    }
-    catch (e) {
+        return res.status(200).json({projectName: updatedProjectName || projectName, projectDetails});
+    } catch (e) {
         console.error('❌ Update project error: ', e);
         return res.sendStatus(500);
     }
@@ -151,18 +168,25 @@ router.patch('/:projectName', async (req, res) => {
 //DELETE PROJECT
 router.delete('/:projectName', async (req, res) => {
     try {
-        const { userId } = req;
+        const {userId} = req;
         const projectName = req.params.projectName;
 
-        const project = await Project.findOneAndDelete({ name: projectName, author: userId }).lean();
+        //make sure request body has all required information
+        if (!userId || !projectName) {
+            return res.sendStatus(400);
+        }
+
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        const project = await Project.findOneAndDelete({name: projectNameTrimmed, author: userId}).lean();
 
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         return res.sendStatus(200);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Delete project error: ', e);
         return res.sendStatus(500);
     }
