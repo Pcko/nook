@@ -65,3 +65,4 @@ export function isInvalidStringForEmail(email){
         return 'Email is in a wrong format';
     }
 }
+

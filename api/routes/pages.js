@@ -2,6 +2,8 @@ import express from 'express';
 
 import Project from '../database/models/project-schema.js';
 
+import {isInvalidStringForURL} from "../util/FormChecks.js";
+
 const router = express.Router();
 
 //CREATE PAGE
@@ -11,15 +13,20 @@ router.post('/:projectName/pages', async (req, res) => {
         const {pageName, folderName} = req.body;
         const {projectName} = req.params;
 
-        //make sure request body has all required information
-        if (![pageName].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are trimmed
         const pageNameTrimmed = pageName.trim();
         const folderNameTrimmed = folderName.trim();
         const projectNameTrimmed = projectName.trim();
+
+        //make sure request body has all required information
+        if (![pageNameTrimmed].every(Boolean)) {
+            return res.sendStatus(400);
+        }
+
+        //make sure the pageName is valid
+        if(isInvalidStringForURL(pageNameTrimmed)){
+            return res.sendStatus(400);
+        }
 
         let project = await Project.findOne({name: projectNameTrimmed, author: userId});
 
@@ -61,17 +68,26 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
         const {projectName, pageName} = req.params;
         const {newPageName, newFolderName, pageContent} = req.body;
 
-        //make sure request body has all required information
-        if (!userId || !projectName || !pageName || !newPageName || !newFolderName || !pageContent) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are trimmed
         const projectNameTrimmed = projectName.trim();
         const pageNameTrimmed = pageName.trim();
         const newPageNameTrimmed = newPageName.trim();
         const newFolderNameTrimmed = newFolderName.trim();
-        const pageContentTrimmed = pageContent.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed || !pageNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        //make sure the pageName is valid
+        if(isInvalidStringForURL(pageNameTrimmed)){
+            return res.sendStatus(400);
+        }
+
+        //make sure the folderName is valid
+        if(isInvalidStringForURL(newFolderNameTrimmed)){
+            return res.sendStatus(400);
+        }
 
         const project = await Project.findOne({name: projectNameTrimmed, author: userId});
         if (!project) {
@@ -108,7 +124,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
 
         //Save data
         if (pageContent) {
-            pages[updatedPageName] = {...pages[updatedPageName], data: pageContentTrimmed};
+            pages[updatedPageName] = {...pages[updatedPageName], data: pageContent};
         }
 
         //Update Folder
@@ -132,14 +148,14 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
         const {userId} = req;
         const {projectName, pageName} = req.params;
 
-        //make sure request body has all required information
-        if (!userId || !projectName || !pageName) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are trimmed
         const projectNameTrimmed = projectName.trim();
         const pageNameTrimmed = pageName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed || !pageNameTrimmed) {
+            return res.sendStatus(400);
+        }
 
         const project = await Project.findOne({name: projectNameTrimmed, author: userId});
 

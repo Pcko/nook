@@ -18,14 +18,14 @@ router.post('/login', async (req, res) => {
     try {
         const {username, password} = req.body;
 
-        //make sure request body has all required information
-        if (![username, password].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
         const passwordTrimmed = password.trim();
+
+        //make sure request body has all required information
+        if (![usernameTrimmed, passwordTrimmed].every(Boolean)) {
+            return res.sendStatus(400);
+        }
 
         const user = await User.findOne({_id: usernameTrimmed});
 
@@ -68,17 +68,17 @@ router.post('/register', async (req, res) => {
     try {
         const {username, password, firstName, lastName, email} = req.body;
 
-        //make sure request body has all required information
-        if (![username, password, firstName, lastName, email].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
         const passwordTrimmed = password.trim();
         const firstNameTrimmed = firstName.trim();
         const lastNameTrimmed = lastName.trim();
         const emailTrimmed = email.trim();
+
+        //make sure request body has all required information
+        if (![usernameTrimmed, passwordTrimmed, firstNameTrimmed, lastNameTrimmed, emailTrimmed].every(Boolean)) {
+            return res.sendStatus(400);
+        }
 
         //make sure all parameters are valid
         if (isInvalidStringForUsername(usernameTrimmed) ||
@@ -107,11 +107,11 @@ router.post('/register', async (req, res) => {
         //create new user and insert new user into database
         await User.create({
             _id: usernameTrimmed,
-            usernameTrimmed,
-            passwordTrimmed,
-            firstNameTrimmed,
-            lastNameTrimmed,
-            emailTrimmed,
+            _username: usernameTrimmed,
+            _password: passwordTrimmed,
+            _firstName: firstNameTrimmed,
+            _lastName: lastNameTrimmed,
+            _email: emailTrimmed,
         })
 
         return res.sendStatus(201);
