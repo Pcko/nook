@@ -16,6 +16,9 @@ import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
 
+const cssPath = new URL('src/components/website-builder/grapes.css', window.location.origin).toString();
+
+
 function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
     const selectedElementRef = useRef(null);
@@ -46,7 +49,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 storageManager: false,
                 blockManager: {appendTo: "#blocks"},
                 panels: {defaults: []},
-                canvas: {styles: [{href: './src/components/website-builder/grapes.css'}]},
+                canvas: {styles: [{href: cssPath}]},
                 layerManager: {appendTo: "#layers", options: {open: true}},
                 deviceManager: {
                     devices: [
@@ -54,6 +57,37 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         {name: "Tablet", width: "768px"},
                         {name: "Mobile", width: "375px"}
                     ]
+                },
+                styleManager: {
+                    appendTo: '#right-panel',
+                    sectors: [
+                      {
+                        name: 'Dimension',
+                        open: false,
+                        buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+                      },
+                      {
+                        name: 'Typography',
+                        open: false,
+                        buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align'],
+                        properties: [
+                          {
+                            property: 'text-align',
+                            list: [
+                              { value: 'left', name: 'Left', className: 'fa fa-align-left' },
+                              { value: 'center', name: 'Center', className: 'fa fa-align-center' },
+                              { value: 'right', name: 'Right', className: 'fa fa-align-right' },
+                              { value: 'justify', name: 'Justify', className: 'fa fa-align-justify' },
+                            ],
+                          },
+                        ],
+                      },
+                      {
+                        name: 'Decorations',
+                        open: false,
+                        buildProps: ['opacity', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+                      },
+                    ],
                 },
                 plugins: ["grapesjs-blocks-basic"],
                 pluginsOpts: {
@@ -114,6 +148,10 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         };
     }, []);
 
+
+
+    
+
     /**
      * Saves the current editor state to localStorage.
      *
@@ -135,6 +173,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const clearCanvas = () => {
         const wrapper = editorRef.current?.DomComponents.getWrapper();
         wrapper?.components().reset();
+        console.log("test: "+cssPath)
     };
 
     /**
@@ -208,7 +247,6 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
            
                 <div className="MainContent">  
                     <div id="left-panel">
-                   
                     <div className="toggle-container">
                             <input
                                 type="radio"
@@ -227,7 +265,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                                 onChange={() => setActiveTab("blocks")}
                             />
                             <label htmlFor="block">Blocks</label>
-                        </div>
+                    </div>
 
                         <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}>
                         </div>
@@ -240,7 +278,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </div>
                     </div>
                     <div id="right-panel">
-                        {/* Layers Manager */}
+                        
                     </div>
                 </div>
             </div>
