@@ -1,8 +1,8 @@
 import React from 'react';
 import { CCarousel, CCarouselItem, CImage } from '@coreui/react';
 import '../../assets/styles/coreui.css'
-import Image1 from '../../assets/resources/frontpage/Icon.png';
-import Image2 from '../../assets/resources/frontpage/Slogan.png';
+import Image1 from '../../assets/resources/frontpage/slideshow-icon.png';
+import Image2 from '../../assets/resources/frontpage/slideshow-slogan.png';
 
 const ImageCarousel = () => {
     const images = [Image1, Image2];
