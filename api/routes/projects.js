@@ -17,12 +17,12 @@ router.post('/', async (req, res) => {
 
         //make sure request body has all required information
         if (![projectNameTrimmed].every(Boolean)) {
-            return res.sendStatus(400);
+            return res.sendStatus(403);
         }
 
         //make sure the projecName is valid
         if (isInvalidStringForURL(projectNameTrimmed)) {
-            return res.sendStatus(400);
+            return res.sendStatus(403);
         }
 
         let newProjectName = projectNameTrimmed;
@@ -98,11 +98,6 @@ router.get('/:projectName', async (req, res) => {
             return res.sendStatus(400);
         }
 
-        //make sure the projecName is valid
-        if (isInvalidStringForURL(projectNameTrimmed)) {
-            return res.sendStatus(400);
-        }
-
         const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
             return res.status(404).send('Project not found!');
@@ -139,6 +134,11 @@ router.patch('/:projectName', async (req, res) => {
         let updatedProjectName = projectNameTrimmed;
         if (newProjectName) {
             const newProjectNameTrimmed = newProjectName.trim();
+            //make sure the projectName is valid
+            if (isInvalidStringForURL(newProjectNameTrimmed)) {
+                return res.sendStatus(400);
+            }
+
             updatedProjectName = newProjectNameTrimmed;
 
             let projectExists;

@@ -86,7 +86,7 @@ router.post('/register', async (req, res) => {
             isInvalidStringForFirstName(firstNameTrimmed) ||
             isInvalidStringForLastName(lastNameTrimmed) ||
             isInvalidStringForEmail(emailTrimmed)) {
-            return res.status(400).send({
+            return res.status(403).send({
                 message: 'Parameters invalid!',
                 errors: {
                     username: isInvalidStringForUsername(usernameTrimmed),

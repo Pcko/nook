@@ -25,7 +25,7 @@ router.post('/:projectName/pages', async (req, res) => {
 
         //make sure the pageName is valid
         if (isInvalidStringForURL(pageNameTrimmed)) {
-            return res.sendStatus(400);
+            return res.sendStatus(403);
         }
 
         let project = await Project.findOne({ name: projectNameTrimmed, author: userId });
@@ -96,7 +96,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
             const newPageNameTrimmed = newPageName.trim();
             //make sure the pageName is valid
             if (isInvalidStringForURL(newPageNameTrimmed)) {
-                return res.sendStatus(400);
+                return res.sendStatus(403);
             }
 
             updatedPageName = newPageNameTrimmed;
@@ -127,7 +127,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
             const newFolderNameTrimmed = newFolderName.trim();
             //make sure the folderName is valid
             if (isInvalidStringForURL(newFolderNameTrimmed)) {
-                return res.sendStatus(400);
+                return res.sendStatus(403);
             }
 
             pages[updatedPageName] = { ...pages[updatedPageName], folderName: newFolderNameTrimmed };
