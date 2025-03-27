@@ -135,7 +135,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
             });
 
             if (state) {
-                editorInstance.setComponents(state);
+                editorInstance.setComponents(state.pageContent);
+                editorInstance.setStyle(state.pageStyles);
             }
 
             editor.current = editorInstance;
@@ -159,11 +160,16 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
      */
     const handleSave = async () => {
         try {
-            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {pageContent: editor.current.getComponents()});
-        }catch (err){
+            const components = editor.current.getComponents();
+            const styles = editor.current.getStyle();
+            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
+                pageContent: components,
+                pageStyles: styles
+            });
+        } catch (err) {
             console.error(err);
         }
-    }
+    };
 
     /**
      * Clears all content from the GrapesJS editor canvas.
