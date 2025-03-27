@@ -20,10 +20,9 @@ router.post('/login', async (req, res) => {
 
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
-        const passwordTrimmed = password.trim();
 
         //make sure request body has all required information
-        if (![usernameTrimmed, passwordTrimmed].every(Boolean)) {
+        if (![usernameTrimmed, password].every(Boolean)) {
             return res.sendStatus(400);
         }
 
@@ -35,7 +34,7 @@ router.post('/login', async (req, res) => {
         }
 
         //validate password
-        const match = await bcrypt.compare(passwordTrimmed, user.password);
+        const match = await bcrypt.compare(password, user.password);
         if (!match) {
             return res.status(403).send({ message: 'Username or password is invalid!' });
         }
@@ -70,19 +69,18 @@ router.post('/register', async (req, res) => {
 
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
-        const passwordTrimmed = password.trim();
         const firstNameTrimmed = firstName.trim();
         const lastNameTrimmed = lastName.trim();
         const emailTrimmed = email.trim();
 
         //make sure request body has all required information
-        if (![usernameTrimmed, passwordTrimmed, firstNameTrimmed, lastNameTrimmed, emailTrimmed].every(Boolean)) {
+        if (![usernameTrimmed, password, firstNameTrimmed, lastNameTrimmed, emailTrimmed].every(Boolean)) {
             return res.sendStatus(400);
         }
 
         //make sure all parameters are valid
         if (isInvalidStringForUsername(usernameTrimmed) ||
-            isInvalidStringForPassword(passwordTrimmed) ||
+            isInvalidStringForPassword(password) ||
             isInvalidStringForFirstName(firstNameTrimmed) ||
             isInvalidStringForLastName(lastNameTrimmed) ||
             isInvalidStringForEmail(emailTrimmed)) {
@@ -90,7 +88,7 @@ router.post('/register', async (req, res) => {
                 message: 'Parameters invalid!',
                 errors: {
                     username: isInvalidStringForUsername(usernameTrimmed),
-                    password: isInvalidStringForPassword(passwordTrimmed),
+                    password: isInvalidStringForPassword(password),
                     firstName: isInvalidStringForFirstName(firstNameTrimmed),
                     lastName: isInvalidStringForLastName(lastNameTrimmed),
                     email: isInvalidStringForEmail(emailTrimmed),
@@ -108,7 +106,7 @@ router.post('/register', async (req, res) => {
         await User.create({
             _id: usernameTrimmed,
             username: usernameTrimmed,
-            password: passwordTrimmed,
+            password,
             firstName: firstNameTrimmed,
             lastName: lastNameTrimmed,
             email: emailTrimmed,
@@ -155,7 +153,7 @@ router.post('/token', async (req, res) => {
 
 function createTokens(tokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET);
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'}); //valid for 7 days after creation
 
     return { accessToken, refreshToken };
 }
