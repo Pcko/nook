@@ -13,11 +13,8 @@ export const customBlocks = [
     content: {
       type: "Box",
       components: [],
-      style: {
-        "padding": "24px",
-        "display": "flex",
-        "flex-direction": "column",
-        "flex": "1",
+      attributes: {
+        style: "padding: 24px;display: flex; flex-direction: column; flex: 1;",
       },
     },
     category: "Components",
@@ -37,12 +34,11 @@ export const customBlocks = [
     content: {
       type: "button",
       content: "Click Me",
-      style: {
-        "padding": "10px 20px",
-        "color": "black",
-        "font-size": "16px",
-        "background-color": "lightgrey",
-        "cursor": "pointer",
+      attributes: {
+        style: "padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; text-align: center;",
+        "data-action": "run-code",
+        onmouseover: "this.style.backgroundColor='#38803c'",
+        onmouseout: "this.style.backgroundColor='#4CAF50'",
       },
     },
     category: "Interactive",
