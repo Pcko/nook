@@ -2,18 +2,20 @@
 
 export function isInvalidStringForURL(pageName){
     const regex = /^[^/?#&]*$/;
+    const trimmedPageName = pageName.trim();
 
-    if(!regex.test(pageName)){
+    if(!trimmedPageName || !regex.test(trimmedPageName)){
         return 'Invalid Name';
     }
 }
 
 export function isInvalidStringForUsername(username){
-    if(!username){
+    const trimmedUsername = username.trim();
+    if(!trimmedUsername){
         return 'Username is required';
     }
 
-    if(username.length < 2){
+    if(trimmedUsername.length < 2){
         return 'Username must be at least 2 characters long';
     }
 }
@@ -29,31 +31,37 @@ export function isInvalidStringForPassword(password){
 }
 
 export function isInvalidStringForFirstName(firstName){
-    if(!firstName){
+    const trimmedFirstName = firstName.trim();
+
+    if(!trimmedFirstName){
         return 'First name is required';
     }
 
-    if(firstName.length < 2){
+    if(trimmedFirstName.length < 2){
         return 'First name must be at least 2 characters long';
     }
 }
 
 export function isInvalidStringForLastName(lastName){
-    if(!lastName){
+    const trimmedLastName = lastName.trim();
+
+    if(!trimmedLastName){
         return 'Last name is required';
     }
 
-    if(lastName.length < 2){
+    if(trimmedLastName.length < 2){
         return 'Last name must be at least 2 characters long';
     }
 }
 
 export function isInvalidStringForEmail(email){
-    if(!email){
+    const trimmedEmail = email.trim();
+
+    if(!trimmedEmail){
         return 'Email is required';
     }
 
-    if(!isEmail(email)){
+    if(!isEmail(trimmedEmail)){
         return 'Email is in a wrong format';
     }
 }
