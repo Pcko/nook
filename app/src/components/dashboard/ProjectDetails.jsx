@@ -41,8 +41,6 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                     projects[selectedProjectId].pages = pages;
                     setPages(projects[selectedProjectId].pages);
                 }catch (err) {
-                    console.error(err.message);
-
                     {/* retry after 2.5 seconds */}
                     await new Promise(resolve => setTimeout(resolve, 2500));
                 }

@@ -18,10 +18,12 @@ function Dashboard ()  {
 
   useEffect(() => {
     const keys = Object.keys(projects);
+    console.log(keys)
     if(!keys.includes(selectedProject)){
-      setSelectedProject(Object.keys(projects)[0]);
+      console.log(keys[0])
+      setSelectedProject(keys[0]);
     }
-  }, [projects]);
+  }, [projects, selectedProject]);
 
   useEffect(() => {
     if(activeTab === 'projects'){
@@ -69,17 +71,11 @@ function Dashboard ()  {
   const handleLogout = async () => {
     try{
         const response = await axios.post('/api/settings/logout');
-        localStorage.clear();
-        sessionStorage.clear();
-        navigate('/');
-    } catch(err){
-      if(err.response.data){
-        showNotification('error', err.response.data.message);
-      }
-      else{
-        showNotification('error', 'There was an error logging out. Please contact our support team for help.')
-      }
-    }
+    } catch(err) { }
+
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/');
 
     showNotification('success', 'Successfully logged out.');
   };
