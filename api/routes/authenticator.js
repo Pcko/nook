@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import express from 'express';
+import speakeasy from 'speakeasy';
 
 import User from '../database/models/user-schema.js';
 import {
@@ -39,23 +40,12 @@ router.post('/login', async (req, res) => {
             return res.status(403).send({ message: 'Username or password is invalid!' });
         }
 
-        //create tokens for authentication
-        await user.updateTokenVersion();
-        const userid = user._id;
-        const tokenVersion = Number(user.tokenVersion);
-        const tokenUser = { id: userid, version: tokenVersion };
-
-        const { accessToken, refreshToken } = createTokens(tokenUser);
-
-        //create new user to return for settings
-        const newUser = {
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
+        if (user.twoFactorAuthOn) {
+            return res.status(202).send({ message: 'Please send auth-passcode!' });
         }
-
-        return res.status(200).json({ user: newUser, accessToken, refreshToken });
+        else {
+            return await createAndSendTokensAndUser(res, user);
+        }
     } catch (e) {
         console.error("❌ Login error: ", e);
         return res.sendStatus(500);
@@ -119,6 +109,36 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// TWO FACTOR AUTHENTIFICATOR
+router.post('/twoFactorAuth', async (req, res) => {
+    const { username, otp } = req.body;
+
+    //make sure all parameters are trimmed
+    const usernameTrimmed = username.trim();
+
+    //make sure request body has all required information
+    if (![usernameTrimmed, otp].every(Boolean)) {
+        return res.sendStatus(400);
+    }
+
+    const user = await User.findOne({ _id: usernameTrimmed }).lean();
+
+    //make sure username exists
+    if (!user) {
+        return res.status(403).send({ message: 'Username or password is invalid!' });
+    }
+
+    const userSecret = user.twoFactorAuthSecret;
+
+    if (!speakeasy.totp.verify({
+        secret: userSecret, encoding: 'base32', token: otp
+    })) {
+        return res.status(403).send({ message: 'One time password is invalid!' })
+    }
+
+    return await createAndSendTokensAndUser(res, user);
+});
+
 // REFRESH TOKEN REQUEST
 router.post('/token', async (req, res) => {
     try {
@@ -151,9 +171,29 @@ router.post('/token', async (req, res) => {
     }
 });
 
+async function createAndSendTokensAndUser(res, user) {
+    //create tokens for authentication
+    await user.updateTokenVersion();
+    const userid = user._id;
+    const tokenVersion = Number(user.tokenVersion);
+    const tokenUser = { id: userid, version: tokenVersion };
+
+    const { accessToken, refreshToken } = createTokens(tokenUser);
+
+    //create new user to return for settings
+    const newUser = {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+    }
+
+    return res.status(200).json({ user: newUser, accessToken, refreshToken });
+}
+
 function createTokens(tokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'}); //valid for 7 days after creation
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' }); //valid for 7 days after creation
 
     return { accessToken, refreshToken };
 }
