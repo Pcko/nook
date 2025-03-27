@@ -1,5 +1,4 @@
-import BackgroundText from "../general/NookBackground"
-import logo from "../../assets/resources/image.png"
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
@@ -66,7 +65,6 @@ function Registration() {
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <BackgroundText />
             <div id="Window" className="min-h-[650] w-[1000px] p-3 text-text bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
 

@@ -1,4 +1,4 @@
-import { isEmail } from 'validator';
+
 
 export function isInvalidStringForURL(pageName){
     const regex = /^[^/?#&]*$/;
