@@ -52,14 +52,19 @@ export const customBlocks = [
     label: "1 Column",
     content: {
       type: "div",
-      attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px; min-height: 50px;",
+      style: {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "padding": "10px",
+        "min-height": "50px"
       },
       components: [
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px;min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
@@ -72,21 +77,27 @@ export const customBlocks = [
     label: "2 Columns",
     content: {
       type: "div",
-      attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px;",
+      style: {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "padding": "10px"
       },
       components: [
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
@@ -99,28 +110,36 @@ export const customBlocks = [
     label: "3 Columns",
     content: {
       type: "div",
-      attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px;",
+      style: {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "padding": "10px"
       },
       components: [
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
         {
           type: "div",
-          attributes: {
-            style: "flex: 1; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "1",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
@@ -133,21 +152,27 @@ export const customBlocks = [
     label: "3/7 Grid",
     content: {
       type: "div",
-      attributes: {
-        style: "display: flex; flex-wrap: wrap; padding: 10px;",
+      style: {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "padding": "10px"
       },
       components: [
         {
           type: "div",
-          attributes: {
-            style: "flex: 3; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "3",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
         {
           type: "div",
-          attributes: {
-            style: "flex: 7; padding: 10px; min-height: 50px;",
+          style: {
+            "flex": "7",
+            "padding": "10px",
+            "min-height": "50px"
           },
           components: [],
         },
