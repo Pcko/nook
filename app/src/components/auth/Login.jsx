@@ -5,6 +5,8 @@ import axios from '../auth/AxiosInstance'
 import ImageCarousel from './ImageCarousel';
 import { useNotifications } from '../general/NotificationContext';
 import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
+import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
+import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -12,6 +14,20 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(true);
+
+    const closeLogin = (accesToken, refreshToken, user) => {
+        showNotification('success', 'Login successfull');
+    
+        localStorage.setItem('accessToken', accesToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // username und password zurücksetzen, sobald der Login-Screen verlassen wird
+        setUsername('');
+        setPassword('');
+        navigate('/dashboard');
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -36,18 +52,13 @@ function Login() {
                 timeoutErrorMessage: 'Server did not respond.',
             });
 
-            showNotification('success', 'Login successfull');
-
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-
-            // username und password zurücksetzen, sobald der Login-Screen verlassen wird
-            setUsername('');
-            setPassword('');
-            navigate('/dashboard');
+            if(response.status === 202){
+                setTwoFactorAuthenticationFormActive(true);
+            }else{
+                closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
+            }
         } catch (err) {
-            if(err.response.data.message){
+            if(err.response){
                 showNotification('error', err.response.data.message);
             }
             else{
@@ -56,6 +67,32 @@ function Login() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handle2FASubmit = (twoFactorAuthenticationCode) => {
+        setTwoFactorAuthenticationFormActive(false);
+
+        if(!twoFactorAuthenticationCode){
+            return;
+        }
+        console.log(twoFactorAuthenticationCode);
+        setLoading(true);
+
+        try{
+            const response = axios.post('/auth/twoFactorAuthentication', {twoFactorAuthenticationCode});
+
+            closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
+        }
+        catch(err){
+            if(err.response){
+                showNotification('error', err.response.data.message);
+            }
+            else{
+                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
+            }
+        }
+
+        setLoading(false);
     };
 
     return (
@@ -113,6 +150,13 @@ function Login() {
                     </div>
                 </div>
             </div>
+
+            {/* Dynamically rendered form */}
+            {twoFactorAuthenticationFormActive?
+                <CenteredWindowWithBackgroundBlur>
+                    <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>
+                </CenteredWindowWithBackgroundBlur>
+            : ''}
         </div>
     );
 }
