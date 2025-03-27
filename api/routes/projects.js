@@ -2,6 +2,8 @@ import express from 'express';
 
 import Project from '../database/models/project-schema.js';
 
+import { isInvalidStringForURL } from "../util/FormChecks.js";
+
 const router = express.Router();
 
 //CREATE PROJECT
@@ -10,12 +12,20 @@ router.post('/', async (req, res) => {
         const { userId } = req;
         const { projectName } = req.body;
 
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
         //make sure request body has all required information
-        if (![projectName].every(Boolean)) {
-            return res.sendStatus(400);
+        if (![projectNameTrimmed].every(Boolean)) {
+            return res.sendStatus(403);
         }
 
-        let newProjectName = projectName;
+        //make sure the projecName is valid
+        if (isInvalidStringForURL(projectNameTrimmed)) {
+            return res.sendStatus(403);
+        }
+
+        let newProjectName = projectNameTrimmed;
         let duplicateNumber = 1;
         let projectExists;
         do {
@@ -23,7 +33,7 @@ router.post('/', async (req, res) => {
 
             if (projectExists) {
                 duplicateNumber += 1;
-                newProjectName = `${projectName} (${duplicateNumber})`;
+                newProjectName = `${projectNameTrimmed} (${duplicateNumber})`;
             }
         }
         while (projectExists);
@@ -41,8 +51,7 @@ router.post('/', async (req, res) => {
         };
 
         return res.status(200).json({ projectName: newProjectName, projectDetails });
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Create project error: ', e);
         return res.sendStatus(500);
     }
@@ -69,8 +78,7 @@ router.get('/', async (req, res) => {
         });
 
         return res.status(200).json(projectDetails);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Read all projects error: ', e);
         return res.sendStatus(500);
     }
@@ -82,14 +90,21 @@ router.get('/:projectName', async (req, res) => {
         const { userId } = req;
         const projectName = req.params.projectName;
 
-        const project = await Project.findOne({ name: projectName, author: userId }).lean();
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         return res.status(200).json(project);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Read specific project error: ', e);
         return res.sendStatus(500);
     }
@@ -102,23 +117,38 @@ router.patch('/:projectName', async (req, res) => {
         const projectName = req.params.projectName;
         const { newProjectName, pages } = req.body;
 
-        const project = await Project.findOne({ name: projectName, author: userId });
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        const project = await Project.findOne({ name: projectNameTrimmed, author: userId });
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         //Rename
-        let updatedProjectName;
+        let updatedProjectName = projectNameTrimmed;
         if (newProjectName) {
+            const newProjectNameTrimmed = newProjectName.trim();
+            //make sure the projectName is valid
+            if (isInvalidStringForURL(newProjectNameTrimmed)) {
+                return res.sendStatus(400);
+            }
+
+            updatedProjectName = newProjectNameTrimmed;
+
             let projectExists;
             let duplicateNumber = 1;
-            updatedProjectName = newProjectName;
             do {
                 projectExists = await Project.findOne({ name: updatedProjectName, author: userId });
-    
+
                 if (projectExists) {
                     duplicateNumber += 1;
-                    updatedProjectName = `${newProjectName} (${duplicateNumber})`;
+                    updatedProjectName = `${newProjectNameTrimmed} (${duplicateNumber})`;
                 }
             }
             while (projectExists);
@@ -141,8 +171,7 @@ router.patch('/:projectName', async (req, res) => {
         };
 
         return res.status(200).json({ projectName: updatedProjectName || projectName, projectDetails });
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Update project error: ', e);
         return res.sendStatus(500);
     }
@@ -154,15 +183,22 @@ router.delete('/:projectName', async (req, res) => {
         const { userId } = req;
         const projectName = req.params.projectName;
 
-        const project = await Project.findOneAndDelete({ name: projectName, author: userId }).lean();
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        const project = await Project.findOneAndDelete({ name: projectNameTrimmed, author: userId }).lean();
 
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         return res.sendStatus(200);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Delete project error: ', e);
         return res.sendStatus(500);
     }
