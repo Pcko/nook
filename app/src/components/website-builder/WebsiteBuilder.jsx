@@ -3,10 +3,8 @@
  *
  * @module WebsiteBuilder
  */
-
-
-import React, { useEffect, useRef, useState } from "react";
-import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineBorder } from "react-icons/ai";
+import React, {useEffect, useRef, useState} from "react";
+import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -16,9 +14,6 @@ import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
 
-const cssPath = new URL('src/components/website-builder/grapes.css', window.location.origin).toString();
-
-
 function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
     const selectedElementRef = useRef(null);
@@ -26,7 +21,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
-    const [activeTab, setActiveTab, ] = useState("layers");
+    const [activeTab, setActiveTab,] = useState("layers");
     const [outlinesActive, setOutlinesActive] = useState(true);
 
     /**
@@ -49,7 +44,6 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 storageManager: false,
                 blockManager: {appendTo: "#blocks"},
                 panels: {defaults: []},
-                canvas: {styles: [{href: cssPath}]},
                 layerManager: {appendTo: "#layers", options: {open: true}},
                 deviceManager: {
                     devices: [
@@ -61,32 +55,32 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 styleManager: {
                     appendTo: '#right-panel',
                     sectors: [
-                      {
-                        name: 'Dimension',
-                        open: false,
-                        buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
-                      },
-                      {
-                        name: 'Typography',
-                        open: false,
-                        buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align'],
-                        properties: [
-                          {
-                            property: 'text-align',
-                            list: [
-                              { value: 'left', name: 'Left', className: 'fa fa-align-left' },
-                              { value: 'center', name: 'Center', className: 'fa fa-align-center' },
-                              { value: 'right', name: 'Right', className: 'fa fa-align-right' },
-                              { value: 'justify', name: 'Justify', className: 'fa fa-align-justify' },
+                        {
+                            name: 'Dimension',
+                            open: false,
+                            buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+                        },
+                        {
+                            name: 'Typography',
+                            open: false,
+                            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align'],
+                            properties: [
+                                {
+                                    property: 'text-align',
+                                    list: [
+                                        {value: 'left', name: 'Left', className: 'fa fa-align-left'},
+                                        {value: 'center', name: 'Center', className: 'fa fa-align-center'},
+                                        {value: 'right', name: 'Right', className: 'fa fa-align-right'},
+                                        {value: 'justify', name: 'Justify', className: 'fa fa-align-justify'},
+                                    ],
+                                },
                             ],
-                          },
-                        ],
-                      },
-                      {
-                        name: 'Decorations',
-                        open: false,
-                        buildProps: ['opacity', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
-                      },
+                        },
+                        {
+                            name: 'Decorations',
+                            open: false,
+                            buildProps: ['opacity', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+                        },
                     ],
                 },
                 plugins: ["grapesjs-blocks-basic"],
@@ -123,20 +117,20 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
 
             document.addEventListener("keydown", function (event) {
                 if (event.ctrlKey && event.shiftKey && event.key === "E" && selectedElementRef.current) {
-                    openNodeEditor(selectedElementRef);
                     event.preventDefault();
+                    openNodeEditor(selectedElementRef);
                 }
             });
             document.addEventListener("keydown", function (event) {
                 if (event.ctrlKey && event.key === "S" && selectedElementRef.current) {
-                    handleSave();
                     event.preventDefault();
+                    handleSave();
                 }
             });
 
             if (state) {
-                editorInstance.setComponents(state.pageContent);
-                editorInstance.setStyle(state.pageStyles);
+                editorInstance.setComponents(state.components);
+                editorInstance.setStyle(state.styles);
             }
 
             editor.current = editorInstance;
@@ -145,13 +139,10 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
-            localStorage.setItem('tabs','[]');
+            localStorage.setItem('tabs', '[]');
         };
     }, []);
 
-
-
-    
 
     /**
      * Saves the current editor state to localStorage.
@@ -162,9 +153,12 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         try {
             const components = editor.current.getComponents();
             const styles = editor.current.getStyle();
+
             const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
-                pageContent: components,
-                pageStyles: styles
+                pageContent: {
+                    components: components,
+                    styles: styles,
+                }
             });
         } catch (err) {
             console.error(err);
@@ -179,7 +173,6 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const clearCanvas = () => {
         const wrapper = editorRef.current?.DomComponents.getWrapper();
         wrapper?.components().reset();
-        console.log("test: "+cssPath)
     };
 
     /**
@@ -192,22 +185,21 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const setDevice = (device) => {
         editorRef.current?.setDevice(device);
     };
-    
-   /**
-     * Switches the layout outline visibility. 
+
+    /**
+     * Switches the layout outline visibility.
      *
      *
      * @function toggleOutlines
      */
     const toggleOutlines = () => {
-        console.log("hi")
         if (outlinesActive) {
-          editorRef.current?.stopCommand("core:component-outline");
+            editorRef.current?.stopCommand("core:component-outline");
         } else {
-          editorRef.current?.runCommand("core:component-outline");
+            editorRef.current?.runCommand("core:component-outline");
         }
         setOutlinesActive(!outlinesActive);
-      };
+    };
 
 
     return (
@@ -225,7 +217,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                             <AiOutlineCode size={20}/>
                         </button>
                         <button className="top-button" onClick={toggleOutlines}>
-                            <AiOutlineBorder size={20} />
+                            <AiOutlineBorder size={20}/>
                         </button>
                     </div>
 
@@ -250,10 +242,10 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </button>
                     </div>
                 </div>
-           
-                <div className="MainContent">  
+
+                <div className="MainContent">
                     <div id="left-panel">
-                    <div className="toggle-container">
+                        <div className="toggle-container">
                             <input
                                 type="radio"
                                 id="layer"
@@ -271,7 +263,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                                 onChange={() => setActiveTab("blocks")}
                             />
                             <label htmlFor="block">Blocks</label>
-                    </div>
+                        </div>
 
                         <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}>
                         </div>
@@ -284,7 +276,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </div>
                     </div>
                     <div id="right-panel">
-                        
+
                     </div>
                 </div>
             </div>
