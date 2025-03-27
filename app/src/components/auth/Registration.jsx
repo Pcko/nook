@@ -6,6 +6,7 @@ import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
 import { isInvalidStringForUsername, isInvalidStringForPassword, isInvalidStringForFirstName, isInvalidStringForLastName, isInvalidStringForEmail } from '../general/FormChecks';
 import { useNotifications } from '../general/NotificationContext'
+import LoadingScreen from "../general/LoadingScreen";
 
 function Registration() {
     const [username, setUsername] = useState('');
@@ -62,6 +63,10 @@ function Registration() {
         finally {
             setLoading(false);
         }
+    }
+
+    if(loading){
+        return <LoadingScreen/>
     }
 
     return (

@@ -32,7 +32,26 @@ function App() {
     }, []);
 
     return (
-        <LoadingScreen/>
+        <NotificationProvider>
+            <NotificationOverlay />
+            <Router>
+                <div className={'h-full'}>
+                    <main className={'h-full bg-far-bg text-text'}>
+                        <Routes>
+                            <Route path="/" element={<AuthRedirect/>}/>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register/>} />
+
+                            <Route element={<ProtectedRoute/>}>
+                                <Route path="/settings" element={<Settings/>} />
+                                <Route path="/dashboard" element={<Dashboard/>} />
+                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
+                            </Route>
+                        </Routes>
+                    </main>
+                </div>
+            </Router>
+        </NotificationProvider>
     );
 }
 

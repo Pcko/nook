@@ -5,6 +5,7 @@ import axios from '../auth/AxiosInstance'
 import ImageCarousel from './ImageCarousel';
 import { useNotifications } from '../general/NotificationContext';
 import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
+import LoadingScreen from '../general/LoadingScreen';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -57,6 +58,10 @@ function Login() {
             setLoading(false);
         }
     };
+
+    if(loading){
+        return <LoadingScreen/>
+    }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
