@@ -95,6 +95,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
       outline: 1px dashed #141c1c !important; /* Red solid outline for components */
     }
                 `,
+              
             });
 
             // Run the component outline command to enable outlines by default
@@ -114,6 +115,14 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
             editorInstance.on("component:deselected", () => {
                 selectedElementRef.current = null;
             });
+
+
+            document.addEventListener('keydown', function(event) {
+                if (event.shiftKey && event.key === 'O') {
+                    event.preventDefault();
+                    toggleOutlines();
+                }
+              });
 
             document.addEventListener("keydown", function (event) {
                 if (event.ctrlKey && event.shiftKey && event.key === "E" && selectedElementRef.current) {
@@ -193,12 +202,15 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
      * @function toggleOutlines
      */
     const toggleOutlines = () => {
-        if (outlinesActive) {
-            editorRef.current?.stopCommand("core:component-outline");
-        } else {
-            editorRef.current?.runCommand("core:component-outline");
-        }
-        setOutlinesActive(!outlinesActive);
+        setOutlinesActive(prev => {
+            const next = !prev;
+            if (next) {
+                editorRef.current?.runCommand('core:component-outline');
+            } else {
+                editorRef.current?.stopCommand('core:component-outline');
+            }
+            return next;
+        });
     };
 
 
