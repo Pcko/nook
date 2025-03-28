@@ -110,33 +110,39 @@ router.post('/register', async (req, res) => {
 });
 
 // TWO FACTOR AUTHENTIFICATOR
-router.post('/twoFactorAuth', async (req, res) => {
-    const { username, otp } = req.body;
+router.post('/twoFactorAuthentication', async (req, res) => {
+    try {
+        const { username, otp } = req.body;
 
-    //make sure all parameters are trimmed
-    const usernameTrimmed = username.trim();
+        //make sure all parameters are trimmed
+        const usernameTrimmed = username.trim();
 
-    //make sure request body has all required information
-    if (![usernameTrimmed, otp].every(Boolean)) {
-        return res.sendStatus(400);
+        //make sure request body has all required information
+        if (![usernameTrimmed, otp].every(Boolean)) {
+            return res.sendStatus(400);
+        }
+
+        const user = await User.findOne({ _id: usernameTrimmed }).lean();
+
+        //make sure username exists
+        if (!user) {
+            return res.status(403).send({ message: 'Username or password is invalid!' });
+        }
+
+        const userSecret = user.twoFactorAuthSecret;
+
+        if (!speakeasy.totp.verify({
+            secret: userSecret, encoding: 'base32', token: otp
+        })) {
+            return res.status(403).send({ message: 'One time password is invalid!' })
+        }
+
+        return await createAndSendTokensAndUser(res, user);
     }
-
-    const user = await User.findOne({ _id: usernameTrimmed }).lean();
-
-    //make sure username exists
-    if (!user) {
-        return res.status(403).send({ message: 'Username or password is invalid!' });
+    catch (e) {
+        console.error("❌ TwoFactorAuth error: ", e);
+        return res.sendStatus(500);
     }
-
-    const userSecret = user.twoFactorAuthSecret;
-
-    if (!speakeasy.totp.verify({
-        secret: userSecret, encoding: 'base32', token: otp
-    })) {
-        return res.status(403).send({ message: 'One time password is invalid!' })
-    }
-
-    return await createAndSendTokensAndUser(res, user);
 });
 
 // REFRESH TOKEN REQUEST

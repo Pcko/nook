@@ -1,4 +1,5 @@
 import express from 'express';
+import speakeasy from 'speakeasy';
 
 import User from '../database/models/user-schema.js';
 
@@ -48,7 +49,7 @@ router.delete('/delete-account', async (req, res) => {
     //make sure all parameters are trimmed
     const usernameTrimmed = username.trim();
 
-    if(usernameTrimmed !== req.userId){
+    if (usernameTrimmed !== req.userId) {
       return res.status(403).send({ message: 'Access token is not issued for this username' });
     }
 
@@ -66,11 +67,56 @@ router.delete('/delete-account', async (req, res) => {
   }
 });
 
+// ACTIVATE TWO FACTOR AUTH REQUEST
+router.get('/twoFactorAuth', async (req, res) => {
+  try {
+    const { userId } = req;
+
+    const user = await User.findById(userId);
+
+    const secret = speakeasy.generateSecret();
+    user.twoFactorAuthSecret = secret.base32;
+    await user.save();
+
+    return res.json({ qrCodeUrl: secret.otpauth_url });
+  }
+  catch (e) {
+    console.error("❌ Activate TwoFactorAuth error:", e);
+    return res.sendStatus(500);
+  }
+});
+
+// CONFIRM TWO FACTOR AUTH REQUEST
+router.post('/twoFactorAuth', async (req, res) => {
+  try {
+    const { userId } = req;
+    const { otp } = req.body;
+
+    const user = await User.findById(userId);
+    const userSecret = user.twoFactorAuthSecret;
+
+    if (!speakeasy.totp.verify({
+      secret: userSecret, encoding: 'base32', token: otp
+    })) {
+      return res.status(403).send({ message: 'One time password is invalid!' })
+    }
+
+    user.twoFactorAuthOn = true;
+    await user.save();
+
+    return res.status(200);
+  }
+  catch (e) {
+    console.error("❌ Confirm TwoFactorAuth error:", e);
+    return res.sendStatus(500);
+  }
+})
+
 // LOGOUT REQUEST
 router.post('/logout', async (req, res) => {
   try {
     const { userId } = req;
-    
+
     const user = await User.findOne({ _id: userId })
     await user.updateTokenVersion();
 
