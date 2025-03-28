@@ -18,9 +18,7 @@ function Dashboard ()  {
 
   useEffect(() => {
     const keys = Object.keys(projects);
-    console.log(keys)
     if(!keys.includes(selectedProject)){
-      console.log(keys[0])
       setSelectedProject(keys[0]);
     }
   }, [projects, selectedProject]);
