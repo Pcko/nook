@@ -4,28 +4,46 @@ import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
 
 function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
-    const [newPageName, setNewPageName] = useState('');
+    const [newPageName, setNewPageName] = useState(pageName);
+    const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
     const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
         /* Form Checks */
-        if(newPageName in Object.keys(pages)){
-            console.error('page name must be unique');
+        if(newPageName !== pageName && pages[newPageName]){
+            showNotification('error', 'Your page name must be unique.');
             return;
         }
-        const result = isInvalidStringForURL(newPageName);
-        if(result){
-            return showNotification('error', result);
+        const trimmedFolderName = newFolderName?.trim();
+        if(!trimmedFolderName){
+            if(!newPageName.trim()){
+                return showNotification('error', 'At least one of the fields is required');
+            }
+
+            const result = isInvalidStringForURL(newPageName);
+            if(result){
+                return showNotification('error', result);
+            }
         }
 
         try{
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, { newPageName });
+            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, 
+                { 
+                    newPageName: newPageName === pageName ? undefined : newPageName, 
+                    newFolderName: trimmedFolderName === pages[pageName].folderName ? undefined : trimmedFolderName, 
+                });
 
-            const page = { ...pages[pageName] };
-            delete pages[pageName];
-            pages[response.data.newPageName] = page;
+            if(trimmedFolderName){
+                pages[pageName].folderName = trimmedFolderName;
+            }
+
+            if(newPageName){
+                const page = { ...pages[pageName] };
+                delete pages[pageName];
+                pages[response.data.newPageName] = page;
+            }
 
             showNotification('success', 'Successfully applied changes to your page.');
         }catch (err) {
@@ -51,12 +69,22 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                     type="text"
                     id="newPageName"
                     name="newPageName"
-                    required
                     minLength="2"
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
                     onChange={(e) => setNewPageName(e.target.value)}
                     value={newPageName}
-                    placeholder="Example: My Page"
+                    placeholder="Default: keep previous"
+                />
+                <label htmlFor="folderName" className="block mb-1">Folder</label>
+                <input
+                    type="text"
+                    id="newFolderName"
+                    name="newFolderName"
+                    minLength="2"
+                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    value={newFolderName}
+                    placeholder="Default: keep previous"
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">

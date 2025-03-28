@@ -74,7 +74,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
     };
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full flex flex-col">
             {/* Top Bar */}
             <div className="flex">
                 {/* Search Bar */}
@@ -119,12 +119,17 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
             <hr className="mt-5 mb-10 border-ui-border"/>
 
             {/* Projects Table */}
+            <div className="overflow-y-scroll">
             <div className="grid grid-cols-4 border-ui-border">
                 {/* Table Headers */}
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg">Project Name</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Created</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Last Modified</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tr-lg">Number of Pages</div>
+                <div className="sticky top-0 bg-far-bg">
+                    <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg">Project Name</div>
+                </div>
+                <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Created</div>
+                <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Last Modified</div>
+                <div className="sticky top-0 bg-far-bg">
+                    <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tr-lg">Number of Pages</div>
+                </div>
 
                 {/*
                     All the user's projects
@@ -182,7 +187,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                         </Fragment>
                     ))}
             </div>
-
+            </div>
 
 
             {/* Dynamically rendered forms */}

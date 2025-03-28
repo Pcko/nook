@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-const BackgroundWithText = () => {
+const NookBackground = () => {
 
     useEffect(() => {
         const createBackgroundText = () => {
@@ -57,4 +57,4 @@ const BackgroundWithText = () => {
     return null; // No need to render anything for the background component itself
 };
 
-export default BackgroundWithText;
+export default NookBackground;

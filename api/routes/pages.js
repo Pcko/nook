@@ -2,29 +2,41 @@ import express from 'express';
 
 import Project from '../database/models/project-schema.js';
 
+import { isInvalidStringForURL } from "../util/FormChecks.js";
+
 const router = express.Router();
 
 //CREATE PAGE
 router.post('/:projectName/pages', async (req, res) => {
     try {
         const { userId } = req;
-        const { pageName } = req.body;
+        const { pageName, folderName } = req.body;
         const { projectName } = req.params;
 
+        //make sure all parameters are trimmed
+        const pageNameTrimmed = pageName.trim();
+        const folderNameTrimmed = folderName && folderName.trim();
+        const projectNameTrimmed = projectName.trim();
+
         //make sure request body has all required information
-        if (![pageName].every(Boolean)) {
+        if (![pageNameTrimmed].every(Boolean)) {
             return res.sendStatus(400);
         }
 
-        let project = await Project.findOne({ name: projectName, author: userId });
+        //make sure the pageName is valid
+        if (isInvalidStringForURL(pageNameTrimmed)) {
+            return res.sendStatus(403);
+        }
 
-        if(!project){
+        let project = await Project.findOne({ name: projectNameTrimmed, author: userId });
+
+        if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         const pages = { ...project.pages };
 
-        let updatedPageName = pageName;
+        let updatedPageName = pageNameTrimmed;
         let duplicateNumber = 1;
 
         let pageExists = undefined;
@@ -33,18 +45,17 @@ router.post('/:projectName/pages', async (req, res) => {
 
             if (pageExists) {
                 duplicateNumber += 1;
-                updatedPageName = `${pageName} (${duplicateNumber})`;
+                updatedPageName = `${pageNameTrimmed} (${duplicateNumber})`;
             }
         }
         while (pageExists);
 
-        pages[updatedPageName] = { data: {} };
+        pages[updatedPageName] = { folderName: folderNameTrimmed || 'General', data: {} };
         project.pages = pages;
         await project.save();
 
-        return res.status(200).json({pageName: updatedPageName, pageDetails: pages[updatedPageName]});
-    }
-    catch (e) {
+        return res.status(200).json({ pageName: updatedPageName, pageDetails: pages[updatedPageName] });
+    } catch (e) {
         console.error('❌ Create project error: ', e);
         return res.sendStatus(500);
     }
@@ -55,33 +66,49 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
     try {
         const { userId } = req;
         const { projectName, pageName } = req.params;
-        const { newPageName, pageContent } = req.body;
+        const { newPageName, newFolderName, pageContent } = req.body;
 
-        const project = await Project.findOne({ name: projectName, author: userId });
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+        const pageNameTrimmed = pageName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed || !pageNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        const project = await Project.findOne({ name: projectNameTrimmed, author: userId });
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         const pages = { ...project.pages };
 
-        const selectedPage = pages[pageName];
-        if(!selectedPage){
+        const selectedPage = pages[pageNameTrimmed];
+        if (!selectedPage) {
             return res.status(404).send('Page not found!')
         }
 
         //Rename
-        let updatedPageName = undefined;
+        let updatedPageName = pageNameTrimmed;
+
         if (newPageName) {
-            updatedPageName = newPageName;
+            const newPageNameTrimmed = newPageName.trim();
+            //make sure the pageName is valid
+            if (isInvalidStringForURL(newPageNameTrimmed)) {
+                return res.sendStatus(403);
+            }
+
+            updatedPageName = newPageNameTrimmed;
+
             let duplicateNumber = 1;
-    
             let pageExists = undefined;
             do {
                 pageExists = pages[updatedPageName];
-    
+
                 if (pageExists) {
                     duplicateNumber += 1;
-                    updatedPageName = `${pageName} (${duplicateNumber})`;
+                    updatedPageName = `${newPageNameTrimmed} (${duplicateNumber})`;
                 }
             }
             while (pageExists);
@@ -92,15 +119,25 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
 
         //Save data
         if (pageContent) {
-            pages[pageName] = { ...pages[pageName], data: pageContent };
+            pages[updatedPageName] = { ...pages[updatedPageName], data: pageContent };
+        }
+
+        //Update Folder
+        if (newFolderName) {
+            const newFolderNameTrimmed = newFolderName.trim();
+            //make sure the folderName is valid
+            if (isInvalidStringForURL(newFolderNameTrimmed)) {
+                return res.sendStatus(403);
+            }
+
+            pages[updatedPageName] = { ...pages[updatedPageName], folderName: newFolderNameTrimmed };
         }
 
         project.pages = pages;
         await project.save();
 
-        return res.status(200).json({newPageName: updatedPageName});
-    }
-    catch (e) {
+        return res.status(200).json({ newPageName: updatedPageName });
+    } catch (e) {
         console.error('❌ Update page error: ', e);
         return res.sendStatus(500);
     }
@@ -112,27 +149,35 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
         const { userId } = req;
         const { projectName, pageName } = req.params;
 
-        const project = await Project.findOne({ name: projectName, author: userId });
+        //make sure all parameters are trimmed
+        const projectNameTrimmed = projectName.trim();
+        const pageNameTrimmed = pageName.trim();
+
+        //make sure request body has all required information
+        if (!userId || !projectNameTrimmed || !pageNameTrimmed) {
+            return res.sendStatus(400);
+        }
+
+        const project = await Project.findOne({ name: projectNameTrimmed, author: userId });
 
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
         const pages = { ...project.pages };
-        const pageExists = pages[pageName];
+        const pageExists = pages[pageNameTrimmed];
 
-        if(!pageExists){
+        if (!pageExists) {
             return res.status(404).send('Page not found!');
         }
 
-        delete pages[pageName];
+        delete pages[pageNameTrimmed];
 
         project.pages = pages;
         await project.save();
 
         return res.sendStatus(200);
-    }
-    catch (e) {
+    } catch (e) {
         console.error('❌ Delete page error: ', e);
         return res.sendStatus(500);
     }

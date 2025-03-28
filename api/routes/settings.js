@@ -45,11 +45,14 @@ router.delete('/delete-account', async (req, res) => {
       return res.sendStatus(400);
     }
 
-    if(username !== req.userId){
+    //make sure all parameters are trimmed
+    const usernameTrimmed = username.trim();
+
+    if(usernameTrimmed !== req.userId){
       return res.status(403).send({ message: 'Access token is not issued for this username' });
     }
 
-    const user = await User.findOneAndDelete({ _id: username });
+    const user = await User.findOneAndDelete({ _id: usernameTrimmed });
     //make sure username exists
     if (!user) {
       return res.sendStatus(404);
