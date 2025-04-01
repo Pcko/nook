@@ -74,7 +74,7 @@ router.get('/twoFactorAuth', async (req, res) => {
 
     const user = await User.findById(userId);
 
-    const secret = speakeasy.generateSecret();
+    const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
     user.twoFactorAuthSecret = secret.base32;
     await user.save();
 

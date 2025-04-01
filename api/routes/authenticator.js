@@ -110,7 +110,7 @@ router.post('/register', async (req, res) => {
 });
 
 // TWO FACTOR AUTHENTIFICATOR
-router.post('/twoFactorAuthentication', async (req, res) => {
+router.post('/twoFactorAuth', async (req, res) => {
     try {
         const { username, otp } = req.body;
 
@@ -122,7 +122,7 @@ router.post('/twoFactorAuthentication', async (req, res) => {
             return res.sendStatus(400);
         }
 
-        const user = await User.findOne({ _id: usernameTrimmed }).lean();
+        const user = await User.findOne({ _id: usernameTrimmed });
 
         //make sure username exists
         if (!user) {

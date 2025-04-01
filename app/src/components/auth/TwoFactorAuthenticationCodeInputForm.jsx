@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
-function TwoFactorAuthenticationCodeInputForm({ submitForm }){
+function TwoFactorAuthenticationCodeInputForm({ submitForm }) {
     const [authenticationCode, setAuthenticationCode] = useState('');
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
         submitForm(authenticationCode);
     };
 
@@ -21,13 +22,14 @@ function TwoFactorAuthenticationCodeInputForm({ submitForm }){
                     minLength="6"
                     maxLength="6"
                     className="w-full h-8 px-2 tracking-wide border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
-                    onChange={(e) => setAuthenticationCode(e.target.value)}
+                    onChange={(e) => setAuthenticationCode(e.target.value.replace(/\D/g, ''))}
                     value={authenticationCode}
                     placeholder="XXXXXX"
+                    autocomplete="off"
                 />
                 <div className="w-full flex mt-5">
-                    <input type="button" value="Cancel" onClick={() => submitForm()} className="w-[40%] py-1 px-4 bg-ui-button rounded-lg ml-0 mr-auto hover:cursor-pointer hover:bg-ui-button-hover btn"/>
-                    <input type="submit" value="Confirm" className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover btn"/>
+                    <input type="button" value="Cancel" onClick={() => submitForm()} className="w-[40%] py-1 px-4 bg-ui-button rounded-lg ml-0 mr-auto hover:cursor-pointer hover:bg-ui-button-hover btn" />
+                    <input type="submit" value="Confirm" className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover btn" />
                 </div>
             </form>
         </div>

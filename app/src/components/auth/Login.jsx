@@ -14,12 +14,12 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
-    const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(true);
+    const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
 
-    const closeLogin = (accesToken, refreshToken, user) => {
+    const closeLogin = (accessToken, refreshToken, user) => {
         showNotification('success', 'Login successfull');
-    
-        localStorage.setItem('accessToken', accesToken);
+
+        localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('user', JSON.stringify(user));
 
@@ -35,7 +35,7 @@ function Login() {
 
         /* Form Checks */
         const error = isInvalidStringForUsername(username) || isInvalidStringForPassword(password);
-        if(error){
+        if (error) {
             return showNotification('error', error);
         }
 
@@ -52,16 +52,16 @@ function Login() {
                 timeoutErrorMessage: 'Server did not respond.',
             });
 
-            if(response.status === 202){
+            if (response.status === 202) {
                 setTwoFactorAuthenticationFormActive(true);
-            }else{
+            } else {
                 closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
             }
         } catch (err) {
-            if(err.response){
+            if (err.response) {
                 showNotification('error', err.response.data.message);
             }
-            else{
+            else {
                 showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
             }
         } finally {
@@ -69,25 +69,25 @@ function Login() {
         }
     };
 
-    const handle2FASubmit = (twoFactorAuthenticationCode) => {
+    const handle2FASubmit = async (twoFactorAuthenticationCode) => {
         setTwoFactorAuthenticationFormActive(false);
 
-        if(!twoFactorAuthenticationCode){
+        if (!twoFactorAuthenticationCode) {
             return;
         }
-        console.log(twoFactorAuthenticationCode);
         setLoading(true);
 
-        try{
-            const response = axios.post('/auth/twoFactorAuthentication', {twoFactorAuthenticationCode});
-
+        try {
+            const response = await axios.post('/auth/twoFactorAuth', { username, otp: twoFactorAuthenticationCode });
+            console.log(response.data)
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         }
-        catch(err){
-            if(err.response){
+        catch (err) {
+            console.error(err.message)
+            if (err.response) {
                 showNotification('error', err.response.data.message);
             }
-            else{
+            else {
                 showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
             }
         }
@@ -152,11 +152,11 @@ function Login() {
             </div>
 
             {/* Dynamically rendered form */}
-            {twoFactorAuthenticationFormActive?
+            {twoFactorAuthenticationFormActive ?
                 <CenteredWindowWithBackgroundBlur>
-                    <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>
+                    <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} />
                 </CenteredWindowWithBackgroundBlur>
-            : ''}
+                : ''}
         </div>
     );
 }
