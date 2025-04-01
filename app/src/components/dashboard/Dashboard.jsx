@@ -7,6 +7,7 @@ import UserIcon from '../general/UserIcon';
 import ProjectHub from "./ProjectHub";
 import ProjectDetails from "./ProjectDetails";
 import { useNotifications } from "../general/NotificationContext"
+import useErrorHandler from "../general/ErrorHandler";
 
 function Dashboard ()  {
   const [projects, setProjects] = useState({});
@@ -15,6 +16,7 @@ function Dashboard ()  {
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
   const { showNotification } = useNotifications();
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     const keys = Object.keys(projects);
@@ -43,12 +45,7 @@ function Dashboard ()  {
 
           showNotification('success', 'Successfully loaded your projects');
         }catch(err){
-          if(err.response.status === 404){
-            showNotification('error', 'No projects found.');
-          }
-          else{
-            showNotification('error', err.response.data.message || 'There was an issue loading your projects from our server. Please try again later.');
-          }
+          handleError(err);
         }
       }
 

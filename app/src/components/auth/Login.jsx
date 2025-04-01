@@ -6,6 +6,7 @@ import {useNotifications} from '../general/NotificationContext';
 import {isInvalidStringForPassword, isInvalidStringForUsername} from '../general/FormChecks';
 import NookBackground from "../general/NookBackground";
 import LoadingScreen from '../general/LoadingScreen';
+import useErrorHandler from "../general/ErrorHandler";
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -13,6 +14,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -48,11 +50,7 @@ function Login() {
             setPassword('');
             navigate('/dashboard');
         } catch (err) {
-            if (err.response.data.message) {
-                showNotification('error', err.response.data.message);
-            } else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         } finally {
             setLoading(false);
         }

@@ -2,19 +2,21 @@ import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import axios from '../auth/AxiosInstance';
 import LoadingScreen from "../general/LoadingScreen";
+import useErrorHandler from "./ErrorHandler";
 
 function AuthRedirect(){
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const handleError = useErrorHandler();
 
     useEffect( ()=>{
         const checkAuthStatus = async ()=>{
             const accessToken = localStorage.getItem('accessToken');
             const refreshToken = localStorage.getItem('refreshToken');
 
-            if(!accessToken || !refreshToken){
+            if(!refreshToken){
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 setLoading(false);
@@ -32,14 +34,7 @@ function AuthRedirect(){
             catch(err){
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                if(err.response){
-                    if(err.response.status===401){
-                        navigate('/login');
-                    }
-                    if(err.response.message){
-                        setError(err.response.message);
-                    }
-                }5
+                handleError({err, redirectToLogin: true});
             }
             finally{
                 setLoading(false);

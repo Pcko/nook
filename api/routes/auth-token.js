@@ -6,7 +6,7 @@ function authenticateToken(req, res, next) {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return res.sendStatus(400);
+        return res.sendStatus(401);
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, tokenContent) => {

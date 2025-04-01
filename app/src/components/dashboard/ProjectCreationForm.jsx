@@ -2,10 +2,12 @@ import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
 import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
+import useErrorHandler from "../general/ErrorHandler";
 
 function ProjectCreationForm({ closeForm, setProjects }){
     const [projectName, setProjectName] = useState('');
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -27,7 +29,7 @@ function ProjectCreationForm({ closeForm, setProjects }){
 
             showNotification('success', 'Successfully added your new project.');
         }catch (err) {
-            return showNotification('error', 'There was an issue communicating with our servers.');
+            return handleError(err);
         }
 
         closeForm();

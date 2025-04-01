@@ -47,7 +47,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
 
             showNotification('success', 'Successfully applied changes to your page.');
         }catch (err) {
-            return showNotification('error', 'There was an issue communicating with our servers.');
+            return handleError(err);
         }
 
         closeForm();

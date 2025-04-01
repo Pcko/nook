@@ -2,11 +2,13 @@ import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
 import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
+import useErrorHandler from "../general/ErrorHandler";
 
 function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     const [pageName, setPageName] = useState('');
     const [folderName, setFolderName] = useState('');
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -29,7 +31,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
 
             showNotification('success', 'Successfully added your new page.');
         }catch (err) {
-            return showNotification('error', 'There was an issue communicating with our servers.');
+            return handleError(err);
         }
 
         closeForm();

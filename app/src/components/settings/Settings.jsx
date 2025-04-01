@@ -13,6 +13,7 @@ import {
     isInvalidStringForLastName,
     isInvalidStringForPassword
 } from "../general/FormChecks";
+import useErrorHandler from "../general/ErrorHandler";
 
 function loadSettings() {
     const settings = {
@@ -30,6 +31,7 @@ function Settings() {
     const [activeTab, setActiveTab] = useState('account');
     const [changes, setChanges] = useState({});
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const originalSettings = loadSettings();
 
@@ -91,7 +93,7 @@ function Settings() {
             const newUserObject = { ...oldUserObject, ...changes.account };
             localStorage.setItem('user', JSON.stringify(newUserObject));
         }catch(err){
-            showNotification('error', 'Something went wrong trying to apply your changes. Check your internet connection and try again.');
+            handleError(err);
         }
     };
 

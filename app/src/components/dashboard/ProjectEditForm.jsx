@@ -2,10 +2,12 @@ import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
 import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
+import useErrorHandler from "../general/ErrorHandler";
 
 function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
     const [newProjectName, setNewProjectName] = useState(projectName);
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -29,7 +31,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
             onProjectEdit(response.data.projectName, response.data.projectDetails);
             showNotification('success', 'Successfully applied changes your project.');
         }catch (err) {
-            return showNotification('error', 'There was an issue communicating with our servers.');
+            return handleError(err);
         }
 
         closeForm();
