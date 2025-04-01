@@ -206,10 +206,17 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 <CenteredWindowWithBackgroundBlur>
                     <ProjectEditForm
                         onProjectEdit={
-                            (newProjectName, data)=>{
-                            delete projects[projectNameToEdit];
-                            projects[newProjectName] = data;
-                        }}
+                            (newProjectName, data)=> {
+                                setProjects(prevProjects => {
+                                    const {[projectNameToEdit]: _, ...updatedProjects} = prevProjects;
+
+                                    return {
+                                        ...updatedProjects,
+                                        [newProjectName]: data
+                                    };
+                                });
+                            }
+                        }
                         projectName={projectNameToEdit} closeForm={()=>{setProjectNameToEdit(undefined)}}
                         projects={projects}
                     />

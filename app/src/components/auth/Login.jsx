@@ -5,14 +5,14 @@ import ImageCarousel from './ImageCarousel';
 import {useNotifications} from '../general/NotificationContext';
 import {isInvalidStringForPassword, isInvalidStringForUsername} from '../general/FormChecks';
 import NookBackground from "../general/NookBackground";
-
+import LoadingScreen from '../general/LoadingScreen';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const {showNotification} = useNotifications();
+    const { showNotification } = useNotifications();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -57,6 +57,10 @@ function Login() {
             setLoading(false);
         }
     };
+
+    if(loading){
+        return <LoadingScreen/>
+    }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">

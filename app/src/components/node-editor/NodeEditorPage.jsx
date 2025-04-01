@@ -15,7 +15,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
     const arrangeNodes = useRef(null);
 
     useEffect(() => {
-        const container = document.querySelector('#editor-container');
+        const container = document.querySelector('#editor-container-rete');
         if (container && !editorInitialized.current) {
             create(container).then(({editor, engine, area, arrangeGraph}) => {
                 editorRef.current = editor;
@@ -185,7 +185,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
         <div style={{display: "flex", height: "100vh"}}>
             <SidePanel hierarchyList={hierarchyList}/>
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
-                <div id={'editor-container'} style={{height: "100%"}}/>
+                <div id={'editor-container-rete'} style={{height: "100%"}}/>
             </div>
         </div>
     );
