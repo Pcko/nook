@@ -1,12 +1,15 @@
 import React, {useEffect, useRef, useState} from "react";
-import {clean, create, fetchNodeTypes, load, save} from "./Editor";
+import Editor from "./Editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
+
+
 
 function NodeEditorPage({element, setArrangeNodes, doReload}) {
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
+    const {create, clean, load, save, fetchNodeTypes} = Editor();
     const grapesjsElement = useRef(element);
     const editorRef = useRef(null);
     const engineRef = useRef(null);
