@@ -86,11 +86,11 @@ router.get('/twoFactorAuth', async (req, res) => {
   }
 });
 
-// CONFIRM TWO FACTOR AUTH REQUEST
+// TOGGLE TWO FACTOR AUTH REQUEST
 router.post('/twoFactorAuth', async (req, res) => {
   try {
     const { userId } = req;
-    const { otp } = req.body;
+    const { otp, isEnabled } = req.body;
 
     const user = await User.findById(userId);
     const userSecret = user.twoFactorAuthSecret;
@@ -101,10 +101,10 @@ router.post('/twoFactorAuth', async (req, res) => {
       return res.status(403).send({ message: 'One time password is invalid!' })
     }
 
-    user.twoFactorAuthOn = true;
+    user.twoFactorAuthOn = isEnabled;
     await user.save();
 
-    return res.status(200);
+    return res.sendStatus(200);
   }
   catch (e) {
     console.error("❌ Confirm TwoFactorAuth error:", e);
