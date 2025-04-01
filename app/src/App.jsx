@@ -11,8 +11,6 @@ import EditorHub from "./components/editor-hub/EditorHub";
 
 import './index.css';
 
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import {NotificationProvider} from "./components/general/NotificationContext";
 import NotificationOverlay from "./components/general/NotificationOverlay";
 
