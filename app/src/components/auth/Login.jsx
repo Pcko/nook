@@ -37,7 +37,7 @@ function Login() {
                 timeoutErrorMessage: 'Server did not respond.',
             });
 
-            showNotification('success', 'Login successfull');
+            showNotification('success', 'Login successful');
 
             localStorage.setItem('accessToken', response.data.accessToken);
             localStorage.setItem('refreshToken', response.data.refreshToken);

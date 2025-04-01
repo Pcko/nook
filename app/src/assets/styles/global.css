@@ -13,6 +13,7 @@
     --ui-border-selected:#54585E;
     --ui-subtle:#6D54B5;
     --text:#FFFFFF;
+    --text-on-primary:#FFFFFF;
     --dangerous:#FF4d4d;
     --success: #4CAF50;
 }
@@ -32,6 +33,7 @@
     --ui-border-selected:#9A9EA3;
     --ui-subtle: #A99CD9;
     --text: #2E2E2E;
+    --text-on-primary:#FFFFFF;
     --dangerous:#FF4d4d;
     --success: #4CAF50;
 }
@@ -51,6 +53,7 @@
     --ui-border-selected: #00FF00 !important;
     --ui-subtle: #FFFF00 !important;
     --text: #FFFFFF !important;
+    --text-on-primary:#000000 !important;
     --dangerous:#FFA500 !important;
     --success: #00FF00 !important;
 }

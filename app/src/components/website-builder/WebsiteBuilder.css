@@ -27,7 +27,7 @@
 
         .clear-canvas-button {
             background-color: var(--primary);
-            color: var(--text);
+            color: var(--text-on-primary);
             border: none;
             border-radius: 5px;
             padding: 6px 12px;
@@ -231,6 +231,7 @@
 
         #blocks .gjs-block:hover {
             background-color: var(--primary);
+            color: var(--text-on-primary);
             transform: scale(1.03);
         }
 
@@ -258,9 +259,9 @@
         /*Toggle Container*/
         .toggle-container {
             display: inline-flex;
-            border: 2px solid #23252A; 
+            border: 2px solid var(--ui-border);
             border-radius: 5px;
-            background-color: #17181B;
+            background-color: var(--ui-bg);
             font-size: 14px;
             margin-bottom: 15px;
           }
@@ -275,18 +276,17 @@
             padding: 6px 0;
             border-radius: 5px;  
             background-color: transparent;
-            color: #fff;          
             user-select: none;
             text-align: center;
           }
       
           .toggle-container label:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: var(--ui-bg-selected);
           }
       
           .toggle-container input[type="radio"]:checked + label {
-            background-color: #101012;
-            color: #fff;             
+            background-color: var(--primary);
+            color: var(--text-on-primary);
           }
 
           .hidden { display: none; }
