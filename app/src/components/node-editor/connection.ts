@@ -6,4 +6,5 @@ export class Connection<
     B extends NodeProps
 > extends ClassicPreset.Connection<A, B> {
     isLoop?: boolean;
+    isMagnetic = true;
 }

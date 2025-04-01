@@ -1,20 +1,30 @@
 import {NodeEditor} from "rete";
+import {Connection} from "./connection";
+import {ControlFlowEngine} from "rete-engine";
 import {createRoot} from "react-dom/client";
+import {Schemes} from "./types";
+import Preset from "./contextMenu";
+import {Preset as NodePreset} from "./NodeStyle";
+import { useNotifications } from "../general/NotificationContext"
+
+// Rete Plugins
 import {AreaExtensions, AreaPlugin} from "rete-area-plugin";
 import {Presets, ReactArea2D, ReactPlugin} from "rete-react-plugin";
-import {ControlFlowEngine} from "rete-engine";
-import {Schemes} from "./types";
 import {ConnectionPlugin, Presets as ConnectionPresets} from "rete-connection-plugin";
 import {MinimapPlugin} from "rete-minimap-plugin";
-import {Connection} from "./connection";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
-import Preset from "./contextMenu";
+import {ArrangeAppliers, AutoArrangePlugin, Presets as ArrangePresets} from "rete-auto-arrange-plugin";
+import {MagneticConnection, useMagneticConnection} from "./magnetic-connection";
+
+// Custom
 import SliderComponent, {SliderControl} from "./Controls/SliderControl";
 import ColorPickerComponent, {ColorPickerControl} from "./Controls/ColorPickerControl";
 import {TextInputComponent, TextInputControl} from "./Controls/TextInputControl";
 import {DropdownComponent, DropdownControl} from "./Controls/DropdownControl";
-import {AutoArrangePlugin, Presets as ArrangePresets, ArrangeAppliers} from "rete-auto-arrange-plugin";
+import {SerializedConnection, SerializedNode} from "./Interfaces/serialisation";
 
+
+const { showNotification } = useNotifications();
 export type AreaExtra = ReactArea2D<Schemes>;
 
 /**
@@ -29,7 +39,6 @@ export async function create(container: HTMLElement) {
     const area = new AreaPlugin<Schemes, AreaExtra>(container);
     const render = new ReactPlugin<Schemes, AreaExtra>({createRoot});
     const connection = new ConnectionPlugin<Schemes, AreaExtra>();
-    const minimap = new MinimapPlugin<any>();
     const arrange = new AutoArrangePlugin<Schemes, AreaExtra>();
 
     // Fetch node types
@@ -47,11 +56,12 @@ export async function create(container: HTMLElement) {
             await AreaExtensions.zoomAt(area, editor.getNodes());
         }
     });
+
     arrange.addPreset(ArrangePresets.classic.setup());
 
-    // Add visual presets
+    // Render customization
     render.addPreset(Presets.classic.setup());
-    // WIP React Controls for better integration!
+    render.addPreset(Preset);
     render.addPreset(
         Presets.classic.setup({
             customize: {
@@ -61,11 +71,15 @@ export async function create(container: HTMLElement) {
                     if (data.payload instanceof TextInputControl) return TextInputComponent;
                     if (data.payload instanceof DropdownControl) return DropdownComponent;
                     return null;
+                },
+                connection(data) {
+                    if (data.payload.isMagnetic) return MagneticConnection;
+                    return Connection;
                 }
             }
         })
     );
-    render.addPreset(Preset);
+
     connection.addPreset(ConnectionPresets.classic.setup());
 
     // Use plugins in the editor
@@ -96,6 +110,40 @@ export async function create(container: HTMLElement) {
     };
     arrangeNodes().then(() => AreaExtensions.zoomAt(area, editor.getNodes()));
 
+    useMagneticConnection(connection, {
+        async createConnection(from, to) {
+            if (from.side === to.side) return;
+            const [source, target] = from.side === "output" ? [from, to] : [to, from];
+            const sourceNode = editor.getNode(source.nodeId) ;
+            const targetNode = editor.getNode(target.nodeId);
+
+            if(!sourceNode || !targetNode) {
+                return;
+            }
+
+            await editor.addConnection(
+                new Connection(
+                    sourceNode,
+                    source.key as never,
+                    targetNode,
+                    target.key as never
+                )
+            );
+        },
+        display(from, to) {
+            return from.side !== to.side;
+        },
+        offset(socket, position) {
+            const socketRadius = 10;
+
+            return {
+                x:
+                    position.x + (socket.side === "input" ? -socketRadius : socketRadius),
+                y: position.y
+            };
+        }
+    });
+
     return {
         editor, engine, area, arrangeGraph: () => arrangeNodes(),
     };
@@ -106,16 +154,19 @@ export async function create(container: HTMLElement) {
  *
  * @returns {Promise<JSON>} - A promise that resolves to a JSON representation of the editor's state.
  */
-export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<{ nodes: [], connections: [] }> {
+export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<{
+    nodes: SerializedNode[];
+    connections: SerializedConnection[];
+}> {
     return new Promise((resolve) => {
         const data = {
-            nodes: [],
-            connections: []
+            nodes: Array<SerializedNode>(),
+            connections: Array<SerializedConnection>(),
         };
 
         // Serialize nodes
         editor?.getNodes().forEach(node => {
-            const serializedNode = {
+            const serializedNode: SerializedNode = {
                 id: node.id,
                 type: node.constructor.name,
                 label: node.label,
@@ -149,7 +200,10 @@ export async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes
  * @param editor - The editor in which the state will be loaded.
  * @param area - The area in which the state will be loaded.
  */
-export async function load(saveState: { nodes: [], connections: [] }, editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<void> {
+export async function load(saveState: {
+    nodes: SerializedNode[];
+    connections: SerializedConnection[];
+}, editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<void> {
     const promises = [];
     const nodeMap = await fetchNodeTypes(); //Fetch available node types
 
@@ -219,12 +273,12 @@ export async function load(saveState: { nodes: [], connections: [] }, editor: No
                         connData.targetInput
                     ));
                 } else {
-                    console.error(`Invalid connection keys: sourceOutput=${connData.sourceOutput}, targetInput=${connData.targetInput}`);
+                   showNotification(`Invalid connection keys: sourceOutput=${connData.sourceOutput}, targetInput=${connData.targetInput}`);
                 }
             }
         }
     } catch (error) {
-        console.warn(error)
+        console.error(error)
         throw error;
     }
 }
@@ -240,7 +294,7 @@ export async function clean(editor: NodeEditor<Schemes>): Promise<void> {
  * Fetches all available node types from the nodes module.
  */
 export async function fetchNodeTypes() {
-    const module = await import("./Nodes/_nodes");
+    const module = await import("./Nodes/_nodes.ts");
     let newMap = new Map();
     Object.entries(module).forEach(([key, value]) => newMap.set(key, value));
     return newMap;

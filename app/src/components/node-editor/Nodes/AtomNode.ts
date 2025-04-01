@@ -1,4 +1,4 @@
-import BasicNookNode from "./BasicNookNode";
+import {BasicNookNode} from "./BasicNookNode";
 
 abstract class AtomNode extends BasicNookNode {
     protected constructor(name: string) {

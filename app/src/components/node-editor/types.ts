@@ -11,6 +11,7 @@ import {
     SetTextNode,
     VariableNode
 } from './Nodes/_nodes'
+import {BasicNookNode} from "./Nodes/BasicNookNode";
 
 /**
  * All usable Nook Nodes.
@@ -33,3 +34,4 @@ export type ConnProps = Connection<PerformClickNode, LogNode> | Connection<PageL
  * The Nook Node schemes.
  */
 export type Schemes = GetSchemes<NodeProps, ConnProps>;
+export type Node = BasicNookNode & { width: number; height: number };

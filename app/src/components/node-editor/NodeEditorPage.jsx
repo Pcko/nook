@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {clean, create, fetchNodeTypes, load, save} from "./editor";
+import {clean, create, fetchNodeTypes, load, save} from "./Editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
 

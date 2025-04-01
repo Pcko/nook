@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { ClassicScheme, RenderEmit } from '../types';
-import { RefControl } from './refs/RefControl';
-import { RefSocket } from './refs/RefSocket';
+import {JSX} from 'react';
+import {RefControl, RefSocket, RenderEmit} from "rete-react-plugin/_types/presets/classic";
+import {ClassicScheme} from "rete-react-plugin";
+
 
 type NodeExtraData = { width?: number; height?: number };
 
@@ -11,7 +12,7 @@ type Props<S extends ClassicScheme> = {
     emit: RenderEmit<S>;
 };
 
-export type NodeComponent<Scheme extends ClassicScheme> = (props: Props<Scheme>) => TSX.Element;
+export type NodeComponent<Scheme extends ClassicScheme> = (props: Props<Scheme>) => JSX.Element;
 
 function sortByIndex<T extends [string, undefined | { index?: number }][]>(entries: T) {
     entries.sort((a, b) => {
@@ -21,12 +22,12 @@ function sortByIndex<T extends [string, undefined | { index?: number }][]>(entri
     });
 }
 
-export function <Scheme extends ClassicScheme>(props: Props<Scheme>) {
+export function Preset<Scheme extends ClassicScheme>(props: Props<Scheme>) {
     const inputs = Object.entries(props.data.inputs);
     const outputs = Object.entries(props.data.outputs);
     const controls = Object.entries(props.data.controls);
     const selected = props.data.selected || false;
-    const { id, label, width, height } = props.data;
+    const {id, label, width, height} = props.data;
 
     sortByIndex(inputs);
     sortByIndex(outputs);
@@ -81,7 +82,8 @@ export function <Scheme extends ClassicScheme>(props: Props<Scheme>) {
             {outputs.map(([key, output]) => (
                 output && (
                     <div className="output text-right" key={key} data-testid={`output-${key}`}>
-                        <div className="output-title inline-block text-white font-sans text-sm mx-1" data-testid="output-title">
+                        <div className="output-title inline-block text-white font-sans text-sm mx-1"
+                             data-testid="output-title">
                             {output?.label}
                         </div>
                         <RefSocket
@@ -124,7 +126,8 @@ export function <Scheme extends ClassicScheme>(props: Props<Scheme>) {
                                 data-testid="input-socket"
                             />
                             {input && (!input.control || !input.showControl) && (
-                                <div className="input-title inline-block text-white font-sans text-sm mx-1" data-testid="input-title">
+                                <div className="input-title inline-block text-white font-sans text-sm mx-1"
+                                     data-testid="input-title">
                                     {input?.label}
                                 </div>
                             )}
