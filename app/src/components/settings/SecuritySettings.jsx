@@ -58,8 +58,6 @@ function SecuritySettings({changeHandler}) {
     };
 
     const handle2FASubmit = async (otp) => {
-        setTwoFactorAuthFormActive(false);
-
         if(!otp){
             return;
         }
@@ -70,6 +68,7 @@ function SecuritySettings({changeHandler}) {
             user.twoFactorAuthOn = !user.twoFactorAuthOn;
             localStorage.setItem('user', JSON.stringify(user));
             showNotification('success', `2-Factor-Authentication has successfully been ${user.twoFactorAuthOn ? 'enabled' : 'disabled'}`);
+            setTwoFactorAuthFormActive(false);
         }
         catch (err) {
             if (err.response) {
