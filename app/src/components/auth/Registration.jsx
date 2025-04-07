@@ -11,7 +11,7 @@ import {
     isInvalidStringForUsername
 } from '../general/FormChecks';
 import {useNotifications} from '../general/NotificationContext'
-
+import LoadingScreen from "../general/LoadingScreen";
 
 function Registration() {
     const [username, setUsername] = useState('');
@@ -22,7 +22,7 @@ function Registration() {
     const [errorDisplay, setErrorDisplay] = useState('')
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const {showNotification} = useNotifications();
+    const { showNotification } = useNotifications();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -66,6 +66,10 @@ function Registration() {
         } finally {
             setLoading(false);
         }
+    }
+
+    if(loading){
+        return <LoadingScreen/>
     }
 
     return (

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import axios from '../auth/AxiosInstance';
 
 import UserIcon from '../general/UserIcon';
@@ -14,14 +13,14 @@ function Dashboard ()  {
   const [activeTab, setActiveTab] = useState('projects')
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
-  const { showNotification } = useNotifications();
+  const {showNotification} = useNotifications();
 
   useEffect(() => {
     const keys = Object.keys(projects);
     if(!keys.includes(selectedProject)){
-      setSelectedProject(Object.keys(projects)[0]);
+      setSelectedProject(keys[0]);
     }
-  }, [projects]);
+  }, [projects, selectedProject]);
 
   useEffect(() => {
     if(activeTab === 'projects'){
@@ -69,17 +68,11 @@ function Dashboard ()  {
   const handleLogout = async () => {
     try{
         const response = await axios.post('/api/settings/logout');
-        localStorage.clear();
-        sessionStorage.clear();
-        navigate('/');
-    } catch(err){
-      if(err.response.data){
-        showNotification('error', err.response.data.message);
-      }
-      else{
-        showNotification('error', 'There was an error logging out. Please contact our support team for help.')
-      }
-    }
+    } catch(err) { }
+
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/');
 
     showNotification('success', 'Successfully logged out.');
   };

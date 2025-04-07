@@ -111,7 +111,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                     </Listbox>
 
                     {/* Create New Project Button */}
-                    <input type="button" className="btn rounded" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
+                    <input type="button" className="btn rounded text-text-on-primary" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
                 </div>
             </div>
 
@@ -206,10 +206,17 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 <CenteredWindowWithBackgroundBlur>
                     <ProjectEditForm
                         onProjectEdit={
-                            (newProjectName, data)=>{
-                            delete projects[projectNameToEdit];
-                            projects[newProjectName] = data;
-                        }}
+                            (newProjectName, data)=> {
+                                setProjects(prevProjects => {
+                                    const {[projectNameToEdit]: _, ...updatedProjects} = prevProjects;
+
+                                    return {
+                                        ...updatedProjects,
+                                        [newProjectName]: data
+                                    };
+                                });
+                            }
+                        }
                         projectName={projectNameToEdit} closeForm={()=>{setProjectNameToEdit(undefined)}}
                         projects={projects}
                     />

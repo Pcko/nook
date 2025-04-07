@@ -14,4 +14,4 @@ abstract class BasicNookNode extends ClassicPreset.Node {
     }
 }
 
-export default BasicNookNode;
+export {BasicNookNode};
