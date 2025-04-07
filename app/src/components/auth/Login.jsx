@@ -153,9 +153,7 @@ function Login() {
 
             {/* Dynamically rendered form */}
             {twoFactorAuthenticationFormActive ?
-                <CenteredWindowWithBackgroundBlur>
-                    <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} />
-                </CenteredWindowWithBackgroundBlur>
+                <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} />
                 : ''}
         </div>
     );

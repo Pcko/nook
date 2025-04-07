@@ -192,6 +192,7 @@ async function createAndSendTokensAndUser(res, user) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        twoFactorAuthOn: user.twoFactorAuthOn,
     }
 
     return res.status(200).json({ user: newUser, accessToken, refreshToken });
