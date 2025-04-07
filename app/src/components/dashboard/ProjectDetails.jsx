@@ -134,7 +134,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
               </div>
 
               {/* Create New Page Button */}
-              <input type="button" className="btn rounded ml-auto mr-0" value="+ New Page" onClick={()=>setPageCreationFormActive(true)}/>
+              <input type="button" className="btn text-text-on-primary rounded ml-auto mr-0" value="+ New Page" onClick={()=>setPageCreationFormActive(true)}/>
           </div>
 
           {/* Horizontal Rule between Top Bar and Content */}

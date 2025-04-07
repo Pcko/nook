@@ -1,9 +1,16 @@
 /** @type {import('tailwindcss').Config} */
-
+/**
+ * Tailwind CSS configuration
+ * @type {object}
+ * @property {object} content - Files to scan for classes
+ * @property {object} theme - Theme customization
+ * @property {Array} plugins - Tailwind plugins
+ */
 module.exports = {
     content: [
         "./src/*.{js,jsx,ts,tsx,html}",
-        "./src/**/*.{js,jsx,ts,tsx}"
+        "./src/**/*.{js,jsx,ts,tsx}",
+        "./src/**/**/*.{js,jsx,ts,tsx}",
     ],
     theme: {
         extend: {
@@ -22,7 +29,7 @@ module.exports = {
                 "ui-border-selected": "var(--ui-border-selected)",
                 "ui-subtle": "var(--ui-subtle)",
                 "text": "var(--text)",
-                "text-on-primary":     "var--text-on-primary",
+                "text-on-primary": "var(--text-on-primary)",
                 "dangerous": "var(--dangerous)",
                 "success": "var(--success)",
             },
