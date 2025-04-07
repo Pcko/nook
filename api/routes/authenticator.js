@@ -162,6 +162,10 @@ router.post('/token', async (req, res) => {
             const { id, version } = tokenContent;
             const user = await User.findOne({ _id: id });
 
+            if (!user){
+                return res.status(401).json({message: 'User does not exist!'})
+            }
+
             if (user.tokenVersion !== version) {
                 return res.status(401).json({ error: 'invalid_token' });
             }
@@ -200,7 +204,7 @@ async function createAndSendTokensAndUser(res, user) {
 
 function createTokens(tokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' }); //valid for 7 days after creation
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' }); //valid for 30 days after creation
 
     return { accessToken, refreshToken };
 }

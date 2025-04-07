@@ -17,6 +17,10 @@ function authenticateToken(req, res, next) {
         const { id, version } = tokenContent;
         const user = await User.findOne({ _id: id }).lean();
 
+        if (!user){
+            return res.status(401).json({message: 'User does not exist'})
+        }
+
         if (user.tokenVersion !== version) {
             return res.status(401).json({ error: 'invalid_token' });
         }
