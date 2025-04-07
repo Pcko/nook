@@ -124,24 +124,24 @@
             }
 
 
-            #right-panel::-webkit-scrollbar {
+            .right-panel::-webkit-scrollbar {
                 width: 6px;
             }
 
-            #right-panel::-webkit-scrollbar-thumb {
+            .right-panel::-webkit-scrollbar-thumb {
                 background: var(--ui-subtle);
                 border-radius: 3px;
             }
 
-            #right-panel::-webkit-scrollbar-thumb:hover {
+            .right-panel::-webkit-scrollbar-thumb:hover {
                 background: var(--primary);
             }
 
-            #right-panel::-webkit-scrollbar-track {
+            .right-panel::-webkit-scrollbar-track {
                 background: transparent;
             }
 
-            #right-panel {
+            .right-panel {
                 flex: 1;
                 padding: 16px;
                 background-color: var(--ui-bg);
@@ -150,30 +150,30 @@
             }
         }
 
-  #right-panel .gjs-sm-sector-title {
+  .right-panel .gjs-sm-sector-title {
     background-color: var(--ui-bg);
     color: var(--text);
     padding: 15px;
     border-radius: 4px;
   }
   
-  #right-panel .gjs-sm-properties {
+  .right-panel .gjs-sm-properties {
     background-color: var(--far-bg);
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 10px;
   }
   
-  #right-panel .gjs-sm-property {
+  .right-panel .gjs-sm-property {
     margin-bottom: 10px;
   }
   
-  #right-panel .gjs-sm-label {
+  .right-panel .gjs-sm-label {
     font-size: 14px;
     color: var(--gjs-secondary-color);
   }
   
-  #right-panel .gjs-sm-field {
+  .right-panel .gjs-sm-field {
     border: 2px solid var(--primary);
     border-radius: 5px;
     padding: 5px;
@@ -197,9 +197,9 @@
             scrollbar-color: var(--ui-subtle) transparent;
         }
 
-        #left-panel {
-             display: flex;
-    flex-direction: column;
+        .left-panel {
+            display: flex;
+            flex-direction: column;
             flex: 1;
             padding: 16px;
             background-color: var(--ui-bg);
@@ -298,6 +298,32 @@
             overflow: hidden; /* Prevent scrolling */
             display: flex;
           }
-          
+
+
+        /*Preview Mode*/
+        .hidden {
+            display: none;
+          }
+
+        .PreviewTopPanel{
+            width: 100%;
+            background-color: var(--ui-bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            padding: 8px 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+
+            background: repeating-linear-gradient(
+              45deg,        /* Angle of the stripes */
+              var(--ui-bg-selected),       /* First color */
+              var(--ui-bg-selected) 10px,  /* Thickness of the first color */
+              var(--far-bg) 10px,   /* Second color starts immediately after the first */
+              var(--far-bg) 20px    /* Thickness of the second color */
+            );
+        }
+        
     }
 }
