@@ -7,7 +7,7 @@ import {Schemes} from "../types";
 import {findNearestPoint, isInsideRect} from "./math";
 import {getNodeRect} from "./utils";
 
-export {MagneticConnection} from "./MagneticConnection";
+export {MagneticConnection} from "../CustomPresets/MagneticConnection";
 
 type Props = {
     createConnection: (from: SocketData, to: SocketData) => Promise<void>;

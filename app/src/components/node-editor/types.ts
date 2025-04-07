@@ -3,7 +3,6 @@ import {GetSchemes} from "rete";
 import {
     ButtonClickNode,
     GetElementNode,
-    LogNode,
     NavigateNode,
     PageLoadNode,
     PerformClickNode,
@@ -12,6 +11,7 @@ import {
     VariableNode
 } from './Nodes/_nodes'
 import {BasicNookNode} from "./Nodes/BasicNookNode";
+import AtomNode from "./Nodes/AtomNode.ts";
 
 /**
  * All usable Nook Nodes.
@@ -24,14 +24,17 @@ export type NodeProps =
     | PerformClickNode
     | SetBackgroundColourNode
     | SetTextNode
-    | VariableNode;
+    | VariableNode
+    | BasicNookNode
+    | AtomNode;
+
 /**
- *  All possible Connections for Nook Nodes.
+ *  All possible CustomPresets for Nook Nodes.
  */
-export type ConnProps = Connection<PerformClickNode, LogNode> | Connection<PageLoadNode, LogNode> | Connection<ButtonClickNode, LogNode>;
+export type ConnProps = Connection<AtomNode, NodeProps>;
 
 /**
  * The Nook Node schemes.
  */
 export type Schemes = GetSchemes<NodeProps, ConnProps>;
-export type Node = BasicNookNode & { width: number; height: number };
+export type Node = BasicNookNode;

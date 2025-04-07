@@ -21,7 +21,8 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
     "sourceMap": true,
-    "incremental": true
+    "incremental": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

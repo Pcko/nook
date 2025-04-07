@@ -1,83 +1,91 @@
-import {NodeEditor} from "rete";
+/**
+ * Editor module for managing a Rete.js-based node editor.
+ * This module provides functionality to create, save, load, and manage nodes and connections.
+ * It integrates various Rete.js plugins and custom controls for enhanced functionality.
+ */
+import {ClassicPreset, NodeEditor} from "rete";
 import {Connection} from "./connection";
 import {ControlFlowEngine} from "rete-engine";
 import {createRoot} from "react-dom/client";
 import {Schemes} from "./types";
-import Preset from "./contextMenu";
+import ContextMenuPreset from "./contextMenu";
 import {useNotifications} from "../general/NotificationContext"
 
 // Rete Plugins
 import {AreaExtensions, AreaPlugin} from "rete-area-plugin";
-import {Presets, ReactArea2D, ReactPlugin} from "rete-react-plugin";
+import {ReactArea2D, ReactPlugin, Presets as ReactPresets} from "rete-react-plugin";
 import {ConnectionPlugin, Presets as ConnectionPresets} from "rete-connection-plugin";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import {ArrangeAppliers, AutoArrangePlugin, Presets as ArrangePresets} from "rete-auto-arrange-plugin";
-import {MagneticConnection, useMagneticConnection} from "./magnetic-connection";
 
 // Custom
-import SliderComponent, {SliderControl} from "./Controls/SliderControl";
-import ColorPickerComponent, {ColorPickerControl} from "./Controls/ColorPickerControl";
-import {TextInputComponent, TextInputControl} from "./Controls/TextInputControl";
-import {DropdownComponent, DropdownControl} from "./Controls/DropdownControl";
 import {SerializedConnection, SerializedNode} from "./Interfaces/serialisation";
+import {MagneticConnection, useMagneticConnection} from "./magnetic-connection";
+import {StandardConnection} from "./CustomPresets/StandardConnection.tsx";
+import {StyledNode} from './CustomPresets/NodeStyle'
 
 export type AreaExtra = ReactArea2D<Schemes>;
 
+/**
+ * Creates an instance of the Visual Editor.
+ * @returns {Object} An object containing methods for creating, saving, loading, and cleaning the editor.
+ */
 function Editor() {
 
     const {showNotification} = useNotifications();
 
     /**
-     * Creates a new instance of the Visual Editor.
+     * Creates and configures a new instance of the Visual Editor.
      *
-     * @param {HTMLElement} container - The HTML element where the editor will be rendered.
-     * @returns {Promise<{ editor: NodeEditor<Schemes>, engine: ControlFlowEngine<Schemes>, area: AreaPlugin<Schemes, AreaExtra> }>}
+     * @param {HTMLElement} container - DOM element to render the editor within
+     * @returns {Promise<{
+     *   editor: NodeEditor<Schemes>,
+     *   engine: ControlFlowEngine<Schemes>,
+     *   area: AreaPlugin<Schemes, AreaExtra>,
+     *   arrangeGraph: () => Promise<void>
+     * }>} Configured editor instance with associated components
+     *
+     * @example
+     * const { editor, area } = await Editor().create(containerElement);
      */
     async function create(container: HTMLElement) {
-        let arrangeNodes = async () => {
-        };
         const editor = new NodeEditor<Schemes>();
-        const engine = new ControlFlowEngine<Schemes>();
         const area = new AreaPlugin<Schemes, AreaExtra>(container);
         const render = new ReactPlugin<Schemes, AreaExtra>({createRoot});
         const connection = new ConnectionPlugin<Schemes, AreaExtra>();
         const arrange = new AutoArrangePlugin<Schemes, AreaExtra>();
+        const engine = new ControlFlowEngine<Schemes>();
+
+        let arrangeNodes: Function;
 
         try {
-            // Fetch node types
             const types = await fetchNodeTypes();
-            const context = Array.from(types.entries()).map(([name, NodeClass]) => [name, () => new NodeClass(name)]);
+            if (!types || types.size === 0) {
+                throw new Error("Failed to fetch node types.");
+            }
+
+            const context = Array.from(types.entries()).map(
+                ([name, NodeClass]) => [
+                    name,
+                    () => new NodeClass(name)
+                ]
+            );
             const contextMenu = new ContextMenuPlugin<Schemes>({
                 items: ContextMenuPresets.classic.setup(context),
             });
 
-            // Arrange Plugin
-            const applier = new ArrangeAppliers.TransitionApplier<Schemes, never>({
-                duration: 500,
-                timingFunction: (t) => t,
-                async onTick() {
-                    await AreaExtensions.zoomAt(area, editor.getNodes());
-                }
-            });
-
             arrange.addPreset(ArrangePresets.classic.setup());
 
-            // Render customization
-            render.addPreset(Presets.classic.setup());
-            render.addPreset(Preset);
+            render.addPreset(ContextMenuPreset);
             render.addPreset(
-                Presets.classic.setup({
+                ReactPresets.classic.setup({
                     customize: {
-                        control(data) {
-                            if (data.payload instanceof SliderControl) return SliderComponent;
-                            if (data.payload instanceof ColorPickerControl) return ColorPickerComponent;
-                            if (data.payload instanceof TextInputControl) return TextInputComponent;
-                            if (data.payload instanceof DropdownControl) return DropdownComponent;
-                            return null;
-                        },
                         connection(data) {
                             if (data.payload.isMagnetic) return MagneticConnection;
-                            return Connection;
+                            return StandardConnection;
+                        },
+                        node() {
+                            return StyledNode;
                         }
                     }
                 })
@@ -85,7 +93,6 @@ function Editor() {
 
             connection.addPreset(ConnectionPresets.classic.setup());
 
-            // Use plugins in the editor
             editor.use(area);
             editor.use(engine);
             area.use(contextMenu);
@@ -93,7 +100,6 @@ function Editor() {
             area.use(render);
             area.use(arrange);
 
-            // Add area extensions
             AreaExtensions.simpleNodesOrder(area);
             AreaExtensions.showInputControl(area);
             AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
@@ -102,16 +108,22 @@ function Editor() {
 
             arrangeNodes = async () => {
                 await arrange.layout({
-                    applier: applier,
+                    applier: new ArrangeAppliers.TransitionApplier<Schemes, never>({
+                        duration: 500,
+                        timingFunction: (t) => t,
+                        async onTick() {
+                            await AreaExtensions.zoomAt(area, editor.getNodes());
+                        }
+                    }),
                     options: {
                         "elk.algorithm": "layered",
                         "elk.spacing.nodeNode": "50",
                         "elk.layered.spacing.nodeNodeBetweenLayers": "50",
                     }
                 });
-                AreaExtensions.zoomAt(area, editor.getNodes());
             };
-            arrangeNodes().then(() => AreaExtensions.zoomAt(area, editor.getNodes()));
+
+            await arrangeNodes();
 
             useMagneticConnection(connection, {
                 async createConnection(from, to) {
@@ -120,45 +132,49 @@ function Editor() {
                     const sourceNode = editor.getNode(source.nodeId);
                     const targetNode = editor.getNode(target.nodeId);
 
-                    if (!sourceNode || !targetNode) {
-                        return;
-                    }
+                    if (!sourceNode || !targetNode) return;
 
-                    await editor.addConnection(
-                        new Connection(
-                            sourceNode,
-                            source.key as never,
-                            targetNode,
-                            target.key as never
-                        )
+                    const conn = new Connection(
+                        sourceNode,
+                        source.key as never,
+                        targetNode,
+                        target.key as never
                     );
+                    conn.isMagnetic = false;
+
+                    await editor.addConnection(conn);
                 },
                 display(from, to) {
                     return from.side !== to.side;
                 },
                 offset(socket, position) {
                     const socketRadius = 10;
-
                     return {
-                        x:
-                            position.x + (socket.side === "input" ? -socketRadius : socketRadius),
+                        x: position.x + (socket.side === "input" ? -socketRadius : socketRadius),
                         y: position.y
                     };
                 }
             });
+
         } catch (err) {
-            showNotification('error', 'Could not load the NodeEditor!')
+            showNotification("error", "Could not load the NodeEditor!");
+            console.error(err)
         }
 
-        return {
-            editor, engine, area, arrangeGraph: () => arrangeNodes(),
-        };
+        return {editor, engine, area, arrangeGraph: () => arrangeNodes(), clean};
     }
 
     /**
-     * Saves the current state of the editor, including nodes and connections.
+     * Serializes the current editor state including nodes, connections, and their positions.
      *
-     * @returns {Promise<JSON>} - A promise that resolves to a JSON representation of the editor's state.
+     * @param {NodeEditor<Schemes>} editor - Current editor instance
+     * @param {AreaPlugin<Schemes, AreaExtra>} area - Associated area plugin
+     * @returns {Promise<{ nodes: SerializedNode[], connections: SerializedConnection[] }>}
+     *          Object containing serialized nodes and connections
+     *
+     * @example
+     * const saveData = await Editor().save(editor, area);
+     * localStorage.setItem('editorState', JSON.stringify(saveData));
      */
     async function save(editor: NodeEditor<Schemes>, area: AreaPlugin<Schemes, AreaExtra>): Promise<{
         nodes: SerializedNode[];
@@ -200,11 +216,20 @@ function Editor() {
     }
 
     /**
-     * Loads a saved state into the editor, restoring nodes and connections.
+     * Loads a previously saved editor state.
      *
-     * @param {JSON} saveState - A JSON object representing the saved state.
-     * @param editor - The editor in which the state will be loaded.
-     * @param area - The area in which the state will be loaded.
+     * @param {Object} saveState - Saved state to load
+     * @param {SerializedNode[]} saveState.nodes - Array of serialized nodes
+     * @param {SerializedConnection[]} saveState.connections - Array of serialized connections
+     * @param {NodeEditor<Schemes>} editor - Editor instance to load into
+     * @param {AreaPlugin<Schemes, AreaExtra>} area - Associated area plugin
+     * @returns {Promise<void>}
+     *
+     * @throws Will display error notifications if loading fails
+     *
+     * @example
+     * const savedData = JSON.parse(localStorage.getItem('editorState'));
+     * await Editor().load(savedData, editor, area);
      */
     async function load(saveState: {
         nodes: SerializedNode[];
@@ -291,7 +316,13 @@ function Editor() {
     }
 
     /**
-     * Cleans up the editor by clearing all nodes.
+     * Clears all nodes and connections from the editor.
+     *
+     * @param {NodeEditor<Schemes>} editor - Editor instance to clean
+     * @returns {Promise<void>}
+     *
+     * @example
+     * await Editor().clean(editor);
      */
     async function clean(editor: NodeEditor<Schemes>): Promise<void> {
         await editor.clear();
@@ -299,6 +330,12 @@ function Editor() {
 
     /**
      * Fetches all available node types from the nodes module.
+     *
+     * @returns {Promise<Map<string, any>>} Map of node names to their constructor functions
+     *
+     * @example
+     * const nodeTypes = await Editor().fetchNodeTypes();
+     * const MyNodeClass = nodeTypes.get('MyNode');
      */
     async function fetchNodeTypes() {
         const module = await import("./Nodes/_nodes");
