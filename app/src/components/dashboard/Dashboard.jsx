@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import axios from '../auth/AxiosInstance';
 
 import UserIcon from '../general/UserIcon';
@@ -14,7 +13,7 @@ function Dashboard ()  {
   const [activeTab, setActiveTab] = useState('projects')
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
-  const { showNotification } = useNotifications();
+  const {showNotification} = useNotifications();
 
   useEffect(() => {
     const keys = Object.keys(projects);

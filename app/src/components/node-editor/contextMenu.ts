@@ -99,7 +99,6 @@ const Preset = Presets.contextMenu.setup({
     common: () => CustomCommon,
     search: () => CustomSearch,
     subitems: () => CustomSubitems,
-    separator: () => Separator,
   },
 });
 
