@@ -55,7 +55,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     ]
                 },
                 styleManager: {
-                    appendTo: '#right-panel',
+                    appendTo: '.right-panel',
                     sectors: [
                         {
                             name: 'Dimension',
