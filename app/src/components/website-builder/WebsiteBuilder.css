@@ -318,10 +318,10 @@
 
             background: repeating-linear-gradient(
               45deg,        /* Angle of the stripes */
-              var(--ui-bg),       /* First color */
-              var(--ui-bg) 10px,  /* Thickness of the first color */
-              black 10px,   /* Second color starts immediately after the first */
-              black 20px    /* Thickness of the second color */
+              var(--ui-bg-selected),       /* First color */
+              var(--ui-bg-selected) 10px,  /* Thickness of the first color */
+              var(--far-bg) 10px,   /* Second color starts immediately after the first */
+              var(--far-bg) 20px    /* Thickness of the second color */
             );
         }
         
