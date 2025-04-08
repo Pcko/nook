@@ -58,6 +58,18 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     appendTo: '.right-panel',
                     sectors: [
                         {
+                            name: 'Code-Editor',
+                            open: true,
+                            buildProps: ['custom'],
+                            properties: [
+                            {
+                                property: 'custom',
+                                type: 'custom-html',
+                                name: ' ',
+                            },
+                            ],
+                        },
+                        {
                             name: 'Dimension',
                             open: false,
                             buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
@@ -99,6 +111,19 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 `,
               
             });
+            
+            editorInstance.StyleManager.addType('custom-html', {
+                create({ property }) {
+                  const el = document.createElement('div');
+                  el.innerHTML = `
+                    <div >
+                      <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
+                    </div>
+                  `;
+                  el.querySelector('.clear-canvas-button').onclick = () =>  openNodeEditor(selectedElementRef);
+                  return el;
+                },
+              });
 
             // Run the component outline command to enable outlines by default
             editorInstance.runCommand('core:component-outline');
@@ -316,7 +341,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </div>
                     </div>
                     <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}>
-
+                        
                     </div>
                 </div>
             </div>
