@@ -40,8 +40,8 @@ function TwoFactorAuthenticationCodeInputForm({ submitForm }) {
                     <div className="w-full flex mt-5">
                         <input type="button" value="Cancel" onClick={() => submitForm()}
                                className="w-[40%] py-1 px-4 bg-ui-button rounded-lg ml-0 mr-auto hover:cursor-pointer hover:bg-ui-button-hover btn"/>
-                        <input type="submit" value="Confirm" onClick={handleFormSubmit}
-                               className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover btn"/>
+                        <input type="submit" value="Confirm" onClick={handleFormSubmit} disabled={authenticationCode.length !== 6}
+                               className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover btn disabled:text-text-subtle disabled:bg-ui-button"/>
                     </div>
                 </form>
             </div>

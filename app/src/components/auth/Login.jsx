@@ -70,16 +70,15 @@ function Login() {
     };
 
     const handle2FASubmit = async (twoFactorAuthenticationCode) => {
-        setTwoFactorAuthenticationFormActive(false);
-
         if (!twoFactorAuthenticationCode) {
+            setTwoFactorAuthenticationFormActive(false);
             return;
         }
         setLoading(true);
 
         try {
-            const response = await axios.post('/auth/twoFactorAuth', { username, otp: twoFactorAuthenticationCode });
-            console.log(response.data)
+            const response = await axios.post('/auth/login', { username, password, otp: twoFactorAuthenticationCode });
+            setTwoFactorAuthenticationFormActive(false);
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         }
         catch (err) {
