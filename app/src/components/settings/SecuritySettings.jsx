@@ -59,7 +59,7 @@ function SecuritySettings({changeHandler}) {
 
     const handle2FASubmit = async (otp) => {
         if(!otp){
-            return;
+            return setTwoFactorAuthFormActive(false);
         }
 
         try {
