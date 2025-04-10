@@ -18,7 +18,7 @@ function authenticateToken(req, res, next) {
         const user = await User.findOne({ _id: id }).lean();
 
         if (!user){
-            return res.status(401).json({message: 'User does not exist'})
+            return res.status(401).json({ error: 'unknown_user' })
         }
 
         if (user.tokenVersion !== version) {

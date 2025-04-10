@@ -17,7 +17,7 @@ const router = express.Router();
 // LOGIN AUTHENTICATOR REQUEST
 router.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, otp } = req.body;
 
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
@@ -40,12 +40,22 @@ router.post('/login', async (req, res) => {
             return res.status(403).send({ message: 'Username or password is invalid!' });
         }
 
+        //check for twoFactorAuthentication
         if (user.twoFactorAuthOn) {
-            return res.status(202).send({ message: 'Please send auth-passcode!' });
+            if(!otp){
+                return res.status(202).send({ message: 'Please send auth-passcode!' });
+            }
+
+            const userSecret = user.twoFactorAuthSecret;
+
+            if (!speakeasy.totp.verify({
+                secret: userSecret, encoding: 'base32', token: otp
+            })) {
+                return res.status(403).send({ message: 'One time password is invalid!' })
+            }
         }
-        else {
-            return await createAndSendTokensAndUser(res, user);
-        }
+
+        return await createAndSendTokensAndUser(res, user);
     } catch (e) {
         console.error("❌ Login error: ", e);
         return res.sendStatus(500);
@@ -105,42 +115,6 @@ router.post('/register', async (req, res) => {
         return res.sendStatus(201);
     } catch (e) {
         console.error("❌ Registration error: ", e);
-        return res.sendStatus(500);
-    }
-});
-
-// TWO FACTOR AUTHENTIFICATOR
-router.post('/twoFactorAuth', async (req, res) => {
-    try {
-        const { username, otp } = req.body;
-
-        //make sure all parameters are trimmed
-        const usernameTrimmed = username.trim();
-
-        //make sure request body has all required information
-        if (![usernameTrimmed, otp].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
-        const user = await User.findOne({ _id: usernameTrimmed });
-
-        //make sure username exists
-        if (!user) {
-            return res.status(403).send({ message: 'Username or password is invalid!' });
-        }
-
-        const userSecret = user.twoFactorAuthSecret;
-
-        if (!speakeasy.totp.verify({
-            secret: userSecret, encoding: 'base32', token: otp
-        })) {
-            return res.status(403).send({ message: 'One time password is invalid!' })
-        }
-
-        return await createAndSendTokensAndUser(res, user);
-    }
-    catch (e) {
-        console.error("❌ TwoFactorAuth error: ", e);
         return res.sendStatus(500);
     }
 });
