@@ -1,12 +1,13 @@
-import BackgroundText from '../general/NookBackground'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
 import ImageCarousel from './ImageCarousel';
 import { useNotifications } from '../general/NotificationContext';
 import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
 import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
 import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
+import NookBackground from "../general/NookBackground";
+import LoadingScreen from '../general/LoadingScreen';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -94,12 +95,17 @@ function Login() {
         setLoading(false);
     };
 
+    if(loading){
+        return <LoadingScreen/>
+    }
+
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <BackgroundText />
-            <div id="Window" className="w-[1000px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+            <NookBackground/>
+            <div id="Window"
+                 className="w-[1000px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
                 <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
-                    <ImageCarousel />
+                    <ImageCarousel/>
                     <div className="mx-[14%] my-[10%]">
                         <h1 className="text-4xl mb-3">Login</h1>
 

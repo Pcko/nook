@@ -47,7 +47,7 @@ axiosInstance.interceptors.response.use(
             } catch {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                return Promise.reject(error);
+                return Promise.reject({...error, message: 'Please login again'});
             }
         }
 

@@ -5,7 +5,7 @@ import React from "react";
  * NOT IMPLEMENTED
  */
 export class SliderControl extends ClassicPreset.Control {
-    constructor(public min = 0, public max = 100, public step = 1, public value = 50, public onChange = (val) => {
+    constructor(public min = 0, public max = 100, public step = 1, public value = 50, public onChange = () => {
     }) {
         super();
     }
@@ -20,7 +20,7 @@ export default function SliderComponent(props: { data: SliderControl }) {
             max={max}
             step={step}
             value={value}
-            onChange={(e) => onChange(+e.target.value)}
+            onChange={(e) => onChange()}
         />
     );
 }

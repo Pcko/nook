@@ -1,5 +1,5 @@
 import { ClassicPreset } from "rete";
-import BasicNookNode from "./BasicNookNode";
+import {BasicNookNode} from "./BasicNookNode";
 import AtomNode from "./AtomNode";
 
 const socket = new ClassicPreset.Socket("socket");

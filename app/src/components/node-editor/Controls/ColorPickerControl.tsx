@@ -2,7 +2,7 @@ import {ClassicPreset} from "rete";
 import React from "react";
 
 export class ColorPickerControl extends ClassicPreset.Control {
-    constructor(public value = "#ffffff", public onChange = (val) => {}) {
+    constructor(public value = "#ffffff", public onChange = () => {}) {
         super();
     }
 }
@@ -13,7 +13,7 @@ export default function ColorPickerComponent(props: { data: ColorPickerControl }
         <input
             type="color"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange()}
         />
     );
 }

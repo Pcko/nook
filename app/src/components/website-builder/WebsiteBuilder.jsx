@@ -3,10 +3,8 @@
  *
  * @module WebsiteBuilder
  */
-
-
-import React, { useEffect, useRef, useState } from "react";
-import {AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
+import React, {useEffect, useRef, useState} from "react";
+import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineEye} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -23,7 +21,10 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
 
-    const [activeTab, setActiveTab] = useState("layers");
+    const [activeTab, setActiveTab,] = useState("layers");
+    const [outlinesActive, setOutlinesActive] = useState(true);
+    const [isPreview, setIsPreview] = useState(false);
+
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
@@ -45,7 +46,6 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 storageManager: false,
                 blockManager: {appendTo: "#blocks"},
                 panels: {defaults: []},
-                canvas: {styles: [{href: './src/components/website-builder/grapes.css'}]},
                 layerManager: {appendTo: "#layers", options: {open: true}},
                 deviceManager: {
                     devices: [
@@ -54,11 +54,79 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         {name: "Mobile", width: "375px"}
                     ]
                 },
+                styleManager: {
+                    appendTo: '.right-panel',
+                    sectors: [
+                        {
+                            name: 'Code-Editor',
+                            open: true,
+                            buildProps: ['custom'],
+                            properties: [
+                            {
+                                property: 'custom',
+                                type: 'custom-html',
+                                name: ' ',
+                            },
+                            ],
+                        },
+                        {
+                            name: 'Dimension',
+                            open: false,
+                            buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
+                        },
+                        {
+                            name: 'Typography',
+                            open: false,
+                            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align'],
+                            properties: [
+                                {
+                                    property: 'text-align',
+                                    list: [
+                                        {value: 'left', name: 'Left', className: 'fa fa-align-left'},
+                                        {value: 'center', name: 'Center', className: 'fa fa-align-center'},
+                                        {value: 'right', name: 'Right', className: 'fa fa-align-right'},
+                                        {value: 'justify', name: 'Justify', className: 'fa fa-align-justify'},
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            name: 'Decorations',
+                            open: false,
+                            buildProps: ['opacity', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
+                        },
+                    ],
+                },
                 plugins: ["grapesjs-blocks-basic"],
                 pluginsOpts: {
                     "grapesjs-blocks-basic": {blocks: ["row", "column", "image"], flexGrid: true}
                 },
+                canvasCss: `
+                    .gjs-selected {
+                    outline: 2px solid #6b439b !important; /* Red dashed outline for selected components */
+                    }
+     .gjs-dashed *[data-gjs-highlightable]  {
+      outline: 1px dashed #141c1c !important; /* Red solid outline for components */
+    }
+                `,
+              
             });
+            
+            editorInstance.StyleManager.addType('custom-html', {
+                create({ property }) {
+                  const el = document.createElement('div');
+                  el.innerHTML = `
+                    <div >
+                      <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
+                    </div>
+                  `;
+                  el.querySelector('.clear-canvas-button').onclick = () =>  openNodeEditor(selectedElementRef);
+                  return el;
+                },
+              });
+
+            // Run the component outline command to enable outlines by default
+            editorInstance.runCommand('core:component-outline');
 
             addCustomCommands(editorInstance);
             customBlocks.forEach((block) => {
@@ -75,21 +143,30 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 selectedElementRef.current = null;
             });
 
+
+            document.addEventListener('keydown', function(event) {
+                if (event.shiftKey && event.key === 'O') {
+                    event.preventDefault();
+                    toggleOutlines();
+                }
+              });
+
             document.addEventListener("keydown", function (event) {
                 if (event.ctrlKey && event.shiftKey && event.key === "E" && selectedElementRef.current) {
-                    openNodeEditor(selectedElementRef);
                     event.preventDefault();
+                    openNodeEditor(selectedElementRef);
                 }
             });
             document.addEventListener("keydown", function (event) {
                 if (event.ctrlKey && event.key === "S" && selectedElementRef.current) {
-                    handleSave();
                     event.preventDefault();
+                    handleSave();
                 }
             });
 
             if (state) {
-                editorInstance.setComponents(state);
+                editorInstance.setComponents(state.components);
+                editorInstance.setStyle(state.styles);
             }
 
             editor.current = editorInstance;
@@ -98,22 +175,33 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
-            localStorage.setItem('tabs','[]');
+            localStorage.setItem('tabs', '[]');
         };
     }, []);
 
+
     /**
-     * Saves the current editor state to localStorage.
+     * Saves the current editor state to Database.
      *
      * @function handleSave
      */
     const handleSave = async () => {
         try {
-            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {pageContent: editor.current.getComponents()});
-        }catch (err){
+            const components = editor.current.getComponents();
+            const styles = editor.current.getStyle();
+
+            const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
+                pageContent: {
+                    components: components,
+                    styles: styles,
+                }
+            });
+        } catch (err) {
             console.error(err);
         }
-    }
+    };
+
+
 
     /**
      * Clears all content from the GrapesJS editor canvas.
@@ -135,12 +223,51 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     const setDevice = (device) => {
         editorRef.current?.setDevice(device);
     };
-    
+
+    /**
+     * Switches the layout outline visibility.
+     *
+     *
+     * @function toggleOutlines
+     */
+    const toggleOutlines = () => {
+        setOutlinesActive(prev => {
+            const next = !prev;
+            if (next) {
+                editorRef.current?.runCommand('core:component-outline');
+            } else {
+                editorRef.current?.stopCommand('core:component-outline');
+            }
+            return next;
+        });
+    };
+ 
+
+    const togglePreview = () => {
+        if (editorRef.current) {
+          if (!isPreview) {
+            editorRef.current.stopCommand('sw-visibility');
+            editorRef.current.runCommand('core:preview');
+          } else {
+            editorRef.current.stopCommand('core:preview');
+            editorRef.current.runCommand('sw-visibility');
+          }
+          setIsPreview(!isPreview);
+        }
+      };
+
 
     return (
         <div className="GrapesJsApp">
             <div className="Editor">
-                <div className="TopPanel">
+                <div className={`hidden ${!isPreview ? '' : 'PreviewTopPanel'}`}>
+                    <div>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            End Preview
+                        </button>
+                    </div>
+                </div>
+                <div className={`TopPanel ${!isPreview ? '' : 'hidden'}`}>
                     <div className="top-left">
                         <button className="top-button" onClick={() => editorRef.current?.runCommand("undo")}>
                             <AiOutlineUndo size={20}/>
@@ -150,6 +277,9 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         </button>
                         <button className="top-button" onClick={() => editorRef.current?.runCommand("show-code")}>
                             <AiOutlineCode size={20}/>
+                        </button>
+                        <button className="top-button" onClick={toggleOutlines}>
+                            <AiOutlineBorder size={20}/>
                         </button>
                     </div>
 
@@ -172,13 +302,15 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         <button className="clear-canvas-button" onClick={handleSave}>
                             Save Canvas
                         </button>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            Preview
+                        </button>
                     </div>
                 </div>
-           
-                <div className="MainContent">  
-                    <div id="left-panel">
-                   
-                    <div className="toggle-container">
+
+                <div className="MainContent">
+                    <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
+                        <div className="toggle-container">
                             <input
                                 type="radio"
                                 id="layer"
@@ -208,8 +340,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                             {/* Editor contents will be rendered here */}
                         </div>
                     </div>
-                    <div id="right-panel">
-                        {/* Layers Manager */}
+                    <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}>
+                        
                     </div>
                 </div>
             </div>
