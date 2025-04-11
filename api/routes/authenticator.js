@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
 
         //check for twoFactorAuthentication
         if (user.twoFactorAuthOn) {
-            if(!otp){
+            if (!otp) {
                 return res.status(202).send({ message: 'Please send auth-passcode!' });
             }
 
@@ -85,8 +85,8 @@ router.post('/register', async (req, res) => {
             isInvalidStringForLastName(lastNameTrimmed) ||
             isInvalidStringForEmail(emailTrimmed)) {
             return res.status(403).send({
-                message: 'Parameters invalid!',
-                errors: {
+                error: 'invalid_parameters',
+                messages: {
                     username: isInvalidStringForUsername(usernameTrimmed),
                     password: isInvalidStringForPassword(password),
                     firstName: isInvalidStringForFirstName(firstNameTrimmed),
@@ -99,7 +99,7 @@ router.post('/register', async (req, res) => {
         //make sure username is not already used
         const userExists = await User.findOne({ _id: usernameTrimmed }).lean();
         if (userExists) {
-            return res.status(409).send({ message: 'This username is not available' });
+            return res.status(409).send({ message: 'This username is not available!' });
         }
 
         //create new user and insert new user into database
@@ -136,8 +136,8 @@ router.post('/token', async (req, res) => {
             const { id, version } = tokenContent;
             const user = await User.findOne({ _id: id });
 
-            if (!user){
-                return res.status(401).json({message: 'User does not exist!'})
+            if (!user) {
+                return res.status(401).json({ error: 'unkown_user' })
             }
 
             if (user.tokenVersion !== version) {

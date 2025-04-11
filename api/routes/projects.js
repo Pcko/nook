@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
 
         const projects = await Project.find({ author: userId });
         if (projects.length === 0) {
-            return res.status(404).send({ message: 'No projects found!' });
+            return res.status(404).send({ error: 'no_existing_projects' });
         }
 
         //Object parsing for return
@@ -100,7 +100,7 @@ router.get('/:projectName', async (req, res) => {
 
         const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
-            return res.status(404).send('Project not found!');
+            return res.status(404).send({ error: 'unknown_project' });
         }
 
         return res.status(200).json(project);
@@ -127,7 +127,7 @@ router.patch('/:projectName', async (req, res) => {
 
         const project = await Project.findOne({ name: projectNameTrimmed, author: userId });
         if (!project) {
-            return res.status(404).send('Project not found!');
+            return res.status(404).send({ error: 'unknown_project' });
         }
 
         //Rename
@@ -194,7 +194,7 @@ router.delete('/:projectName', async (req, res) => {
         const project = await Project.findOneAndDelete({ name: projectNameTrimmed, author: userId }).lean();
 
         if (!project) {
-            return res.status(404).send('Project not found!');
+            return res.status(404).send({ error: 'unknown_project' });
         }
 
         return res.sendStatus(200);

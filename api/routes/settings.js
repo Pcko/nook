@@ -50,7 +50,7 @@ router.delete('/delete-account', async (req, res) => {
     const usernameTrimmed = username.trim();
 
     if (usernameTrimmed !== req.userId) {
-      return res.status(403).send({ message: 'Access token is not issued for this username' });
+      return res.status(403).send({ error: 'username_inconsistency' });
     }
 
     const user = await User.findOneAndDelete({ _id: usernameTrimmed });
