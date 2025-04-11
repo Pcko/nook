@@ -42,7 +42,6 @@ function Dashboard ()  {
             return newProjects;
           });
 
-          showNotification('success', 'Successfully loaded your projects');
         }catch(err){
           handleError(err);
         }

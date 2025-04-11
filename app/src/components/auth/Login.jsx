@@ -80,13 +80,7 @@ function Login() {
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         }
         catch (err) {
-            console.error(err.message)
-            if (err.response) {
-                showNotification('error', err.response.data.message);
-            }
-            else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         }
 
         setLoading(false);

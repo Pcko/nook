@@ -6,11 +6,13 @@ const useErrorHandler = () => {
     const navigate = useNavigate();
 
     const handleError = (err) => {
-        if (err?.redirectToLogin) {
+        if (err.redirectToLogin) {
             navigate('/login');
         }
-        const errorMessage = err?.response?.data?.message || err.message || 'An unknown error occurred';
-        showNotification('error', errorMessage);
+        const errorMessage = err.response?.data?.error ? err.response.data.message : err.message;
+        if(errorMessage) {
+            showNotification('error', errorMessage);
+        }
     };
 
     return handleError;
