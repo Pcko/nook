@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import Project from './project-schema.js';
+import Page from '../models/page-schema.js';
 
 const { Schema } = mongoose;
 
@@ -64,6 +65,11 @@ UserSchema.pre('save', async function (next) {
 UserSchema.pre('findOneAndDelete', async function (next) {
     const user = await this.model.findOne(this.getFilter());
     if (!user) return next();
+
+    const projects = await Project.find({ author: user._id });
+    for (project of projects) {
+        await Page.deleteMany({ projectId: project._id });
+    }
 
     await Project.deleteMany({ author: user._id });
 

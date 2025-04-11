@@ -1,6 +1,7 @@
 import express from 'express';
 
 import Project from '../database/models/project-schema.js';
+import Page from '../models/page-schema.js';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
 
@@ -28,20 +29,23 @@ router.post('/:projectName/pages', async (req, res) => {
             return res.sendStatus(403);
         }
 
-        let project = await Project.findOne({ name: projectNameTrimmed, author: userId });
-
+        const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
             return res.status(404).send('Project not found!');
         }
 
-        const pages = { ...project.pages };
+        /*
+        const page = await Page.findOne({ name: pageNameTrimmed, projectId: project._id });
+        if (!page) {
+            return res.status(404).send('Page not found!');
+        }
+            */
 
         let updatedPageName = pageNameTrimmed;
         let duplicateNumber = 1;
-
         let pageExists = undefined;
         do {
-            pageExists = pages[updatedPageName];
+            pageExists = await Page.findOne({ name: pageNameTrimmed, projectId: project._id });
 
             if (pageExists) {
                 duplicateNumber += 1;
@@ -50,11 +54,17 @@ router.post('/:projectName/pages', async (req, res) => {
         }
         while (pageExists);
 
-        pages[updatedPageName] = { folderName: folderNameTrimmed || 'General', data: {} };
-        project.pages = pages;
-        await project.save();
+        const pageData = {
+            name: updatedPageName,
+            data: {},
+            projectId: project._id,
+        };
+        if (folderNameTrimmed) {
+            pageData.folderName = folderNameTrimmed;
+        }
+        const pageDetails = await Page.create(pageData);
 
-        return res.status(200).json({ pageName: updatedPageName, pageDetails: pages[updatedPageName] });
+        return res.status(200).json({ pageName: updatedPageName, pageDetails });
     } catch (e) {
         console.error('❌ Create project error: ', e);
         return res.sendStatus(500);
