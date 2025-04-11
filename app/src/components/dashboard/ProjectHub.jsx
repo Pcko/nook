@@ -109,7 +109,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                     </Listbox>
 
                     {/* Create New Project Button */}
-                    <input type="button" className="btn rounded" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
+                    <input type="button" className="btn rounded text-text-on-primary" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
                 </div>
             </div>
 

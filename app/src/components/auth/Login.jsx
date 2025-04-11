@@ -2,8 +2,10 @@ import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
 import ImageCarousel from './ImageCarousel';
-import {useNotifications} from '../general/NotificationContext';
-import {isInvalidStringForPassword, isInvalidStringForUsername} from '../general/FormChecks';
+import { useNotifications } from '../general/NotificationContext';
+import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
+import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
+import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
 import NookBackground from "../general/NookBackground";
 import LoadingScreen from '../general/LoadingScreen';
 import useErrorHandler from "../general/ErrorHandler";
@@ -14,7 +16,21 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
     const handleError = useErrorHandler();
+
+    const closeLogin = (accessToken, refreshToken, user) => {
+        showNotification('success', 'Login successfull');
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // username und password zurücksetzen, sobald der Login-Screen verlassen wird
+        setUsername('');
+        setPassword('');
+        navigate('/dashboard');
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -39,21 +55,41 @@ function Login() {
                 timeoutErrorMessage: 'Server did not respond.',
             });
 
-            showNotification('success', 'Login successfull');
-
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-
-            // username und password zurücksetzen, sobald der Login-Screen verlassen wird
-            setUsername('');
-            setPassword('');
-            navigate('/dashboard');
+            if (response.status === 202) {
+                setTwoFactorAuthenticationFormActive(true);
+            } else {
+                closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
+            }
         } catch (err) {
             handleError(err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handle2FASubmit = async (twoFactorAuthenticationCode) => {
+        if (!twoFactorAuthenticationCode) {
+            setTwoFactorAuthenticationFormActive(false);
+            return;
+        }
+        setLoading(true);
+
+        try {
+            const response = await axios.post('/auth/login', { username, password, otp: twoFactorAuthenticationCode });
+            setTwoFactorAuthenticationFormActive(false);
+            closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
+        }
+        catch (err) {
+            console.error(err.message)
+            if (err.response) {
+                showNotification('error', err.response.data.message);
+            }
+            else {
+                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
+            }
+        }
+
+        setLoading(false);
     };
 
     if(loading){
@@ -72,7 +108,7 @@ function Login() {
 
                         <span>Don't have an account yet? </span>
                         <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                           onClick={() => navigate('/register')}>Sign up</a>
+                            onClick={() => navigate('/register')}>Sign up</a>
 
                         <form onSubmit={handleSubmit}>
                             {/* Username Field */}
@@ -102,7 +138,7 @@ function Login() {
                             />
 
                             <a className={"text-ui-subtle text-xs underline hover:cursor-pointer"}
-                               onClick={() => navigate('/register')}>Forgot your password?</a>
+                                onClick={() => navigate('/register')}>Forgot your password?</a>
 
                             {/* Sign-in Button */}
                             <input
@@ -116,6 +152,11 @@ function Login() {
                     </div>
                 </div>
             </div>
+
+            {/* Dynamically rendered form */}
+            {twoFactorAuthenticationFormActive ?
+                <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} />
+                : ''}
         </div>
     );
 }

@@ -4,7 +4,7 @@
  * @module WebsiteBuilder
  */
 import React, {useEffect, useRef, useState} from "react";
-import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
+import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineEye} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -23,6 +23,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
 
     const [activeTab, setActiveTab,] = useState("layers");
     const [outlinesActive, setOutlinesActive] = useState(true);
+    const [isPreview, setIsPreview] = useState(false);
+
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
@@ -53,8 +55,20 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     ]
                 },
                 styleManager: {
-                    appendTo: '#right-panel',
+                    appendTo: '.right-panel',
                     sectors: [
+                        {
+                            name: 'Code-Editor',
+                            open: true,
+                            buildProps: ['custom'],
+                            properties: [
+                            {
+                                property: 'custom',
+                                type: 'custom-html',
+                                name: ' ',
+                            },
+                            ],
+                        },
                         {
                             name: 'Dimension',
                             open: false,
@@ -97,6 +111,19 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 `,
               
             });
+            
+            editorInstance.StyleManager.addType('custom-html', {
+                create({ property }) {
+                  const el = document.createElement('div');
+                  el.innerHTML = `
+                    <div >
+                      <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
+                    </div>
+                  `;
+                  el.querySelector('.clear-canvas-button').onclick = () =>  openNodeEditor(selectedElementRef);
+                  return el;
+                },
+              });
 
             // Run the component outline command to enable outlines by default
             editorInstance.runCommand('core:component-outline');
@@ -154,7 +181,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
 
 
     /**
-     * Saves the current editor state to localStorage.
+     * Saves the current editor state to Database.
      *
      * @function handleSave
      */
@@ -173,6 +200,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
             console.error(err);
         }
     };
+
+
 
     /**
      * Clears all content from the GrapesJS editor canvas.
@@ -212,12 +241,33 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
             return next;
         });
     };
+ 
+
+    const togglePreview = () => {
+        if (editorRef.current) {
+          if (!isPreview) {
+            editorRef.current.stopCommand('sw-visibility');
+            editorRef.current.runCommand('core:preview');
+          } else {
+            editorRef.current.stopCommand('core:preview');
+            editorRef.current.runCommand('sw-visibility');
+          }
+          setIsPreview(!isPreview);
+        }
+      };
 
 
     return (
         <div className="GrapesJsApp">
             <div className="Editor">
-                <div className="TopPanel">
+                <div className={`hidden ${!isPreview ? '' : 'PreviewTopPanel'}`}>
+                    <div>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            End Preview
+                        </button>
+                    </div>
+                </div>
+                <div className={`TopPanel ${!isPreview ? '' : 'hidden'}`}>
                     <div className="top-left">
                         <button className="top-button" onClick={() => editorRef.current?.runCommand("undo")}>
                             <AiOutlineUndo size={20}/>
@@ -252,11 +302,14 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         <button className="clear-canvas-button" onClick={handleSave}>
                             Save Canvas
                         </button>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            Preview
+                        </button>
                     </div>
                 </div>
 
                 <div className="MainContent">
-                    <div id="left-panel">
+                    <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
                         <div className="toggle-container">
                             <input
                                 type="radio"
@@ -287,8 +340,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                             {/* Editor contents will be rendered here */}
                         </div>
                     </div>
-                    <div id="right-panel">
-
+                    <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}>
+                        
                     </div>
                 </div>
             </div>

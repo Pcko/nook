@@ -63,7 +63,7 @@ function ProjectEditForm({ closeForm, projectName, onProjectEdit, projects }){
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Update Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="submit" value="Update Project" className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>

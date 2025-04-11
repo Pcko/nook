@@ -3,7 +3,7 @@ import axios from '../auth/AxiosInstance';
 import { isInvalidStringForURL } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
 
-function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
+function PageEditForm({ closeForm, selectedProjectId, pageName, pages }) {
     const [newPageName, setNewPageName] = useState(pageName);
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
     const { showNotification } = useNotifications();
@@ -12,41 +12,40 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
         e.preventDefault();
 
         /* Form Checks */
-        if(newPageName !== pageName && pages[newPageName]){
-            showNotification('error', 'Your page name must be unique.');
-            return;
+        if (newPageName !== pageName && pages[newPageName]) {
+            return showNotification('error', 'Your page name must be unique.');
         }
         const trimmedFolderName = newFolderName?.trim();
-        if(!trimmedFolderName){
-            if(!newPageName.trim()){
+        if (!trimmedFolderName) {
+            if (!newPageName.trim()) {
                 return showNotification('error', 'At least one of the fields is required');
             }
 
             const result = isInvalidStringForURL(newPageName);
-            if(result){
+            if (result) {
                 return showNotification('error', result);
             }
         }
 
-        try{
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`, 
-                { 
-                    newPageName: newPageName === pageName ? undefined : newPageName, 
-                    newFolderName: trimmedFolderName === pages[pageName].folderName ? undefined : trimmedFolderName, 
+        try {
+            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`,
+                {
+                    newPageName: newPageName === pageName ? undefined : newPageName,
+                    newFolderName: trimmedFolderName === pages[pageName].folderName ? undefined : trimmedFolderName,
                 });
 
-            if(trimmedFolderName){
+            if (trimmedFolderName) {
                 pages[pageName].folderName = trimmedFolderName;
             }
 
-            if(newPageName){
+            if (newPageName) {
                 const page = { ...pages[pageName] };
                 delete pages[pageName];
                 pages[response.data.newPageName] = page;
             }
 
             showNotification('success', 'Successfully applied changes to your page.');
-        }catch (err) {
+        } catch (err) {
             return handleError(err);
         }
 
@@ -58,7 +57,9 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
                 <h1 className="text-xl">Edit Page "{pageName}"</h1>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer" onClick={()=>closeForm()}>
+                     stroke="currentColor"
+                     className="size-5 ml-auto mr-1 hover:cursor-pointer"
+                     onClick={() => closeForm()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
                 </svg>
             </div>
@@ -88,8 +89,11 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }){
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
-                        <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Edit Page" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="button" value="Cancel"
+                               onClick={() => closeForm()}
+                               className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
+                        <input type="submit" value="Edit Page"
+                               className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>
