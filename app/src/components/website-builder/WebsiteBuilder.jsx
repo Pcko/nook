@@ -13,6 +13,7 @@ import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
+import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
 
 function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
     /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
@@ -46,7 +47,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     const el = document.createElement('div');
                     el.innerHTML = `
                       <div>
-                        <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
+                        <button style="margin:auto;" class="clear-canvas-button">Open Editor</button>
                       </div>
                     `;
                     el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
@@ -82,6 +83,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                                 property: 'custom',
                                 type: 'custom-html',
                                 name: ' ',
+                                full: true,
                             },
                             ],
                         },
@@ -314,40 +316,51 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 </div>
 
                 <div className="MainContent">
-                    <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
-                        <div className="toggle-container">
-                            <input
-                                type="radio"
-                                id="layer"
-                                name="toggle"
-                                checked={activeTab === "layers"}
-                                onChange={() => setActiveTab("layers")}
-                            />
-                            <label htmlFor="layer">Layers</label>
+                    <PanelGroup direction="horizontal">
+                        {/* Left Panel */}
+                        <Panel defaultSize={20} minSize={15} maxSize={25}>
+                            <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
+                                <div className="toggle-container">
+                                    <input
+                                        type="radio"
+                                        id="layer"
+                                        name="toggle"
+                                        checked={activeTab === "layers"}
+                                        onChange={() => setActiveTab("layers")}
+                                    />
+                                    <label htmlFor="layer">Layers</label>
 
-                            <input
-                                type="radio"
-                                id="block"
-                                name="toggle"
-                                checked={activeTab === "blocks"}
-                                onChange={() => setActiveTab("blocks")}
-                            />
-                            <label htmlFor="block">Blocks</label>
-                        </div>
+                                    <input
+                                        type="radio"
+                                        id="block"
+                                        name="toggle"
+                                        checked={activeTab === "blocks"}
+                                        onChange={() => setActiveTab("blocks")}
+                                    />
+                                    <label htmlFor="block">Blocks</label>
+                                </div>
 
-                        <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}>
-                        </div>
-                        <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}>
-                        </div>
-                    </div>
-                    <div id="editor-container">
-                        <div id="gjs" style={{height: "100%"}}>
-                            {/* Editor contents will be rendered here */}
-                        </div>
-                    </div>
-                    <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}>
-                        
-                    </div>
+                                <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}></div>
+                                <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}></div>
+                            </div>
+                        </Panel>
+
+                        <PanelResizeHandle className="resize-handle" />
+
+                        {/* Editor Panel */}
+                        <Panel defaultSize={60}>
+                            <div id="editor-container">
+                                <div id="gjs" style={{height: "100%"}}></div>
+                            </div>
+                        </Panel>
+
+                        <PanelResizeHandle className="resize-handle" />
+
+                        {/* Right Panel */}
+                        <Panel defaultSize={20} minSize={15} maxSize={25}>
+                            <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}></div>
+                        </Panel>
+                    </PanelGroup>
                 </div>
             </div>
         </div>
