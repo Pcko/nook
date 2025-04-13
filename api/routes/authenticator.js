@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import express from 'express';
+import speakeasy from 'speakeasy';
 
 import User from '../database/models/user-schema.js';
 import {
@@ -16,7 +17,7 @@ const router = express.Router();
 // LOGIN AUTHENTICATOR REQUEST
 router.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, otp } = req.body;
 
         //make sure all parameters are trimmed
         const usernameTrimmed = username.trim();
@@ -39,23 +40,22 @@ router.post('/login', async (req, res) => {
             return res.status(403).send({ message: 'Username or password is invalid!' });
         }
 
-        //create tokens for authentication
-        await user.updateTokenVersion();
-        const userid = user._id;
-        const tokenVersion = Number(user.tokenVersion);
-        const tokenUser = { id: userid, version: tokenVersion };
+        //check for twoFactorAuthentication
+        if (user.twoFactorAuthOn) {
+            if(!otp){
+                return res.status(202).send({ message: 'Please send auth-passcode!' });
+            }
 
-        const { accessToken, refreshToken } = createTokens(tokenUser);
+            const userSecret = user.twoFactorAuthSecret;
 
-        //create new user to return for settings
-        const newUser = {
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
+            if (!speakeasy.totp.verify({
+                secret: userSecret, encoding: 'base32', token: otp
+            })) {
+                return res.status(403).send({ message: 'One time password is invalid!' })
+            }
         }
 
-        return res.status(200).json({ user: newUser, accessToken, refreshToken });
+        return await createAndSendTokensAndUser(res, user);
     } catch (e) {
         console.error("❌ Login error: ", e);
         return res.sendStatus(500);
@@ -136,6 +136,10 @@ router.post('/token', async (req, res) => {
             const { id, version } = tokenContent;
             const user = await User.findOne({ _id: id });
 
+            if (!user){
+                return res.status(401).json({message: 'User does not exist!'})
+            }
+
             if (user.tokenVersion !== version) {
                 return res.status(401).json({ error: 'invalid_token' });
             }
@@ -151,9 +155,30 @@ router.post('/token', async (req, res) => {
     }
 });
 
+async function createAndSendTokensAndUser(res, user) {
+    //create tokens for authentication
+    await user.updateTokenVersion();
+    const userid = user._id;
+    const tokenVersion = Number(user.tokenVersion);
+    const tokenUser = { id: userid, version: tokenVersion };
+
+    const { accessToken, refreshToken } = createTokens(tokenUser);
+
+    //create new user to return for settings
+    const newUser = {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        twoFactorAuthOn: user.twoFactorAuthOn,
+    }
+
+    return res.status(200).json({ user: newUser, accessToken, refreshToken });
+}
+
 function createTokens(tokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d'}); //valid for 7 days after creation
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' }); //valid for 30 days after creation
 
     return { accessToken, refreshToken };
 }
