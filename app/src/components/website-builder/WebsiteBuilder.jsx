@@ -39,6 +39,22 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
      */
     useEffect(() => {
         if (!editorRef.current) {
+
+            const customStyleTypePlugin = (editor) => {
+                editor.StyleManager.addType('custom-html', {
+                  create({ property }) {
+                    const el = document.createElement('div');
+                    el.innerHTML = `
+                      <div>
+                        <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
+                      </div>
+                    `;
+                    el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
+                    return el;
+                  },
+                });
+              };
+            
             const editorInstance = grapesjs.init({
                 container: "#gjs",
                 height: '100%',
@@ -97,7 +113,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         },
                     ],
                 },
-                plugins: ["grapesjs-blocks-basic"],
+                plugins: ["grapesjs-blocks-basic", customStyleTypePlugin],
                 pluginsOpts: {
                     "grapesjs-blocks-basic": {blocks: ["row", "column", "image"], flexGrid: true}
                 },
@@ -112,19 +128,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
               
             });
             
-            editorInstance.StyleManager.addType('custom-html', {
-                create({ property }) {
-                  const el = document.createElement('div');
-                  el.innerHTML = `
-                    <div >
-                      <button style="margin:10px;" class="clear-canvas-button">Open Editor</button>
-                    </div>
-                  `;
-                  el.querySelector('.clear-canvas-button').onclick = () =>  openNodeEditor(selectedElementRef);
-                  return el;
-                },
-              });
-
+          
             // Run the component outline command to enable outlines by default
             editorInstance.runCommand('core:component-outline');
 
@@ -163,6 +167,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                     handleSave();
                 }
             });
+
 
             if (state) {
                 editorInstance.setComponents(state.components);
