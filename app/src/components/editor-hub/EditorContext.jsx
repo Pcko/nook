@@ -1,0 +1,42 @@
+import {createContext, useContext, useReducer} from 'react';
+
+const EditorContext = createContext(undefined);
+
+const initialState = {
+    selectedElement: null,
+    isNodeEditorOpen: false,
+    tabs: [],
+    activeTabIndex: 0,
+    editorState: null,
+};
+
+function editorReducer(state, action) {
+    switch (action.type) {
+        case 'SELECT_ELEMENT':
+            return {...state, selectedElement: action.payload};
+        case 'OPEN_NODE_EDITOR':
+            return {...state, isNodeEditorOpen: true};
+        case 'CLOSE_NODE_EDITOR':
+            return {...state, isNodeEditorOpen: false};
+        case 'SET_EDITOR_STATE' :
+            return {...state, editorState: action.payload};
+        default:
+            return state;
+    }
+}
+
+export function EditorProvider({children}) {
+    const [state, dispatch] = useReducer(editorReducer, initialState);
+
+    return (
+        <EditorContext.Provider value={{state, dispatch}}>
+            {children}
+        </EditorContext.Provider>
+    );
+}
+
+export function useEditor() {
+    const ctx = useContext(EditorContext);
+    if (!ctx) throw new Error('useEditor must be inside EditorProvider');
+    return ctx;
+}

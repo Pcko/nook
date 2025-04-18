@@ -13,16 +13,17 @@ import grapesjs from "grapesjs";
 import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
+import {useEditor} from "../editor-hub/EditorContext";
 
-function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
-    /** @type {React.MutableRefObject<null|Object>} Stores the selected element in the editor. */
-    const selectedElementRef = useRef(null);
+function WebsiteBuilder({initialState, pageInfo}) {
+    const {state, dispatch} = useEditor();
 
-    /** @type {React.MutableRefObject<null|Object>} Stores the GrapesJS editor instance. */
     const editorRef = useRef(null);
+    const stateRef = useRef(state);
 
     const [activeTab, setActiveTab,] = useState("layers");
     const [outlinesActive, setOutlinesActive] = useState(true);
+
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
@@ -94,8 +95,7 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
      .gjs-dashed *[data-gjs-highlightable]  {
       outline: 1px dashed #141c1c !important; /* Red solid outline for components */
     }
-                `,
-              
+                `
             });
 
             // Run the component outline command to enable outlines by default
@@ -109,49 +109,44 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
             editorRef.current = editorInstance;
 
             editorInstance.on("component:selected", component => {
-                selectedElementRef.current = component;
+                dispatch({type: 'SELECT_ELEMENT', payload: component})
             });
 
             editorInstance.on("component:deselected", () => {
-                selectedElementRef.current = null;
+                dispatch({type: 'SELECT_ELEMENT', payload: null})
             });
 
+            document.addEventListener('keydown', function (event) {
+                event.preventDefault();
 
-            document.addEventListener('keydown', function(event) {
                 if (event.shiftKey && event.key === 'O') {
-                    event.preventDefault();
                     toggleOutlines();
                 }
-              });
-
-            document.addEventListener("keydown", function (event) {
-                if (event.ctrlKey && event.shiftKey && event.key === "E" && selectedElementRef.current) {
-                    event.preventDefault();
-                    openNodeEditor(selectedElementRef);
+                if (event.ctrlKey && event.shiftKey && event.key === "E" && stateRef.current.selectedElement) {
+                    dispatch({type: 'OPEN_NODE_EDITOR'});
                 }
-            });
-            document.addEventListener("keydown", function (event) {
-                if (event.ctrlKey && event.key === "S" && selectedElementRef.current) {
-                    event.preventDefault();
+                if (event.ctrlKey && event.key === "S" && stateRef.current.selectedElement) {
                     handleSave();
                 }
             });
 
-            if (state) {
-                editorInstance.setComponents(state.components);
-                editorInstance.setStyle(state.styles);
+            if (state.editorState) {
+                editorInstance.setComponents(initialState.components);
+                editorInstance.setStyle(initialState.styles);
+                dispatch({type: 'SET_EDITOR_STATE', payload: initialState});
             }
-
-            editor.current = editorInstance;
         }
 
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
-            localStorage.setItem('tabs', '[]');
+            stateRef.current = null;
         };
     }, []);
 
+    useEffect(() => {
+        stateRef.current = state;
+    }, [state]);
 
     /**
      * Saves the current editor state to localStorage.
@@ -160,8 +155,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
      */
     const handleSave = async () => {
         try {
-            const components = editor.current.getComponents();
-            const styles = editor.current.getStyle();
+            const components = editorRef.current.getComponents();
+            const styles = editorRef.current.getStyle();
 
             const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
                 pageContent: {
