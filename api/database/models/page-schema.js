@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Project from './project-schema.js';
 
 const { Schema } = mongoose;
 
@@ -31,4 +32,11 @@ const PageSchema = new Schema(
 
 PageSchema.index({ name: 1, projectId: 1 }, { unique: true });
 
-export default mongoose.model('Project', PageSchema);
+PageSchema.pre('save', async function (next) {
+    const project = await Project.findById(this.projectId);
+    await project.updatePageCount;
+
+    next();
+})
+
+export default mongoose.model('Page', PageSchema);

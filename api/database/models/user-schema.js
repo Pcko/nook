@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import Project from './project-schema.js';
-import Page from '../models/page-schema.js';
+import Page from './page-schema.js';
 
 const { Schema } = mongoose;
 

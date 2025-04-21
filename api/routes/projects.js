@@ -1,6 +1,7 @@
 import express from 'express';
 
 import Project from '../database/models/project-schema.js';
+import Page from '../database/models/page-schema.js';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
 
@@ -103,7 +104,12 @@ router.get('/:projectName', async (req, res) => {
             return res.status(404).send('Project not found!');
         }
 
-        return res.status(200).json(project);
+        const pages = await Page.find({projectId: project._id});
+        if (!pages) {
+            return res.status(404).send('No pages found!');
+        }
+
+        return res.status(200).json(project, pages);
     } catch (e) {
         console.error('❌ Read specific project error: ', e);
         return res.sendStatus(500);

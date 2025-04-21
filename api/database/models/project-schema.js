@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Page from '../models/page-schema.js';
+import Page from './page-schema.js';
 
 const { Schema } = mongoose;
 
@@ -11,6 +11,8 @@ const ProjectSchema = new Schema(
         },
         pageCount: {
             type: Number,
+            default: 0,
+            required: true,
         },
         author: {
             type: String,
@@ -25,11 +27,11 @@ const ProjectSchema = new Schema(
 
 ProjectSchema.index({ name: 1, author: 1 }, { unique: true });
 
-ProjectSchema.pre('save', async function (next) {
+ProjectSchema.methods.updatePageCount = async function () {
     const pages = await Page.find({ project: this._id });
-
     this.pageCount = pages.length;
-    next();
-})
+
+    await this.save();
+}
 
 export default mongoose.model('Project', ProjectSchema);
