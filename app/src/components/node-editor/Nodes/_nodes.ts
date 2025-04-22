@@ -16,4 +16,5 @@ export {SetTextNode} from './SetTextNode';
 // Other Nodes
 export {VariableNode} from './VariableNode';
 export {LogNode} from './LogNode';
+export {ConditionalNode} from './ConditionalNode';
 

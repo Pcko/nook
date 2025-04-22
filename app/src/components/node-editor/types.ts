@@ -1,6 +1,7 @@
 import {Connection} from "./connection";
 import {GetSchemes} from "rete";
 import {
+    ConditionalNode,
     OnClickNode,
     OnHoverNode,
     OnPageLoadNode,
@@ -19,7 +20,8 @@ export type NodeProps =
     | OnPageLoadNode
     | SetBackgroundColourNode
     | SetTextNode
-    | VariableNode;
+    | VariableNode
+    | ConditionalNode;
 
 /**
  *  All possible CustomPresets for Nook Nodes.
