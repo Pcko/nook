@@ -58,8 +58,8 @@ router.post('/:projectName/pages', async (req, res) => {
         const pageDetails = await Page.create(pageData);
 
         return res.status(200).json({ pageName: updatedPageName, pageDetails });
-    } catch (e) {
-        console.error('❌ Create project error: ', e);
+    } catch (err) {
+        console.error('❌ Create project error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -131,8 +131,8 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
         await page.save();
 
         return res.status(200).json({ newPageName: updatedPageName });
-    } catch (e) {
-        console.error('❌ Update page error: ', e);
+    } catch (err) {
+        console.error('❌ Update page error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -163,8 +163,8 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
         }
 
         return res.sendStatus(200);
-    } catch (e) {
-        console.error('❌ Delete page error: ', e);
+    } catch (err) {
+        console.error('❌ Delete page error: ', err);
         return res.sendStatus(500);
     }
 });
