@@ -4,7 +4,7 @@
  * @module WebsiteBuilder
  */
 import React, {useEffect, useRef, useState} from "react";
-import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
+import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineEye} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -14,6 +14,7 @@ import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
 import {useEditor} from "../editor-hub/EditorContext";
+import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
 
 function WebsiteBuilder({initialState, pageInfo}) {
     const {state, dispatch} = useEditor();
@@ -23,6 +24,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
 
     const [activeTab, setActiveTab,] = useState("layers");
     const [outlinesActive, setOutlinesActive] = useState(true);
+    const [isPreview, setIsPreview] = useState(false);
 
 
     /**
@@ -38,6 +40,22 @@ function WebsiteBuilder({initialState, pageInfo}) {
      */
     useEffect(() => {
         if (!editorRef.current) {
+
+            const customStyleTypePlugin = (editor) => {
+                editor.StyleManager.addType('custom-html', {
+                  create({ property }) {
+                    const el = document.createElement('div');
+                    el.innerHTML = `
+                      <div>
+                        <button style="margin:auto;" class="clear-canvas-button">Open Editor</button>
+                      </div>
+                    `;
+                    el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
+                    return el;
+                  },
+                });
+              };
+
             const editorInstance = grapesjs.init({
                 container: "#gjs",
                 height: '100%',
@@ -54,8 +72,21 @@ function WebsiteBuilder({initialState, pageInfo}) {
                     ]
                 },
                 styleManager: {
-                    appendTo: '#right-panel',
+                    appendTo: '.right-panel',
                     sectors: [
+                        {
+                            name: 'Code-Editor',
+                            open: true,
+                            buildProps: ['custom'],
+                            properties: [
+                            {
+                                property: 'custom',
+                                type: 'custom-html',
+                                name: ' ',
+                                full: true,
+                            },
+                            ],
+                        },
                         {
                             name: 'Dimension',
                             open: false,
@@ -84,7 +115,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
                         },
                     ],
                 },
-                plugins: ["grapesjs-blocks-basic"],
+                plugins: ["grapesjs-blocks-basic", customStyleTypePlugin],
                 pluginsOpts: {
                     "grapesjs-blocks-basic": {blocks: ["row", "column", "image"], flexGrid: true}
                 },
@@ -95,8 +126,10 @@ function WebsiteBuilder({initialState, pageInfo}) {
      .gjs-dashed *[data-gjs-highlightable]  {
       outline: 1px dashed #141c1c !important; /* Red solid outline for components */
     }
-                `
+                `,
+              
             });
+
 
             // Run the component outline command to enable outlines by default
             editorInstance.runCommand('core:component-outline');
@@ -149,7 +182,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
     }, [state]);
 
     /**
-     * Saves the current editor state to localStorage.
+     * Saves the current editor state to Database.
      *
      * @function handleSave
      */
@@ -208,11 +241,30 @@ function WebsiteBuilder({initialState, pageInfo}) {
         });
     };
 
+    const togglePreview = () => {
+        if (editorRef.current) {
+          if (!isPreview) {
+            editorRef.current.stopCommand('sw-visibility');
+            editorRef.current.runCommand('core:preview');
+          } else {
+            editorRef.current.stopCommand('core:preview');
+            editorRef.current.runCommand('sw-visibility');
+          }
+          setIsPreview(!isPreview);
+        }
+      };
 
     return (
         <div className="GrapesJsApp">
             <div className="Editor">
-                <div className="TopPanel">
+                <div className={`hidden ${!isPreview ? '' : 'PreviewTopPanel'}`}>
+                    <div>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            End Preview
+                        </button>
+                    </div>
+                </div>
+                <div className={`TopPanel ${!isPreview ? '' : 'hidden'}`}>
                     <div className="top-left">
                         <button className="top-button" onClick={() => editorRef.current?.runCommand("undo")}>
                             <AiOutlineUndo size={20}/>
@@ -247,44 +299,58 @@ function WebsiteBuilder({initialState, pageInfo}) {
                         <button className="clear-canvas-button" onClick={handleSave}>
                             Save Canvas
                         </button>
+                        <button className="clear-canvas-button" onClick={togglePreview}>
+                            Preview
+                        </button>
                     </div>
                 </div>
 
                 <div className="MainContent">
-                    <div id="left-panel">
-                        <div className="toggle-container">
-                            <input
-                                type="radio"
-                                id="layer"
-                                name="toggle"
-                                checked={activeTab === "layers"}
-                                onChange={() => setActiveTab("layers")}
-                            />
-                            <label htmlFor="layer">Layers</label>
+                    <PanelGroup direction="horizontal">
+                        {/* Left Panel */}
+                        <Panel defaultSize={20} minSize={15} maxSize={25}>
+                            <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
+                                <div className="toggle-container">
+                                    <input
+                                        type="radio"
+                                        id="layer"
+                                        name="toggle"
+                                        checked={activeTab === "layers"}
+                                        onChange={() => setActiveTab("layers")}
+                                    />
+                                    <label htmlFor="layer">Layers</label>
 
-                            <input
-                                type="radio"
-                                id="block"
-                                name="toggle"
-                                checked={activeTab === "blocks"}
-                                onChange={() => setActiveTab("blocks")}
-                            />
-                            <label htmlFor="block">Blocks</label>
-                        </div>
+                                    <input
+                                        type="radio"
+                                        id="block"
+                                        name="toggle"
+                                        checked={activeTab === "blocks"}
+                                        onChange={() => setActiveTab("blocks")}
+                                    />
+                                    <label htmlFor="block">Blocks</label>
+                                </div>
 
-                        <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}>
-                        </div>
-                        <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}>
-                        </div>
-                    </div>
-                    <div id="editor-container">
-                        <div id="gjs" style={{height: "100%"}}>
-                            {/* Editor contents will be rendered here */}
-                        </div>
-                    </div>
-                    <div id="right-panel">
+                                <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}></div>
+                                <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}></div>
+                            </div>
+                        </Panel>
 
-                    </div>
+                        <PanelResizeHandle className="resize-handle" />
+
+                        {/* Editor Panel */}
+                        <Panel defaultSize={60}>
+                            <div id="editor-container">
+                                <div id="gjs" style={{height: "100%"}}></div>
+                            </div>
+                        </Panel>
+
+                        <PanelResizeHandle className="resize-handle" />
+
+                        {/* Right Panel */}
+                        <Panel defaultSize={20} minSize={15} maxSize={25}>
+                            <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}></div>
+                        </Panel>
+                    </PanelGroup>
                 </div>
             </div>
         </div>
