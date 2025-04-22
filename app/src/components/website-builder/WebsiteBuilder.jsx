@@ -318,8 +318,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                 <div className="MainContent">
                     <PanelGroup direction="horizontal">
                         {/* Left Panel */}
-                        <Panel defaultSize={20} minSize={15} maxSize={25}>
-                            <div className={`left-panel ${!isPreview ? '' : 'hidden'}`}>
+                        <Panel defaultSize={20} minSize={15} maxSize={25} className={`${!isPreview ? '' : 'hidden'}`}>
+                            <div className="left-panel">
                                 <div className="toggle-container">
                                     <input
                                         type="radio"
@@ -357,8 +357,8 @@ function WebsiteBuilder({state, pageInfo, editor, openNodeEditor}) {
                         <PanelResizeHandle className="resize-handle" />
 
                         {/* Right Panel */}
-                        <Panel defaultSize={20} minSize={15} maxSize={25}>
-                            <div className={`right-panel ${!isPreview ? '' : 'hidden'}`}></div>
+                        <Panel defaultSize={20} minSize={15} maxSize={25} className={`${!isPreview ? '' : 'hidden'}`}>
+                            <div className="right-panel"></div>
                         </Panel>
                     </PanelGroup>
                 </div>
