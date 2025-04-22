@@ -63,7 +63,7 @@ router.post('/:projectName/pages', async (req, res) => {
         return res.sendStatus(500);
     }
 });
- 
+
 //UPDATE PAGE
 router.patch('/:projectName/pages/:pageName', async (req, res) => {
     try {
@@ -82,12 +82,12 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
 
         const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
-            return res.status(404).send({message: 'Project not found!'});
+            return res.status(404).send({ message: 'Project not found!' });
         }
 
-        const page = await Page.findOne({name: pageNameTrimmed, projectId: project._id});
+        const page = await Page.findOne({ name: pageNameTrimmed, projectId: project._id });
         if (!page) {
-            return res.status(404).send({message: 'Page not found!'});
+            return res.status(404).send({ message: 'Page not found!' });
         }
 
         //Rename
@@ -104,7 +104,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
             let duplicateNumber = 1;
             let pageExists;
             do {
-                pageExists = await Page.findeOne({name: updatedPageName, projectId: project._id}).lean();
+                pageExists = await Page.findOne({ name: updatedPageName, projectId: project._id }).lean();
 
                 if (pageExists) {
                     duplicateNumber += 1;
@@ -129,7 +129,7 @@ router.patch('/:projectName/pages/:pageName', async (req, res) => {
         }
 
         await page.save();
-        
+
         return res.status(200).json({ newPageName: updatedPageName });
     } catch (e) {
         console.error('❌ Update page error: ', e);
@@ -154,12 +154,12 @@ router.delete('/:projectName/pages/:pageName', async (req, res) => {
 
         const project = await Project.findOne({ name: projectNameTrimmed, author: userId }).lean();
         if (!project) {
-            return res.status(404).send({message: 'Project not found!'});
+            return res.status(404).send({ message: 'Project not found!' });
         }
 
-        const page = await Page.findOneAndDelete({name: pageNameTrimmed, projectId: project._id});
+        const page = await Page.findOneAndDelete({ name: pageNameTrimmed, projectId: project._id });
         if (!page) {
-            return res.status(404).send({message: 'Page not found!'});
+            return res.status(404).send({ message: 'Page not found!' });
         }
 
         return res.sendStatus(200);

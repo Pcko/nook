@@ -104,12 +104,18 @@ router.get('/:projectName', async (req, res) => {
             return res.status(404).send('Project not found!');
         }
 
-        const pages = await Page.find({projectId: project._id});
+        const pages = await Page.find({ projectId: project._id });
         if (!pages) {
             return res.status(404).send('No pages found!');
         }
 
-        return res.status(200).json(project, pages);
+        const pagesObj = {};
+        for (let page of pages) {
+            pagesObj[page.name] = page;
+        }
+        project.pages = pagesObj;
+
+        return res.status(200).json(project);
     } catch (e) {
         console.error('❌ Read specific project error: ', e);
         return res.sendStatus(500);
