@@ -34,7 +34,7 @@ PageSchema.index({ name: 1, projectId: 1 }, { unique: true });
 
 PageSchema.pre('save', async function (next) {
     const project = await Project.findById(this.projectId);
-    await project.updatePageCount;
+    await project.updatePageCount();
 
     next();
 })
