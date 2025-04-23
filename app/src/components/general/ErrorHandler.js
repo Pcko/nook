@@ -9,7 +9,7 @@ const useErrorHandler = () => {
         if (err.redirectToLogin) {
             navigate('/login');
         }
-        const errorMessage = err.response?.data?.error ? err.response.data.message : err.message;
+        const errorMessage = err.response?.data?.message || (err.response?.data?.error ? undefined : err.message);
         if(errorMessage) {
             showNotification('error', errorMessage);
         }

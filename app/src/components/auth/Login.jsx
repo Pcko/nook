@@ -20,7 +20,7 @@ function Login() {
     const handleError = useErrorHandler();
 
     const closeLogin = (accessToken, refreshToken, user) => {
-        showNotification('success', 'Login successfull');
+        showNotification('success', 'Login successful!');
 
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);

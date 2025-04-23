@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useNotifications } from "../general/NotificationContext";
-const { showNotification } = useNotifications();
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -34,7 +33,7 @@ axiosInstance.interceptors.response.use(
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) {
-                    return Promise.reject(error);
+                    throw error;
                 }
 
                 const response = await axiosInstance.post('/auth/token', { 'token': refreshToken });
@@ -55,7 +54,7 @@ axiosInstance.interceptors.response.use(
                             ...error.response,
                             data:{
                                 ...error.response.data,
-                                message:'Your refresh token has expired, please log in again.'
+                                message:'Your session has expired, please log in again.'
                             }
                         },
                         redirectToLogin: true,
