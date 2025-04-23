@@ -3,18 +3,18 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import axios from '../auth/AxiosInstance';
 import LoadingScreen from "../general/LoadingScreen";
 
-function AuthRedirect(){
+function AuthRedirect() {
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect( ()=>{
-        const checkAuthStatus = async ()=>{
+    useEffect(() => {
+        const checkAuthStatus = async () => {
             const accessToken = localStorage.getItem('accessToken');
             const refreshToken = localStorage.getItem('refreshToken');
 
-            if(!accessToken || !refreshToken){
+            if (!accessToken || !refreshToken) {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
                 setLoading(false);
@@ -22,26 +22,31 @@ function AuthRedirect(){
                 return;
             }
 
-            try{
-                const response = await axios.post('/auth/token', { 'token': refreshToken});
+            try {
+                const response = await axios.post('/auth/token', { 'token': refreshToken });
 
-                if(response.status === 200){
+                const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+
+                if (response.status === 200) {
+                    localStorage.setItem('accessToken', newAccessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
                     setIsAuthenticated(true);
                 }
             }
-            catch(err){
+            catch (err) {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                if(err.response){
-                    if(err.response.status===401){
+                if (err.response) {
+                    if (err.response.status === 401) {
                         navigate('/login');
                     }
-                    if(err.response.message){
+                    if (err.response.message) {
                         setError(err.response.message);
                     }
-                }5
+                } 5
             }
-            finally{
+            finally {
                 setLoading(false);
             }
         }
@@ -49,18 +54,18 @@ function AuthRedirect(){
         checkAuthStatus();
     });
 
-    if(loading){
-        return <LoadingScreen/>;
+    if (loading) {
+        return <LoadingScreen />;
     }
 
-    if(error){
+    if (error) {
         return <div>There was an error loading the page.</div>;
     }
 
-    if(isAuthenticated){
-        return <Navigate to="/dashboard"/>;
-    }else{
-        return <Navigate to="/login"/>;
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" />;
+    } else {
+        return <Navigate to="/login" />;
     }
 }
 
