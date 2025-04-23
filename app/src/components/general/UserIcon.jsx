@@ -5,9 +5,9 @@ function UserIcon(){
 
     return (
         <div className="flex w-[2rem] h-[2rem] bg-primary rounded mr-3">
-            <div className="text-lg m-auto">
+            <div className="text-lg text-text-on-primary m-auto">
                 {
-                user.firstName.charAt(0) + user.lastName.charAt(0)
+                user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()
                 }
             </div>
         </div>

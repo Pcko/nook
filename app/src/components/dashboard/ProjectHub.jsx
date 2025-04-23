@@ -122,12 +122,12 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
             <div className="overflow-y-scroll">
             <div className="grid grid-cols-4 border-ui-border">
                 {/* Table Headers */}
-                <div className="sticky top-0 bg-far-bg">
+                <div className="sticky top-0 bg-website-bg">
                     <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg">Project Name</div>
                 </div>
                 <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Created</div>
                 <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Last Modified</div>
-                <div className="sticky top-0 bg-far-bg">
+                <div className="sticky top-0 bg-website-bg">
                     <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tr-lg">Number of Pages</div>
                 </div>
 
