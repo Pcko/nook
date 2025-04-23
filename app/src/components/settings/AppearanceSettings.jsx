@@ -10,17 +10,18 @@ function AppearanceSettings({changeHandler, options}){
 
     const handleThemeChange = (selectedOption) => {
         const oldTheme = localStorage.getItem('theme') || 'system';
+        const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         localStorage.setItem('theme', selectedOption);
         setSelectedTheme(selectedOption);
 
-        if(oldTheme === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            document.documentElement.classList.remove('light');
+        if(oldTheme === 'system') {
+            document.documentElement.classList.remove(systemTheme);
+        } else {
+            document.documentElement.classList.remove(oldTheme);
         }
 
         if (selectedOption === 'system') {
-            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-                document.documentElement.classList.add('light');
-            }
+            document.documentElement.classList.add(systemTheme);
         } else {
             document.documentElement.classList.remove(oldTheme);
             document.documentElement.classList.add(selectedOption);
