@@ -3,6 +3,8 @@ import Editor from "./Editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
 import {useNotifications} from "../general/NotificationContext";
+import grapesjs from "grapesjs";
+import "grapesjs/dist/css/grapes.min.css";
 import RunTime from "./NodeProcessor/RunTime";
 import {useEditor} from "../editor-hub/EditorContext";
 
@@ -204,6 +206,35 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
         }
     }
 
+/**
+     * Initializes GrapesJS on the specified <div id="gjs2">
+     */
+useEffect(() => {
+    const gjsEditor = grapesjs.init({
+        container: '#gjs2',
+        height: '100%',
+        width: '100%',
+        fromElement: false,
+        storageManager: false,
+        panels: { defaults: [] },
+        components: [
+            element
+          ],
+    });
+
+    gjsEditor.on('load', () => {
+        const canvasBody = gjsEditor.Canvas.getBody();
+    
+        if (canvasBody) {
+          canvasBody.style.pointerEvents = 'none';
+        }
+        gjsEditor.runCommand('select-clear');
+        })
+
+    return () => gjsEditor.destroy();
+    
+}, []);
+
     /**
      * Finds nodes directly connected to the starting node
      *
@@ -278,6 +309,8 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
             <SidePanel hierarchyList={hierarchyList}/>
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
                 <div id={`editor-container-rete-${index}`} style={{height: "100%"}}/>
+            </div>
+            <div id="gjs2" className="!fixed top-[100px] !right-20 !w-[250px] !h-[250px] bg-white rounded z-[1150]">
             </div>
         </div>
     );
