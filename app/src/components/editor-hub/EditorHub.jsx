@@ -9,7 +9,7 @@ function EditorHub() {
     const gjsEditorRef = useRef(null);
     const location = useLocation();
     const data = location.state;
-    const { projectName, pageName } = useParams();
+    const {projectName, pageName} = useParams();
 
     /**
      * Opens a tab in the NodeEditor for the selected grapesjs component
@@ -34,7 +34,8 @@ function EditorHub() {
     return (
         <div className="h-screen w-screen relative">
             {/* WebsiteBuilder is always there */}
-            <WebsiteBuilder state={data} pageInfo={{ projectName, pageName }} editor={gjsEditorRef} openNodeEditor={openNodeEditor}/>
+            <WebsiteBuilder state={data} pageInfo={{projectName, pageName}} editor={gjsEditorRef}
+                            openNodeEditor={openNodeEditor}/>
 
             {/* Overlay for NodeEditor */}
             {isOverlayOpen ?
