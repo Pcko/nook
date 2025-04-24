@@ -1,12 +1,15 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: '/',
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
     timeout: 1500
 });
 
 axiosInstance.interceptors.request.use((config) => {
-    if (config.url.startsWith('/api')) {
+    const requestUrl = new URL(config.url, config.baseURL).pathname;
+
+    if (requestUrl.startsWith('/api')) {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
             config.headers['authorization'] = `Bearer ${accessToken}`;
@@ -23,7 +26,8 @@ axiosInstance.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config;
-        if (error.response && error.response.status === 401 && originalRequest.url.startsWith('/api') && !originalRequest._retry) {
+        const originalRequestUrl = new URL(originalRequest.url, originalRequest.baseURL).pathname
+        if (error.response && error.response.status === 401 && originalRequestUrl.startsWith('/api') && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
@@ -31,10 +35,11 @@ axiosInstance.interceptors.response.use(
                     return Promise.reject(error);
                 }
 
-                const response = await axios.post('/auth/token', { 'token': refreshToken });
-                const { accessToken } = response.data;
+                const response = await axiosInstance.post('/auth/token', { 'token': refreshToken });
+                const { accessToken, refreshToken: newRefreshToken } = response.data;
 
                 localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', newRefreshToken);
 
                 originalRequest.headers['authorization'] = `Bearer ${accessToken}`;
 
@@ -42,7 +47,7 @@ axiosInstance.interceptors.response.use(
             } catch {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-                return Promise.reject(error);
+                return Promise.reject({...error, message: 'Please login again'});
             }
         }
 

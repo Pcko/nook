@@ -1,17 +1,43 @@
+/**
+ * @file commands.js
+ * @description Defines custom commands for GrapesJS.
+ * Includes undo, redo, and code export functionalities.
+ *
+ * @module commands
+ */
+
 import beautify from "js-beautify";
 
 export const addCustomCommands = (editor) => {
-  // Undo Command
+      /**
+     * Undo the last action performed in the editor.
+     *
+     * @name undo
+     * @function
+     * @param {Object} editor - The GrapesJS editor instance.
+     */
   editor.Commands.add("undo", {
     run: (editor) => editor.UndoManager.undo(),
   });
 
-  // Redo Command
+      /**
+     * Redo the last undone action in the editor.
+     *
+     * @name redo
+     * @function
+     * @param {Object} editor - The GrapesJS editor instance.
+     */
   editor.Commands.add("redo", {
     run: (editor) => editor.UndoManager.redo(),
   });
 
-  // Show Code Command
+      /**
+     * Show a code export modal displaying formatted HTML and CSS.
+     *
+     * @name show-code
+     * @function
+     * @param {Object} editor - The GrapesJS editor instance.
+     */
   editor.Commands.add("show-code", {
     run: (editor) => {
       const rawHtml = editor.getHtml();

@@ -1,10 +1,17 @@
-import BackgroundText from "../general/NookBackground"
-import logo from "../../assets/resources/image.png"
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import NookBackground from "../general/NookBackground"
+import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import axios from '../auth/AxiosInstance'
 import ImageCarousel from "./ImageCarousel";
-
+import {
+    isInvalidStringForEmail,
+    isInvalidStringForFirstName,
+    isInvalidStringForLastName,
+    isInvalidStringForPassword,
+    isInvalidStringForUsername
+} from '../general/FormChecks';
+import {useNotifications} from '../general/NotificationContext'
+import LoadingScreen from "../general/LoadingScreen";
 
 function Registration() {
     const [username, setUsername] = useState('');
@@ -15,9 +22,21 @@ function Registration() {
     const [errorDisplay, setErrorDisplay] = useState('')
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { showNotification } = useNotifications();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        /* Form Checks */
+        const result =
+            isInvalidStringForUsername(username) ||
+            isInvalidStringForPassword(password) ||
+            isInvalidStringForFirstName(firstName) ||
+            isInvalidStringForLastName(lastName) ||
+            isInvalidStringForEmail(email);
+        if (result) {
+            return showNotification('error', result);
+        }
 
         try {
             setLoading(true);
@@ -36,31 +55,38 @@ function Registration() {
                 timeoutErrorMessage: 'Server did not respond.',
             })
 
-            if (response.status >= 200 && response.status < 300) {
-                console.log('Account creation was successful! ', response.message);
-                navigate('/login');
-            }
+            showNotification('success', 'Account creation was successful!');
+            navigate('/login');
         } catch (err) {
-            setErrorDisplay(err.message);
-        }
-        finally {
+            if (err.response.data.message) {
+                showNotification('error', err.response.data.message);
+            } else {
+                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
+            }
+        } finally {
             setLoading(false);
         }
     }
 
+    if(loading){
+        return <LoadingScreen/>
+    }
+
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <BackgroundText />
-            <div id="Window" className="min-h-[650] w-[1000px] p-3 text-text bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
+            <NookBackground/>
+            <div id="Window"
+                 className="min-h-[650] w-[1000px] p-3 text-text bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
                 {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
 
                 <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
-                    <ImageCarousel />
+                    <ImageCarousel/>
                     <div className={"m-[10%]"}>
                         <h1 className="text-3xl mb-2">Create an Account</h1>
 
                         <span>Already have an account? </span>
-                        <a className={"text-ui-subtle underline hover:cursor-pointer"} onClick={() => navigate('/login')}>Log in</a>
+                        <a className={"text-ui-subtle underline hover:cursor-pointer"}
+                           onClick={() => navigate('/login')}>Log in</a>
 
                         <form onSubmit={handleSubmit} className={"w-full mt-6"}>
                             {/* Username Field */}
@@ -137,14 +163,14 @@ function Registration() {
                                 className={"mr-2"}
                             />
                             I agree to the <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                                onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
+                                              onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
 
                             {/* Conditionally show error message */}
                             {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
 
                             <input
                                 type="submit"
-                                className={`btn w-full mt-3 ${loading ? 'animate-spin' : ''}`}
+                                className={`btn w-full mt-3 ${loading ? 'animate-pulse' : ''}`}
                                 value="Register"
                             >
                             </input>

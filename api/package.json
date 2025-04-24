@@ -2,12 +2,12 @@
   "name": "api",
   "version": "0.1.0",
   "description": "<server> npm i\r <client> npm i\r <client> npm run build\r <server> npm run start",
-  "main": "server-dev.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "npm --prefix ../app run build && nodemon server.js"
+    "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +17,9 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.0"
+    "mongoose": "^8.10.0",
+    "speakeasy": "^2.0.0",
+    "validator": "^13.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

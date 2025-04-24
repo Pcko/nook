@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import axios from '../auth/AxiosInstance';
 
 import UserIcon from '../general/UserIcon';
 import ProjectHub from "./ProjectHub";
 import ProjectDetails from "./ProjectDetails";
+import { useNotifications } from "../general/NotificationContext"
 
 function Dashboard ()  {
   const [projects, setProjects] = useState({});
@@ -13,22 +13,47 @@ function Dashboard ()  {
   const [activeTab, setActiveTab] = useState('projects')
   const [userMenuExpanded, setUserMenuExpanded] = useState(false);
   const navigate = useNavigate();
+  const {showNotification} = useNotifications();
 
   useEffect(() => {
-    const getProjects = async ()=>{
-      let loadedProjects;
-
-      try{
-        const response = await axios.get('/api/projects');
-        loadedProjects = response.data;
-        setProjects(loadedProjects);
-      }catch(e){
-        console.error(e.message);
-      }
+    const keys = Object.keys(projects);
+    if(!keys.includes(selectedProject)){
+      setSelectedProject(keys[0]);
     }
+  }, [projects, selectedProject]);
 
-    getProjects();
-  }, []);
+  useEffect(() => {
+    if(activeTab === 'projects'){
+      const getProjects = async ()=>{
+        let loadedProjects;
+
+        try{
+          const response = await axios.get('/api/projects');
+          loadedProjects = response.data;
+
+          {/* Update the dates and page count without deleting the pages cache */}
+          setProjects((prevProjects)=>{
+            const newProjects = {}
+            for(let key in loadedProjects){
+              newProjects[key] = {...prevProjects[key], ...loadedProjects[key]};
+            }
+            return newProjects;
+          });
+
+          showNotification('success', 'Successfully loaded your projects');
+        }catch(err){
+          if(err.response.status === 404){
+            showNotification('error', 'No projects found.');
+          }
+          else{
+            showNotification('error', err.response.data.message || 'There was an issue loading your projects from our server. Please try again later.');
+          }
+        }
+      }
+
+      getProjects();
+    }
+  }, [activeTab]);
 
   useEffect(()=>{
     if(!selectedProject && Object.keys(projects).length !== 0) {
@@ -43,14 +68,14 @@ function Dashboard ()  {
   const handleLogout = async () => {
     try{
         const response = await axios.post('/api/settings/logout');
-        localStorage.clear();
-        sessionStorage.clear();
-        navigate('/');
-    } catch(e){
-        console.error(e.message);
-    }
-  };
+    } catch(err) { }
 
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/');
+
+    showNotification('success', 'Successfully logged out.');
+  };
 
   {/* Navigation to the Project Details Tab with the clicked-on project selected */}
   const switchToProjectDetails = (projectId) => {
@@ -73,17 +98,17 @@ function Dashboard ()  {
       }
     }
 
-    return <div>Loading Projects...</div>
+    return <div>Loading projects...</div>
   }
 
   return (
     <div className="flex h-screen bg-website-bg">
       {/* Side Bar */}
-      <aside className="w-1/4 pt-[70px] px-[4vw]">
+      <aside className="w-1/4 pt-[50px] px-[4vw]">
         {/* Drop-Down-Menu Head */}
         <div className="mb-2 flex hover:cursor-pointer" onClick={() => setUserMenuExpanded(!userMenuExpanded)}>
           <UserIcon/>
-          <h2 className="text-xl my-auto mr-3">{JSON.parse(localStorage.getItem('user')).username}</h2>
+          <h2 className="my-auto mr-3">{JSON.parse(localStorage.getItem('user')).username}</h2>
 
           {/* Drop-Down-Icon */}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
@@ -106,7 +131,7 @@ function Dashboard ()  {
         }
 
         {/* Tab Navigation */}
-        <nav className="mt-4">
+        <nav className="mt-6">
           {/* Project Details */}
           <div
               className={`flex items-center w-full mb-3 p-2 cursor-pointer rounded ${activeTab === 'projectDetails' ? 'bg-ui-bg-selected' : 'bg-transparent'}`}
@@ -134,7 +159,7 @@ function Dashboard ()  {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 m-6 mt-[50px] mr-[5vw]">
+      <main className="flex-1 ml-6 mt-[50px] mr-[5vw]">
         {/* Projects */}
         {renderTabContent()}
       </main>

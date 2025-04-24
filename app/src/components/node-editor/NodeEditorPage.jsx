@@ -1,57 +1,140 @@
 import React, {useEffect, useRef, useState} from "react";
-import {clean, create, fetchNodeTypes, load, save} from "./editor";
+import Editor from "./Editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
+import {useNotifications} from "../general/NotificationContext";
+import RunTime from "./NodeProcessor/RunTime";
+import {useEditor} from "../editor-hub/EditorContext";
 
-function NodeEditorPage({element}) {
+/**
+ * Main node editor page component that provides a visual interface for node-based editing.
+ *
+ * This component:
+ * - Manages the editor lifecycle (initialization, saving, loading)
+ * - Maintains node hierarchy and connections
+ * - Provides keyboard shortcuts
+ * - Integrates with a side panel for hierarchy visualization
+ *
+ * @param {Object} props - Component properties
+ * @param {Object} props.element - GrapesJS element reference
+ * @param {Function} props.setArrangeNodes - Callback to set arrange nodes function
+ * @param {boolean} props.doReload - Flag to trigger reload of editor state
+ *
+ * @returns {JSX.Element} The rendered component
+ *
+ * @example
+ * <NodeEditorPage
+ *   element={grapesjsElement}
+ *   setArrangeNodes={setArrangeFunction}
+ *   doReload={reloadFlag}
+ * />
+ */
+let index = 0;
+
+function NodeEditorPage({element, setArrangeNodes, doReload}) {
+    index++;
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
+    // Refs for persistent editor references
     const grapesjsElement = useRef(element);
     const editorRef = useRef(null);
     const engineRef = useRef(null);
     const areaRef = useRef(null);
     const editorInitialized = useRef(false);
+    const arrangeNodes = useRef(null);
 
+    // Editor API functions
+    const {create, clean, load, save, fetchNodeTypes} = Editor();
+
+    const {showNotification} = useNotifications();
+    const {state} = useEditor();
+
+    /**
+     * Initializes the editor on component mount and sets up cleanup on unmount
+     */
     useEffect(() => {
-        const container = document.querySelector('#editor-container');
+        const container = document.querySelector(`#editor-container-rete-${index}`);
         if (container && !editorInitialized.current) {
-            create(container).then(({editor, engine, area}) => {
+            create(container).then(({editor, engine, area, arrangeGraph}) => {
                 editorRef.current = editor;
+                // Add pipe to track node/connection changes
+                editorRef.current.addPipe(context => {
+                    if (context.type.toLowerCase().includes('node') ||
+                        context.type.toLowerCase().includes('connection')) {
+                        buildHierarchy();
+                    }
+                    return context;
+                })
                 engineRef.current = engine;
                 areaRef.current = area;
+                arrangeNodes.current = arrangeGraph;
+                setArrangeNodes(() => arrangeGraph);
                 loadState();
 
                 editorInitialized.current = true;
             }).catch((err) => {
-                console.error("Error initializing editor:", err.message);
+                showNotification('error', 'Error initializing editor')
             });
         }
 
+        /**
+         * Fetches available node types for the editor
+         */
         async function getNodeTypes() {
             let newMap = await fetchNodeTypes();
             setNodeTypes(newMap);
         }
 
+        const handler = (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'X' && arrangeNodes.current) {
+                e.preventDefault();
+                arrangeNodes.current().then();
+            }
+            if(e.ctrlKey && e.shiftKey && e.key === 'R') {
+                executeNodes();
+            }
+        };
+        // Set up keyboard shortcut for arranging nodes (Ctrl+Shift+X)
+        document.addEventListener("keydown", handler);
+
         getNodeTypes();
+
+        // Cleanup function
         return () => {
             if (editorInitialized.current && editorRef.current) {
                 saveState();
                 clean(editorRef.current).then(() => {
                     editorInitialized.current = false;
+                    document.removeEventListener('keydown', handler);
                 }).catch((err) => {
-                    console.error("Error cleaning editor:", err.message);
+                    showNotification('error', "Error cleansing the Editor");
                 });
             }
         };
     }, []);
 
+    /**
+     * Auto-saves editor state when hierarchy changes
+     */
     useEffect(() => {
         setTimeout(() => {
-            buildHierarchy();
+            saveState();
         }, 10);
     }, [hierarchyList]);
 
+    /**
+     * Reloads editor state when doReload flag changes
+     */
+    useEffect(() => {
+        if (doReload) {
+            loadState();
+        }
+    }, [doReload]);
+
+    /**
+     * Saves current editor state to GrapesJS element
+     */
     function saveState() {
         if (!editorRef.current || !areaRef.current) return;
 
@@ -60,53 +143,73 @@ function NodeEditorPage({element}) {
         });
     }
 
+    /**
+     * Loads editor state from GrapesJS element
+     */
     function loadState() {
         if (!editorRef.current || !areaRef.current) return;
 
         try {
             const savedState = grapesjsElement.current.get('graph');
+
             if (savedState) {
-                load(savedState, editorRef.current, areaRef.current)
+                clean(editorRef.current).then(() => {
+                    load(savedState, editorRef.current, areaRef.current)
+                })
             }
         } catch (err) {
-            console.warn("Error initializing editor:", err.message);
+            showNotification('error', 'Error initializing editor!');
         }
     }
 
+    /**
+     * Builds node hierarchy structure starting from AtomNodes
+     */
     function buildHierarchy() {
         let chains = [];
         let atomNodes = [];
 
-        editorRef.current.getNodes().forEach((node) => {
-            if (node instanceof AtomNode) {
-                atomNodes.push(node);
-            }
-        });
+        try {
+            // Find all AtomNodes in the editor
+            editorRef.current.getNodes().forEach((node) => {
+                if (node instanceof AtomNode) {
+                    atomNodes.push(node);
+                }
+            });
 
-        atomNodes.forEach((atomNode) => {
-            let chain = [atomNode];
-            let connectedNodes = findConnectedNodes(atomNode);
+            // Build chains of connected nodes for each AtomNode
+            atomNodes.forEach((atomNode) => {
+                let chain = [atomNode];
+                let connectedNodes = findConnectedNodes(atomNode);
+                chain = [...chain, ...connectedNodes];
+                chains.push(chain);
+            });
 
-            chain = [...chain, ...connectedNodes];
-            chains.push(chain);
-        });
+            // Create hierarchy list for the side panel
+            const hierarchy = chains.map((chain) => ({
+                header: chain[0].label,
+                children:
+                    chain.length >= 2 ?
+                        chain.slice(1).map((node) => ({
+                            id: node.id,
+                            name: node.label,
+                        }))
+                        :
+                        [],
+            }));
 
-        // Create hierarchy list
-        const hierarchy = chains.map((chain) => ({
-            header: chain[0].label,
-            children:
-                chain.length >= 2 ?
-                    chain.slice(1).map((node) => ({
-                        id: node.id,
-                        name: node.label,
-                    }))
-                    :
-                    [],
-        }));
-
-        setHierarchyList(hierarchy);
+            setHierarchyList(hierarchy);
+        } catch (err) {
+            showNotification('error', 'Error building hierarchy');
+        }
     }
 
+    /**
+     * Finds nodes directly connected to the starting node
+     *
+     * @param {Object} startNode - Node to begin search from
+     * @returns {Array} Array of connected nodes
+     */
     function findConnectedNodes(startNode) {
         let rawConnections = editorRef.current.connections;
         const connections = Array.isArray(rawConnections) ? [...rawConnections] : Array.from(rawConnections);
@@ -117,7 +220,8 @@ function NodeEditorPage({element}) {
         }
 
         connections.forEach((connection) => {
-            if (connection.source === startNode.id || connectedNodes.find(node => node.id === connection.source)) {
+            if (connection.source === startNode.id ||
+                connectedNodes.find(node => node.id === connection.source)) {
                 const connectedNode = editorRef.current.getNode(connection.target);
                 if (connectedNode) {
                     connectedNodes.push(connectedNode);
@@ -128,6 +232,13 @@ function NodeEditorPage({element}) {
         return connectedNodes;
     }
 
+    /**
+     * Recursively finds all nodes connected to the starting node
+     *
+     * @param {Object} startNode - Node to begin search from
+     * @param {Set} [visited=new Set()] - Set of already visited nodes
+     * @returns {Array} Array of all connected nodes in the graph
+     */
     function findConnectedNodesRecursiv(startNode, visited = new Set()) {
         let rawConnections = editorRef.current.connections;
         if (!rawConnections || rawConnections.length === 0) return [];
@@ -135,6 +246,9 @@ function NodeEditorPage({element}) {
         const connections = Array.isArray(rawConnections) ? [...rawConnections] : Array.from(rawConnections);
         let connectedNodes = [];
 
+        /**
+         * Depth-first search to traverse node connections
+         */
         function dfs(node) {
             if (visited.has(node.id)) return;
             visited.add(node.id);
@@ -154,11 +268,16 @@ function NodeEditorPage({element}) {
         return connectedNodes;
     }
 
+    function executeNodes() {
+        let runner = new RunTime(editorRef.current.getNodes(), editorRef.current);
+        runner.run(state.selectedElement);
+    }
+
     return (
         <div style={{display: "flex", height: "100vh"}}>
             <SidePanel hierarchyList={hierarchyList}/>
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
-                <div id={'editor-container'} style={{height: "100%"}}/>
+                <div id={`editor-container-rete-${index}`} style={{height: "100%"}}/>
             </div>
         </div>
     );

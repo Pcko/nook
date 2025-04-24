@@ -6,6 +6,7 @@ import axios from '../auth/AxiosInstance';
 import ProjectCreationForm from "./ProjectCreationForm";
 import ProjectEditForm from "./ProjectEditForm";
 import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
+import { useNotifications } from "../general/NotificationContext";
 
 const sortByOptions = [
     { id: 1, option: 'Name', svg: 'm10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802' },
@@ -33,6 +34,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
     const [sortReversed, setSortReversed] = useState(false);
     const [projectCreationFormActive, setProjectCreationFormActive] = useState(false);
     const [projectNameToEdit, setProjectNameToEdit] = useState();
+    const { showNotification } = useNotifications();
 
     const compareTableEntries = ([keyA, valueA], [keyB, valueB]) => {
         switch (sortByOption) {
@@ -60,13 +62,19 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 delete updatedProjects[projectName];
                 return updatedProjects;
             });
-        } catch (e){
-            console.error(e);
+
+            showNotification('success', 'Successfully deleted your project.');
+        } catch (err){
+            if(err.response.data){
+                showNotification('error', err.response.data.message);
+            }else{
+                showNotification('error', 'There was an issue communicating with our server. Please try again.');
+            }
         }
     };
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full flex flex-col">
             {/* Top Bar */}
             <div className="flex">
                 {/* Search Bar */}
@@ -103,7 +111,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                     </Listbox>
 
                     {/* Create New Project Button */}
-                    <input type="button" className="btn rounded" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
+                    <input type="button" className="btn rounded text-text-on-primary" value="+ New Project" onClick={()=>setProjectCreationFormActive(true)}/>
                 </div>
             </div>
 
@@ -111,12 +119,17 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
             <hr className="mt-5 mb-10 border-ui-border"/>
 
             {/* Projects Table */}
+            <div className="overflow-y-scroll">
             <div className="grid grid-cols-4 border-ui-border">
                 {/* Table Headers */}
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg">Project Name</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Created</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Last Modified</div>
-                <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tr-lg">Number of Pages</div>
+                <div className="sticky top-0 bg-far-bg">
+                    <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg">Project Name</div>
+                </div>
+                <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Created</div>
+                <div className="sticky top-0 font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4">Last Modified</div>
+                <div className="sticky top-0 bg-far-bg">
+                    <div className="font-semibold bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tr-lg">Number of Pages</div>
+                </div>
 
                 {/*
                     All the user's projects
@@ -163,10 +176,10 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                                 </Listbox>
                             </div>
                             <div className="p-4 bg-ui-bg border-ui-border border-[1px]">
-                                {projectDetails.createdAt.toLocaleString()}
+                                {new Date(projectDetails.createdAt).toLocaleString(navigator.language)}
                             </div>
                             <div className="p-4 bg-ui-bg border-ui-border border-[1px]">
-                                {projectDetails.updatedAt.toLocaleString()}
+                                {new Date(projectDetails.updatedAt).toLocaleString(navigator.language)}
                             </div>
                             <div className={`p-4 bg-ui-bg border-ui-border border-[1px] ${index === filteredProjects.length - 1 ? 'rounded-br-lg' : ''}`}>
                                 {projectDetails.pageCount}
@@ -174,7 +187,7 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                         </Fragment>
                     ))}
             </div>
-
+            </div>
 
 
             {/* Dynamically rendered forms */}
@@ -193,11 +206,19 @@ function ProjectHub({ onProjectClick, projects, setProjects }) {
                 <CenteredWindowWithBackgroundBlur>
                     <ProjectEditForm
                         onProjectEdit={
-                            (newProjectName, data)=>{
-                            delete projects[projectNameToEdit];
-                            projects[newProjectName] = data;
-                        }}
+                            (newProjectName, data)=> {
+                                setProjects(prevProjects => {
+                                    const {[projectNameToEdit]: _, ...updatedProjects} = prevProjects;
+
+                                    return {
+                                        ...updatedProjects,
+                                        [newProjectName]: data
+                                    };
+                                });
+                            }
+                        }
                         projectName={projectNameToEdit} closeForm={()=>{setProjectNameToEdit(undefined)}}
+                        projects={projects}
                     />
                 </CenteredWindowWithBackgroundBlur>
             : ''}

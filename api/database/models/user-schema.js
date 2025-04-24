@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
+import Project from './project-schema.js';
+
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -21,7 +23,6 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
         lowercase: true,
         trim: true,
     },
@@ -35,6 +36,17 @@ const UserSchema = new Schema({
         required: true,
         trim: true,
     },
+    tokenVersion: {
+        type: Number,
+        default: 0,
+    },
+    twoFactorAuthOn: {
+        type: Boolean,
+        default: false,
+    },
+    twoFactorAuthSecret: {
+        type: String,
+    }
 },
     { timestamps: true }
 );
@@ -48,5 +60,20 @@ UserSchema.pre('save', async function (next) {
 
     next();
 })
+
+UserSchema.pre('findOneAndDelete', async function (next) {
+    const user = await this.model.findOne(this.getFilter());
+    if (!user) return next();
+
+    await Project.deleteMany({ author: user._id });
+
+    next();
+})
+
+UserSchema.methods.updateTokenVersion = async function () {
+    this.tokenVersion += 1;
+    await this.save();
+}
+
 
 export default mongoose.model('User', UserSchema);

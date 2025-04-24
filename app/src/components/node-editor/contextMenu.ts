@@ -4,17 +4,17 @@ import { Presets } from "rete-react-plugin";
 const { Menu, Common, Search, Item, Subitems } = Presets.contextMenu;
 
 const colors = {
-  primary: "#6B439B",
-  secondary: "#8869AD",
-  primaryHover: "#5A3382",
-  websiteBg: "#202020",
-  uiBg: "#2B2B2B",
-  text: "#E0E0E0",
-  hover: "#3A3A3A",
-  active: "#4A4A4A",
-  border: "#3D3D3D",
-  separator: "#5A5A5A",
-  inputBg: "#1C1C1C",
+  primary: "var(--primary)",
+  secondary: "var(--secondary)",
+  primaryHover: "var(--primary-hover)",
+  websiteBg: "var(--website-bg)",
+  uiBg: "var(--ui-bg)",
+  text: "var(--text)",
+  hover: "var(--ui-bg-selected)",
+  active: "var(--ui-button-hover)",
+  border: "var(--ui-border)",
+  separator: "var(--ui-subtle)",
+  inputBg: "var(--ui-border-selected)",
 };
 
 const CustomMenu = styled(Menu)`
@@ -99,7 +99,6 @@ const Preset = Presets.contextMenu.setup({
     common: () => CustomCommon,
     search: () => CustomSearch,
     subitems: () => CustomSubitems,
-    separator: () => Separator,
   },
 });
 

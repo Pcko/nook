@@ -5,6 +5,14 @@ import AccountSettings from "./AccountSettings";
 import AppearanceSettings from "./AppearanceSettings";
 import SecuritySettings from "./SecuritySettings";
 import axios from "../auth/AxiosInstance";
+import { useNotifications } from "../general/NotificationContext";
+import {
+    isInvalidStringForUsername,
+    isInvalidStringForEmail,
+    isInvalidStringForFirstName,
+    isInvalidStringForLastName,
+    isInvalidStringForPassword
+} from "../general/FormChecks";
 
 function loadSettings() {
     const settings = {
@@ -21,6 +29,7 @@ function Settings() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('account');
     const [changes, setChanges] = useState({});
+    const { showNotification } = useNotifications();
 
     const originalSettings = loadSettings();
 
@@ -50,8 +59,20 @@ function Settings() {
         }
 
         if(Object.keys(changes).length===0){
-            console.log('nothing to save');
+            showNotification('error', 'There are no changes to be saved.');
             return;
+        }
+
+        /* Form Checks */
+        const accountObject = changes['account'];
+        const result =
+            !accountObject.username ? undefined : isInvalidStringForUsername(accountObject.username) ||
+            !accountObject.password ? undefined : isInvalidStringForPassword(accountObject.password) ||
+            !accountObject.firstName ? undefined : isInvalidStringForFirstName(accountObject.firstName) ||
+            !accountObject.lastName ? undefined : isInvalidStringForLastName(accountObject.lastName) ||
+            !accountObject.email ? undefined : isInvalidStringForEmail(accountObject.email);
+        if(result){
+            return showNotification('error', result);
         }
 
         try{
@@ -59,21 +80,18 @@ function Settings() {
             const response = await axios.patch(
                 '/api/settings',
                 {
-                    username,
                     changes,
                 }
             );
 
-            if(response.status===200){
-                console.log('settings have been changed');
-                setChanges({});
+            showNotification('success', 'Successfully applied the changes to your settings.');
+            setChanges({});
 
-                const oldUserObject = JSON.parse(localStorage.getItem('user'));
-                const newUserObject = { ...oldUserObject, ...changes.account };
-                localStorage.setItem('user', JSON.stringify(newUserObject));
-            }
-        }catch(e){
-            console.log(e)
+            const oldUserObject = JSON.parse(localStorage.getItem('user'));
+            const newUserObject = { ...oldUserObject, ...changes.account };
+            localStorage.setItem('user', JSON.stringify(newUserObject));
+        }catch(err){
+            showNotification('error', 'Something went wrong trying to apply your changes. Check your internet connection and try again.');
         }
     };
 
@@ -88,18 +106,38 @@ function Settings() {
         return false;
     };
 
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'account':
-                return <AccountSettings options={{...originalSettings['account'], ...changes['account']}} changeHandler={(setting, data) => handleSettingsChange('account', setting, data)}/>;
-            case 'appearance':
-                return <AppearanceSettings options={originalSettings['appearance']} changeHandler={(setting, data) => handleSettingsChange('appearance', setting, data)}/>;
-            case 'security':
-                return <SecuritySettings changeHandler={(setting, data) => handleSettingsChange('security', setting, data)}/>;
-            default:
-                return <div>no tab selected somehow??</div>;
-        }
+    const renderFormContent = () => {
+        return(
+            <form onSubmit={applyChanges} className="h-full">
+                {
+                    activeTab === 'account' ?
+                    <AccountSettings options={{...originalSettings['account'], ...changes['account']}} changeHandler={(setting, data) => handleSettingsChange('account', setting, data)}/>
+                    : activeTab === 'appearance' ?
+                    <AppearanceSettings options={originalSettings['appearance']} changeHandler={(setting, data) => handleSettingsChange('appearance', setting, data)}/>
+                    : undefined
+                }
+                {settingsHaveChanges() ?
+                    <div className="absolute h-[60px] py-1 px-3 top-5 right-5 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
+                        <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
+                        <input type="submit"
+                               className="btn text-center h-3/4 my-auto"
+                               value="Save"
+                        />
+                    </div>
+                    : ''}
+            </form>
+        );
     };
+
+    const renderNonFormContent = () => {
+        switch (activeTab) {
+            case 'security':
+                return <SecuritySettings changeHandler={(setting, data) => handleSettingsChange('security', setting, data)} activateTwoFactorAuthForm={()=>{setTwoFactorAuthFormActive(true)}}/>;
+            default:
+                return undefined;
+        }
+    }
+
 
     return(
         <div>
@@ -152,18 +190,8 @@ function Settings() {
                     </div>
                 </div>
                 <div className="w-full h-screen px-[15%] py-[10vh] bg-website-bg border-l-ui-border border-l-[1px] ">
-                    <form onSubmit={applyChanges} className="h-full">
-                        {renderTabContent()}
-                        {settingsHaveChanges() ?
-                            <div className="absolute h-[60px] py-1 px-3 top-5 right-5 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
-                                <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
-                                <input type="submit"
-                                       className="btn text-center h-3/4 my-auto"
-                                       value="Save"
-                                />
-                            </div>
-                            : ''}
-                    </form>
+                    {renderNonFormContent()}
+                    {renderFormContent()}
                 </div>
             </div>
         </div>

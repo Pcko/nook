@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import axios from '../auth/AxiosInstance';
+import LoadingScreen from "../general/LoadingScreen";
 
 function AuthRedirect(){
     const [loading, setLoading] = useState(true);
@@ -25,23 +26,23 @@ function AuthRedirect(){
                 const response = await axios.post('/auth/token', { 'token': refreshToken});
 
                 if(response.status === 200){
-                    setLoading(false);
                     setIsAuthenticated(true);
                 }
-                else{
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    setLoading(false);
-                    setIsAuthenticated(false);
-                    setError(response.status);
-                }
             }
-            catch(e){
-                if(e.response){
-                    if(e.response.status===401){
+            catch(err){
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                if(err.response){
+                    if(err.response.status===401){
                         navigate('/login');
                     }
-                }
+                    if(err.response.message){
+                        setError(err.response.message);
+                    }
+                }5
+            }
+            finally{
+                setLoading(false);
             }
         }
 
@@ -49,7 +50,7 @@ function AuthRedirect(){
     });
 
     if(loading){
-        return <div className="h-full m-auto animate-pulse text-text bg-ui-bg">loading...</div>;
+        return <LoadingScreen/>;
     }
 
     if(error){

@@ -1,22 +1,33 @@
 import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
 function ProjectCreationForm({ closeForm, setProjects }){
     const [projectName, setProjectName] = useState('');
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+
+        /* Form Checks */
+        const result = isInvalidStringForURL(projectName);
+        if(result){
+            return showNotification('error', result);
+        }
 
         try{
             const response = await axios.post('/api/projects', { projectName });
 
             setProjects((prevProjects) => {
                 const updatedProjects = { ...prevProjects };
-                updatedProjects[projectName] = response.data;
+                updatedProjects[response.data.projectName] = response.data.projectDetails;
                 return updatedProjects;
             });
-        }catch (e) {
-            console.error(e.message);
+
+            showNotification('success', 'Successfully added your new project.');
+        }catch (err) {
+            return showNotification('error', 'There was an issue communicating with our servers.');
         }
 
         closeForm();
@@ -48,7 +59,7 @@ function ProjectCreationForm({ closeForm, setProjects }){
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Project" className="py-1 px-4 bg-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="submit" value="Create Project" className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>
