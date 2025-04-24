@@ -29,8 +29,8 @@ router.patch('/', async (req, res) => {
 
     res.sendStatus(200);
   }
-  catch (e) {
-    console.error("❌ Alter settings error: ", e);
+  catch (err) {
+    console.error("❌ Alter settings error: ", err);
     return res.sendStatus(500);
   }
 });
@@ -61,8 +61,8 @@ router.delete('/delete-account', async (req, res) => {
 
     return res.sendStatus(200);
   }
-  catch (e) {
-    console.error("❌ Account deletion error: ", e);
+  catch (err) {
+    console.error("❌ Account deletion error: ", err);
     return res.sendStatus(500);
   }
 });
@@ -80,8 +80,8 @@ router.get('/twoFactorAuth', async (req, res) => {
 
     return res.json({ qrCodeUrl: secret.otpauth_url });
   }
-  catch (e) {
-    console.error("❌ Activate TwoFactorAuth error:", e);
+  catch (err) {
+    console.error("❌ Activate TwoFactorAuth error:", err);
     return res.sendStatus(500);
   }
 });
@@ -106,8 +106,8 @@ router.post('/twoFactorAuth', async (req, res) => {
 
     return res.sendStatus(200);
   }
-  catch (e) {
-    console.error("❌ Confirm TwoFactorAuth error:", e);
+  catch (err) {
+    console.error("❌ Confirm TwoFactorAuth error:", err);
     return res.sendStatus(500);
   }
 })
@@ -122,8 +122,8 @@ router.post('/logout', async (req, res) => {
 
     return res.sendStatus(200);
   }
-  catch (e) {
-    console.error("❌ Logout error:", e);
+  catch (err) {
+    console.error("❌ Logout error:", err);
     return res.sendStatus(500);
   }
 });

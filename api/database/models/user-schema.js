@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import Project from './project-schema.js';
+import Page from './page-schema.js';
 
 const { Schema } = mongoose;
 
@@ -61,19 +62,44 @@ UserSchema.pre('save', async function (next) {
     next();
 })
 
+// findOneAndDelete (also covers findByIdAndDelete)
 UserSchema.pre('findOneAndDelete', async function (next) {
     const user = await this.model.findOne(this.getFilter());
-    if (!user) return next();
-
-    await Project.deleteMany({ author: user._id });
-
+    await handleUserDeletion(user);
     next();
-})
+});
+
+// deleteOne (query middleware)
+UserSchema.pre('deleteOne', { document: false, query: true }, async function (next) {
+    const user = await this.model.findOne(this.getFilter());
+    await handleUserDeletion(user);
+    next();
+});
+
+// deleteMany (bulk deletion)
+UserSchema.pre('deleteMany', async function (next) {
+    const users = await this.model.find(this.getFilter());
+    for (const user of users) {
+        await handleUserDeletion(user);
+    }
+    next();
+});
+
+// remove (document middleware)
+UserSchema.pre('remove', async function (next) {
+    await handleUserDeletion(this);
+    next();
+});
 
 UserSchema.methods.updateTokenVersion = async function () {
     this.tokenVersion += 1;
     await this.save();
 }
 
+async function handleUserDeletion(user) {
+    if (!user) return;
+
+    await Project.deleteMany({ author: user._id });
+}
 
 export default mongoose.model('User', UserSchema);

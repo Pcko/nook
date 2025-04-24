@@ -1,6 +1,7 @@
 import express from 'express';
 
 import Project from '../database/models/project-schema.js';
+import Page from '../database/models/page-schema.js';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
 
@@ -51,8 +52,8 @@ router.post('/', async (req, res) => {
         };
 
         return res.status(200).json({ projectName: newProjectName, projectDetails });
-    } catch (e) {
-        console.error('❌ Create project error: ', e);
+    } catch (err) {
+        console.error('❌ Create project error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -78,8 +79,8 @@ router.get('/', async (req, res) => {
         });
 
         return res.status(200).json(projectDetails);
-    } catch (e) {
-        console.error('❌ Read all projects error: ', e);
+    } catch (err) {
+        console.error('❌ Read all projects error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -103,9 +104,20 @@ router.get('/:projectName', async (req, res) => {
             return res.status(404).send({ error: 'unknown_project' });
         }
 
+        const pages = await Page.find({ projectId: project._id });
+        if (!pages) {
+            return res.status(404).send('No pages found!');
+        }
+
+        const pagesObj = {};
+        for (let page of pages) {
+            pagesObj[page.name] = page;
+        }
+        project.pages = pagesObj;
+
         return res.status(200).json(project);
-    } catch (e) {
-        console.error('❌ Read specific project error: ', e);
+    } catch (err) {
+        console.error('❌ Read specific project error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -171,8 +183,8 @@ router.patch('/:projectName', async (req, res) => {
         };
 
         return res.status(200).json({ projectName: updatedProjectName || projectName, projectDetails });
-    } catch (e) {
-        console.error('❌ Update project error: ', e);
+    } catch (err) {
+        console.error('❌ Update project error: ', err);
         return res.sendStatus(500);
     }
 });
@@ -198,8 +210,8 @@ router.delete('/:projectName', async (req, res) => {
         }
 
         return res.sendStatus(200);
-    } catch (e) {
-        console.error('❌ Delete project error: ', e);
+    } catch (err) {
+        console.error('❌ Delete project error: ', err);
         return res.sendStatus(500);
     }
 });

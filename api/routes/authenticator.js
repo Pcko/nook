@@ -56,8 +56,8 @@ router.post('/login', async (req, res) => {
         }
 
         return await createAndSendTokensAndUser(res, user);
-    } catch (e) {
-        console.error("❌ Login error: ", e);
+    } catch (err) {
+        console.error("❌ Login error: ", err);
         return res.sendStatus(500);
     }
 });
@@ -79,20 +79,16 @@ router.post('/register', async (req, res) => {
         }
 
         //make sure all parameters are valid
-        if (isInvalidStringForUsername(usernameTrimmed) ||
+        const result =
+            isInvalidStringForUsername(usernameTrimmed) ||
             isInvalidStringForPassword(password) ||
             isInvalidStringForFirstName(firstNameTrimmed) ||
             isInvalidStringForLastName(lastNameTrimmed) ||
-            isInvalidStringForEmail(emailTrimmed)) {
+            isInvalidStringForEmail(emailTrimmed);
+        if (result) {
             return res.status(403).send({
                 error: 'invalid_parameters',
-                messages: {
-                    username: isInvalidStringForUsername(usernameTrimmed),
-                    password: isInvalidStringForPassword(password),
-                    firstName: isInvalidStringForFirstName(firstNameTrimmed),
-                    lastName: isInvalidStringForLastName(lastNameTrimmed),
-                    email: isInvalidStringForEmail(emailTrimmed),
-                }
+                message: result,
             });
         }
 
@@ -113,8 +109,8 @@ router.post('/register', async (req, res) => {
         })
 
         return res.sendStatus(201);
-    } catch (e) {
-        console.error("❌ Registration error: ", e);
+    } catch (err) {
+        console.error("❌ Registration error: ", err);
         return res.sendStatus(500);
     }
 });
@@ -149,8 +145,8 @@ router.post('/token', async (req, res) => {
 
             return res.status(200).json(tokens);
         })
-    } catch (e) {
-        console.error("❌ Refresh token error: ", e);
+    } catch (err) {
+        console.error("❌ Refresh token error: ", err);
         return res.sendStatus(500);
     }
 });
