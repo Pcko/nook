@@ -1,12 +1,12 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import axios from '../auth/AxiosInstance';
-import {isInvalidStringForURL} from "../general/FormChecks";
-import {useNotifications} from "../general/NotificationContext";
+import { isInvalidStringForURL } from "../general/FormChecks";
+import { useNotifications } from "../general/NotificationContext";
 
-function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
+function PageEditForm({ closeForm, selectedProjectId, pageName, pages }) {
     const [newPageName, setNewPageName] = useState(pageName);
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
-    const {showNotification} = useNotifications();
+    const { showNotification } = useNotifications();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -39,14 +39,14 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
             }
 
             if (newPageName) {
-                const page = {...pages[pageName]};
+                const page = { ...pages[pageName] };
                 delete pages[pageName];
                 pages[response.data.newPageName] = page;
             }
 
             showNotification('success', 'Successfully applied changes to your page.');
         } catch (err) {
-            return showNotification('error', 'There was an issue communicating with our servers.');
+            return handleError(err);
         }
 
         closeForm();
@@ -57,7 +57,8 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
                 <h1 className="text-xl">Edit Page "{pageName}"</h1>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer"
+                     stroke="currentColor"
+                     className="size-5 ml-auto mr-1 hover:cursor-pointer"
                      onClick={() => closeForm()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
                 </svg>
@@ -88,7 +89,8 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
-                        <input type="button" value="Cancel" onClick={() => closeForm()}
+                        <input type="button" value="Cancel"
+                               onClick={() => closeForm()}
                                className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
                         <input type="submit" value="Edit Page"
                                className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
