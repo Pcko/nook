@@ -8,6 +8,7 @@ import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackg
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
 import { useNotifications } from "../general/NotificationContext";
+import useErrorHandler from "../general/ErrorHandler";
 
 function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [pages, setPages] = useState(projects[selectedProjectId].pages);
@@ -17,6 +18,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
     const [minimizedFolders, setMinimizedFolders] = useState(new Set([]));
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     useEffect(() => {
         setPages(projects[selectedProjectId].pages)
@@ -42,6 +44,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
                     projects[selectedProjectId].pages = pages;
                     setPages(projects[selectedProjectId].pages);
                 }catch (err) {
+                    handleError(err);
                     {/* retry after 2.5 seconds */}
                     await new Promise(resolve => setTimeout(resolve, 2500));
                 }
@@ -79,11 +82,7 @@ function ProjectDetails({projects, selectedProjectId, setSelectedProjectId}){
 
             showNotification('success', 'Successfully deleted your page.');
         } catch (err){
-            if(err.response.data){
-                showNotification('error', err.response.data.message);
-            }else{
-                showNotification('error', 'There was an issue trying to communicate with our server. Please try again later.')
-            }
+            handleError(err);
         }
     };
 

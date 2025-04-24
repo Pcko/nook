@@ -12,6 +12,7 @@ import {
 } from '../general/FormChecks';
 import {useNotifications} from '../general/NotificationContext'
 import LoadingScreen from "../general/LoadingScreen";
+import useErrorHandler from "../general/ErrorHandler";
 
 function Registration() {
     const [username, setUsername] = useState('');
@@ -23,6 +24,7 @@ function Registration() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const handleError = useErrorHandler();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -58,11 +60,7 @@ function Registration() {
             showNotification('success', 'Account creation was successful!');
             navigate('/login');
         } catch (err) {
-            if (err.response.data.message) {
-                showNotification('error', err.response.data.message);
-            } else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         } finally {
             setLoading(false);
         }

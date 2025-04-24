@@ -5,6 +5,7 @@ import { isInvalidStringForPassword } from "../general/FormChecks";
 import { useNotifications } from "../general/NotificationContext";
 import QRCodeDisplay from "./QRCodeDisplay";
 import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
+import useErrorHandler from "../general/ErrorHandler";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -12,6 +13,7 @@ function SecuritySettings({changeHandler}) {
     const [qrCodeUrl, setQRCodeUrl] = useState();
     const { showNotification } = useNotifications();
     const [twoFactorAuthFormActive, setTwoFactorAuthFormActive] = useState(false);
+    const handleError = useErrorHandler();
 
     const sendPasswordChangeRequest = async (e) => {
         e.preventDefault();
@@ -71,12 +73,7 @@ function SecuritySettings({changeHandler}) {
             setTwoFactorAuthFormActive(false);
         }
         catch (err) {
-            if (err.response) {
-                showNotification('error', err.response.data.message);
-            }
-            else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         }
     }
 

@@ -1,10 +1,12 @@
 import axios from '../auth/AxiosInstance';
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../general/NotificationContext"
+import useErrorHandler from "../general/ErrorHandler";
 
 function AccountDeletionConfirmationForm() {
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
+    const showError = useErrorHandler();
 
     const handleAccountDeletion = async () => {
         try {
@@ -23,7 +25,7 @@ function AccountDeletionConfirmationForm() {
             navigate('/login');
         }
         catch (err) {
-            showNotification('error', 'There was an error trying to delete your account. Please contact our support team for help.')
+            showError(err);
         }
     };
 

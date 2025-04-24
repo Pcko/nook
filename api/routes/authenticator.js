@@ -79,27 +79,23 @@ router.post('/register', async (req, res) => {
         }
 
         //make sure all parameters are valid
-        if (isInvalidStringForUsername(usernameTrimmed) ||
+        const result =
+            isInvalidStringForUsername(usernameTrimmed) ||
             isInvalidStringForPassword(password) ||
             isInvalidStringForFirstName(firstNameTrimmed) ||
             isInvalidStringForLastName(lastNameTrimmed) ||
-            isInvalidStringForEmail(emailTrimmed)) {
+            isInvalidStringForEmail(emailTrimmed);
+        if (result) {
             return res.status(403).send({
-                message: 'Parameters invalid!',
-                errors: {
-                    username: isInvalidStringForUsername(usernameTrimmed),
-                    password: isInvalidStringForPassword(password),
-                    firstName: isInvalidStringForFirstName(firstNameTrimmed),
-                    lastName: isInvalidStringForLastName(lastNameTrimmed),
-                    email: isInvalidStringForEmail(emailTrimmed),
-                }
+                error: 'invalid_parameters',
+                message: result,
             });
         }
 
         //make sure username is not already used
         const userExists = await User.findOne({ _id: usernameTrimmed }).lean();
         if (userExists) {
-            return res.status(409).send({ message: 'This username is not available' });
+            return res.status(409).send({ message: 'This username is not available!' });
         }
 
         //create new user and insert new user into database
@@ -137,7 +133,7 @@ router.post('/token', async (req, res) => {
             const user = await User.findOne({ _id: id });
 
             if (!user) {
-                return res.status(401).json({ message: 'User does not exist!' })
+                return res.status(401).json({ error: 'unkown_user' })
             }
 
             if (user.tokenVersion !== version) {
