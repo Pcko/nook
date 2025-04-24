@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import speakeasy from 'speakeasy';
+import rateLimit from 'express-rate-limit';
 
 import User from '../database/models/user-schema.js';
 import {
@@ -14,8 +15,19 @@ import {
 
 const router = express.Router();
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: {
+        message: 'Too many login attempts. Please try again in 15 minutes.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+
 // LOGIN AUTHENTICATOR REQUEST
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { username, password, otp } = req.body;
 
