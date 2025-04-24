@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
 
         //check for twoFactorAuthentication
         if (user.twoFactorAuthOn) {
-            if(!otp){
+            if (!otp) {
                 return res.status(202).send({ message: 'Please send auth-passcode!' });
             }
 
@@ -56,8 +56,8 @@ router.post('/login', async (req, res) => {
         }
 
         return await createAndSendTokensAndUser(res, user);
-    } catch (e) {
-        console.error("❌ Login error: ", e);
+    } catch (err) {
+        console.error("❌ Login error: ", err);
         return res.sendStatus(500);
     }
 });
@@ -79,27 +79,23 @@ router.post('/register', async (req, res) => {
         }
 
         //make sure all parameters are valid
-        if (isInvalidStringForUsername(usernameTrimmed) ||
+        const result =
+            isInvalidStringForUsername(usernameTrimmed) ||
             isInvalidStringForPassword(password) ||
             isInvalidStringForFirstName(firstNameTrimmed) ||
             isInvalidStringForLastName(lastNameTrimmed) ||
-            isInvalidStringForEmail(emailTrimmed)) {
+            isInvalidStringForEmail(emailTrimmed);
+        if (result) {
             return res.status(403).send({
-                message: 'Parameters invalid!',
-                errors: {
-                    username: isInvalidStringForUsername(usernameTrimmed),
-                    password: isInvalidStringForPassword(password),
-                    firstName: isInvalidStringForFirstName(firstNameTrimmed),
-                    lastName: isInvalidStringForLastName(lastNameTrimmed),
-                    email: isInvalidStringForEmail(emailTrimmed),
-                }
+                error: 'invalid_parameters',
+                message: result,
             });
         }
 
         //make sure username is not already used
         const userExists = await User.findOne({ _id: usernameTrimmed }).lean();
         if (userExists) {
-            return res.status(409).send({ message: 'This username is not available' });
+            return res.status(409).send({ message: 'This username is not available!' });
         }
 
         //create new user and insert new user into database
@@ -113,8 +109,8 @@ router.post('/register', async (req, res) => {
         })
 
         return res.sendStatus(201);
-    } catch (e) {
-        console.error("❌ Registration error: ", e);
+    } catch (err) {
+        console.error("❌ Registration error: ", err);
         return res.sendStatus(500);
     }
 });
@@ -136,8 +132,8 @@ router.post('/token', async (req, res) => {
             const { id, version } = tokenContent;
             const user = await User.findOne({ _id: id });
 
-            if (!user){
-                return res.status(401).json({message: 'User does not exist!'})
+            if (!user) {
+                return res.status(401).json({ error: 'unkown_user' })
             }
 
             if (user.tokenVersion !== version) {
@@ -149,8 +145,8 @@ router.post('/token', async (req, res) => {
 
             return res.status(200).json(tokens);
         })
-    } catch (e) {
-        console.error("❌ Refresh token error: ", e);
+    } catch (err) {
+        console.error("❌ Refresh token error: ", err);
         return res.sendStatus(500);
     }
 });

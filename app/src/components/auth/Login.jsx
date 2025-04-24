@@ -8,6 +8,7 @@ import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackg
 import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
 import NookBackground from "../general/NookBackground";
 import LoadingScreen from '../general/LoadingScreen';
+import useErrorHandler from "../general/ErrorHandler";
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -16,9 +17,10 @@ function Login() {
     const navigate = useNavigate();
     const { showNotification } = useNotifications();
     const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
+    const handleError = useErrorHandler();
 
     const closeLogin = (accessToken, refreshToken, user) => {
-        showNotification('success', 'Login successfull');
+        showNotification('success', 'Login successful!');
 
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
@@ -59,12 +61,7 @@ function Login() {
                 closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
             }
         } catch (err) {
-            if (err.response) {
-                showNotification('error', err.response.data.message);
-            }
-            else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         } finally {
             setLoading(false);
         }
@@ -83,13 +80,7 @@ function Login() {
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         }
         catch (err) {
-            console.error(err.message)
-            if (err.response) {
-                showNotification('error', err.response.data.message);
-            }
-            else {
-                showNotification('error', 'Something went wrong. Check your internet connection and try again later.')
-            }
+            handleError(err);
         }
 
         setLoading(false);
