@@ -5,7 +5,7 @@ function ThemePreview({ theme }){
             appliedClass = 'light';
         }
         else {
-            appliedClass = '';
+            appliedClass = 'dark';
         }
     }
 
