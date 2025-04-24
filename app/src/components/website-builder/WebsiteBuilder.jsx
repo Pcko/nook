@@ -4,7 +4,7 @@
  * @module WebsiteBuilder
  */
 import React, {useEffect, useRef, useState} from "react";
-import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo, AiOutlineEye} from "react-icons/ai";
+import {AiOutlineBorder, AiOutlineCode, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
 import {BsDisplay, BsPhone, BsTablet} from "react-icons/bs";
 import {customBlocks} from "./ressources/blocks.js";
 import {addCustomCommands} from "./ressources/commands.js";
@@ -14,7 +14,8 @@ import "grapesjs/dist/css/grapes.min.css";
 import "grapesjs-blocks-basic";
 import axios from "../auth/AxiosInstance";
 import {useEditor} from "../editor-hub/EditorContext";
-import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
+import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
+import pako from "pako";
 
 function WebsiteBuilder({initialState, pageInfo}) {
     const {state, dispatch} = useEditor();
@@ -25,7 +26,6 @@ function WebsiteBuilder({initialState, pageInfo}) {
     const [activeTab, setActiveTab,] = useState("layers");
     const [outlinesActive, setOutlinesActive] = useState(true);
     const [isPreview, setIsPreview] = useState(false);
-
 
     /**
      * Effect: Initializes the GrapesJS editor on mount and sets up event listeners.
@@ -43,18 +43,18 @@ function WebsiteBuilder({initialState, pageInfo}) {
 
             const customStyleTypePlugin = (editor) => {
                 editor.StyleManager.addType('custom-html', {
-                  create({ property }) {
-                    const el = document.createElement('div');
-                    el.innerHTML = `
+                    create({property}) {
+                        const el = document.createElement('div');
+                        el.innerHTML = `
                       <div>
                         <button style="margin:auto;" class="clear-canvas-button">Open Editor</button>
                       </div>
                     `;
-                    el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
-                    return el;
-                  },
+                        el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
+                        return el;
+                    },
                 });
-              };
+            };
 
             const editorInstance = grapesjs.init({
                 container: "#gjs",
@@ -79,12 +79,12 @@ function WebsiteBuilder({initialState, pageInfo}) {
                             open: true,
                             buildProps: ['custom'],
                             properties: [
-                            {
-                                property: 'custom',
-                                type: 'custom-html',
-                                name: ' ',
-                                full: true,
-                            },
+                                {
+                                    property: 'custom',
+                                    type: 'custom-html',
+                                    name: ' ',
+                                    full: true,
+                                },
                             ],
                         },
                         {
@@ -127,9 +127,8 @@ function WebsiteBuilder({initialState, pageInfo}) {
       outline: 1px dashed #141c1c !important; /* Red solid outline for components */
     }
                 `,
-              
-            });
 
+            });
 
             // Run the component outline command to enable outlines by default
             editorInstance.runCommand('core:component-outline');
@@ -162,12 +161,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
                     handleSave();
                 }
             });
-
-            if (state.editorState) {
-                editorInstance.setComponents(initialState.components);
-                editorInstance.setStyle(initialState.styles);
-                dispatch({type: 'SET_EDITOR_STATE', payload: initialState});
-            }
+            handleLoad(editorInstance);
         }
 
         return () => {
@@ -181,6 +175,23 @@ function WebsiteBuilder({initialState, pageInfo}) {
         stateRef.current = state;
     }, [state]);
 
+    function handleLoad(editorInstance) {
+        if (initialState) {
+            const binaryString = atob(initialState);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            const decompressed = pako.inflate(bytes, {to: 'string'});
+            const parsedData = JSON.parse(decompressed);
+
+            editorInstance.setComponents(parsedData.components);
+            editorInstance.setStyle(parsedData.styles);
+            dispatch({type: 'SET_EDITOR_STATE', payload: parsedData});
+        }
+    }
+
     /**
      * Saves the current editor state to Database.
      *
@@ -190,12 +201,13 @@ function WebsiteBuilder({initialState, pageInfo}) {
         try {
             const components = editorRef.current.getComponents();
             const styles = editorRef.current.getStyle();
+            const dataToSave = JSON.stringify({components: components, styles: styles});
+
+            const compressed = pako.deflate(dataToSave);
+            const base64Compressed = btoa(String.fromCharCode.apply(null, compressed));
 
             const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
-                pageContent: {
-                    components: components,
-                    styles: styles,
-                }
+                pageContent: base64Compressed
             });
         } catch (err) {
             console.error(err);
@@ -243,16 +255,16 @@ function WebsiteBuilder({initialState, pageInfo}) {
 
     const togglePreview = () => {
         if (editorRef.current) {
-          if (!isPreview) {
-            editorRef.current.stopCommand('sw-visibility');
-            editorRef.current.runCommand('core:preview');
-          } else {
-            editorRef.current.stopCommand('core:preview');
-            editorRef.current.runCommand('sw-visibility');
-          }
-          setIsPreview(!isPreview);
+            if (!isPreview) {
+                editorRef.current.stopCommand('sw-visibility');
+                editorRef.current.runCommand('core:preview');
+            } else {
+                editorRef.current.stopCommand('core:preview');
+                editorRef.current.runCommand('sw-visibility');
+            }
+            setIsPreview(!isPreview);
         }
-      };
+    };
 
     return (
         <div className="GrapesJsApp">
@@ -330,12 +342,14 @@ function WebsiteBuilder({initialState, pageInfo}) {
                                     <label htmlFor="block">Blocks</label>
                                 </div>
 
-                                <div id="layers" className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}></div>
-                                <div id="blocks" className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}></div>
+                                <div id="layers"
+                                     className={`toggle-content ${activeTab === "layers" ? "visible" : "hidden"}`}></div>
+                                <div id="blocks"
+                                     className={`toggle-content ${activeTab === "blocks" ? "visible" : "hidden"}`}></div>
                             </div>
                         </Panel>
 
-                        <PanelResizeHandle className="resize-handle" />
+                        <PanelResizeHandle className="resize-handle"/>
 
                         {/* Editor Panel */}
                         <Panel defaultSize={60}>
@@ -344,7 +358,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
                             </div>
                         </Panel>
 
-                        <PanelResizeHandle className="resize-handle" />
+                        <PanelResizeHandle className="resize-handle"/>
 
                         {/* Right Panel */}
                         <Panel defaultSize={20} minSize={15} maxSize={25}>
