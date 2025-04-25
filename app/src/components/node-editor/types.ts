@@ -1,37 +1,32 @@
 import {Connection} from "./connection";
 import {GetSchemes} from "rete";
 import {
-    ButtonClickNode,
-    GetElementNode,
-    NavigateNode,
-    PageLoadNode,
-    PerformClickNode,
+    ConditionalNode,
+    OnClickNode,
+    OnHoverNode,
+    OnPageLoadNode,
     SetBackgroundColourNode,
     SetTextNode,
     VariableNode
 } from './Nodes/_nodes'
 import {BasicNookNode} from "./Nodes/BasicNookNode";
-import AtomNode from "./Nodes/AtomNode.ts";
 
 /**
  * All usable Nook Nodes.
  */
 export type NodeProps =
-    ButtonClickNode
-    | GetElementNode
-    | NavigateNode
-    | PageLoadNode
-    | PerformClickNode
+    OnClickNode
+    | OnHoverNode
+    | OnPageLoadNode
     | SetBackgroundColourNode
     | SetTextNode
     | VariableNode
-    | BasicNookNode
-    | AtomNode;
+    | ConditionalNode;
 
 /**
  *  All possible CustomPresets for Nook Nodes.
  */
-export type ConnProps = Connection<AtomNode, NodeProps>;
+export type ConnProps = Connection<NodeProps, NodeProps>;
 
 /**
  * The Nook Node schemes.

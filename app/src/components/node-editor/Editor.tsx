@@ -26,7 +26,7 @@ import {
 // Custom
 import {SerializedConnection, SerializedNode} from "./Interfaces/serialisation";
 import {MagneticConnection, useMagneticConnection} from "./magnetic-connection";
-import {StandardConnection} from "./CustomPresets/StandardConnection.tsx";
+import {StandardConnection} from "./CustomPresets/StandardConnection";
 import {StyledNode} from './CustomPresets/NodeStyle'
 
 export type AreaExtra = ReactArea2D<Schemes>;

@@ -3,6 +3,8 @@ import Editor from "./Editor";
 import SidePanel from "./SidePanel";
 import AtomNode from "./Nodes/AtomNode";
 import {useNotifications} from "../general/NotificationContext";
+import RunTime from "./NodeProcessor/RunTime";
+import {useEditor} from "../editor-hub/EditorContext";
 
 /**
  * Main node editor page component that provides a visual interface for node-based editing.
@@ -27,7 +29,10 @@ import {useNotifications} from "../general/NotificationContext";
  *   doReload={reloadFlag}
  * />
  */
+let index = 0;
+
 function NodeEditorPage({element, setArrangeNodes, doReload}) {
+    index++;
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
 
@@ -42,14 +47,14 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
     // Editor API functions
     const {create, clean, load, save, fetchNodeTypes} = Editor();
 
-    // Notification Hook
     const {showNotification} = useNotifications();
+    const {state} = useEditor();
 
     /**
      * Initializes the editor on component mount and sets up cleanup on unmount
      */
     useEffect(() => {
-        const container = document.querySelector('#editor-container-rete');
+        const container = document.querySelector(`#editor-container-rete-${index}`);
         if (container && !editorInitialized.current) {
             create(container).then(({editor, engine, area, arrangeGraph}) => {
                 editorRef.current = editor;
@@ -81,12 +86,17 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
             setNodeTypes(newMap);
         }
 
-        // Set up keyboard shortcut for arranging nodes (Ctrl+Shift+X)
-        document.addEventListener("keydown", (e) => {
+        const handler = (e) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'X' && arrangeNodes.current) {
+                e.preventDefault();
                 arrangeNodes.current().then();
             }
-        });
+            if(e.ctrlKey && e.shiftKey && e.key === 'R') {
+                executeNodes();
+            }
+        };
+        // Set up keyboard shortcut for arranging nodes (Ctrl+Shift+X)
+        document.addEventListener("keydown", handler);
 
         getNodeTypes();
 
@@ -96,6 +106,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
                 saveState();
                 clean(editorRef.current).then(() => {
                     editorInitialized.current = false;
+                    document.removeEventListener('keydown', handler);
                 }).catch((err) => {
                     showNotification('error', "Error cleansing the Editor");
                 });
@@ -257,11 +268,16 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
         return connectedNodes;
     }
 
+    function executeNodes() {
+        let runner = new RunTime(editorRef.current.getNodes(), editorRef.current);
+        runner.run(state.selectedElement);
+    }
+
     return (
         <div style={{display: "flex", height: "100vh"}}>
             <SidePanel hierarchyList={hierarchyList}/>
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
-                <div id={'editor-container-rete'} style={{height: "100%"}}/>
+                <div id={`editor-container-rete-${index}`} style={{height: "100%"}}/>
             </div>
         </div>
     );

@@ -5,6 +5,7 @@ const styles = css<{ selected?: boolean }>`
     background: var(--primary);
     border-color: var(--ui-border);
     border-width: 2px;
+    color: black;
 
     .title {
         color: var(--text-on-primary);
