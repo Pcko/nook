@@ -49,7 +49,6 @@ router.post('/:projectName/pages', async (req, res) => {
 
         const pageData = {
             name: updatedPageName,
-            data: '',
             projectId: project._id,
         };
         if (folderNameTrimmed) {

@@ -11,7 +11,7 @@ const PageSchema = new Schema(
         },
         data: {
             type: String,
-            required: true,
+            default: "",
         },
         projectId: {
             type: Schema.Types.ObjectId,
