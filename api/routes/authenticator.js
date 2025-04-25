@@ -16,10 +16,10 @@ import {
 const router = express.Router();
 
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 5,
     message: {
-        message: 'Too many login attempts. Please try again in 15 minutes.'
+        message: 'Too many login attempts. Please try again in 5 minutes.'
     },
     standardHeaders: true,
     legacyHeaders: false,
