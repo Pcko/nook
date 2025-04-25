@@ -10,7 +10,7 @@ const PageSchema = new Schema(
             required: true,
         },
         data: {
-            type: Object,
+            type: String,
             required: true,
         },
         projectId: {

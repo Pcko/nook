@@ -16,9 +16,11 @@ import axios from "../auth/AxiosInstance";
 import {useEditor} from "../editor-hub/EditorContext";
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels';
 import pako from "pako";
+import {useNotifications} from "../general/NotificationContext";
 
 function WebsiteBuilder({initialState, pageInfo}) {
     const {state, dispatch} = useEditor();
+    const {showNotification} = useNotifications();
 
     const editorRef = useRef(null);
     const stateRef = useRef(state);
@@ -50,7 +52,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
                         <button style="margin:auto;" class="clear-canvas-button">Open Editor</button>
                       </div>
                     `;
-                        el.querySelector('.clear-canvas-button').onclick = () => openNodeEditor(selectedElementRef);
+                        el.querySelector('.clear-canvas-button').onclick = () => dispatch({type: 'OPEN_NODE_EDITOR'});
                         return el;
                     },
                 });
@@ -149,18 +151,22 @@ function WebsiteBuilder({initialState, pageInfo}) {
             });
 
             document.addEventListener('keydown', function (event) {
-                event.preventDefault();
-
                 if (event.shiftKey && event.key === 'O') {
+                    event.preventDefault();
                     toggleOutlines();
                 }
                 if (event.ctrlKey && event.shiftKey && event.key === "E" && stateRef.current.selectedElement) {
+                    event.preventDefault();
+                    dispatch({type: 'SET_EDITOR_DATA', payload: {components: editorRef.current.getComponents(), styles : editorRef.current.getStyle()}});
                     dispatch({type: 'OPEN_NODE_EDITOR'});
                 }
-                if (event.ctrlKey && event.key === "S" && stateRef.current.selectedElement) {
+                if (event.ctrlKey && event.key === "S") {
+                    event.preventDefault();
                     handleSave();
                 }
             });
+
+            dispatch({type: 'SET_EDITOR_STATE', payload: initialState});
             handleLoad(editorInstance);
         }
 
@@ -175,20 +181,47 @@ function WebsiteBuilder({initialState, pageInfo}) {
         stateRef.current = state;
     }, [state]);
 
+    /**
+     * Decompresses the data so that it can be saved in the DB.
+     * @param data
+     * @returns {any}
+     */
+    function decompress(data) {
+        const binaryString = atob(data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        const decompressed = pako.inflate(bytes, {to: 'string'});
+        return JSON.parse(decompressed);
+    }
+
+    /**
+     * Compresses an editor state so it can be loaded into the editor.
+     * @param data
+     * @returns {string}
+     */
+    function compress(data) {
+        const compressed = pako.deflate(data);
+        return btoa(String.fromCharCode.apply(null, compressed));
+    }
+
+    /**
+     * Loads a previous editor state.
+     *
+     * @function handleLoad
+     */
     function handleLoad(editorInstance) {
-        if (initialState) {
-            const binaryString = atob(initialState);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
+        try {
+            if (state.editorState) {
+                const parsedData = decompress(state.editorState);
+
+                editorInstance.setComponents(parsedData.components);
+                editorInstance.setStyle(parsedData.styles);
             }
-
-            const decompressed = pako.inflate(bytes, {to: 'string'});
-            const parsedData = JSON.parse(decompressed);
-
-            editorInstance.setComponents(parsedData.components);
-            editorInstance.setStyle(parsedData.styles);
-            dispatch({type: 'SET_EDITOR_STATE', payload: parsedData});
+        } catch (err) {
+            showNotification("error", "Could not load previous State!");
         }
     }
 
@@ -202,15 +235,14 @@ function WebsiteBuilder({initialState, pageInfo}) {
             const components = editorRef.current.getComponents();
             const styles = editorRef.current.getStyle();
             const dataToSave = JSON.stringify({components: components, styles: styles});
-
-            const compressed = pako.deflate(dataToSave);
-            const base64Compressed = btoa(String.fromCharCode.apply(null, compressed));
+            const compressedState = compress(dataToSave);
 
             const response = await axios.patch(`/api/projects/${pageInfo.projectName}/pages/${pageInfo.pageName}`, {
-                pageContent: base64Compressed
-            });
+                pageContent: compressedState
+            })
+            dispatch({type: 'SET_EDITOR_STATE', payload: compressedState});
         } catch (err) {
-            console.error(err);
+            showNotification("error", "Could not save State!");
         }
     };
 
