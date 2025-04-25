@@ -324,7 +324,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
                 rounded-xl shadow-md overflow-hidden border border-gray-200
                 transition-opacity duration-300 ${previewReady ? 'opacity-100' : 'opacity-0'}
             `}>
-                <div id="gjs-preview"/>
+                <div id="gjs-preview" className={"mt-[-40px]"}/>
             </div>
         </div>
     );
