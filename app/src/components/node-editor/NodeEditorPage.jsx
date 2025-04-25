@@ -37,18 +37,20 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
     index++;
     const [hierarchyList, setHierarchyList] = useState([]);
     const [nodeTypes, setNodeTypes] = useState(new Map());
+    const [previewReady, setPreviewReady] = useState(false);
 
     // Refs for persistent editor references
     const grapesjsElement = useRef(element);
+    const cloneElementForPreview = useRef(JSON.parse(JSON.stringify(element)));
     const editorRef = useRef(null);
     const engineRef = useRef(null);
     const areaRef = useRef(null);
     const editorInitialized = useRef(false);
     const arrangeNodes = useRef(null);
+    const gjsEditorRef = useRef(null);
 
     // Editor API functions
     const {create, clean, load, save, fetchNodeTypes} = Editor();
-
     const {showNotification} = useNotifications();
     const {state} = useEditor();
 
@@ -93,7 +95,7 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
                 e.preventDefault();
                 arrangeNodes.current().then();
             }
-            if(e.ctrlKey && e.shiftKey && e.key === 'R') {
+            if (e.ctrlKey && e.shiftKey && e.key === '>') {
                 executeNodes();
             }
         };
@@ -206,34 +208,41 @@ function NodeEditorPage({element, setArrangeNodes, doReload}) {
         }
     }
 
-/**
+    /**
      * Initializes GrapesJS on the specified <div id="gjs2">
      */
-useEffect(() => {
-    const gjsEditor = grapesjs.init({
-        container: '#gjs2',
-        height: '100%',
-        width: '100%',
-        fromElement: false,
-        storageManager: false,
-        panels: { defaults: [] },
-        components: [
-            element
-          ],
-    });
+    useEffect(() => {
+        function initPreview() {
+            gjsEditorRef.current = grapesjs.init({
+                container: '#gjs-preview',
+                height: '140%',
+                width: '120%',
+                fromElement: false,
+                storageManager: false,
+                panels: {defaults: []}
+            });
 
-    gjsEditor.on('load', () => {
-        const canvasBody = gjsEditor.Canvas.getBody();
-    
-        if (canvasBody) {
-          canvasBody.style.pointerEvents = 'none';
+            setPreviewReady(true)
         }
-        gjsEditor.runCommand('select-clear');
-        })
 
-    return () => gjsEditor.destroy();
-    
-}, []);
+        const timer = setTimeout(initPreview, 100);
+        return () => {
+            gjsEditorRef.current.destroy();
+            clearTimeout(timer);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (previewReady && gjsEditorRef.current) {
+            // ERST WENNS FERTIG IST SETZE ICH DIESE WERTE!!
+            gjsEditorRef.current.getWrapper().empty();
+            gjsEditorRef.current.addComponents(cloneElementForPreview.current, {keepIds: true});
+            gjsEditorRef.current.addStyle(state.editorData.styles);
+
+            // WEIL DER EDITOR NICHT DIE REFERENZ BENUTZT SONDERN EINE EIGENE KOPIE ANLEGT !!!
+            cloneElementForPreview.current = Array.from(gjsEditorRef.current.getComponents())[0]
+        }
+    }, [element, previewReady]);
 
     /**
      * Finds nodes directly connected to the starting node
@@ -301,7 +310,7 @@ useEffect(() => {
 
     function executeNodes() {
         let runner = new RunTime(editorRef.current.getNodes(), editorRef.current);
-        runner.run(state.selectedElement);
+        runner.run(cloneElementForPreview.current);
     }
 
     return (
@@ -310,7 +319,12 @@ useEffect(() => {
             <div style={{flex: 1, position: "relative"}} className={'bg-website-bg'}>
                 <div id={`editor-container-rete-${index}`} style={{height: "100%"}}/>
             </div>
-            <div id="gjs2" className="!fixed top-[100px] !right-20 !w-[250px] !h-[250px] bg-white rounded z-[1150]">
+            <div className={`
+                fixed top-20 right-5 w-64 h-64 bg-white z-[1150]
+                rounded-xl shadow-md overflow-hidden border border-gray-200
+                transition-opacity duration-300 ${previewReady ? 'opacity-100' : 'opacity-0'}
+            `}>
+                <div id="gjs-preview"/>
             </div>
         </div>
     );

@@ -158,7 +158,6 @@ function Editor() {
 
         } catch (err) {
             showNotification("error", "Could not load the NodeEditor!");
-            console.error(err)
         }
 
         return {editor, engine, area, arrangeGraph: () => arrangeNodes(), clean};

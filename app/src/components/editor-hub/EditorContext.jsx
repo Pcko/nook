@@ -8,6 +8,7 @@ const initialState = {
     tabs: [],
     activeTabIndex: 0,
     editorState: null,
+    editorData: null,
 };
 
 function editorReducer(state, action) {
@@ -20,6 +21,8 @@ function editorReducer(state, action) {
             return {...state, isNodeEditorOpen: false};
         case 'SET_EDITOR_STATE' :
             return {...state, editorState: action.payload};
+        case 'SET_EDITOR_DATA':
+            return {...state, editorData: action.payload};
         default:
             return state;
     }
