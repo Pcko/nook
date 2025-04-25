@@ -16,15 +16,25 @@ import NotificationOverlay from "./components/general/NotificationOverlay";
 
 function App() {
     useEffect(()=>{
-        const theme = localStorage.getItem('theme');
         const accessibilityMode = localStorage.getItem('accessibility');
-
-        if(theme === 'light' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)){
-            document.documentElement.classList.add('light');
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+            theme = 'system';
+            localStorage.setItem('theme', theme);
         }
 
-        if(accessibilityMode === 'high-contrast'){
+        if (accessibilityMode === 'high-contrast'){
             document.documentElement.classList.add('high-contrast');
+        }
+
+        if (theme === 'system') {
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.documentElement.classList.add('light');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+        } else {
+            document.documentElement.classList.add(theme);
         }
     }, []);
 

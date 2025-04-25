@@ -30,6 +30,7 @@
     "rete-connection-plugin": "^2.0.5",
     "rete-context-menu-plugin": "^2.0.4",
     "rete-engine": "^2.0.2",
+    "rete-history-plugin": "^2.1.0",
     "rete-minimap-plugin": "^2.0.3",
     "rete-react-plugin": "^2.0.7",
     "uuid": "^11.0.2",

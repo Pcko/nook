@@ -17,6 +17,11 @@ import {ReactArea2D, ReactPlugin, Presets as ReactPresets} from "rete-react-plug
 import {ConnectionPlugin, Presets as ConnectionPresets} from "rete-connection-plugin";
 import {ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
 import {ArrangeAppliers, AutoArrangePlugin, Presets as ArrangePresets} from "rete-auto-arrange-plugin";
+import {
+    HistoryExtensions,
+    HistoryPlugin,
+    Presets as HistoryPresets
+} from "rete-history-plugin";
 
 // Custom
 import {SerializedConnection, SerializedNode} from "./Interfaces/serialisation";
@@ -55,6 +60,7 @@ function Editor() {
         const connection = new ConnectionPlugin<Schemes, AreaExtra>();
         const arrange = new AutoArrangePlugin<Schemes, AreaExtra>();
         const engine = new ControlFlowEngine<Schemes>();
+        const history = new HistoryPlugin<Schemes>();
 
         let arrangeNodes: Function;
 
@@ -92,6 +98,8 @@ function Editor() {
             );
 
             connection.addPreset(ConnectionPresets.classic.setup());
+            HistoryExtensions.keyboard(history);
+            history.addPreset(HistoryPresets.classic.setup());
 
             editor.use(area);
             editor.use(engine);
@@ -99,6 +107,7 @@ function Editor() {
             area.use(connection);
             area.use(render);
             area.use(arrange);
+            area.use(history);
 
             AreaExtensions.simpleNodesOrder(area);
             AreaExtensions.showInputControl(area);

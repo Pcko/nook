@@ -1,38 +1,44 @@
 import { useState } from 'react'
 import HR from './SettingsHR';
+import ThemePreview from "./ThemePreview";
 
-import systemThemeIcon from '../../assets/resources/icons/system-theme.jpg';
-import darkThemeIcon from '../../assets/resources/icons/dark-theme.jpg';
-import lightThemeIcon from '../../assets/resources/icons/light-theme.jpg';
+const availableThemes = ['system', 'dark', 'light', 'volcano', 'forest', 'legacy', 'neon-pulse', 'daylight', 'cosmic'];
 
 function AppearanceSettings({changeHandler, options}){
     const {accessibility:originalAccessibility} = options;
-    const originalTheme = localStorage.getItem('theme') || 'system';
-    const [selectedTheme, setSelectedTheme] = useState(originalTheme);
+    const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('theme') || 'system');
 
     const handleThemeChange = (selectedOption) => {
-        setSelectedTheme(selectedOption);
-        //changeHandler('theme', selectedOption);
-
+        const oldTheme = localStorage.getItem('theme') || 'system';
+        const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         localStorage.setItem('theme', selectedOption);
+        setSelectedTheme(selectedOption);
 
-        if(selectedOption === 'light' || (selectedOption === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches)){
-            document.documentElement.classList.add('light');
-        }else{
-            document.documentElement.classList.remove('light');
+        if(oldTheme === 'system') {
+            document.documentElement.classList.remove(systemTheme);
+        } else {
+            document.documentElement.classList.remove(oldTheme);
+        }
+
+        if (selectedOption === 'system') {
+            document.documentElement.classList.add(systemTheme);
+        } else {
+            document.documentElement.classList.remove(oldTheme);
+            document.documentElement.classList.add(selectedOption);
         }
     };
 
     const handleAccessibilityModeChange = (selectedOption)=>{
-        //changeHandler('accessibility', selectedOption);
+        const oldSetting = localStorage.getItem('accessibility');
 
         localStorage.setItem('accessibility', selectedOption);
 
+        if(oldSetting === 'high-contrast') {
+            document.documentElement.classList.remove('high-contrast');
+        }
+
         if(selectedOption === 'high-contrast'){
             document.documentElement.classList.add('high-contrast');
-        }
-        else{
-            document.documentElement.classList.remove('high-contrast');
         }
     };
 
@@ -44,38 +50,20 @@ function AppearanceSettings({changeHandler, options}){
 
                 <h2 className="mb-3">Interface Theme</h2>
 
-                <div className="grid grid-cols-3 mx-10">
-                    <img src={systemThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('system')}}/>
-                    <img src={darkThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('dark')}}/>
-                    <img src={lightThemeIcon} className="w-10/12 m-auto border-[2px] border-ui-border rounded-[5px]" onClick={()=>{handleThemeChange('light')}}/>
-
-                    <label className="w-10/12 m-auto">
-                        <input type="radio"
-                               value="system"
-                               onChange={(e)=>{handleThemeChange(e.target.value)}}
-                               checked={selectedTheme === 'system'}
-                               className="mr-1"
-                        />
-                        System
-                    </label>
-                    <label className="w-10/12 m-auto">
-                        <input type="radio"
-                               value="dark"
-                               onChange={(e)=>{handleThemeChange(e.target.value)}}
-                               checked={selectedTheme === 'dark'}
-                               className="mr-1"
-                        />
-                        Dark
-                    </label>
-                    <label className="w-10/12 m-auto">
-                        <input type="radio"
-                               value="light"
-                               onChange={(e)=>{handleThemeChange(e.target.value)}}
-                               checked={selectedTheme === 'light'}
-                               className="mr-1"
-                        />
-                        Light
-                    </label>
+                <div className="flex flex-wrap gap-5 mx-5">
+                    {availableThemes.map(theme => (
+                        <div onClick={()=>{handleThemeChange(theme)}}>
+                            <ThemePreview theme={theme}/>
+                            <label className="w-10/12 m-auto">
+                                <input type="radio"
+                                       value={theme}
+                                       checked={selectedTheme === theme}
+                                       className="mr-1"
+                                />
+                                {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                            </label>
+                        </div>
+                    ))}
                 </div>
 
                 <HR/>
