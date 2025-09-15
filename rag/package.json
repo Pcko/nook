@@ -1,0 +1,15 @@
+{
+  "name": "nook-rag",
+  "version": "1.0.0",
+  "description": "RAG-Endpoint for Nook",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "type": "module"
+}
