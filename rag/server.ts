@@ -25,8 +25,6 @@ app.post('/query', async (req: Request, res: Response) => {
         return res.sendStatus(400);
     }
 
-    return res.sendStatus(501);
-
     // Send Request to ChromaDB if queryRequest.skipContext isn't true
     let query = queryRequest.query;
     if(!queryRequest.skipContext) {
