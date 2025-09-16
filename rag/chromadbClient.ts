@@ -1,31 +1,36 @@
 import dotenv from "dotenv";
 import type {ChromadbResponseBody} from './dto/chromadbResponseBody.dto.ts';
+import {ChromaClient} from "chromadb";
+
 dotenv.config();
 
+const client = new ChromaClient({
+    host: "localhost",
+    port: parseInt(process.env.CHROMADB_API_PORT || "8000"),
+    ssl: false
+});
+
+const collection = await getChromaDBCollection("nook-page-generation");
+
 export async function getChromaDBResponse(query: string, nResults: number): Promise<ChromadbResponseBody> {
-    try {
-        const port = process.env.CHROMADB_API_PORT || '8000';
-        const response = await fetch(`http://localhost:${port}/api/v1/query`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                collection: 'nook_context',
-                queryTexts: query,
-                n_results: nResults,
-            }),
-        });
+    const queryResult = await collection.query({
+        queryTexts: [query],
+        nResults: nResults,
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`ChromaDB API error: ${errorText}`);
-        }
+    return {
+        documents: queryResult.documents,
+    };
+}
 
-        const data = await response.json();
-        return data;
-    } catch (err) {
-        console.error('Error fetching ChromaDB response:', err);
-        throw err;
+export async function addChromaDBDocuments(documents: string[]) {
+    
+}
+
+async function getChromaDBCollection(name: string) {
+    try{
+        return await client.getCollection({name});
+    } catch (error) {
+        return await client.createCollection({name});
     }
 }
