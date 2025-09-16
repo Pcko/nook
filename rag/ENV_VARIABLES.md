@@ -10,3 +10,6 @@ SERVER_PORT=3000
 
 ### the local port on the server that serves the LLM api
 LLM_PORT=11400
+
+### the local port on the server that servers the chromadb api
+CHROMADB_API_PORT=8000
