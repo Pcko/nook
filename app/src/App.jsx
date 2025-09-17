@@ -1,0 +1,65 @@
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect } from 'react';
+
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Registration"
+import ProtectedRoute from "./components/auth/ProtectedRoute"
+import AuthRedirect from "./components/general/AuthRedirect";
+import Dashboard from "./components/dashboard/Dashboard"
+import Settings from "./components/settings/Settings";
+import EditorHub from "./components/editor-hub/EditorHub";
+
+import './index.css';
+
+import {NotificationProvider} from "./components/general/NotificationContext";
+import NotificationOverlay from "./components/general/NotificationOverlay";
+
+function App() {
+    useEffect(()=>{
+        const accessibilityMode = localStorage.getItem('accessibility');
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+            theme = 'system';
+            localStorage.setItem('theme', theme);
+        }
+
+        if (accessibilityMode === 'high-contrast'){
+            document.documentElement.classList.add('high-contrast');
+        }
+
+        if (theme === 'system') {
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.documentElement.classList.add('light');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+        } else {
+            document.documentElement.classList.add(theme);
+        }
+    }, []);
+
+    return (
+        <NotificationProvider>
+            <NotificationOverlay />
+            <Router>
+                <div className={'h-full'}>
+                    <main className={'h-full bg-far-bg text-text'}>
+                        <Routes>
+                            <Route path="/" element={<AuthRedirect/>}/>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register/>} />
+
+                            <Route element={<ProtectedRoute/>}>
+                                <Route path="/settings" element={<Settings/>} />
+                                <Route path="/dashboard" element={<Dashboard/>} />
+                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
+                            </Route>
+                        </Routes>
+                    </main>
+                </div>
+            </Router>
+        </NotificationProvider>
+    );
+}
+
+export default App;
