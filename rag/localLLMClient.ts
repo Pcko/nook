@@ -11,7 +11,7 @@ export async function getLLMResponse(query: string, model: string = 'gpt-oss:20b
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model,
+                model: model,
                 prompt: query,
                 stream: false,
             }),
