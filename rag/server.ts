@@ -4,7 +4,7 @@ import {type QueryRequestBody, isQueryRequestBody} from "./dto/queryRequestBody.
 import {type QueryResponseBody} from "./dto/queryResponseBody.dto.ts";
 import {getLLMResponse} from "./localLLMClient.ts";
 import type {LlmResponseBody} from "./dto/llmResponseBody.dto.ts";
-import {getChromaDBResponse} from "./chromadbClient.js";
+import {getChromaDBResponse, addChromaDBDocuments} from "./chromadbClient.ts";
 
 dotenv.config();
 const app = express();
@@ -46,6 +46,14 @@ app.post('/query', async (req: Request, res: Response) => {
         response: llmResponse.output
     }
     res.status(200).send(queryResponseBody);
+});
+
+app.post('/vectorResults', async (req: Request, res: Response) => {
+    res.status(200).send(await getChromaDBResponse(req.body.query));
+});
+
+app.post('/addVector', async (req: Request, res: Response) => {
+    res.status(201).send(await addChromaDBDocuments(req.body.ids, req.body.documents));
 });
 
 const port = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT) : 3000;

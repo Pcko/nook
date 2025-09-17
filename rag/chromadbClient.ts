@@ -17,6 +17,7 @@ const client = new ChromaClient({
 });
 
 const collection = await getChromaDBCollection("nook-page-generation");
+console.log(collection);
 
 export async function getChromaDBResponse(query: string, nResults: number): Promise<ChromadbResponseBody> {
     const queryResult = await collection.query({
@@ -29,8 +30,11 @@ export async function getChromaDBResponse(query: string, nResults: number): Prom
     };
 }
 
-export async function addChromaDBDocuments(documents: string[]) {
-    
+export async function addChromaDBDocuments(ids: string[], documents: string[]) {
+    await collection.add({
+       ids,
+       documents: documents,
+    });
 }
 
 async function getChromaDBCollection(name: string) {
