@@ -42,22 +42,6 @@ function WebsiteBuilder({initialState, pageInfo}) {
      */
     useEffect(() => {
         if (!editorRef.current) {
-
-            const customStyleTypePlugin = (editor) => {
-                editor.StyleManager.addType('custom-html', {
-                    create({property}) {
-                        const el = document.createElement('div');
-                        el.innerHTML = `
-                      <div>
-                        <button style="margin:auto;" class="clear-canvas-button">Open Editor</button>
-                      </div>
-                    `;
-                        el.querySelector('.clear-canvas-button').onclick = () => dispatch({type: 'OPEN_NODE_EDITOR'});
-                        return el;
-                    },
-                });
-            };
-
             const editorInstance = grapesjs.init({
                 container: "#gjs",
                 height: '100%',
@@ -76,19 +60,6 @@ function WebsiteBuilder({initialState, pageInfo}) {
                 styleManager: {
                     appendTo: '.right-panel',
                     sectors: [
-                        {
-                            name: 'Code-Editor',
-                            open: true,
-                            buildProps: ['custom'],
-                            properties: [
-                                {
-                                    property: 'custom',
-                                    type: 'custom-html',
-                                    name: ' ',
-                                    full: true,
-                                },
-                            ],
-                        },
                         {
                             name: 'Dimension',
                             open: false,
@@ -117,7 +88,7 @@ function WebsiteBuilder({initialState, pageInfo}) {
                         },
                     ],
                 },
-                plugins: ["grapesjs-blocks-basic", customStyleTypePlugin],
+                plugins: ["grapesjs-blocks-basic"],
                 pluginsOpts: {
                     "grapesjs-blocks-basic": {blocks: ["row", "column", "image"], flexGrid: true}
                 },
@@ -154,11 +125,6 @@ function WebsiteBuilder({initialState, pageInfo}) {
                 if (event.shiftKey && event.key === 'O') {
                     event.preventDefault();
                     toggleOutlines();
-                }
-                if (event.ctrlKey && event.shiftKey && event.key === "E" && stateRef.current.selectedElement) {
-                    event.preventDefault();
-                    dispatch({type: 'SET_EDITOR_DATA', payload: {components: editorRef.current.getComponents(), styles : editorRef.current.getStyle()}});
-                    dispatch({type: 'OPEN_NODE_EDITOR'});
                 }
                 if (event.ctrlKey && event.key === "S") {
                     event.preventDefault();
