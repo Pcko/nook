@@ -1,8 +1,14 @@
 import dotenv from "dotenv";
 import type {ChromadbResponseBody} from './dto/chromadbResponseBody.dto.ts';
 import {ChromaClient} from "chromadb";
+import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
 
 dotenv.config();
+
+const embedder = new OllamaEmbeddingFunction({
+    url: 'http://localhost:11434',
+    model: 'nomic-embed-text',
+});
 
 const client = new ChromaClient({
     host: "localhost",
@@ -31,6 +37,9 @@ async function getChromaDBCollection(name: string) {
     try{
         return await client.getCollection({name});
     } catch (error) {
-        return await client.createCollection({name});
+        return await client.createCollection({
+            name: name,
+            embeddingFunction: embedder
+        });
     }
 }
