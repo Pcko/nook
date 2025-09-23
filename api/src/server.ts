@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
@@ -14,13 +14,14 @@ import pageRouter from './routes/pages.js';
 
 import 'dotenv/config';
 
-const allowedOrigins = [process.env.APP_URL];
+const allowedOrigins: string[] = process.env.APP_URL ? [process.env.APP_URL] : [];
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT: number = parseInt(process.env.PORT || '8080', 10);
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));
@@ -31,9 +32,9 @@ app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/projects', authenticateToken, projectRouter);
 app.use('/api/projects', authenticateToken, pageRouter);
 
-app.get('/api/health', (req, res) => res.send('✅ API is running!'));
+app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
-app.get('*', (req, res) => {
+app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
 
