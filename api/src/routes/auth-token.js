@@ -17,7 +17,7 @@ function authenticateToken(req, res, next) {
         const { id, version } = tokenContent;
         const user = await User.findOne({ _id: id }).lean();
 
-        if (!user){
+        if (!user) {
             return res.status(401).json({ error: 'unknown_user' })
         }
 
