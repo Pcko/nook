@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
-import type {ChromadbResponseBody} from './dto/chromadbResponseBody.dto.ts';
-import {ChromaClient} from "chromadb";
+import type {ChromaDBQueryResponseBody} from './dto/chromadbQueryResponseBody.dto.ts';
+import { ChromaClient } from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
+import type {ChromaDBGetResponseBody} from "./dto/chromaDBGetResponseBody.dto.js";
 
 dotenv.config();
+const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "5");
 
 const embedder = new OllamaEmbeddingFunction({
     url: 'http://localhost:11434',
@@ -16,10 +18,12 @@ const client = new ChromaClient({
     ssl: false
 });
 
-const collection = await getChromaDBCollection("nook-page-generation");
-console.log(collection);
+const collection = await client.getOrCreateCollection({
+    name: "nook-page-generation",
+    embeddingFunction: embedder
+});
 
-export async function getChromaDBResponse(query: string, nResults: number): Promise<ChromadbResponseBody> {
+async function getChromaDBQueryResponse(query: string, nResults: number=defaultNResults): Promise<ChromaDBQueryResponseBody> {
     const queryResult = await collection.query({
         queryTexts: [query],
         nResults: nResults,
@@ -30,20 +34,24 @@ export async function getChromaDBResponse(query: string, nResults: number): Prom
     };
 }
 
-export async function addChromaDBDocuments(ids: string[], documents: string[]) {
+async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
+    return await collection.get();
+}
+
+async function removeChromaDBEntries(ids: string[]): Promise<void> {
+    await collection.delete({ids});
+}
+
+async function addChromaDBDocuments(ids: string[], documents: string[]) {
     await collection.add({
        ids,
        documents: documents,
     });
 }
 
-async function getChromaDBCollection(name: string) {
-    try{
-        return await client.getCollection({name});
-    } catch (error) {
-        return await client.createCollection({
-            name: name,
-            embeddingFunction: embedder
-        });
-    }
-}
+export default {
+    query: getChromaDBQueryResponse,
+    addDocuments: addChromaDBDocuments,
+    getEntries: getChromaDBEntries,
+    removeEntries: removeChromaDBEntries,
+};
