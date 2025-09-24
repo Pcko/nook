@@ -1,7 +1,7 @@
 ## Required parameters
 
 ### the "password" to the rag api, any request that does not contain this header (same name) set will be rejected.
-RAG_API_KEY=abcdefg
+RAG_API_KEY=
 
 ## Optional parameters (with defaults)
 
