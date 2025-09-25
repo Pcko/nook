@@ -35,7 +35,13 @@ async function getChromaDBQueryResponse(query: string, nResults: number=defaultN
 }
 
 async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
-    return await collection.get();
+    const getResult = await collection.get();
+
+    return {
+        ids: getResult.ids,
+        documents: getResult.documents,
+        metadatas: getResult.metadatas
+    };
 }
 
 async function removeChromaDBEntries(ids: string[]): Promise<void> {
