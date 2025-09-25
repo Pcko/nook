@@ -3,8 +3,8 @@ import chromaClient from "../chromadbClient.ts";
 
 const chromaRouter = Router();
 
-chromaRouter.get('/entries', (req, res) => {
-    res.status(200).send(chromaClient.getEntries());
+chromaRouter.get('/entries', async (req, res) => {
+    res.status(200).send(await chromaClient.getEntries());
 });
 
 chromaRouter.post('/query', async (req: Request, res: Response) => {

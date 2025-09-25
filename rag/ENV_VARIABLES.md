@@ -3,6 +3,9 @@
 ### the "password" to the rag api, any request that does not contain this header (same name) set will be rejected.
 RAG_API_KEY=
 
+### the LLM model name used in ollama
+Local_LLM_Model=
+
 ## Optional parameters (with defaults)
 
 ### the port the server will run on

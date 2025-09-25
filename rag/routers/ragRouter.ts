@@ -22,16 +22,14 @@ ragRouter.post('/query', async (req: Request, res: Response) => {
 
     // Get Response from LLM
     let llmResponse: LlmResponseBody;
-    if(queryRequest.forceGroq) {
-        return res.sendStatus(501);
-    } else {
+    if(queryRequest.useLocalLLM) {
         llmResponse = await getLLMResponse(query);
+    } else {
+        return res.sendStatus(501);
     }
 
     // Return LLM Response
-    const queryResponseBody: QueryResponseBody = {
-        response: llmResponse.output
-    }
+    const queryResponseBody: QueryResponseBody = llmResponse;
     res.status(200).send(queryResponseBody);
 });
 

@@ -1,4 +1,5 @@
 export interface LlmResponseBody {
-    output: string;
-    [key: string]: any;
+    think: string;
+    response: string;
+    total_duration: number;
 }

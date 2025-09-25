@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import type {LlmResponseBody} from "./dto/llmResponseBody.dto.ts";
 dotenv.config();
 
-export async function getLLMResponse(query: string, model: string = 'gpt-oss:20b'): Promise<LlmResponseBody> {
+export async function getLLMResponse(query: string): Promise<LlmResponseBody> {
     try {
         const port = process.env.LLM_API_PORT || '11434';
         const response = await fetch(`http://localhost:${port}/api/generate`, {
@@ -11,7 +11,7 @@ export async function getLLMResponse(query: string, model: string = 'gpt-oss:20b
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: model,
+                model: process.env.Local_LLM_Model,
                 prompt: query,
                 stream: false,
             }),
@@ -23,7 +23,15 @@ export async function getLLMResponse(query: string, model: string = 'gpt-oss:20b
         }
 
         const data = await response.json();
-        return data;
+        const thinkMatch = data.response.match(/<think>(.*?)<\/think>/s);
+        const think = thinkMatch ? thinkMatch[1].trim() : "";
+        const trimmedResponse = data.response.replace(/<think>.*?<\/think>/s, '').trim();
+
+        return {
+            think,
+            response: trimmedResponse,
+            total_duration: data.total_duration
+        };
     } catch (err) {
         console.error('Error fetching AI response:', err);
         throw err;
