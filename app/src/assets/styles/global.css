@@ -19,7 +19,7 @@
 }
 
 .light{
-    --primary: #9B70D5;
+    --primary: #575BC7;
     --secondary: #A79FCC;
     --primary-hover: #A07CBE;
     --text-subtle: #A1A4A7;
@@ -29,10 +29,10 @@
     --ui-bg-selected: #B0B3B8;
     --ui-button: #E1E4E8;
     --ui-button-hover: #B0B3B8;
-    --ui-border: #E1E4E8;
+    --ui-border: #CECECE;
     --ui-border-selected:#9A9EA3;
-    --ui-subtle: #A99CD9;
-    --text: #2E2E2E;
+    --ui-subtle: #575BC7;
+    --text: #2E2F30;
     --text-on-primary:#DFDFDF;
     --dangerous:#FF4d4d;
     --success: #4CAF50;
