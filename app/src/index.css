@@ -107,11 +107,11 @@ body{
 }
 
 .btn {
-  @apply px-4 py-2 rounded-md text-text-on-primary font-medium hover:bg-blue-700 transition;
+  @apply border-2 px-4 py-2 rounded-md text-text-on-primary font-medium hover:bg-blue-700 transition;
 }
 
 .form-field {
- @apply w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg
+ @apply w-full h-10 px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
 }
 
 .title{

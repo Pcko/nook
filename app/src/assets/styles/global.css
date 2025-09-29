@@ -1,60 +1,63 @@
-.dark{
-    --primary:#6B439B;
-    --secondary:#8869AD;
-    --primary-hover:#5A3382;
-    --text-subtle:#949597;
-    --far-bg:#090909;
-    --website-bg:#101012;
-    --ui-bg:#17181B;
-    --ui-bg-selected:#1E1F23;
-    --ui-button:#2D3036;
+.dark {
+    --primary: #6B439B;
+    --secondary: #8869AD;
+    --primary-hover: #5A3382;
+    --text-subtle: #949597;
+    --far-bg: #090909;
+    --website-bg: #101012;
+    --ui-bg: #17181B;
+    --ui-bg-selected: #1E1F23;
+    --ui-default: #FFFFFF;
+    --ui-button: #2D3036;
     --ui-button-hover: #1E1F23;
-    --ui-border:#2D3036;
-    --ui-border-selected:#54585E;
-    --ui-subtle:#6D54B5;
-    --text:#FFFFFF;
-    --text-on-primary:#FFFFFF;
-    --dangerous:#FF4d4d;
+    --ui-border: #2D3036;
+    --ui-border-selected: #54585E;
+    --ui-subtle: #6D54B5;
+    --text: #FFFFFF;
+    --text-on-primary: #FFFFFF;
+    --dangerous: #FF4d4d;
     --success: #4CAF50;
 }
 
-.light{
+.light {
     --primary: #575BC7;
     --secondary: #A79FCC;
     --primary-hover: #A07CBE;
     --text-subtle: #A1A4A7;
     --far-bg: #D9D9D9;
-    --website-bg: #F2F2F5;
-    --ui-bg: #F5F5F7;
+    --website-bg: #FFFFFF;
+    --ui-bg: #FCFBFC;
     --ui-bg-selected: #B0B3B8;
+    --ui-default: #FFFFFF;
     --ui-button: #E1E4E8;
     --ui-button-hover: #B0B3B8;
     --ui-border: #CECECE;
-    --ui-border-selected:#9A9EA3;
+    --ui-border-selected: #9A9EA3;
     --ui-subtle: #575BC7;
     --text: #2E2F30;
-    --text-on-primary:#DFDFDF;
-    --dangerous:#FF4d4d;
+    --text-on-primary: #DFDFDF;
+    --dangerous: #FF4d4d;
     --success: #4CAF50;
 }
 
-.volcano{
-    --primary:#E88873;
-    --secondary:#E0AC9D;
-    --primary-hover:#d97663;
-    --text-subtle:#949597;
-    --far-bg:#090909;
-    --website-bg:#101012;
-    --ui-bg:#484A47;
-    --ui-bg-selected:#3c3e3b;
-    --ui-button:#2D3036;
+.volcano {
+    --primary: #E88873;
+    --secondary: #E0AC9D;
+    --primary-hover: #d97663;
+    --text-subtle: #949597;
+    --far-bg: #090909;
+    --website-bg: #101012;
+    --ui-bg: #484A47;
+    --ui-bg-selected: #3c3e3b;
+    --ui-default: #FFFFFF;
+    --ui-button: #2D3036;
     --ui-button-hover: #1E1F23;
-    --ui-border:#5C6D70;
-    --ui-border-selected:#9BAEB0;
-    --ui-subtle:#E6A195;
-    --text:#FFFFFF;
-    --text-on-primary:#FFFFFF;
-    --dangerous:#FF4d4d;
+    --ui-border: #5C6D70;
+    --ui-border-selected: #9BAEB0;
+    --ui-subtle: #E6A195;
+    --text: #FFFFFF;
+    --text-on-primary: #FFFFFF;
+    --dangerous: #FF4d4d;
     --success: #4CAF50;
 }
 
@@ -67,6 +70,7 @@
     --website-bg: #162416;
     --ui-bg: #2E4032;
     --ui-bg-selected: #3D5A40;
+    --ui-default: #FFFFFF;
     --ui-button: #1F2F24;
     --ui-button-hover: #2C3F30;
     --ui-border: #4A6650;
@@ -86,14 +90,15 @@
     --website-bg: #F2F2F5;
     --ui-bg: #F5F5F7;
     --ui-bg-selected: #04AFD7;
+    --ui-default: #FFFFFF;
     --ui-button: #E1E4E8;
     --ui-button-hover: #B0B3B8;
     --ui-border: #E1E4E8;
-    --ui-border-selected:#9A9EA3;
+    --ui-border-selected: #9A9EA3;
     --ui-subtle: #07F49E;
     --text: #2E2E2E;
-    --text-on-primary:#202020;
-    --dangerous:#FF4d4d;
+    --text-on-primary: #202020;
+    --dangerous: #FF4d4d;
     --success: #4CAF50;
 }
 
@@ -106,6 +111,7 @@
     --website-bg: #10101A;
     --ui-bg: #1A1A2B;
     --ui-bg-selected: #222236;
+    --ui-default: #FFFFFF;
     --ui-button: #2E2E40;
     --ui-button-hover: #3A3A52;
     --ui-border: #39395C;
@@ -126,6 +132,7 @@
     --website-bg: #F2FCFB;
     --ui-bg: #F6FFFF;
     --ui-bg-selected: #D2F4F0;
+    --ui-default: #FFFFFF;
     --ui-button: #E0F4F1;
     --ui-button-hover: #C4E6E1;
     --ui-border: #C0D8D5;
@@ -146,6 +153,7 @@
     --website-bg: #121222;
     --ui-bg: #1B1B2F;
     --ui-bg-selected: #262645;
+    --ui-default: #FFFFFF;
     --ui-button: #29294C;
     --ui-button-hover: #353564;
     --ui-border: #3E3E60;
@@ -166,13 +174,14 @@
     --website-bg: #000000 !important;
     --ui-bg: #000000 !important;
     --ui-bg-selected: #FF0000 !important;
+    --ui-default: #FFFFFF;
     --ui-button: #000000 !important;
     --ui-button-hover: #333333 !important;
     --ui-border: #FFFFFF !important;
     --ui-border-selected: #00FF00 !important;
     --ui-subtle: #FFFF00 !important;
     --text: #FFFFFF !important;
-    --text-on-primary:#000000 !important;
-    --dangerous:#FFA500 !important;
+    --text-on-primary: #000000 !important;
+    --dangerous: #FFA500 !important;
     --success: #00FF00 !important;
 }
