@@ -2,10 +2,12 @@
   "name": "nook-rag",
   "version": "1.0.0",
   "description": "RAG-Endpoint for Nook",
-  "main": "server.ts",
+  "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node server.ts"
+    "dev": "tsc --watch & nodemon dist/server.js",
+    "build": "tsc",
+    "start:prod": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,7 +22,7 @@
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.0",
-    "ts-node": "^10.9.2",
+    "nodemon": "^3.1.10",
     "typescript": "^5.9.2"
   }
 }

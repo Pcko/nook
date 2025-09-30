@@ -1,5 +1,5 @@
 import {type Request, type Response, Router} from "express";
-import chromaClient from "../chromadbClient.ts";
+import chromaClient from "../chromadbClient.js";
 
 const chromaRouter = Router();
 

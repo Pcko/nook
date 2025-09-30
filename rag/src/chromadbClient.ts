@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import type {ChromaDBQueryResponseBody} from './dto/chromadbQueryResponseBody.dto.ts';
+import type {ChromaDBQueryResponseBody} from './dto/chromadbQueryResponseBody.dto.js';
 import { ChromaClient } from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
 import type {ChromaDBGetResponseBody} from "./dto/chromaDBGetResponseBody.dto.js";

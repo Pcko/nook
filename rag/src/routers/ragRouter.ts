@@ -1,9 +1,9 @@
 import {type Request, type Response, Router} from "express";
-import {isQueryRequestBody, type QueryRequestBody} from "../dto/queryRequestBody.dto.ts";
-import chromaClient from "../chromadbClient.ts";
-import type {LlmResponseBody} from "../dto/llmResponseBody.dto.ts";
-import {getLLMResponse} from "../localLLMClient.ts";
-import type {QueryResponseBody} from "../dto/queryResponseBody.dto.ts";
+import {isQueryRequestBody, type QueryRequestBody} from "../dto/queryRequestBody.dto.js";
+import chromaClient from "../chromadbClient.js";
+import type {LlmResponseBody} from "../dto/llmResponseBody.dto.js";
+import {getLLMResponse} from "../localLLMClient.js";
+import type {QueryResponseBody} from "../dto/queryResponseBody.dto.js";
 
 const ragRouter = Router();
 

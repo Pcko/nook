@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import type {LlmResponseBody} from "./dto/llmResponseBody.dto.ts";
+import type {LlmResponseBody} from "./dto/llmResponseBody.dto.js";
 dotenv.config();
 
 export async function getLLMResponse(query: string): Promise<LlmResponseBody> {
