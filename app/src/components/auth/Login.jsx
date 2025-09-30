@@ -11,8 +11,8 @@ import {FcGoogle} from "react-icons/fc";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 
 function Login() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({ username: '', password: '' });
+
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const {showNotification} = useNotifications();
@@ -27,12 +27,13 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(user));
 
         // username und password zurücksetzen, sobald der Login-Screen verlassen wird
-        setUsername('');
-        setPassword('');
+        setFormData({ username: '', password: '' });
         navigate('/dashboard');
     };
 
     const handleSubmit = async (event) => {
+        let username = formData.username;
+        let password = formData.password;
         event.preventDefault();
         setLoading(true);
 
@@ -68,21 +69,28 @@ function Login() {
     };
 
     const handle2FASubmit = async (twoFactorAuthenticationCode) => {
+        let username = formData.username;
+        let password = formData.password;
+
         if (!twoFactorAuthenticationCode) {
             setTwoFactorAuthenticationFormActive(false);
+            showNotification('error', 'Please enter the 2FA code.');
             return;
         }
         setLoading(true);
-
         try {
             const response = await axios.post('/auth/login', {username, password, otp: twoFactorAuthenticationCode});
             setTwoFactorAuthenticationFormActive(false);
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         } catch (err) {
             handleError(err);
+        }finally {
+            setLoading(false);
         }
+    };
 
-        setLoading(false);
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     if (loading) {
@@ -93,7 +101,7 @@ function Login() {
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <div id="Window"
                  className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
-                <div className="bg-blue w-[45%] p-aut flex-none justify-items-center self-center">
+                <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
                     <h1 className={"font-semibold text-4xl"}>Welcome Back</h1>
                     <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"}
                                                  onClick={() => navigate('/register')}>Register Now.</a></p>
@@ -110,8 +118,8 @@ function Login() {
                                 required
                                 minLength="2"
                                 className="form-field mb-5"
-                                onChange={(e) => setUsername(e.target.value)}
-                                value={username}
+                                onChange={(event) => handleChange(event)}
+                                value={formData.username}
                             />
 
                             {/* Password Field */}
@@ -129,8 +137,8 @@ function Login() {
                                 required
                                 minLength="10"
                                 className="form-field"
-                                onChange={(e) => setPassword(e.target.value)}
-                                value={password}
+                                onChange={(event) => handleChange(event)}
+                                value={formData.password}
                             />
 
                             {/* Sign-in Button */}
