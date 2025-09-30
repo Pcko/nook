@@ -1,49 +1,60 @@
-import {useEffect, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 
 function AuthScreenDesktopIcon() {
-    function CraneHoverAnimation({hover}) {
+    function CraneAnimation() {
         const [progress, setProgress] = useState(0);
-
+        const directionRef = useRef(1); // 1 = up, -1 = down
+        const progressRef = useRef(0);
 
         useEffect(() => {
             let animationFrame;
-            const duration = 2000; // 2s full travel
-            const startTimeRef = {current: null};
-            const startProgress = progress;
+            const duration = 190000; // ms per half-cycle
 
             const animate = (timestamp) => {
-                if (!startTimeRef.current) startTimeRef.current = timestamp;
-                const elapsed = timestamp - startTimeRef.current;
+                if (!animate.startTime) animate.startTime = timestamp;
 
-                let targetProgress = hover ? 1 : 0;
-                const deltaProgress = targetProgress - startProgress;
-                let newProgress = startProgress + (deltaProgress * (elapsed / duration));
+                const elapsed = timestamp - animate.startTime;
+                let delta = (elapsed / duration) * directionRef.current;
+                let newProgress = progressRef.current + delta;
 
-                if (hover && newProgress > 1) newProgress = 1;
-                if (!hover && newProgress < 0) newProgress = 0;
+                if (newProgress >= 1) {
+                    newProgress = 1;
+                    directionRef.current = -1;
+                    animate.startTime = timestamp;
+                    setTimeout(()=>{
+                        progressRef.current = newProgress;
+                        setProgress(newProgress);
+                        animationFrame = requestAnimationFrame(animate);
+                    }, 1000)
+                    return;
+                } else if (newProgress <= 0) {
+                    newProgress = 0;
+                    directionRef.current = 1;
+                    animate.startTime = timestamp;
+                }
 
+                progressRef.current = newProgress;
                 setProgress(newProgress);
 
-                if ((hover && newProgress < 1) || (!hover && newProgress > 0)) {
-                    animationFrame = requestAnimationFrame(animate);
-                } else {
-                    startTimeRef.current = null;
-                }
+
+                animationFrame = requestAnimationFrame(animate);
             };
 
             animationFrame = requestAnimationFrame(animate);
 
             return () => cancelAnimationFrame(animationFrame);
-        }, [hover]);
+        }, []);
 
-        // Original positions
+        // Positions hard coded :)
         const verticalStartY = 192;
         const verticalEndY = 102;
         const blockStartY = 238;
         const blockEndY = 174;
         const triangleTopYStart = 191.234;
 
-        const blockOffset = (blockStartY - blockEndY) * progress;
+        // FUNNY STUFFFFFFFFFFFFJ AAJAJAJAJAJAAHAHHAHAH
+        const easedProgress = 0.5 - 0.5 * Math.cos(Math.PI * progress);
+        const blockOffset = (blockStartY - blockEndY) * easedProgress;
         const blockY = blockStartY - blockOffset;
         const triangleY = triangleTopYStart - blockOffset;
         const cableTopY = verticalStartY - blockOffset;
@@ -51,31 +62,35 @@ function AuthScreenDesktopIcon() {
         return (
             <>
                 {/* Vertical cable */}
-                <path d={`M406.5 ${cableTopY}V${verticalEndY}`} stroke="#666BE2" strokeWidth="2"/>
+                <path d={`M406.5 ${cableTopY}V${verticalEndY}`} stroke="#666BE2" strokeWidth="2" />
                 {/* Triangle / hook */}
                 <path
                     d={`M469.666 ${blockY}H343.334L406.5 ${triangleY}L469.666 ${blockY}Z`}
                     stroke="#666BE2"
                     strokeWidth="2"
                 />
-                {/* Block being lifted */}
-                <rect x={317} y={blockY} width={193} height={83} rx={9} fill="#EEE1FF" stroke="#666BE2"
-                      strokeWidth="2"/>
+                {/* Block */}
+                <rect
+                    x={317}
+                    y={blockY}
+                    width={193}
+                    height={83}
+                    rx={9}
+                    fill="#EEE1FF"
+                    stroke="#666BE2"
+                    strokeWidth="2"
+                />
             </>
         );
     }
-
-    const [hover, setHover] = useState(false);
 
     return (
         <svg
             viewBox="0 0 759 543"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            style={{cursor: "pointer"}}
         >
+            {/* Static parts */}
             {/* All static elements */}
             <path d="M671 2L499 76" stroke="#666BE2" strokeWidth="2"/>
             <path d="M691 75L671 49.6988L691 25" stroke="#666BE2" strokeWidth="2"/>
@@ -134,8 +149,8 @@ function AuthScreenDesktopIcon() {
                 fill="#666BE2" stroke="#666BE2"/>
             <rect x="76" y="273" width="434" height="82" rx="9" fill="#C9CBFF" stroke="#666BE2" strokeWidth="2"/>
             <rect x="76" y="174" width="221" height="83" rx="9" fill="#E3F0FF" stroke="#666BE2" strokeWidth="2"/>
-            {/* Lifted block / crane animation */}
-            <CraneHoverAnimation hover={hover}/>
+            {/* Crane animation */}
+            <CraneAnimation />
         </svg>
     );
 }

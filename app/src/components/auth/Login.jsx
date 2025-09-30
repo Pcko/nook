@@ -7,7 +7,7 @@ import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeI
 import LoadingScreen from '../general/LoadingScreen';
 import useErrorHandler from "../general/ErrorHandler";
 import Divider from "./FormDivider";
-import { FcGoogle } from "react-icons/fc";
+import {FcGoogle} from "react-icons/fc";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 
 function Login() {
@@ -91,71 +91,74 @@ function Login() {
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <div id="Window" className="flex w-[98%] h-[98%] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
+            <div id="Window"
+                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
                 <div className="bg-blue w-[45%] p-aut flex-none justify-items-center self-center">
                     <h1 className={"font-semibold text-4xl"}>Welcome Back</h1>
-                    <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"} onClick={() => navigate('/login')}>Register Now.</a></p>
-                    <form onSubmit={handleSubmit} className={"w-[45%]"}>
-                        {/* Username Field */}
-                        <label htmlFor="username" className="block mb-1 mt-6">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            autoComplete={"username"}
-                            required
-                            minLength="2"
-                            className="form-field mb-3"
-                            onChange={(e) => setUsername(e.target.value)}
-                            value={username}
-                        />
+                    <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"}
+                                                 onClick={() => navigate('/register')}>Register Now.</a></p>
+                    <div className={"w-[60%]"}>
+                        <form onSubmit={handleSubmit}>
+                            {/* Username Field */}
+                            <label htmlFor="username" className="block mb-1 mt-6">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                autoComplete={"username"}
+                                placeholder={"Username"}
+                                required
+                                minLength="2"
+                                className="form-field mb-5"
+                                onChange={(e) => setUsername(e.target.value)}
+                                value={username}
+                            />
 
-                        {/* Password Field */}
-                        <label htmlFor="password" className="block">Password
-                            <a className={"text-ui-subtle hover:cursor-pointer ml-3"}
-                               onClick={() => navigate('/register')}>Forgot your password?</a>
-                        </label>
+                            {/* Password Field */}
+                            <label htmlFor="password" className="block">Password
+                                <a className={"text-ui-subtle hover:cursor-pointer ml-3 mt-6"}
+                                   onClick={() => navigate('/register')}>Forgot your password?</a>
+                            </label>
 
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            autoComplete={"current-password"}
-                            required
-                            minLength="10"
-                            className="form-field"
-                            onChange={(e) => setPassword(e.target.value)}
-                            value={password}
-                        />
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder={"Password"}
+                                autoComplete={"current-password"}
+                                required
+                                minLength="10"
+                                className="form-field"
+                                onChange={(e) => setPassword(e.target.value)}
+                                value={password}
+                            />
 
-                        {/* Sign-in Button */}
-                        <input
-                            type={"submit"}
-                            id="sign-up"
-                            className={`btn w-full mt-10 ${loading ? 'animate-pulse' : ''}`}
-                            value="Login"
-                        >
-                        </input>
+                            {/* Sign-in Button */}
+                            <input
+                                type={"submit"}
+                                id="sign-up"
+                                className={`prim-btn w-full mt-6 ${loading ? 'animate-pulse' : ''}`}
+                                value="Login"
+                            >
+                            </input>
 
-                        <Divider className={"mt-7"} dividerText={"Or Login With"}/>
+                            <Divider className={"mt-6"} dividerText={"Or Login With"}/>
 
+                        </form>
                         <button
-                            className={`btn border-ui-border bg-white w-full mt-10 flex items-center justify-center gap-2 hover:bg-ui-button-hover ${loading ? 'animate-pulse' : ''}`}>
+                            className={`btn border-ui-border bg-ui-default w-full mt-6 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
                             <FcGoogle className="text-xl"/>
                             <span className={"text-text"}>Google</span>
                         </button>
-
-                    </form>
+                    </div>
                 </div>
-                <div className="flex-1 justify-items-center self-center">
+                <div className="flex-1 justify-items-center self-center p-[100px]">
                     <AuthScreenDesktopIcon/>
                 </div>
             </div>
 
             {/* Dynamically rendered form */}
-            {twoFactorAuthenticationFormActive ?
-                <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>
-                : ''}
+            {twoFactorAuthenticationFormActive && <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>}
         </div>
     );
 }
