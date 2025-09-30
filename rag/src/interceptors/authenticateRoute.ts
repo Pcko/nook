@@ -1,7 +1,4 @@
 import type {Request, Response, NextFunction} from "express";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export default function authenticate(req : Request, res :Response, next: NextFunction) {
     if(!process.env.RAG_API_KEY || req.headers['authorization'] !== process.env.RAG_API_KEY) {
