@@ -1,6 +1,5 @@
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import axios from '../auth/AxiosInstance'
 import {useNotifications} from '../general/NotificationContext';
 import {isInvalidStringForPassword, isInvalidStringForUsername} from '../general/FormChecks';
 import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
@@ -9,9 +8,10 @@ import useErrorHandler from "../general/ErrorHandler";
 import Divider from "./FormDivider";
 import {FcGoogle} from "react-icons/fc";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+import AuthService from "../../services/AuthService";
 
 function Login() {
-    const [formData, setFormData] = useState({ username: '', password: '' });
+    const [formData, setFormData] = useState({username: '', password: ''});
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(user));
 
         // username und password zurücksetzen, sobald der Login-Screen verlassen wird
-        setFormData({ username: '', password: '' });
+        setFormData({username: '', password: ''});
         navigate('/dashboard');
     };
 
@@ -45,16 +45,7 @@ function Login() {
 
         /* Axios Request */
         try {
-            const response = await axios.post('/auth/login', {
-                username,
-                password
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                timeout: 5000,
-                timeoutErrorMessage: 'Server did not respond.',
-            });
+            const response = await AuthService.login(username, password);
 
             if (response.status === 202) {
                 setTwoFactorAuthenticationFormActive(true);
@@ -79,18 +70,18 @@ function Login() {
         }
         setLoading(true);
         try {
-            const response = await axios.post('/auth/login', {username, password, otp: twoFactorAuthenticationCode});
+            const response = await AuthService.login2FA(username, password, twoFactorAuthenticationCode);
             setTwoFactorAuthenticationFormActive(false);
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
         } catch (err) {
             handleError(err);
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({...formData, [e.target.name]: e.target.value});
     };
 
     if (loading) {
