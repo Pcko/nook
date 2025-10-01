@@ -96,7 +96,7 @@ function Login() {
                     <h1>Welcome Back</h1>
                     <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"}
                                                  onClick={() => navigate('/register')}>Register Now.</a></p>
-                    <div className={"w-[60%]"}>
+                    <div className={"w-[55%]"}>
                         <form onSubmit={handleSubmit} className="mt-2">
                             {/* Username Field */}
                             <label htmlFor="username" className="block mb-1">Username</label>

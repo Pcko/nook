@@ -23,7 +23,7 @@ body {
     h4 { @apply text-h4; }
     h5 { @apply text-h5; }
     h6 { @apply text-h6; }
-    p, label, input, button {
+    p, label, input, input::placeholder, button {
         @apply text-regular;
     }
     small { @apply text-small; }

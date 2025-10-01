@@ -80,9 +80,9 @@ function Registration() {
                 <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
                     <h1>Create an Account</h1>
                     <p>Already have an account? <a className={"text-ui-subtle hover:cursor-pointer"}
-                                                   onClick={() => navigate('/login')}>Log in.</a></p>
+                                                   onClick={() => navigate('/login')}>Sign in.</a></p>
 
-                    <div className={"w-[60%]"}>
+                    <div className={"w-[55%]"}>
                         <form onSubmit={handleSubmit} className="mt-2">
 
                             {/* Username */}
