@@ -10,11 +10,23 @@
     width: 100vw;
     height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
-    @apply text-[14px]
 }
 
 body {
     overflow: hidden;
+}
+
+@layer base {
+    h1 { @apply text-h1; }
+    h2 { @apply text-h2; }
+    h3 { @apply text-h3; }
+    h4 { @apply text-h4; }
+    h5 { @apply text-h5; }
+    h6 { @apply text-h6; }
+    p, label, input, button {
+        @apply text-regular;
+    }
+    small { @apply text-small; }
 }
 
 .full-screen-grid {
@@ -119,10 +131,11 @@ body {
     @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
 }
 
+
 .title {
     @apply px-4 py-2 text-sm font-medium text-white
 }
 
 h1{
-    @apply text-[32.5px] font-semibold leading-tight;
+    @apply font-semibold leading-tight;
 }
