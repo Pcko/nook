@@ -1,0 +1,29 @@
+{
+  "name": "nook-rag",
+  "version": "1.0.0",
+  "description": "RAG-Endpoint for Nook",
+  "main": "src/server.ts",
+  "scripts": {
+    "test": "echo \"no test specified\"",
+    "dev": "tsc --watch & nodemon dist/server.js",
+    "build": "tsc",
+    "prod": "node dist/server.js",
+    "start": "npm run prod"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@chroma-core/ollama": "^0.1.7",
+    "chromadb": "^3.0.15",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.0",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.9.2"
+  }
+}
