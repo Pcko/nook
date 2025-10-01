@@ -1,5 +1,5 @@
 import {type Request, type Response, Router} from "express";
-import {isQueryRequestBody, type QueryRequestBody} from "../dto/queryRequestBody.dto.js";
+import { type QueryRequestBody} from "../dto/queryRequestBody.dto.js";
 import chromaClient from "../chromadbClient.js";
 import type {LlmResponseBody} from "../dto/llmResponseBody.dto.js";
 import {getLLMResponse} from "../localLLMClient.js";
@@ -7,11 +7,8 @@ import type {QueryResponseBody} from "../dto/queryResponseBody.dto.js";
 
 const ragRouter = Router();
 
-ragRouter.post('/query', async (req: Request, res: Response) => {
-    const queryRequest = req.body as QueryRequestBody;
-    if(!isQueryRequestBody(queryRequest)) {
-        return res.sendStatus(400);
-    }
+ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody| { error: string }>) => {
+    const queryRequest = req.body;
 
     // Send Request to ChromaDB if queryRequest.skipContext isn't true
     let query = queryRequest.query;
