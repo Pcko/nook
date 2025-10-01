@@ -23,6 +23,7 @@ module.exports = {
                 "website-bg": "var(--website-bg)",
                 "ui-bg": "var(--ui-bg)",
                 "ui-bg-selected": "var(--ui-bg-selected)",
+                "ui-default": "var(--ui-default)",
                 "ui-button": "var(--ui-button)",
                 "ui-button-hover": "var(--ui-button-hover)",
                 "ui-border": "var(--ui-border)",
