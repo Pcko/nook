@@ -45,7 +45,7 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
             return res.sendStatus(400);
         }
 
-        const user = await User.findOne({ _id: username }) as IUserDocument | null;;
+        const user = await User.findOne({ _id: username }) as IUserDocument | null;
 
         //make sure username exists
         if (!user) {
