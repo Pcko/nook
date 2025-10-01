@@ -1,89 +1,90 @@
 import { useEffect, useRef, useState } from "react";
+import React from "react";
 
-function AuthScreenDesktopIcon() {
-    function CraneAnimation() {
-        const [progress, setProgress] = useState(0);
-        const directionRef = useRef(1); // 1 = up, -1 = down
-        const progressRef = useRef(0);
+function CraneAnimation() {
+    const [progress, setProgress] = useState(0);
+    const directionRef = useRef(1); // 1 = up, -1 = down
+    const progressRef = useRef(0);
 
-        useEffect(() => {
-            let animationFrame;
-            const duration = 190000; // ms per half-cycle
+    useEffect(() => {
+        let animationFrame;
+        const duration = 190000; // ms per half-cycle
 
-            const animate = (timestamp) => {
-                if (!animate.startTime) animate.startTime = timestamp;
+        const animate = (timestamp) => {
+            if (!animate.startTime) animate.startTime = timestamp;
 
-                const elapsed = timestamp - animate.startTime;
-                let delta = (elapsed / duration) * directionRef.current;
-                let newProgress = progressRef.current + delta;
+            const elapsed = timestamp - animate.startTime;
+            let delta = (elapsed / duration) * directionRef.current;
+            let newProgress = progressRef.current + delta;
 
-                if (newProgress >= 1) {
-                    newProgress = 1;
-                    directionRef.current = -1;
-                    animate.startTime = timestamp;
-                    setTimeout(()=>{
-                        progressRef.current = newProgress;
-                        setProgress(newProgress);
-                        animationFrame = requestAnimationFrame(animate);
-                    }, 1000)
-                    return;
-                } else if (newProgress <= 0) {
-                    newProgress = 0;
-                    directionRef.current = 1;
-                    animate.startTime = timestamp;
-                }
+            if (newProgress >= 1) {
+                newProgress = 1;
+                directionRef.current = -1;
+                animate.startTime = timestamp;
+                setTimeout(()=>{
+                    progressRef.current = newProgress;
+                    setProgress(newProgress);
+                    animationFrame = requestAnimationFrame(animate);
+                }, 1000)
+                return;
+            } else if (newProgress <= 0) {
+                newProgress = 0;
+                directionRef.current = 1;
+                animate.startTime = timestamp;
+            }
 
-                progressRef.current = newProgress;
-                setProgress(newProgress);
+            progressRef.current = newProgress;
+            setProgress(newProgress);
 
-
-                animationFrame = requestAnimationFrame(animate);
-            };
 
             animationFrame = requestAnimationFrame(animate);
+        };
 
-            return () => cancelAnimationFrame(animationFrame);
-        }, []);
+        animationFrame = requestAnimationFrame(animate);
 
-        // Positions hard coded :)
-        const verticalStartY = 192;
-        const verticalEndY = 102;
-        const blockStartY = 238;
-        const blockEndY = 174;
-        const triangleTopYStart = 191.234;
+        return () => cancelAnimationFrame(animationFrame);
+    }, []);
 
-        // FUNNY STUFFFFFFFFFFFFJ AAJAJAJAJAJAAHAHHAHAH
-        const easedProgress = 0.5 - 0.5 * Math.cos(Math.PI * progress);
-        const blockOffset = (blockStartY - blockEndY) * easedProgress;
-        const blockY = blockStartY - blockOffset;
-        const triangleY = triangleTopYStart - blockOffset;
-        const cableTopY = verticalStartY - blockOffset;
+    // Positions hard coded :)
+    const verticalStartY = 192;
+    const verticalEndY = 102;
+    const blockStartY = 238;
+    const blockEndY = 174;
+    const triangleTopYStart = 191.234;
 
-        return (
-            <>
-                {/* Vertical cable */}
-                <path d={`M406.5 ${cableTopY}V${verticalEndY}`} stroke="#666BE2" strokeWidth="2" />
-                {/* Triangle / hook */}
-                <path
-                    d={`M469.666 ${blockY}H343.334L406.5 ${triangleY}L469.666 ${blockY}Z`}
-                    stroke="#666BE2"
-                    strokeWidth="2"
-                />
-                {/* Block */}
-                <rect
-                    x={317}
-                    y={blockY}
-                    width={193}
-                    height={83}
-                    rx={9}
-                    fill="#EEE1FF"
-                    stroke="#666BE2"
-                    strokeWidth="2"
-                />
-            </>
-        );
-    }
+    // FUNNY STUFFFFFFFFFFFFJ AAJAJAJAJAJAAHAHHAHAH
+    const easedProgress = 0.5 - 0.5 * Math.cos(Math.PI * progress);
+    const blockOffset = (blockStartY - blockEndY) * easedProgress;
+    const blockY = blockStartY - blockOffset;
+    const triangleY = triangleTopYStart - blockOffset;
+    const cableTopY = verticalStartY - blockOffset;
 
+    return (
+        <>
+            {/* Vertical cable */}
+            <path d={`M406.5 ${cableTopY}V${verticalEndY}`} stroke="#666BE2" strokeWidth="2" />
+            {/* Triangle / hook */}
+            <path
+                d={`M469.666 ${blockY}H343.334L406.5 ${triangleY}L469.666 ${blockY}Z`}
+                stroke="#666BE2"
+                strokeWidth="2"
+            />
+            {/* Block */}
+            <rect
+                x={317}
+                y={blockY}
+                width={193}
+                height={83}
+                rx={9}
+                fill="#EEE1FF"
+                stroke="#666BE2"
+                strokeWidth="2"
+            />
+        </>
+    );
+}
+
+function AuthScreenDesktopIcon() {
     return (
         <svg
             viewBox="0 0 759 543"
@@ -155,4 +156,4 @@ function AuthScreenDesktopIcon() {
     );
 }
 
-export default AuthScreenDesktopIcon;
+export default React.memo(AuthScreenDesktopIcon);

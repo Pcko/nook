@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { useEffect } from 'react';
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import React, {useEffect} from 'react';
 
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Registration"
@@ -15,7 +15,7 @@ import {NotificationProvider} from "./components/general/NotificationContext";
 import NotificationOverlay from "./components/general/NotificationOverlay";
 
 function App() {
-    useEffect(()=>{
+    useEffect(() => {
         const accessibilityMode = localStorage.getItem('accessibility');
         let theme = localStorage.getItem('theme');
         if (!theme) {
@@ -23,7 +23,7 @@ function App() {
             localStorage.setItem('theme', theme);
         }
 
-        if (accessibilityMode === 'high-contrast'){
+        if (accessibilityMode === 'high-contrast') {
             document.documentElement.classList.add('high-contrast');
         }
 
@@ -40,7 +40,7 @@ function App() {
 
     return (
         <NotificationProvider>
-            <NotificationOverlay />
+            <NotificationOverlay/>
             <Router>
                 <div className={'h-full'}>
                     <main className={'h-full bg-far-bg text-text'}>

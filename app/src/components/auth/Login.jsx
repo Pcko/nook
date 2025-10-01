@@ -93,13 +93,13 @@ function Login() {
             <div id="Window"
                  className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
                 <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
-                    <h1 className={"font-semibold text-4xl"}>Welcome Back</h1>
+                    <h1>Welcome Back</h1>
                     <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"}
                                                  onClick={() => navigate('/register')}>Register Now.</a></p>
                     <div className={"w-[60%]"}>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} className="mt-2">
                             {/* Username Field */}
-                            <label htmlFor="username" className="block mb-1 mt-6">Username</label>
+                            <label htmlFor="username" className="block mb-1">Username</label>
                             <input
                                 type="text"
                                 id="username"
@@ -136,16 +136,16 @@ function Login() {
                             <input
                                 type={"submit"}
                                 id="sign-up"
-                                className={`prim-btn w-full mt-6 ${loading ? 'animate-pulse' : ''}`}
+                                className={`prim-btn w-full ${loading ? 'animate-pulse' : ''}`}
                                 value="Login"
                             >
                             </input>
 
-                            <Divider className={"mt-6"} dividerText={"Or Login With"}/>
+                            <Divider className={"mt-5"} dividerText={"Or Login With"}/>
 
                         </form>
                         <button
-                            className={`btn border-ui-border bg-ui-default w-full mt-6 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
+                            className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
                             <FcGoogle className="text-xl"/>
                             <span className={"text-text"}>Google</span>
                         </button>

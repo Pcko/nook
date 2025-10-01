@@ -1,8 +1,6 @@
-import NookBackground from "../general/NookBackground"
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import axios from '../auth/AxiosInstance'
-import ImageCarousel from "./ImageCarousel";
+import {useNotifications} from '../general/NotificationContext';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
@@ -10,52 +8,55 @@ import {
     isInvalidStringForPassword,
     isInvalidStringForUsername
 } from '../general/FormChecks';
-import {useNotifications} from '../general/NotificationContext'
 import LoadingScreen from "../general/LoadingScreen";
 import useErrorHandler from "../general/ErrorHandler";
+import Divider from "./FormDivider";
+import {FcGoogle} from "react-icons/fc";
+import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+import AuthService from "../../services/AuthService";
 
 function Registration() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [errorDisplay, setErrorDisplay] = useState('')
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        email: ''
+    });
+
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
     const handleError = useErrorHandler();
+
+    const handleChange = (e) => {
+        setFormData({...formData, [e.target.name]: e.target.value});
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         /* Form Checks */
-        const result =
-            isInvalidStringForUsername(username) ||
-            isInvalidStringForPassword(password) ||
-            isInvalidStringForFirstName(firstName) ||
-            isInvalidStringForLastName(lastName) ||
-            isInvalidStringForEmail(email);
-        if (result) {
-            return showNotification('error', result);
+        const error =
+            isInvalidStringForUsername(formData.username) ||
+            isInvalidStringForPassword(formData.password) ||
+            isInvalidStringForFirstName(formData.firstName) ||
+            isInvalidStringForLastName(formData.lastName) ||
+            isInvalidStringForEmail(formData.email);
+
+        if (error) {
+            return showNotification('error', error);
         }
 
         try {
             setLoading(true);
-
-            const response = await axios.post('/auth/register', {
-                username,
-                password,
-                firstName,
-                lastName,
-                email
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                timeout: 5000,
-                timeoutErrorMessage: 'Server did not respond.',
-            })
+            await AuthService.register(
+                formData.username,
+                formData.password,
+                formData.firstName,
+                formData.lastName,
+                formData.email
+            );
 
             showNotification('success', 'Account creation was successful!');
             navigate('/login');
@@ -64,30 +65,27 @@ function Registration() {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
-    if(loading){
+    if (loading) {
         return <LoadingScreen/>
     }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <NookBackground/>
             <div id="Window"
-                 className="min-h-[650] w-[1000px] p-3 text-text bg-ui-bg border-[1px] border-ui-border rounded-xl z-10">
-                {/*<img src={logo} className={"w-[35%] right-5 ml-auto"}></img>*/}
+                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
 
-                <div className={"w-full grid grid-cols-2 gap-[2vw]"}>
-                    <ImageCarousel/>
-                    <div className={"m-[10%]"}>
-                        <h1 className="text-3xl mb-2">Create an Account</h1>
+                {/* Left side: Registration form */}
+                <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
+                    <h1>Create an Account</h1>
+                    <p>Already have an account? <a className={"text-ui-subtle hover:cursor-pointer"}
+                                                   onClick={() => navigate('/login')}>Log in.</a></p>
 
-                        <span>Already have an account? </span>
-                        <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                           onClick={() => navigate('/login')}>Log in</a>
+                    <div className={"w-[60%]"}>
+                        <form onSubmit={handleSubmit} className="mt-2">
 
-                        <form onSubmit={handleSubmit} className={"w-full mt-6"}>
-                            {/* Username Field */}
+                            {/* Username */}
                             <label htmlFor="username" className="block mb-1">Username</label>
                             <input
                                 type="text"
@@ -95,25 +93,16 @@ function Registration() {
                                 name="username"
                                 required
                                 minLength="2"
-                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3 autofill:bg-ui-bg"
-                                onChange={(e) => setUsername(e.target.value)}
+                                autoComplete="username"
+                                placeholder="Username"
+                                className="form-field"
+                                onChange={handleChange}
+                                value={formData.username}
                             />
 
-                            {/* Password Field */}
-                            <label htmlFor="password" className="block mb-1">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                required
-                                minLength="10"
-                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-
-                            <div className={"w-full grid grid-cols-2 gap-[2vw] mt-3"}>
+                            {/* First/Last Name */}
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    {/* First Name Field */}
                                     <label htmlFor="firstName" className="block mb-1">First Name</label>
                                     <input
                                         type="text"
@@ -121,12 +110,13 @@ function Registration() {
                                         name="firstName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                                        onChange={(e) => setFirstName(e.target.value)}
+                                        placeholder="First Name"
+                                        className="form-field"
+                                        onChange={handleChange}
+                                        value={formData.firstName}
                                     />
                                 </div>
                                 <div>
-                                    {/* Last Name Field */}
                                     <label htmlFor="lastName" className="block mb-1">Last Name</label>
                                     <input
                                         type="text"
@@ -134,46 +124,65 @@ function Registration() {
                                         name="lastName"
                                         required
                                         minLength="2"
-                                        className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                                        onChange={(e) => setLastName(e.target.value)}
+                                        placeholder="Last Name"
+                                        className="form-field"
+                                        onChange={handleChange}
+                                        value={formData.lastName}
                                     />
                                 </div>
                             </div>
 
-
-                            {/* Email Field */}
+                            {/* Email */}
                             <label htmlFor="email" className="block mb-1">Email</label>
                             <input
                                 type="email"
                                 id="email"
                                 name="email"
                                 required
-                                className="h-8 w-full border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 mb-3"
-                                onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="email"
+                                placeholder="Email"
+                                className="form-field"
+                                onChange={handleChange}
+                                value={formData.email}
                             />
 
-                            {/* Terms and Conditions checkbox */}
+
+                            {/* Password */}
+                            <label htmlFor="password" className="block mb-1">Password</label>
                             <input
-                                type="checkbox"
-                                id="terms"
-                                name="terms"
+                                type="password"
+                                id="password"
+                                name="password"
                                 required
-                                className={"mr-2"}
+                                minLength="10"
+                                autoComplete="new-password"
+                                placeholder="Password"
+                                className="form-field"
+                                onChange={handleChange}
+                                value={formData.password}
                             />
-                            I agree to the <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                                              onClick={() => navigate('/terms-and-conditions')}>Terms and Conditions</a>.
 
-                            {/* Conditionally show error message */}
-                            {errorDisplay && <p id="authErrorDisplay" className="text-red-500">{errorDisplay}</p>}
-
+                            {/* Submit */}
                             <input
                                 type="submit"
-                                className={`btn w-full mt-3 ${loading ? 'animate-pulse' : ''}`}
+                                className={`prim-btn w-full ${loading ? 'animate-pulse' : ''}`}
                                 value="Register"
-                            >
-                            </input>
+                            />
+
+                            <Divider className="mt-5" dividerText="Or Register With"/>
+
                         </form>
+                        <button
+                            className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
+                            <FcGoogle className="text-xl"/>
+                            <span className="text-text">Google</span>
+                        </button>
                     </div>
+                </div>
+
+                {/* Right side: illustration / graphic */}
+                <div className="flex-1 justify-items-center self-center p-[100px]">
+                    <AuthScreenDesktopIcon/>
                 </div>
             </div>
         </div>

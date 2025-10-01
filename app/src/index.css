@@ -10,6 +10,7 @@
     width: 100vw;
     height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
+    @apply text-[14px]
 }
 
 body {
@@ -115,9 +116,13 @@ body {
 }
 
 .form-field {
-    @apply w-full h-10 px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
+    @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
 }
 
 .title {
     @apply px-4 py-2 text-sm font-medium text-white
+}
+
+h1{
+    @apply text-[32.5px] font-semibold leading-tight;
 }
