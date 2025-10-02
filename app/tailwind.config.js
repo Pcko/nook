@@ -34,6 +34,17 @@ module.exports = {
                 "dangerous": "var(--dangerous)",
                 "success": "var(--success)",
             },
+            fontSize: {
+                h1: "32.5px",
+                h2: "29px",
+                h3: "25.5px",
+                h4: "23px",
+                h5: "20px",
+                h6: "18px",
+                regular: "16px",
+                small: "14px",
+                tiny: "12.5px",
+            },
         },
     },
     plugins: [
