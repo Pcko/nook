@@ -82,7 +82,7 @@ function Registration() {
                     <p>Already have an account? <a className={"text-ui-subtle hover:cursor-pointer"}
                                                    onClick={() => navigate('/login')}>Sign in.</a></p>
 
-                    <div className={"w-[55%]"}>
+                    <div className={"w-[60%]"}>
                         <form onSubmit={handleSubmit} className="mt-2">
 
                             {/* Username */}
@@ -145,7 +145,6 @@ function Registration() {
                                 onChange={handleChange}
                                 value={formData.email}
                             />
-
 
                             {/* Password */}
                             <label htmlFor="password" className="block mb-1">Password</label>

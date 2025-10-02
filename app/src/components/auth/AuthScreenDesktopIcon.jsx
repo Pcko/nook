@@ -45,14 +45,13 @@ function CraneAnimation() {
         return () => cancelAnimationFrame(animationFrame);
     }, []);
 
-    // Positions hard coded :)
+    // Positions
     const verticalStartY = 192;
     const verticalEndY = 102;
     const blockStartY = 238;
     const blockEndY = 174;
     const triangleTopYStart = 191.234;
 
-    // FUNNY STUFFFFFFFFFFFFJ AAJAJAJAJAJAAHAHHAHAH
     const easedProgress = 0.5 - 0.5 * Math.cos(Math.PI * progress);
     const blockOffset = (blockStartY - blockEndY) * easedProgress;
     const blockY = blockStartY - blockOffset;
