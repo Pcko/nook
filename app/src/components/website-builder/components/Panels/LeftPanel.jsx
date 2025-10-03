@@ -1,5 +1,13 @@
 import React from "react";
 
+/**
+ * LeftPanel component
+ *
+ * Renders the left sidebar for the website builder, including the GrapesJS block manager (#blocks)
+ *
+ * @component
+ * @returns {JSX.Element} The rendered left panel
+ */
 function LeftPanel() {
   return (
     <div className="w-1/5 min-w-[200px] bg-gray-200 p-2 overflow-y-auto">

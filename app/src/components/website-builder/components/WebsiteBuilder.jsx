@@ -7,12 +7,28 @@ import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
 
-function BasicWebsiteBuilder() {
+/**
+ * WebsiteBuilder component
+ *
+ * Provides the main layout for the website builder application.
+ * Integrates the GrapesJS editor with panels:
+ * - {@link TopPanel} for toolbar controls
+ * - {@link LeftPanel} for block management
+ * - {@link RightPanel} for style management
+ *
+ * The central editor is initialized using the {@link useGrapesEditor} hook,
+ *
+ * @component
+ * @returns {JSX.Element} The rendered website builder layout with editor and panels
+ */
+function WebsiteBuilder() {
   const { containerRef } = useGrapesEditor({
-    height: '100%',
-    fromElement: false,
-    storageManager: false,
-    panels: {defaults: []},
+    height: '100%',           // Editor canvas height
+    fromElement: false,       // Don't take initial HTML from container
+    storageManager: false,    // Disable built-in localStorage/remote storage
+    panels: {defaults: []},   // Remove default GrapesJS panels
+    blockManager: { appendTo: "#blocks" },        // Render blocks inside #blocks
+    styleManager: { appendTo: ".right-panel" },   // Render style manager inside .right-panel
   });
 
   return (
@@ -32,4 +48,4 @@ function BasicWebsiteBuilder() {
   );
 }
 
-export default BasicWebsiteBuilder;
+export default WebsiteBuilder;

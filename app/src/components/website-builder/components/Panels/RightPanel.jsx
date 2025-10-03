@@ -1,5 +1,14 @@
 import React from "react";
 
+/**
+ * RightPanel component
+ *
+ * Renders the right sidebar for the website builder.
+ * Contains the GrapesJS style manager
+ *
+ * @component
+ * @returns {JSX.Element} The rendered right panel
+ */
 function RightPanel() {
   return (
     <div className="w-1/5 min-w-[200px] bg-gray-200 p-2 overflow-y-auto">

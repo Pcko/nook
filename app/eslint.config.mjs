@@ -4,6 +4,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import jsdoc from "eslint-plugin-jsdoc";
 
 export default [
   js.configs.recommended,
@@ -27,6 +28,7 @@ export default [
       "react-refresh": reactRefresh,
       "jsx-a11y": jsxA11y,
       import: importPlugin,
+      jsdoc,
     },
     rules: {
       // React/JSX
@@ -50,7 +52,7 @@ export default [
       ],
 
       // React Hooks
-      "react-hooks/rules-of-hooks": "error", // this one should stay error (critical!)
+      "react-hooks/rules-of-hooks": "error", // critical!
       "react-hooks/exhaustive-deps": "warn",
 
       // Code safety
@@ -72,11 +74,37 @@ export default [
       // Accessibility
       "jsx-a11y/alt-text": "warn",
       "jsx-a11y/click-events-have-key-events": "warn",
+
+      // JSDoc
+      "jsdoc/require-jsdoc": [
+        "warn",
+        {
+          contexts: [
+            "FunctionDeclaration",
+            "FunctionExpression",
+            "ArrowFunctionExpression",
+            "ClassDeclaration",
+            "MethodDefinition",
+          ],
+          require: {
+            FunctionDeclaration: true,
+            ClassDeclaration: true,
+            MethodDefinition: true,
+            ArrowFunctionExpression: false,
+            FunctionExpression: false,
+          },
+        },
+      ],
+      "jsdoc/require-param": "warn",
+      "jsdoc/require-returns": "warn",
     },
     settings: {
       react: { version: "detect" },
       "import/resolver": {
         node: { extensions: [".js", ".jsx"] },
+      },
+      jsdoc: {
+        mode: "typescript", // use TS-style annotations for better tooling, even in JS
       },
     },
   },

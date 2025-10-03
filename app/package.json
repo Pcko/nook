@@ -1,7 +1,6 @@
 {
   "name": "app",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -37,6 +36,7 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.36.0",
     "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^60.7.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^6.1.0",

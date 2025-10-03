@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 import "grapesjs/dist/css/grapes.min.css";
 import { loadCustomBlocks } from "../utils/grapesBlocks";
 
+/**
+ * Custom React hook to initialize and manage a GrapesJS editor instance.
+ *
+ * @param {object} config - GrapesJS configuration object passed to grapesjs.init
+ * @returns {{editorRef, containerRef}}
+ */
 export function useGrapesEditor(config) {
   const containerRef = useRef(null);
   const editorRef = useRef(null);
@@ -12,12 +18,10 @@ export function useGrapesEditor(config) {
     if (containerRef.current && !editorRef.current) {
       editorRef.current = grapesjs.init({
         ...config,
-        container: containerRef.current,
-        blockManager: { appendTo: "#blocks" },
-        styleManager: { appendTo: ".right-panel" },
+        container: containerRef.current, 
       });
 
-      loadCustomBlocks(editorRef.current); // Load blocks
+      loadCustomBlocks(editorRef.current); // Loads blocks
     }
 
     return () => {
