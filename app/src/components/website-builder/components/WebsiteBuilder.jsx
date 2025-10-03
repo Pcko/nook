@@ -1,8 +1,10 @@
 import React from "react";
+
 import { useGrapesEditor } from "../hooks/useGrapesEditor";
-import TopPanel from "./Panels/TopPanel";
+
 import LeftPanel from "./Panels/LeftPanel";
 import RightPanel from "./Panels/RightPanel";
+import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
 
 function BasicWebsiteBuilder() {
@@ -21,7 +23,7 @@ function BasicWebsiteBuilder() {
         <LeftPanel /> {/* Left Panel */}
 
         <div className="flex-1 border border-gray-300"> {/* Editor (Center) */}
-          <div ref={containerRef} className="h-full bg-white"/>
+          <div className="h-full bg-white" ref={containerRef}/>
         </div>
 
         <RightPanel /> {/* Right Panel */}

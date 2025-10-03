@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
 import grapesjs from "grapesjs";
+import { useEffect, useRef } from "react";
+
 import "grapesjs/dist/css/grapes.min.css";
 import { loadCustomBlocks } from "../utils/grapesBlocks";
 
