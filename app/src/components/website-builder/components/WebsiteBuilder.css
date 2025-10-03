@@ -1,0 +1,4 @@
+/* Hide any leftover GrapesJS default panels */
+.gjs-cv-canvas {
+  @apply top-0 right-0 w-full h-full !bg-transparent;
+}
