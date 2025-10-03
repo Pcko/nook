@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
-import Project from './project-schema.js';
+import mongoose, { Schema } from 'mongoose';
+import IPage from '../../types/page.js';
+import IProject from '../../types/project.js';
 
-const { Schema } = mongoose;
-
-const PageSchema = new Schema(
+const PageSchema = new Schema<IPage>(
     {
         name: {
             type: String,
@@ -33,10 +32,12 @@ const PageSchema = new Schema(
 PageSchema.index({ name: 1, projectId: 1 }, { unique: true });
 
 PageSchema.pre('save', async function (next) {
-    const project = await Project.findById(this.projectId);
+    const { default: Project } = await import('./project-schema.js');
+
+    const project = await Project.findById(this.projectId) as IProject;
     await project.updatePageCount();
 
     next();
 })
 
-export default mongoose.model('Page', PageSchema);
+export default mongoose.models.Page || mongoose.model<IPage>('Page', PageSchema);

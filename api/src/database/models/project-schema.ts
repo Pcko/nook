@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import Page from './page-schema.js';
+import IProject from '../../types/project.js';
 
-const { Schema } = mongoose;
-
-const ProjectSchema = new Schema(
+const ProjectSchema = new Schema<IProject>(
     {
         name: {
             type: String,
@@ -24,6 +23,21 @@ const ProjectSchema = new Schema(
         timestamps: true,
     }
 );
+
+ProjectSchema.index({ name: 1, author: 1 }, { unique: true });
+
+async function handleProjectDeletion(project: IProject | null) {
+    if (!project) return;
+
+    await Page.deleteMany({ projectId: project._id });
+}
+
+ProjectSchema.methods.updatePageCount = async function () {
+    const pages = await Page.find({ project: this._id });
+    this.pageCount = pages.length;
+
+    await this.save();
+}
 
 // findOneAndDelete (also covers findByIdAndDelete)
 ProjectSchema.pre('findOneAndDelete', async function (next) {
@@ -48,25 +62,4 @@ ProjectSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-// remove (document middleware)
-ProjectSchema.pre('remove', async function (next) {
-    await handleProjectDeletion(this);
-    next();
-});
-
-ProjectSchema.index({ name: 1, author: 1 }, { unique: true });
-
-ProjectSchema.methods.updatePageCount = async function () {
-    const pages = await Page.find({ project: this._id });
-    this.pageCount = pages.length;
-
-    await this.save();
-}
-
-async function handleProjectDeletion(project) {
-    if (!project) return;
-
-    await Page.deleteMany({ projectId: project._id });
-}
-
-export default mongoose.model('Project', ProjectSchema);
+export default mongoose.models.Project || mongoose.model<IProject>('Project', ProjectSchema);

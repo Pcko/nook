@@ -1,12 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import IUser from '../../types/user.js';
 
-import Project from './project-schema.js';
-import Page from './page-schema.js';
-
-const { Schema } = mongoose;
-
-const UserSchema = new Schema({
+const UserSchema = new Schema<IUser>({
     _id: {
         type: String,
         required: true,
@@ -52,9 +48,21 @@ const UserSchema = new Schema({
     { timestamps: true }
 );
 
-UserSchema.pre('save', async function (next) {
+async function handleUserDeletion(user: IUser | null) {
+    if (!user) return;
+    const { default: Project } = await import('./project-schema.js');
+
+    await Project.deleteMany({ author: user._id });
+}
+
+UserSchema.methods.updateTokenVersion = async function () {
+    this.tokenVersion += 1;
+    await this.save();
+}
+
+UserSchema.pre<IUser>('save', async function (next) {
     if (!this.isModified('password')) {
-        return next()
+        return next();
     };
 
     this.password = await bcrypt.hash(this.password, 10);
@@ -85,21 +93,4 @@ UserSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-// remove (document middleware)
-UserSchema.pre('remove', async function (next) {
-    await handleUserDeletion(this);
-    next();
-});
-
-UserSchema.methods.updateTokenVersion = async function () {
-    this.tokenVersion += 1;
-    await this.save();
-}
-
-async function handleUserDeletion(user) {
-    if (!user) return;
-
-    await Project.deleteMany({ author: user._id });
-}
-
-export default mongoose.model('User', UserSchema);
+export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
