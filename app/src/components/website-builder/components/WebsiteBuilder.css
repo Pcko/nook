@@ -1,8 +1,4 @@
 /* Hide any leftover GrapesJS default panels */
- .gjs-cv-canvas {
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background-color: transparent !important;
+.gjs-cv-canvas {
+  @apply top-0 right-0 w-full h-full !bg-transparent;
 }
