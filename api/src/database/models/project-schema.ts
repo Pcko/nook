@@ -62,4 +62,4 @@ ProjectSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-export default mongoose.models.Project || mongoose.model<IProject>('Project', ProjectSchema);
+export default mongoose.model<IProject>('Project', ProjectSchema);

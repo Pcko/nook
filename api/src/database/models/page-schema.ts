@@ -40,4 +40,4 @@ PageSchema.pre('save', async function (next) {
     next();
 })
 
-export default mongoose.models.Page || mongoose.model<IPage>('Page', PageSchema);
+export default mongoose.model<IPage>('Page', PageSchema);

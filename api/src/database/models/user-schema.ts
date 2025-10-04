@@ -93,4 +93,4 @@ UserSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export default mongoose.model<IUser>('User', UserSchema);
