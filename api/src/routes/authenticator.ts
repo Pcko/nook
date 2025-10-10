@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
+import { Document } from 'mongoose';
 
 import User from '../database/models/user-schema.js';
 import {
@@ -11,8 +12,16 @@ import {
     isInvalidStringForLastName,
     isInvalidStringForPassword,
     isInvalidStringForUsername
-} from '../util/FormChecks.js'
+} from '../util/FormChecks.js';
+import {
+    LoginBody,
+    RegisterBody,
+    TokenBody,
+    TokenContent
+} from '../types/auth.js';
+import IUser from '../types/user.js';
 
+type IUserDocument = IUser & Document;
 const router = express.Router();
 
 const loginLimiter = rateLimit({
@@ -27,19 +36,16 @@ const loginLimiter = rateLimit({
 
 
 // LOGIN AUTHENTICATOR REQUEST
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
     try {
         const { username, password, otp } = req.body;
 
-        //make sure all parameters are trimmed
-        const usernameTrimmed = username.trim();
-
         //make sure request body has all required information
-        if (![usernameTrimmed, password].every(Boolean)) {
+        if (![username, password].every(Boolean)) {
             return res.sendStatus(400);
         }
 
-        const user = await User.findOne({ _id: usernameTrimmed });
+        const user = await User.findOne({ _id: username }) as IUserDocument | null;
 
         //make sure username exists
         if (!user) {
@@ -61,7 +67,9 @@ router.post('/login', loginLimiter, async (req, res) => {
             const userSecret = user.twoFactorAuthSecret;
 
             if (!speakeasy.totp.verify({
-                secret: userSecret, encoding: 'base32', token: otp
+                secret: userSecret!,
+                encoding: 'base32',
+                token: otp
             })) {
                 return res.status(403).send({ message: 'One time password is invalid!' })
             }
@@ -75,28 +83,22 @@ router.post('/login', loginLimiter, async (req, res) => {
 });
 
 // ACCOUNT REGISTRATION REQUEST
-router.post('/register', async (req, res) => {
+router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Response) => {
     try {
         const { username, password, firstName, lastName, email } = req.body;
 
-        //make sure all parameters are trimmed
-        const usernameTrimmed = username.trim();
-        const firstNameTrimmed = firstName.trim();
-        const lastNameTrimmed = lastName.trim();
-        const emailTrimmed = email.trim();
-
         //make sure request body has all required information
-        if (![usernameTrimmed, password, firstNameTrimmed, lastNameTrimmed, emailTrimmed].every(Boolean)) {
+        if (![username, password, firstName, lastName, email].every(Boolean)) {
             return res.sendStatus(400);
         }
 
         //make sure all parameters are valid
         const result =
-            isInvalidStringForUsername(usernameTrimmed) ||
+            isInvalidStringForUsername(username) ||
             isInvalidStringForPassword(password) ||
-            isInvalidStringForFirstName(firstNameTrimmed) ||
-            isInvalidStringForLastName(lastNameTrimmed) ||
-            isInvalidStringForEmail(emailTrimmed);
+            isInvalidStringForFirstName(firstName) ||
+            isInvalidStringForLastName(lastName) ||
+            isInvalidStringForEmail(email);
         if (result) {
             return res.status(403).send({
                 error: 'invalid_parameters',
@@ -105,19 +107,19 @@ router.post('/register', async (req, res) => {
         }
 
         //make sure username is not already used
-        const userExists = await User.findOne({ _id: usernameTrimmed }).lean();
+        const userExists = await User.findOne({ _id: username }).lean<IUser>();
         if (userExists) {
             return res.status(409).send({ message: 'This username is not available!' });
         }
 
         //create new user and insert new user into database
         await User.create({
-            _id: usernameTrimmed,
-            username: usernameTrimmed,
+            _id: username,
+            username: username,
             password,
-            firstName: firstNameTrimmed,
-            lastName: lastNameTrimmed,
-            email: emailTrimmed,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
         })
 
         return res.sendStatus(201);
@@ -128,7 +130,7 @@ router.post('/register', async (req, res) => {
 });
 
 // REFRESH TOKEN REQUEST
-router.post('/token', async (req, res) => {
+router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     try {
         const { token: refreshToken } = req.body;
 
@@ -136,13 +138,13 @@ router.post('/token', async (req, res) => {
             return res.sendStatus(400);
         }
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, tokenContent) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: any, tokenContent: any) => {
             if (err) {
                 return res.status(401).json({ error: 'invalid_token' });
             }
 
             const { id, version } = tokenContent;
-            const user = await User.findOne({ _id: id });
+            const user = await User.findOne({ _id: id }) as IUserDocument | null;
 
             if (!user) {
                 return res.status(401).json({ error: 'unkown_user' })
@@ -163,7 +165,7 @@ router.post('/token', async (req, res) => {
     }
 });
 
-async function createAndSendTokensAndUser(res, user) {
+async function createAndSendTokensAndUser(res: Response, user: IUser) {
     //create tokens for authentication
     await user.updateTokenVersion();
     const userid = user._id;
@@ -172,7 +174,7 @@ async function createAndSendTokensAndUser(res, user) {
 
     const { accessToken, refreshToken } = createTokens(tokenUser);
 
-    //create new user to return for settings
+    //create new userobject to return for settings
     const newUser = {
         username: user.username,
         firstName: user.firstName,
@@ -184,9 +186,9 @@ async function createAndSendTokensAndUser(res, user) {
     return res.status(200).json({ user: newUser, accessToken, refreshToken });
 }
 
-function createTokens(tokenContent) {
-    const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' }); //valid for 30 days after creation
+function createTokens(tokenContent: TokenContent) {
+    const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15min' }); //valid for 15min after creation
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '30d' }); //valid for 30 days after creation
 
     return { accessToken, refreshToken };
 }

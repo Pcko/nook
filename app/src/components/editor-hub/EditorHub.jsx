@@ -1,4 +1,4 @@
-import WebsiteBuilder from "../website-builder/WebsiteBuilder";
+import WebsiteBuilder from "../website-builder/components/WebsiteBuilder";
 import {useLocation, useParams} from "react-router-dom";
 import {EditorProvider} from "./EditorContext";
 

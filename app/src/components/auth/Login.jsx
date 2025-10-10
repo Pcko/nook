@@ -1,21 +1,21 @@
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import axios from '../auth/AxiosInstance'
-import ImageCarousel from './ImageCarousel';
-import { useNotifications } from '../general/NotificationContext';
-import { isInvalidStringForUsername, isInvalidStringForPassword } from '../general/FormChecks';
-import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
+import {useNotifications} from '../general/NotificationContext';
+import {isInvalidStringForPassword, isInvalidStringForUsername} from '../general/FormChecks';
 import TwoFactorAuthenticationCodeInputForm from './TwoFactorAuthenticationCodeInputForm';
-import NookBackground from "../general/NookBackground";
 import LoadingScreen from '../general/LoadingScreen';
 import useErrorHandler from "../general/ErrorHandler";
+import Divider from "./FormDivider";
+import {FcGoogle} from "react-icons/fc";
+import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+import AuthService from "../../services/AuthService";
 
 function Login() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({username: '', password: ''});
+
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
     const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
     const handleError = useErrorHandler();
 
@@ -27,12 +27,13 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(user));
 
         // username und password zurücksetzen, sobald der Login-Screen verlassen wird
-        setUsername('');
-        setPassword('');
+        setFormData({username: '', password: ''});
         navigate('/dashboard');
     };
 
     const handleSubmit = async (event) => {
+        let username = formData.username;
+        let password = formData.password;
         event.preventDefault();
         setLoading(true);
 
@@ -44,16 +45,7 @@ function Login() {
 
         /* Axios Request */
         try {
-            const response = await axios.post('/auth/login', {
-                username,
-                password
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                timeout: 5000,
-                timeoutErrorMessage: 'Server did not respond.',
-            });
+            const response = await AuthService.login(username, password);
 
             if (response.status === 202) {
                 setTwoFactorAuthenticationFormActive(true);
@@ -68,89 +60,104 @@ function Login() {
     };
 
     const handle2FASubmit = async (twoFactorAuthenticationCode) => {
+        let username = formData.username;
+        let password = formData.password;
+
         if (!twoFactorAuthenticationCode) {
             setTwoFactorAuthenticationFormActive(false);
+            showNotification('error', 'Please enter the 2FA code.');
             return;
         }
         setLoading(true);
-
         try {
-            const response = await axios.post('/auth/login', { username, password, otp: twoFactorAuthenticationCode });
+            const response = await AuthService.login2FA(username, password, twoFactorAuthenticationCode);
             setTwoFactorAuthenticationFormActive(false);
             closeLogin(response.data.accessToken, response.data.refreshToken, response.data.user);
-        }
-        catch (err) {
+        } catch (err) {
             handleError(err);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
-    if(loading){
+    const handleChange = (e) => {
+        setFormData({...formData, [e.target.name]: e.target.value});
+    };
+
+    if (loading) {
         return <LoadingScreen/>
     }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <NookBackground/>
             <div id="Window"
-                 className="w-[1000px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10">
-                <div className="w-fit h-fit grid grid-cols-2 gap-[2vw] m-3">
-                    <ImageCarousel/>
-                    <div className="mx-[14%] my-[10%]">
-                        <h1 className="text-4xl mb-3">Login</h1>
-
-                        <span>Don't have an account yet? </span>
-                        <a className={"text-ui-subtle underline hover:cursor-pointer"}
-                            onClick={() => navigate('/register')}>Sign up</a>
-
-                        <form onSubmit={handleSubmit}>
+                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
+                <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
+                    <h1>Welcome Back</h1>
+                    <p>Don’t have an Account? <a className={"text-ui-subtle hover:cursor-pointer"}
+                                                 onClick={() => navigate('/register')}>Register Now.</a></p>
+                    <div className={"w-[60%]"}>
+                        <form onSubmit={handleSubmit} className="mt-2">
                             {/* Username Field */}
-                            <label htmlFor="username" className="block mb-1 mt-6">Username</label>
+                            <label htmlFor="username" className="block mb-1">Username</label>
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
+                                autoComplete={"username"}
+                                placeholder={"Username"}
                                 required
                                 minLength="2"
-                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
-                                onChange={(e) => setUsername(e.target.value)}
-                                value={username}
+                                className="form-field mb-5"
+                                onChange={(event) => handleChange(event)}
+                                value={formData.username}
                             />
 
                             {/* Password Field */}
-                            <label htmlFor="password" className="block">Password</label>
+                            <label htmlFor="password" className="block">Password
+                                <a className={"text-ui-subtle hover:cursor-pointer ml-3 mt-6"}
+                                   onClick={() => navigate('/register')}>Forgot your password?</a>
+                            </label>
+
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
+                                placeholder={"Password"}
+                                autoComplete={"current-password"}
                                 required
                                 minLength="10"
-                                className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg"
-                                onChange={(e) => setPassword(e.target.value)}
-                                value={password}
+                                className="form-field"
+                                onChange={(event) => handleChange(event)}
+                                value={formData.password}
                             />
-
-                            <a className={"text-ui-subtle text-xs underline hover:cursor-pointer"}
-                                onClick={() => navigate('/register')}>Forgot your password?</a>
 
                             {/* Sign-in Button */}
                             <input
                                 type={"submit"}
                                 id="sign-up"
-                                className={`btn w-full mt-10 ${loading ? 'animate-pulse' : ''}`}
-                                value="Sign in"
+                                className={`prim-btn w-full ${loading ? 'animate-pulse' : ''}`}
+                                value="Login"
                             >
                             </input>
+
+                            <Divider className={"mt-5"} dividerText={"Or Login With"}/>
+
                         </form>
+                        <button
+                            className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
+                            <FcGoogle className="text-xl"/>
+                            <span className={"text-text"}>Google</span>
+                        </button>
                     </div>
+                </div>
+                <div className="flex-1 justify-items-center self-center p-[100px]">
+                    <AuthScreenDesktopIcon/>
                 </div>
             </div>
 
             {/* Dynamically rendered form */}
-            {twoFactorAuthenticationFormActive ?
-                <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} />
-                : ''}
+            {twoFactorAuthenticationFormActive && <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>}
         </div>
     );
 }
