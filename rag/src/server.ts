@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
+import "dotenv/config";
 import express, { type Request, type Response } from 'express';
 import chromaRouter from "./routers/chromaRouter.js";
 import ragRouter from "./routers/ragRouter.js";

@@ -1,6 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config();
-
 import type {QueryResponseBody} from "./dto/queryResponseBody.dto.js";
 import Groq from 'groq-sdk';
 import {type StreamCallback} from './types/StreamCallback.js';
@@ -30,7 +27,6 @@ async function streamGroqResponse(query: string, onData: StreamCallback) {
 }
 
 async function getGroqResponse(query: string): Promise<QueryResponseBody> {
-    let data = '';
     try{
         const startingTime = process.hrtime();
         const response = await groq.chat.completions.create({

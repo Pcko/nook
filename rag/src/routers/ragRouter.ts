@@ -16,7 +16,6 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         query = query+`\nContext: ${chromaResponse.documents}`;
     }
 
-    console.log(queryRequest);
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
@@ -34,13 +33,10 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
         return res.end();
     } else {
-        let queryResponse: QueryResponseBody;
-
-        if(queryRequest.useLocalLLM) {
-            queryResponse = await localLLMClient.getLLMResponse(query);
-        } else {
-            queryResponse = await groqClient.getGroqResponse(query);
-        }
+        let queryResponse = await (queryRequest.useLocalLLM ?
+            localLLMClient.getLLMResponse(query) :
+            groqClient.getGroqResponse(query)
+        );
 
         return res.status(200).send(queryResponse);
     }

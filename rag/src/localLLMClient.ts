@@ -54,6 +54,11 @@ async function streamLLMResponse(query: string, onData: StreamCallback) {
             }),
         });
 
+        if(!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Ollama API error: ${errorText}`);
+        }
+
         if(!response.body){
             throw new Error("Ollama did not respond with a stream");
         }
@@ -64,7 +69,7 @@ async function streamLLMResponse(query: string, onData: StreamCallback) {
         while (true) {
             const { value, done } = await reader.read();
             if (done) {
-                break
+                break;
             }
 
             const chunk = JSON.parse(decoder.decode(value, { stream: true }));
@@ -72,7 +77,7 @@ async function streamLLMResponse(query: string, onData: StreamCallback) {
             onData(chunk.response);
         }
     } catch (err) {
-        console.error('Streaming error from Groq:', err);
+        console.error('Streaming error from Ollama:', err);
         throw err;
     }
 }
