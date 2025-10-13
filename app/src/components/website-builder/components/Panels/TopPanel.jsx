@@ -1,5 +1,8 @@
 import React from "react";
 
+import {AiOutlineBorder, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
+import { handleUndo, handleRedo, toggleOutlines } from "../../utils/grapesActions";
+
 /**
  * TopPanel component
  *
@@ -9,11 +12,65 @@ import React from "react";
  * @component
  * @returns {JSX.Element} The rendered top panel
  */
-function TopPanel() {
+function TopPanel({ editorRef }) {
   return (
-    <div className="h-12 ui-border flex items-center px-4">
-      <p className="font-bold">Top Panel</p>
+    <div className="h-12 ui-border flex items-center px-4 space-x-5">
+       <ToolbarButton
+        icon={<AiOutlineUndo size={18} />}
+        label="Str+Z"
+        onClick={() => handleUndo(editorRef)}
+      />
+      <ToolbarButton
+        icon={<AiOutlineRedo size={18} />}
+        label="Str+Y"
+        onClick={() => handleRedo(editorRef)}
+      />
+      <ToolbarButton
+        icon={<AiOutlineBorder size={18} />}
+        label="Alt+O"
+        onClick={() => toggleOutlines(editorRef)}
+      />
     </div>
+  );
+}
+
+function ToolbarButton({ icon, label, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="
+        flex items-center gap-1.5
+        px-2 py-1
+        bg-gray-50 hover:bg-gray-100
+        rounded
+        border border-gray-200
+        text-[12px] font-medium text-gray-700
+        transition
+      "
+    >
+      <span
+        className="
+          flex items-center justify-center
+          bg-white
+          rounded-full
+          w-6 h-6
+          border border-gray-300
+        "
+      >
+        {icon}
+      </span>
+      <span
+        className="
+          bg-gray-200 text-gray-800
+          px-1.5 py-0.5
+          rounded
+          font-mono text-[11px]
+          tracking-tight
+        "
+      >
+        {label}
+      </span>
+    </button>
   );
 }
 
