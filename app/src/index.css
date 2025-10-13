@@ -139,3 +139,7 @@ body {
 h1{
     @apply font-semibold leading-tight;
 }
+
+.table-head{
+    @apply bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg
+}

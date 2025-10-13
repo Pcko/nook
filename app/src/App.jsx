@@ -1,13 +1,6 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import React, {useEffect} from 'react';
-
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Registration"
-import ProtectedRoute from "./components/auth/ProtectedRoute"
-import AuthRedirect from "./components/general/AuthRedirect";
 import Dashboard from "./components/dashboard/Dashboard"
-import Settings from "./components/settings/Settings";
-import EditorHub from "./components/editor-hub/EditorHub";
 
 import './index.css';
 
@@ -45,15 +38,7 @@ function App() {
                 <div className={'h-full'}>
                     <main className={'h-full bg-far-bg text-text'}>
                         <Routes>
-                            <Route path="/" element={<AuthRedirect/>}/>
-                            <Route path="/login" element={<Login/>}/>
-                            <Route path="/register" element={<Register/>}/>
-
-                            <Route element={<ProtectedRoute/>}>
-                                <Route path="/settings" element={<Settings/>}/>
-                                <Route path="/dashboard" element={<Dashboard/>}/>
-                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
-                            </Route>
+                            <Route path="/" element={<Dashboard/>}/>
                         </Routes>
                     </main>
                 </div>

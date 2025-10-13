@@ -79,15 +79,15 @@ function SecuritySettings({changeHandler}) {
 
     return (
         <div>
-            <h1 className="text-5xl mb-10">Security</h1>
+            <h1 className="mb-10">Security</h1>
 
             <form onSubmit={sendPasswordChangeRequest}>
                 <div
                     className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
-                    <div className="text-lg">Change password</div>
+                    <h6 className="font-bold">Change password</h6>
 
                     <input type="submit"
-                           className="btn ml-auto mr-0 mb-1"
+                           className="btn ml-auto mr-0 mb-1 !text-text-on-primary"
                            value="Update Password"/>
 
                     <div>
