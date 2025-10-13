@@ -4,6 +4,9 @@ import { useEffect, useRef } from "react";
 import "grapesjs/dist/css/grapes.min.css";
 import { loadCustomBlocks } from "../utils/grapesBlocks";
 
+import { replaceDefaultShortcuts } from "../utils/shortcuts";
+
+
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
  *
@@ -21,6 +24,7 @@ export function useGrapesEditor(config) {
         container: containerRef.current, 
       });
 
+      replaceDefaultShortcuts(editorRef); 
       loadCustomBlocks(editorRef.current); // Loads blocks
     }
 

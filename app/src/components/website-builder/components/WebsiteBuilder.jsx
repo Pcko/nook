@@ -20,9 +20,9 @@ import "./WebsiteBuilder.css";
  *
  * @component
  * @returns {JSX.Element} The rendered website builder layout with editor and panels
- */
+*/
 function WebsiteBuilder() {
-  const { containerRef } = useGrapesEditor({
+  const { editorRef, containerRef } = useGrapesEditor({
     height: '100%',           // Editor canvas height
     fromElement: false,       // Don't take initial HTML from container
     storageManager: false,    // Disable built-in localStorage/remote storage
@@ -33,7 +33,7 @@ function WebsiteBuilder() {
 
   return (
      <div className="flex flex-col h-screen w-screen bg-gray-100">
-      <TopPanel /> {/* Top Panel */}
+      <TopPanel editorRef={editorRef} /> {/* Top Panel */}
       
       <div className="flex flex-1 overflow-hidden"> {/* Main Layout */}
         <LeftPanel /> {/* Left Panel */}
