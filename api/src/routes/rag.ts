@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import {GenerationQueryBody, GenerationResponseBody} from "../types/generate";
+import {RAGQueryBody, RAGResponseBody} from "../types/rag";
 
 const router = express.Router();
 
-router.post('/query', async (req: Request<{}, {}, GenerationQueryBody>, res: Response) => {
+router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) => {
     try{
         const response = await fetch(`${process.env.RAG_URL}/generation/query`, {
             method: 'POST',
@@ -36,7 +36,7 @@ router.post('/query', async (req: Request<{}, {}, GenerationQueryBody>, res: Res
 
             res.end();
         } else {
-            const data: GenerationResponseBody = await response.json();
+            const data: RAGResponseBody = await response.json();
             res.status(200).send(data);
         }
     } catch (err) {

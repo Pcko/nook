@@ -1,11 +1,11 @@
-export interface GenerationQueryBody {
+export interface RAGQueryBody {
     query: string;
     skipContext?: boolean;
     useLocalLLM?: boolean;
     stream?: boolean;
 }
 
-export interface GenerationResponseBody {
+export interface RAGResponseBody {
     think: string;
     response: string;
     total_duration: number;

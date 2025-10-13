@@ -2,6 +2,7 @@ import type {ChromaDBQueryResponseBody} from './dto/chromadbQueryResponseBody.dt
 import { ChromaClient } from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
 import type {ChromaDBGetResponseBody} from "./dto/chromaDBGetResponseBody.dto.js";
+import type {ChromaDBAddDocumentsRequestBody} from "./dto/chromaDBAddDocumentsRequestBody.dto.js";
 
 const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "5");
 
@@ -46,11 +47,8 @@ async function removeChromaDBEntries(ids: string[]): Promise<void> {
     await collection.delete({ids});
 }
 
-async function addChromaDBDocuments(ids: string[], documents: string[]) {
-    await collection.add({
-       ids,
-       documents: documents,
-    });
+async function addChromaDBDocuments(chromaAddDocumentsBody: ChromaDBAddDocumentsRequestBody): Promise<void> {
+    await collection.add(chromaAddDocumentsBody);
 }
 
 export default {
