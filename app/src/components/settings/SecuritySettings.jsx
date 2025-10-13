@@ -6,6 +6,8 @@ import { useNotifications } from "../general/NotificationContext";
 import QRCodeDisplay from "./QRCodeDisplay";
 import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
 import useErrorHandler from "../general/ErrorHandler";
+import SettingsService from "../../services/SettingsService";
+import AuthService from "../../services/AuthService";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -29,15 +31,7 @@ function SecuritySettings({changeHandler}) {
 
         try {
             const username = JSON.parse(localStorage.getItem('user')).username;
-            const response = await axios.patch('/api/settings',
-                {
-                    'changes': {'account': {'password': newPassword}}
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json'}
-                }
-            );
+            const response = await SettingsService.updatePassword(newPassword);
 
             showNotification('success', 'Your password was updated successfully.');
         } catch (err) {
@@ -51,7 +45,7 @@ function SecuritySettings({changeHandler}) {
             setTwoFactorAuthFormActive(true);
         } else{
             try{
-                const response = await axios.get('/api/settings/twoFactorAuth');
+                const response = await AuthService.toggle2FA();
                 setQRCodeUrl(response.data.qrCodeUrl);
             } catch(err){
                 showNotification('error', err);
@@ -66,7 +60,7 @@ function SecuritySettings({changeHandler}) {
 
         try {
             const user = JSON.parse(localStorage.getItem('user'));
-            const response = await axios.post('/api/settings/twoFactorAuth', { username: user.username, isEnabled: !user.twoFactorAuthOn, otp });
+            const response = await AuthService.activate2FA(user, otp);
             user.twoFactorAuthOn = !user.twoFactorAuthOn;
             localStorage.setItem('user', JSON.stringify(user));
             showNotification('success', `2-Factor-Authentication has successfully been ${user.twoFactorAuthOn ? 'enabled' : 'disabled'}`);

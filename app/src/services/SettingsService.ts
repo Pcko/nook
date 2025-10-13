@@ -9,7 +9,20 @@ const axiosConfig = {
 class SettingsService {
 
     static async updateSettings(changes: {}) {
-       return await axios.patch('/api/settings', {changes});
+        return await axios.patch('/api/settings', {changes});
+    }
+
+    static async updatePassword(newPassword : string) {
+        return await axios.patch('/api/settings',
+            {
+                'changes': {'account': {'password': newPassword}}
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
     }
 }
 

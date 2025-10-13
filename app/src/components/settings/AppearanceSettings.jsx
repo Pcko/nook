@@ -53,7 +53,7 @@ function AppearanceSettings({changeHandler, options}){
                 <div className="flex flex-wrap gap-5 mx-5">
                     {availableThemes.map(theme => (
                         <div onClick={()=>{handleThemeChange(theme)}}>
-                            <ThemePreview theme={theme}/>
+                            <ThemePreview theme={theme} selected={selectedTheme === theme}/>
                             <label className="w-10/12 m-auto">
                                 <input type="radio"
                                        value={theme}

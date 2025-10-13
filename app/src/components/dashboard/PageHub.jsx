@@ -1,12 +1,13 @@
 import React, {Fragment, useState} from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
-import axios from "../auth/AxiosInstance";
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {useNotifications} from "../general/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
+import DashboardService from "../../services/DashboardService";
+import {ThreeDotSvg} from "./resources/DashboardIcons";
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 
 const sortByOptions = [
     {
@@ -109,7 +110,7 @@ function PageHub({onPageClick, pages, setPages}) {
 
     const handlePageDelete = async (pageName) => {
         try {
-            await axios.delete(`/api/pages/${pageName}`);
+            await DashboardService.deletePage(pageName);
             setPages((prev) => {
                 const updated = {...prev};
                 delete updated[pageName];
@@ -188,15 +189,12 @@ function PageHub({onPageClick, pages, setPages}) {
                             onClick={() => setPageCreationFormActive(true)}
                         >
                             {/* Plus-Icon als SVG */}
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                className="w-5 h-5"
-                            >
-                                <path d="M12 5v14m-7-7h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <svg width="14" height="13" viewBox="0 0 18 17" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613" stroke="white"
+                                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            <span>New Page</span>
+                            New Page
                         </button>
 
                     </div>
@@ -247,20 +245,7 @@ function PageHub({onPageClick, pages, setPages}) {
                                         <div className="relative ml-auto">
                                             <ListboxButton
                                                 className="flex items-center justify-center w-8 h-8 rounded hover:bg-ui-bg-selected transition-colors">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth={1.5}
-                                                    stroke="currentColor"
-                                                    className="w-5 h-5 text-text-subtle"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                                                    />
-                                                </svg>
+                                                <ThreeDotSvg/>
                                             </ListboxButton>
 
                                             <ListboxOptions
@@ -295,15 +280,15 @@ function PageHub({onPageClick, pages, setPages}) {
                                 </div>
 
                                 <div
-                                    className="p-4 bg-ui-bg align-middle border-ui-border border-[1px] flex items-center">
+                                    className="p-4 align-middle border-ui-border border-[1px] flex items-center">
                                     {new Date(details.createdAt).toLocaleString(navigator.language)}
                                 </div>
                                 <div
-                                    className="p-4 bg-ui-bg border-ui-border border-[1px] flex items-center">
+                                    className="p-4 border-ui-border border-[1px] flex items-center">
                                     {new Date(details.updatedAt).toLocaleString(navigator.language)}
                                 </div>
                                 <div
-                                    className={`p-4 bg-ui-bg border-ui-border border-[1px] flex items-center ${index === filtered.length - 1 ? "rounded-br-lg" : ""}`}>
+                                    className={`p-4 border-ui-border border-[1px] flex items-center ${index === filtered.length - 1 ? "rounded-br-lg" : ""}`}>
                                 <span className="inline-flex items-center gap-1">
                                     {deploymentStates[details.deploymentStatus.toLowerCase()]}
                                     {details.deploymentStatus}

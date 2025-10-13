@@ -5,6 +5,12 @@ import {useNotifications} from "../general/NotificationContext";
 import {useState} from "react";
 import useErrorHandler from "../general/ErrorHandler";
 import SettingsService from "../../services/SettingsService";
+import {
+    isInvalidStringForEmail,
+    isInvalidStringForFirstName, isInvalidStringForLastName,
+    isInvalidStringForPassword,
+    isInvalidStringForUsername
+} from "../general/FormChecks";
 
 function Settings({activeTab}) {
     const [changes, setChanges] = useState({});
@@ -45,12 +51,27 @@ function Settings({activeTab}) {
             return;
         }
 
+        const accountObject = changes['account'];
+
+        const result =
+            !accountObject.username ? undefined : isInvalidStringForUsername(accountObject.username) ||
+            !accountObject.password ? undefined : isInvalidStringForPassword(accountObject.password) ||
+            !accountObject.firstName ? undefined : isInvalidStringForFirstName(accountObject.firstName) ||
+            !accountObject.lastName ? undefined : isInvalidStringForLastName(accountObject.lastName) ||
+            !accountObject.email ? undefined : isInvalidStringForEmail(accountObject.email);
+
+        if(result){
+            return showNotification('error', result);
+        }
+
         try {
             await SettingsService.updateSettings({changes});
             showNotification('success', 'Changes applied.');
             setChanges({});
-            const oldUser = JSON.parse(localStorage.getItem('user'));
-            localStorage.setItem('user', JSON.stringify({...oldUser, ...changes.account}));
+
+            const oldUserObject = JSON.parse(localStorage.getItem('user'));
+            const newUserObject = { ...oldUserObject, ...changes.account };
+            localStorage.setItem('user', JSON.stringify(newUserObject));
         } catch (err) {
             handleError(err);
         }

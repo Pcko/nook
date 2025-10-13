@@ -6,6 +6,12 @@ import './index.css';
 
 import {NotificationProvider} from "./components/general/NotificationContext";
 import NotificationOverlay from "./components/general/NotificationOverlay";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthRedirect from "./components/general/AuthRedirect";
+import Login from "./components/auth/Login";
+import Settings from "./components/settings/Settings";
+import EditorHub from "./components/editor-hub/EditorHub";
+import Register from "./components/auth/Registration";
 
 function App() {
     useEffect(() => {
@@ -38,7 +44,15 @@ function App() {
                 <div className={'h-full'}>
                     <main className={'h-full bg-far-bg text-text'}>
                         <Routes>
-                            <Route path="/" element={<Dashboard/>}/>
+                            <Route path="/" element={<AuthRedirect/>}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/register" element={<Register/>}/>
+
+                            <Route element={<ProtectedRoute/>}>
+                                <Route path="/settings" element={<Settings/>}/>
+                                <Route path="/dashboard" element={<Dashboard/>}/>
+                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
+                            </Route>
                         </Routes>
                     </main>
                 </div>
