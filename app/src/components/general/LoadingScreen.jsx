@@ -1,8 +1,8 @@
 import BackgroundText from '../general/NookBackground';
 import { motion } from 'framer-motion';
 
-export function LoadingBubble() {
-    return <div className="flex flex-col items-center">
+export function LoadingBubble({className=""}) {
+    return <div className={`flex flex-col items-center ${className}`}>
         <motion.div
             className="w-16 h-16 border-4 border-ui-border-selected border-t-transparent rounded-full "
             animate={{rotate: 360}}
@@ -19,7 +19,7 @@ function LoadingScreen() {
             <BackgroundText/>
             <div id="Window"
                  className="w-[500px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10 p-10">
-                {LoadingBubble()}
+                {LoadingBubble}
             </div>
         </div>
     );

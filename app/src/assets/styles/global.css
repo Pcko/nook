@@ -20,10 +20,10 @@
 }
 
 .light {
-    --primary: #575BC7;
+    --primary: #666BE2;
     --secondary: #A79FCC;
-    --primary-hover: #A07CBE;
-    --text-subtle: #A1A4A7;
+    --primary-hover: #797dd9;
+    --text-subtle: #626264;
     --far-bg: #D9D9D9;
     --website-bg: #FFFFFF;
     --ui-bg: #FCFBFC;

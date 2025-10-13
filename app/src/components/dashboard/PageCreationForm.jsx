@@ -40,7 +40,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     return (
         <div className="bg-ui-bg border-[1px] border-ui-border rounded-lg w-[30vw]">
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
-                <h1 className="text-xl">Create a new page for your project "{selectedProjectId}"</h1>
+                <h1 className="text-xl">Create a new Page!</h1>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                      stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer" onClick={()=>closeForm()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
