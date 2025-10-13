@@ -1,10 +1,8 @@
-import dotenv from 'dotenv';
+import "dotenv/config";
 import express, { type Request, type Response } from 'express';
 import chromaRouter from "./routers/chromaRouter.js";
 import ragRouter from "./routers/ragRouter.js";
 import authenticate from "./interceptors/authenticateRoute.js";
-
-dotenv.config();
 
 if(!process.env.RAG_API_KEY) {
     console.error("ERROR: At least one required .env variable is not set.");

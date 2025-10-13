@@ -13,7 +13,7 @@ chromaRouter.post('/query', async (req: Request<{}, {}, { query: string }>, res:
 });
 
 chromaRouter.post('/addDocuments', async (req: Request<{}, {}, ChromaDBAddDocumentsRequestBody>, res: Response) => {
-    res.status(201).send(await chromaClient.addDocuments(req.body.ids, req.body.documents));
+    res.status(201).send(await chromaClient.addDocuments(req.body));
 });
 
 chromaRouter.delete('/removeEntries', async (req: Request<{}, {}, { ids: string[] }>, res: Response) => {

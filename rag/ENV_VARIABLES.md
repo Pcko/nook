@@ -3,8 +3,14 @@
 ### the "password" to the rag api, any request that does not contain this header (same name) set will be rejected.
 RAG_API_KEY=
 
+### the API key for groq
+GROQ_API_KEY=
+
+### the LLM model name used by groq
+GROQ_LLM_MODEL=
+
 ### the LLM model name used in ollama
-Local_LLM_Model=
+LOCAL_LLM_MODEL=
 
 ## Optional parameters (with defaults)
 
