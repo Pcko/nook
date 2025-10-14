@@ -2,3 +2,56 @@
 .gjs-cv-canvas {
   @apply top-0 right-0 w-full h-full !bg-transparent;
 }
+
+#gjs-blocks{
+  .gjs-block {
+    background-color: var(--ui-default);
+    color: var(--text);
+    border: 2px solid var(--far-bg);
+    border-radius: 5px;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color 0.07s, transform 0.07s;
+  }
+
+  .gjs-block:hover {
+    background-color: var(--primary);
+    color: var(--text-on-primary);
+    transform: scale(1.03);
+    border: 3px solid var(--ui-subtle);
+  }
+
+  .gjs-block-category {
+    background-color: var(--ui-bg);
+    color: var(--text);
+    border: none; 
+  }
+
+  .gjs-title {
+    background-color: var(--ui-bg) !important;
+    border-bottom: 2px solid var(--far-bg) !important;
+  }
+}
+
+#gjs-layers{
+  .gjs-layer-title{
+    background-color: var(--ui-bg) !important;
+    border-bottom: 2px solid var(--far-bg) !important;
+    color: var(--text);
+  }
+
+   .gjs-hovered{
+    background-color: none !important;
+  }
+
+}
+
+.gjs-sm-sector-title {
+  background-color: var(--ui-default) !important;
+  border-bottom: 2px solid var(--far-bg) !important;
+  color: var(--text);
+}
+
+.gjs-one-bg {
+  background-color: var(--ui-default) !important;
+}
