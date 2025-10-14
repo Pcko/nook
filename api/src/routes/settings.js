@@ -1,7 +1,7 @@
 import express from 'express';
 import speakeasy from 'speakeasy';
 
-import User from '../database/models/user-schema.js';
+import { User } from '../util/internal.js';
 
 const router = express.Router();
 

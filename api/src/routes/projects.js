@@ -1,7 +1,7 @@
 import express from 'express';
 
-import Project from '../database/models/project-schema.js';
-import Page from '../database/models/page-schema.js';
+import { Project } from '../util/internal.js';
+import { Page } from '../util/internal.js';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
 
