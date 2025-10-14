@@ -27,7 +27,8 @@ function WebsiteBuilder() {
     fromElement: false,       // Don't take initial HTML from container
     storageManager: false,    // Disable built-in localStorage/remote storage
     panels: {defaults: []},   // Remove default GrapesJS panels
-    blockManager: { appendTo: "#blocks" },        // Render blocks inside #blocks
+    blockManager: { appendTo: "#gjs-blocks" },    // Render blocks inside #blocks
+    layerManager: { appendTo: "#gjs-layers" },
     styleManager: { appendTo: ".right-panel" },   // Render style manager inside .right-panel
   });
 

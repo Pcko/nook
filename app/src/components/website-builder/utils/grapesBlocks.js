@@ -2,16 +2,46 @@
 export const grapesBlocks = [
   {
     id: "text-block",
-    label: "Text",
+    label:  `
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <p>Text</p>
+        <i class="fa fa-font" style="font-size: 30px; margin-top: 10px;"></i>
+      </div>
+    `,
     content: {
       type: "text",
       content: "Text",
     },
     category: "Components",
   },
+    {
+    id: "box-block",
+    label:  `
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <p>Box</p>
+        <i class="fa fa-square-o" style="font-size: 30px; margin-top: 10px;"></i>
+      </div>
+    `,
+    content: {
+      type: "Box",
+      components: [],
+      style: {
+        "padding": "24px",
+        "display": "flex",
+        "flex-direction": "column",
+        "flex": "1",
+      },
+    },
+    category: "Components",
+  },
   {
     id: "column2",
-    label: "2 Columns",
+    label: `
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <p>2 Columns</p>
+        <i class="fa fa-columns" style="font-size: 30px; margin-top: 10px;"></i>
+      </div>
+    `,
     content: {
       type: "div",
       style: {
