@@ -5,7 +5,7 @@ import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
 import { Document } from 'mongoose';
 
-import User from '../database/models/user-schema.js';
+import { User } from '../util/internal.js';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
