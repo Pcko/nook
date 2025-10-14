@@ -1,18 +1,17 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import React, {useEffect} from 'react';
-
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Registration"
-import ProtectedRoute from "./components/auth/ProtectedRoute"
-import AuthRedirect from "./components/general/AuthRedirect";
 import Dashboard from "./components/dashboard/Dashboard"
-import Settings from "./components/settings/Settings";
-import EditorHub from "./components/editor-hub/EditorHub";
 
 import './index.css';
 
 import {NotificationProvider} from "./components/general/NotificationContext";
 import NotificationOverlay from "./components/general/NotificationOverlay";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthRedirect from "./components/general/AuthRedirect";
+import Login from "./components/auth/Login";
+import Settings from "./components/settings/Settings";
+import EditorHub from "./components/editor-hub/EditorHub";
+import Register from "./components/auth/Registration";
 
 function App() {
     useEffect(() => {

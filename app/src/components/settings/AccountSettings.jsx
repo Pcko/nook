@@ -8,7 +8,7 @@ function AccountSettings({changeHandler, options}){
 
     return(
         <div className="h-full flex flex-col">
-            <h1 className="text-5xl mb-10">Account</h1>
+            <h1 className="mb-10">Account</h1>
 
             <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                 {/* Email Field */}
@@ -75,8 +75,8 @@ function AccountSettings({changeHandler, options}){
             <div className="w-full mt-auto mb-0 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                 <span className="my-auto">Do you want to delete your account?</span>
                 <input type="button"
-                       value="DELETE"
-                       className="btn"
+                       value="Delete"
+                       className="btn w-[150px] mr-0 ml-auto hover: !bg-dangerous !text-text-on-primary"
                        onClick={()=>setAccountDeletionFormActive(true)}
                 />
             </div>
