@@ -1,12 +1,12 @@
-#How to run server!
+# How to run server!
 
-#PROD
-<api> npm i
-<app> npm i
-<app> npm run build
-<api> npm run start
+# PROD
+- <api> npm i
+- <app> npm i
+- <app> npm run build
+- <api> npm run start
 
-#DEV
-<app> npm i
-<api> npm i
-<api> npm run dev
+# DEV
+- <app> npm i
+- <api> npm i
+- <api> npm run dev
