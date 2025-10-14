@@ -3,7 +3,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headless
 
 import axios from '../auth/AxiosInstance';
 
-import ProjectCreationForm from "./ProjectCreationForm";
+import ProjectCreationForm from "./ProjectCreationForm.txt";
 import ProjectEditForm from "./ProjectEditForm";
 import CenteredWindowWithBackgroundBlur from '../general/CenteredWindowWithBackgroundBlur';
 import { useNotifications } from "../general/NotificationContext";

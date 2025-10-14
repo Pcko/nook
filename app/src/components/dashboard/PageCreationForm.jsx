@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import axios from '../auth/AxiosInstance';
-import { isInvalidStringForURL } from "../general/FormChecks";
-import { useNotifications } from "../general/NotificationContext";
+import {useNotifications} from "../general/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
+import {isInvalidStringForURL} from "../general/FormChecks";
 
 function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     const [pageName, setPageName] = useState('');
@@ -21,7 +20,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
 
         try{
             const trimmedFolderName = folderName?.trim();
-            const response = await axios.post(`/api/projects/${selectedProjectId}/pages`, { pageName, folderName: trimmedFolderName });
+            const response = await createPage(selectedProjectId, pageName, trimmedFolderName);
 
             setPages((prevPages)=>{
                 const updatedPages = { ...prevPages };
@@ -38,9 +37,9 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     };
 
     return (
-        <div className="bg-ui-bg border-[1px] border-ui-border rounded-lg w-[30vw]">
+        <div className="bg-ui-bg border-[1px] border-ui-border rounded-[5px] w-[30vw]">
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
-                <h1 className="text-xl">Create a new page for your project "{selectedProjectId}"</h1>
+                <h5 className="font-semibold">Create a new Page!</h5>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                      stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer" onClick={()=>closeForm()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
