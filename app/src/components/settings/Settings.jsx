@@ -107,7 +107,7 @@ function Settings({activeTab}) {
 
                 {settingsHaveChanges && (
                     <div
-                        className="absolute top-5 right-5 h-[60px] py-1 px-3 bg-ui-bg rounded-lg border-[1px] border-ui-border flex items-center">
+                        className="absolute top-5 right-5 h-[60px] py-1 px-3 bg-ui-bg rounded-[5px] border border-ui-border flex items-center">
                         <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
                         <input type="submit" className="btn h-3/4 my-auto" value="Save"/>
                     </div>

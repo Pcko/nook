@@ -85,7 +85,7 @@ function convertOptionToHTML(option) {
         </div>);
 }
 
-function PageHub({onPageClick, pages, setPages}) {
+function PageHub({pages, setPages}) {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortByOption, setSortByOption] = useState(sortByOptions[0]);
     const [sortReversed, setSortReversed] = useState(false);
@@ -93,7 +93,13 @@ function PageHub({onPageClick, pages, setPages}) {
     const [pageNameToEdit, setPageNameToEdit] = useState();
     const {showNotification} = useNotifications();
     const handleError = useErrorHandler();
+
     pages = pageExamples;
+    const onPageClick = () => {
+        /**
+         * Implementiere hier das öffnen von Pages
+         */
+    };
 
     const compareTableEntries = ([keyA, valueA], [keyB, valueB]) => {
         switch (sortByOption) {
