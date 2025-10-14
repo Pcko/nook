@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../database/models/user-schema.js';
+import { User } from '../util/internal.js';
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
