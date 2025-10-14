@@ -3,6 +3,9 @@
 ### the "password" to the rag api, any request that does not contain this header (same name) set will be rejected.
 RAG_API_KEY=
 
+### the url of the server accessing the RAG server
+API_URL=
+
 ### the API key for groq
 GROQ_API_KEY=
 
