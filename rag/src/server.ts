@@ -3,14 +3,24 @@ import express, { type Request, type Response } from 'express';
 import chromaRouter from "./routers/chromaRouter.js";
 import ragRouter from "./routers/ragRouter.js";
 import authenticate from "./interceptors/authenticateRoute.js";
+import cors from 'cors';
 
-if(!process.env.RAG_API_KEY) {
+if(
+  !(process.env.RAG_API_KEY &&
+    process.env.API_URL &&
+    process.env.GROQ_API_KEY &&
+    process.env.GROQ_LLM_MODEL &&
+    process.env.LOCAL_LLM_MODEL)
+) {
     console.error("ERROR: At least one required .env variable is not set.");
     process.exit(1);
 }
 
+const allowedOrigins: string[] = [process.env.API_URL] as string[];
+
 const app = express();
 
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 app.use('/chroma', authenticate, chromaRouter);
