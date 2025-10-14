@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import HR from './SettingsHR';
 import AccountDeletionConfirmationForm from "./AccountDeletionConfirmationForm";
 
-function AccountSettings({changeHandler, options}){
+function AccountSettings({changeHandler, options}) {
     const [accountDeletionFormActive, setAccountDeletionFormActive] = useState(false);
-    const {email:originalEmail, firstName:originalFirstName, lastName:originalLastName, username:originalUsername} = options;
+    const {
+        email: originalEmail,
+        firstName: originalFirstName,
+        lastName: originalLastName,
+        username: originalUsername
+    } = options;
 
-    return(
+    return (
         <div className="h-full flex flex-col">
-            <h1 className="text-5xl mb-10">Account</h1>
+            <h1 className="font-medium mb-10">Account</h1>
 
-            <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
+            <div
+                className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                 {/* Email Field */}
                 <label htmlFor="email" className="block my-auto">Email</label>
                 <input
@@ -72,23 +78,27 @@ function AccountSettings({changeHandler, options}){
                 />
             </div>
 
-            <div className="w-full mt-auto mb-0 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
+            <div
+                className="w-full mt-auto mb-0 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
                 <span className="my-auto">Do you want to delete your account?</span>
                 <input type="button"
-                       value="DELETE"
-                       className="btn"
-                       onClick={()=>setAccountDeletionFormActive(true)}
+                       value="Delete"
+                       className="btn w-[150px] mr-0 ml-auto hover: !bg-dangerous !text-text-on-primary"
+                       onClick={() => setAccountDeletionFormActive(true)}
                 />
             </div>
 
-            {accountDeletionFormActive?
+            {accountDeletionFormActive ?
                 <div
                     className="top-0 left-0 absolute w-screen h-screen backdrop-blur backdrop-opacity-80"
-                                                onClick={(e)=>{e.stopPropagation(); setAccountDeletionFormActive(false);}}>
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setAccountDeletionFormActive(false);
+                    }}>
                     <div className="bg-ui-bg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <AccountDeletionConfirmationForm/>
                     </div>
-            </div>:''}
+                </div> : ''}
         </div>
     );
 }

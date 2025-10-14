@@ -15,7 +15,10 @@ import ragRouter from './routes/rag.js';
 
 import 'dotenv/config';
 
-const allowedOrigins: string[] = process.env.APP_URL ? [process.env.APP_URL] : [];
+if (!process.env.APP_URL || !process.env.RAG_URL) {
+    console.error('Cors environment missing!')
+}
+const allowedOrigins: string[] = [process.env.APP_URL, process.env.RAG_URL] as string[];
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

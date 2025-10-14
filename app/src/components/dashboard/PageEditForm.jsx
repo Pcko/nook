@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import axios from '../auth/AxiosInstance';
-import { isInvalidStringForURL } from "../general/FormChecks";
-import { useNotifications } from "../general/NotificationContext";
+import {useState} from 'react';
+import {isInvalidStringForURL} from "../general/FormChecks";
+import {useNotifications} from "../general/NotificationContext";
+import DashboardService from "../../services/DashboardService";
+import useErrorHandler from "../general/ErrorHandler";
 
-function PageEditForm({ closeForm, selectedProjectId, pageName, pages }) {
+function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
     const [newPageName, setNewPageName] = useState(pageName);
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
+    const {handleError} = useErrorHandler();
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -28,18 +30,14 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }) {
         }
 
         try {
-            const response = await axios.patch(`/api/projects/${selectedProjectId}/pages/${pageName}`,
-                {
-                    newPageName: newPageName === pageName ? undefined : newPageName,
-                    newFolderName: trimmedFolderName === pages[pageName].folderName ? undefined : trimmedFolderName,
-                });
+            const response = await DashboardService.updatePage(selectedProjectId, pageName, newPageName, trimmedFolderName, pages);
 
             if (trimmedFolderName) {
                 pages[pageName].folderName = trimmedFolderName;
             }
 
             if (newPageName) {
-                const page = { ...pages[pageName] };
+                const page = {...pages[pageName]};
                 delete pages[pageName];
                 pages[response.data.newPageName] = page;
             }
@@ -55,7 +53,7 @@ function PageEditForm({ closeForm, selectedProjectId, pageName, pages }) {
     return (
         <div className="bg-ui-bg border-[1px] border-ui-border rounded-lg w-[30vw]">
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
-                <h1 className="text-xl">Edit Page "{pageName}"</h1>
+                <h5 className="font-semibold">Edit Page "{pageName}"</h5>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                      stroke="currentColor"
                      className="size-5 ml-auto mr-1 hover:cursor-pointer"

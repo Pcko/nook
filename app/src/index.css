@@ -23,7 +23,7 @@ body {
     h4 { @apply text-h4; }
     h5 { @apply text-h5; }
     h6 { @apply text-h6; }
-    p, label, input, input::placeholder, button {
+    p,div, label, input, input::placeholder, button {
         @apply text-regular;
     }
     small { @apply text-small; }
@@ -100,37 +100,32 @@ body {
 }
 
 .drop-table {
-    border-width: 2px;
-    border-style: dashed;
-    border-color: black;
-    padding: 1rem;
-    margin: 1rem;
-    text-align: center;
-    border-radius: 0.375rem;
+    @apply border-2 border-dashed border-black p-4 m-4 text-center rounded-md;
 }
 
 .dropped-item {
-    padding: 8px;
-    transition: background-color 0.3s;
+    @apply p-2 m-2 transition-colors duration-300;
 }
 
 .dropped-item.highlighted {
-    background-color: #f0f0f0;
-    border: 1px solid #000;
+    @apply border border-ui-border bg-website-bg rounded-[5px];
 }
 
 .btn {
-    @apply border-2 px-4 py-2 rounded-md text-text font-medium hover:bg-blue-700 transition;
+    @apply border-2 px-4 py-2 rounded-[5px] text-text hover:bg-ui-button-hover transition;
+}
+
+.btn-dropdown {
+    @apply px-4 py-2 text-text font-medium;
 }
 
 .prim-btn {
-    @apply text-text-on-primary bg-primary border-2 px-4 py-2 rounded-md font-medium hover:bg-blue-700 transition;
+    @apply text-text-on-primary bg-primary border-2 px-4 py-2 rounded-[5px] hover:bg-ui-subtle transition;
 }
 
 .form-field {
     @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
 }
-
 
 .title {
     @apply px-4 py-2 text-sm font-medium text-white
@@ -138,4 +133,8 @@ body {
 
 h1{
     @apply font-semibold leading-tight;
+}
+
+.table-head{
+    @apply bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg
 }

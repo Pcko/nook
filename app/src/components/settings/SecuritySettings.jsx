@@ -6,6 +6,8 @@ import { useNotifications } from "../general/NotificationContext";
 import QRCodeDisplay from "./QRCodeDisplay";
 import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
 import useErrorHandler from "../general/ErrorHandler";
+import SettingsService from "../../services/SettingsService";
+import AuthService from "../../services/AuthService";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -29,15 +31,7 @@ function SecuritySettings({changeHandler}) {
 
         try {
             const username = JSON.parse(localStorage.getItem('user')).username;
-            const response = await axios.patch('/api/settings',
-                {
-                    'changes': {'account': {'password': newPassword}}
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json'}
-                }
-            );
+            const response = await SettingsService.updatePassword(newPassword);
 
             showNotification('success', 'Your password was updated successfully.');
         } catch (err) {
@@ -51,7 +45,7 @@ function SecuritySettings({changeHandler}) {
             setTwoFactorAuthFormActive(true);
         } else{
             try{
-                const response = await axios.get('/api/settings/twoFactorAuth');
+                const response = await AuthService.toggle2FA();
                 setQRCodeUrl(response.data.qrCodeUrl);
             } catch(err){
                 showNotification('error', err);
@@ -66,7 +60,7 @@ function SecuritySettings({changeHandler}) {
 
         try {
             const user = JSON.parse(localStorage.getItem('user'));
-            const response = await axios.post('/api/settings/twoFactorAuth', { username: user.username, isEnabled: !user.twoFactorAuthOn, otp });
+            const response = await AuthService.activate2FA(user, otp);
             user.twoFactorAuthOn = !user.twoFactorAuthOn;
             localStorage.setItem('user', JSON.stringify(user));
             showNotification('success', `2-Factor-Authentication has successfully been ${user.twoFactorAuthOn ? 'enabled' : 'disabled'}`);
@@ -79,15 +73,15 @@ function SecuritySettings({changeHandler}) {
 
     return (
         <div>
-            <h1 className="text-5xl mb-10">Security</h1>
+            <h1 className="font-medium mb-10">Security</h1>
 
             <form onSubmit={sendPasswordChangeRequest}>
                 <div
-                    className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
-                    <div className="text-lg">Change password</div>
+                    className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border bg-ui-bg rounded-[5px]">
+                    <h6 className="font-bold">Change password</h6>
 
                     <input type="submit"
-                           className="btn ml-auto mr-0 mb-1"
+                           className="btn ml-auto mr-0 mb-1 !text-text-on-primary"
                            value="Update Password"/>
 
                     <div>
@@ -99,7 +93,7 @@ function SecuritySettings({changeHandler}) {
                             name="currentPassword"
                             required
                             minLength="10"
-                            className="h-8 w-2/3 mb-3 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                            className="h-8 w-2/3 mb-3 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg pl-1 pr-1"
                             onChange={(e) => setCurrentPassword(e.target.value)}
                         />
 
@@ -112,7 +106,7 @@ function SecuritySettings({changeHandler}) {
                             required
                             autoComplete="off"
                             minLength="10"
-                            className="h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1"
+                            className="h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg pl-1 pr-1"
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </div>
@@ -124,7 +118,7 @@ function SecuritySettings({changeHandler}) {
 
                     <div className="my-auto">Two-factor authentication</div>
 
-                    <div className="btn bg-ui-button border-[1px] border-ui-border ml-auto mr-0" onClick={handle2FAToggleButtonClick}>{JSON.parse(localStorage.getItem('user')).twoFactorAuthOn ? "Disable" : "Enable"}</div>
+                    <div className="btn bg-ui-button border border-ui-border ml-auto mr-0" onClick={handle2FAToggleButtonClick}>{JSON.parse(localStorage.getItem('user')).twoFactorAuthOn ? "Disable" : "Enable"}</div>
                 </div>
             </form>
 
