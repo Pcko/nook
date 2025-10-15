@@ -11,11 +11,12 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "allowJs": true
+    "allowJs": true,
+    "types": ["./globalexpress.d.ts"]
   },
   "include": [
     "src"
-  ],
+, "globalexpress.d.ts"  ],
   "exclude": [
     "node_modules",
     "dist"

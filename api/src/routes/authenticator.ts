@@ -20,8 +20,8 @@ import {
     TokenContent
 } from '../types/auth.js';
 import IUser from '../types/user.js';
-
 type IUserDocument = IUser & Document;
+
 const router = express.Router();
 
 const loginLimiter = rateLimit({

@@ -1,14 +1,16 @@
 import express, { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
+import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
-import { IdRequest } from '../types/auth.js';
 import { SaveSettingsBody } from '../types/settings.js';
+import IUser from '../types/user.js';
+type IUserDocument = IUser & Document;
 
 const router = express.Router();
 
 // SAVE SETTINGS REQUEST
-router.patch('/', async (req: IdRequest<{}, {}, SaveSettingsBody>, res: Response) => {
+router.patch('/', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
     const { account } = req.body.changes || {};
@@ -21,10 +23,10 @@ router.patch('/', async (req: IdRequest<{}, {}, SaveSettingsBody>, res: Response
 
     if (account) {
       //find user and alter the corresponding userdata
-      const user = await User.findOne({ _id: userId });
+      const user = await User.findOne({ _id: userId }) as IUserDocument;
       Object.keys(account).forEach(key => {
         if (key !== 'username') {
-          user[key] = account[key];
+          (user as any)[key] = account[key];
         }
       });
       await user.save();
@@ -40,24 +42,14 @@ router.patch('/', async (req: IdRequest<{}, {}, SaveSettingsBody>, res: Response
 });
 
 // ACCOUNT DELETION REQUEST
-router.delete('/delete-account', async (req, res) => {
+router.delete('/delete-account', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
     const { username } = req.body;
 
-    //make sure request body has all required information
-    if (!userId || !username) {
-      return res.sendStatus(400);
-    }
+    //ToDo: RequestBodys; errors weitermachen
 
-    //make sure all parameters are trimmed
-    const usernameTrimmed = username.trim();
-
-    if (usernameTrimmed !== req.userId) {
-      return res.status(403).send({ error: 'username_inconsistency' });
-    }
-
-    const user = await User.findOneAndDelete({ _id: usernameTrimmed });
+    const user = await User.findOneAndDelete({ _id: username });
     //make sure username exists
     if (!user) {
       return res.sendStatus(404);
@@ -79,8 +71,8 @@ router.get('/twoFactorAuth', async (req, res) => {
     const user = await User.findById(userId);
 
     const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
-    user.twoFactorAuthSecret = secret.base32;
-    await user.save();
+    user!.twoFactorAuthSecret = secret.base32;
+    await user!.save();
 
     return res.json({ qrCodeUrl: secret.otpauth_url });
   }
@@ -97,7 +89,7 @@ router.post('/twoFactorAuth', async (req, res) => {
     const { otp, isEnabled } = req.body;
 
     const user = await User.findById(userId);
-    const userSecret = user.twoFactorAuthSecret;
+    const userSecret = user!.twoFactorAuthSecret as string;
 
     if (!speakeasy.totp.verify({
       secret: userSecret, encoding: 'base32', token: otp
@@ -105,8 +97,8 @@ router.post('/twoFactorAuth', async (req, res) => {
       return res.status(403).send({ message: 'One time password is invalid!' })
     }
 
-    user.twoFactorAuthOn = isEnabled;
-    await user.save();
+    user!.twoFactorAuthOn = isEnabled;
+    await user!.save();
 
     return res.sendStatus(200);
   }
@@ -122,7 +114,7 @@ router.post('/logout', async (req, res) => {
     const { userId } = req;
 
     const user = await User.findOne({ _id: userId })
-    await user.updateTokenVersion();
+    await user!.updateTokenVersion();
 
     return res.sendStatus(200);
   }
