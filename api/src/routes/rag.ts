@@ -9,7 +9,7 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                authorization: process.env.RAG_KEY || ''
+                authorization: process.env.RAG_API_KEY || ''
             },
             body: JSON.stringify(req.body)
         });
