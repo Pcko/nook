@@ -21,7 +21,7 @@
 
 .light {
     --primary: #666BE2;
-    --secondary: #A79FCC;
+    --secondary: #575BC7;
     --primary-hover: #797dd9;
     --text-subtle: #626264;
     --far-bg: #D9D9D9;
@@ -31,11 +31,11 @@
     --ui-default: #FFFFFF;
     --ui-button: #FFFFFF;
     --ui-button-hover: #B0B3B8;
-    --ui-border: #CECECE;
+    --ui-border: #ddd8dd;
     --ui-border-selected: #9A9EA3;
     --ui-subtle: #575BC7;
     --text: #2E2F30;
-    --text-on-primary: #DFDFDF;
+    --text-on-primary: #FFFFFF;
     --dangerous: #FF4d4d;
     --success: #4CAF50;
 }

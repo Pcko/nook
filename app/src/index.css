@@ -9,7 +9,7 @@
 #root {
     width: 100vw;
     height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, "SF Pro Text", "SF Pro Display", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
@@ -124,7 +124,8 @@ body {
 }
 
 .form-field {
-    @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected focus:outline-none border-[1px] rounded
+    @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected
+    focus:outline-none border-[1px] rounded;
 }
 
 .title {
@@ -137,4 +138,14 @@ h1{
 
 .table-head{
     @apply bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg
+}
+
+.settings-input {
+    @apply text-h6 h-8 w-full border border-ui-border rounded-[5px] bg-website-bg pl-2 pr-1
+    focus:border-ui-border-selected transition-colors duration-200 outline-none;
+}
+
+.settings-pw-input{
+    @apply h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none
+    border rounded-[5px] bg-website-bg pl-2 pr-1 [&::placeholder]:relative [&::placeholder]:top-[3px];
 }
