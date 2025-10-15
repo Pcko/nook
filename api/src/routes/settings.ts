@@ -3,7 +3,6 @@ import speakeasy from 'speakeasy';
 import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
-import { SaveSettingsBody } from '../types/settings.js';
 import IUser from '../types/user.js';
 type IUserDocument = IUser & Document;
 
@@ -14,12 +13,6 @@ router.patch('/', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
     const { account } = req.body.changes || {};
-
-    //make sure request body is not invalid
-    if (!userId) {
-      res.sendStatus(400);
-      return
-    }
 
     if (account) {
       //find user and alter the corresponding userdata

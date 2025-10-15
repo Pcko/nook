@@ -27,7 +27,7 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 
-        req.userId = user.id;
+        req.userId = id;
         next();
     })
 }
