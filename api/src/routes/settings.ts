@@ -1,19 +1,22 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
 
 import { User } from '../util/internal.js';
+import { IdRequest } from '../types/auth.js';
+import { SaveSettingsBody } from '../types/settings.js';
 
 const router = express.Router();
 
 // SAVE SETTINGS REQUEST
-router.patch('/', async (req, res) => {
+router.patch('/', async (req: IdRequest<{}, {}, SaveSettingsBody>, res: Response) => {
   try {
     const { userId } = req;
-    const { account } = req.body.changes;
+    const { account } = req.body.changes || {};
 
     //make sure request body is not invalid
     if (!userId) {
-      return res.sendStatus(400);
+      res.sendStatus(400);
+      return
     }
 
     if (account) {
@@ -31,7 +34,8 @@ router.patch('/', async (req, res) => {
   }
   catch (err) {
     console.error("❌ Alter settings error: ", err);
-    return res.sendStatus(500);
+    res.sendStatus(500);
+    return;
   }
 });
 
