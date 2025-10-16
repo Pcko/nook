@@ -13,8 +13,6 @@ import projectRouter from './routes/projects.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 
-import 'dotenv/config';
-
 if (!process.env.APP_URL || !process.env.RAG_URL) {
     console.error('Cors environment missing!')
 }
