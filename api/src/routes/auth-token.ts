@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../util/internal.js';
+import { Request, Response, NextFunction } from 'express';
+import { TokenContent } from '../types/auth.js';
 
-function authenticateToken(req, res, next) {
+function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -9,12 +11,12 @@ function authenticateToken(req, res, next) {
         return res.sendStatus(401);
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, tokenContent) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, async (err, tokenContent) => {
         if (err) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 
-        const { id, version } = tokenContent;
+        const { id, version } = tokenContent as TokenContent;
         const user = await User.findOne({ _id: id }).lean();
 
         if (!user) {

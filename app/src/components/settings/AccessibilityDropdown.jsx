@@ -11,7 +11,7 @@ function AccessibilityDropdown({ options, selected, onChange }) {
         <div className="w-1/2 ml-auto mr-0 relative">
             <Listbox value={selected} onChange={onChange}>
                 <div className="relative">
-                    <Listbox.Button className="w-full p-1 rounded-[5px] text-text text-center bg-ui-bg border border-ui-border cursor-pointer">
+                    <Listbox.Button className="w-full pt-2 pb-1 px-1 rounded-[5px] text-text text-center bg-ui-default border-2 border-ui-border cursor-pointer">
                         {optionLabels[selected]}
                     </Listbox.Button>
 

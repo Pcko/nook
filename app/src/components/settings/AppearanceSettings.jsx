@@ -7,6 +7,7 @@ const availableThemes = ['system', 'dark', 'light'];
 
 function AppearanceSettings({changeHandler, options}) {
     const {accessibility: originalAccessibility} = options;
+    const [selectedAccessibility, setSelectedAccessibility] = useState(originalAccessibility);
     const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('theme') || 'system');
 
     const handleThemeChange = (selectedOption) => {
@@ -41,13 +42,15 @@ function AppearanceSettings({changeHandler, options}) {
         if (selectedOption === 'high-contrast') {
             document.documentElement.classList.add('high-contrast');
         }
+
+        setSelectedAccessibility(selectedOption);
     };
 
     return (
         <div>
             <h1 className="font-medium mb-10">Appearance</h1>
 
-            <div className="w-full py-3 px-5 border-ui-border border bg-ui-bg rounded-[5px]">
+            <div className="w-full py-3 px-5 mb-1 border-ui-border border bg-ui-bg rounded-[5px]">
 
                 <p className="mb-3 font-semibold">Interface Theme</p>
 
@@ -70,12 +73,11 @@ function AppearanceSettings({changeHandler, options}) {
                 </div>
 
                 <HR/>
-
                 <div className="grid grid-cols-2 mb-2">
-                    <p className="font-semibold">Accessibility</p>
+                    <p className="font-semibold mt-1">Accessibility</p>
                     <AccessibilityDropdown
                         options={["normal", "high-contrast"]}
-                        selected={originalAccessibility}
+                        selected={selectedAccessibility}
                         onChange={handleAccessibilityModeChange}
                     />
                 </div>

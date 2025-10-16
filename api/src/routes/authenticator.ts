@@ -20,13 +20,13 @@ import {
     TokenContent
 } from '../types/auth.js';
 import IUser from '../types/user.js';
-
 type IUserDocument = IUser & Document;
+
 const router = express.Router();
 
 const loginLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
-    max: 5,
+    max: 15,
     message: {
         message: 'Too many login attempts. Please try again in 5 minutes.'
     },

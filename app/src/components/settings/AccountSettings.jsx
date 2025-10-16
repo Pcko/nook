@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import HR from './SettingsHR';
 import AccountDeletionConfirmationForm from "./AccountDeletionConfirmationForm";
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur"
 
 function AccountSettings({changeHandler, options}) {
     const [accountDeletionFormActive, setAccountDeletionFormActive] = useState(false);
@@ -12,20 +13,19 @@ function AccountSettings({changeHandler, options}) {
     } = options;
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="min-h-0 flex flex-col flex-1">
             <h1 className="font-medium mb-10">Account</h1>
 
-            <div
-                className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
+            <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border rounded-[5px]">
                 {/* Email Field */}
-                <label htmlFor="email" className="block my-auto">Email</label>
+                <h6 className="block my-auto">Email</h6>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     required
                     defaultValue={originalEmail}
-                    className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 "
+                    className="settings-input"
                     onChange={(e) => changeHandler('email', e.target.value)}
                 />
 
@@ -33,7 +33,7 @@ function AccountSettings({changeHandler, options}) {
                 <HR/>
 
                 {/* First Name Field */}
-                <label htmlFor="firstName" className="block my-auto">First Name</label>
+                <h6 className="block my-auto">First Name</h6>
                 <input
                     type="text"
                     id="firstName"
@@ -41,7 +41,7 @@ function AccountSettings({changeHandler, options}) {
                     required
                     defaultValue={originalFirstName}
                     minLength="2"
-                    className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 "
+                    className="settings-input"
                     onChange={(e) => changeHandler('firstName', e.target.value)}
                 />
 
@@ -49,7 +49,7 @@ function AccountSettings({changeHandler, options}) {
                 <HR/>
 
                 {/* Last Name Field */}
-                <label htmlFor="lastName" className="block my-auto">Last Name</label>
+                <h6 className="block my-auto">Last Name</h6>
                 <input
                     type="text"
                     id="lastName"
@@ -57,7 +57,7 @@ function AccountSettings({changeHandler, options}) {
                     required
                     defaultValue={originalLastName}
                     minLength="2"
-                    className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1 "
+                    className="settings-input"
                     onChange={(e) => changeHandler('lastName', e.target.value)}
                 />
 
@@ -65,7 +65,7 @@ function AccountSettings({changeHandler, options}) {
                 <HR/>
 
                 {/* Username Field */}
-                <label htmlFor="username" className="block my-auto">Username</label>
+                <h6 className="block my-auto">Username</h6>
                 <input
                     type="text"
                     id="username"
@@ -73,24 +73,25 @@ function AccountSettings({changeHandler, options}) {
                     required
                     defaultValue={originalUsername}
                     minLength="2"
-                    className="h-8 w-full border-ui-border focus:border-white focus:outline-none border-[1px] rounded bg-ui-bg pl-1 pr-1  autofill:bg-ui-bg"
+                    className="settings-input"
                     onChange={(e) => changeHandler('username', e.target.value)}
                 />
             </div>
 
-            <div
-                className="w-full mt-auto mb-0 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border-[1px] bg-ui-bg rounded-lg">
-                <span className="my-auto">Do you want to delete your account?</span>
-                <input type="button"
-                       value="Delete"
-                       className="btn w-[150px] mr-0 ml-auto hover: !bg-dangerous !text-text-on-primary"
-                       onClick={() => setAccountDeletionFormActive(true)}
-                />
+            <div className="mt-[375px] py-3 px-5 w-full grid grid-cols-[70%_30%] border-ui-border border bg-ui-bg rounded-[5px]">
+                <h6 className="my-auto">Want to delete your Account?</h6>
+                <button
+                    onClick={() => setAccountDeletionFormActive(true)}
+                    className="btn bg-website-bg w-[180px] h-[40px] text-h6 font-normal mr-0 ml-auto flex items-center justify-center"
+                >
+                    Delete
+                </button>
             </div>
 
-            {accountDeletionFormActive ?
-                <div
-                    className="top-0 left-0 absolute w-screen h-screen backdrop-blur backdrop-opacity-80"
+            {accountDeletionFormActive &&
+            <>
+               <div
+                    className="fixed inset-0 w-full h-full z-20 items-center justify-center"
                     onClick={(e) => {
                         e.stopPropagation();
                         setAccountDeletionFormActive(false);
@@ -98,7 +99,10 @@ function AccountSettings({changeHandler, options}) {
                     <div className="bg-ui-bg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <AccountDeletionConfirmationForm/>
                     </div>
-                </div> : ''}
+                </div> 
+                <CenteredWindowWithBackgroundBlur/>
+            </>}
+        
         </div>
     );
 }

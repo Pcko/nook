@@ -14,7 +14,7 @@ class DashboardService {
         return axios.delete(`/api/pages/${pageName}`);
     }
 
-    static async createPage(selectedProjectId: string, pageNamev, trimmedFolderName) {
+    static async createPage(selectedProjectId: string, pageName: string, trimmedFolderName: string) {
         return await axios.post(`/api/projects/${selectedProjectId}/pages`, {pageName, folderName: trimmedFolderName});
     }
 }

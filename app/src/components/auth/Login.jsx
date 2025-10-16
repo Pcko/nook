@@ -147,7 +147,7 @@ function Login() {
                         <button
                             className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
                             <FcGoogle className="text-xl"/>
-                            <span className={"text-text"}>Google</span>
+                            <span className={"font-normal"}>Google</span>
                         </button>
                     </div>
                 </div>
