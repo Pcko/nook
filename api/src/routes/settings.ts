@@ -4,12 +4,13 @@ import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
 import IUser from '../types/user.js';
+import { SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/settings.js';
 type IUserDocument = IUser & Document;
 
 const router = express.Router();
 
 // SAVE SETTINGS REQUEST
-router.patch('/', async (req: Request, res: Response) => {
+router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) => {
   try {
     const { userId } = req;
     const { account } = req.body.changes || {};
@@ -40,7 +41,9 @@ router.delete('/delete-account', async (req: Request, res: Response) => {
     const { userId } = req;
     const { username } = req.body;
 
-    //ToDo: RequestBodys; errors weitermachen
+    if(userId !== username){
+      return res.sendStatus(400);
+    }
 
     const user = await User.findOneAndDelete({ _id: username });
     //make sure username exists
@@ -57,11 +60,11 @@ router.delete('/delete-account', async (req: Request, res: Response) => {
 });
 
 // ACTIVATE TWO FACTOR AUTH REQUEST
-router.get('/twoFactorAuth', async (req, res) => {
+router.get('/twoFactorAuth', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId) as IUserDocument;
 
     const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
     user!.twoFactorAuthSecret = secret.base32;
@@ -76,12 +79,12 @@ router.get('/twoFactorAuth', async (req, res) => {
 });
 
 // TOGGLE TWO FACTOR AUTH REQUEST
-router.post('/twoFactorAuth', async (req, res) => {
+router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBody>, res: Response) => {
   try {
     const { userId } = req;
     const { otp, isEnabled } = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId) as IUserDocument;
     const userSecret = user!.twoFactorAuthSecret as string;
 
     if (!speakeasy.totp.verify({
@@ -102,12 +105,12 @@ router.post('/twoFactorAuth', async (req, res) => {
 })
 
 // LOGOUT REQUEST
-router.post('/logout', async (req, res) => {
+router.post('/logout', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findOne({ _id: userId })
-    await user!.updateTokenVersion();
+    const user = await User.findOne({ _id: userId }) as IUserDocument;
+    await user.updateTokenVersion();
 
     return res.sendStatus(200);
   }
