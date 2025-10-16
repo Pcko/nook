@@ -57,7 +57,7 @@ function Dashboard() {
             {/* Sidebar */}
             <aside className="w-[clamp(280px,20vw,400px)] pt-[50px] px-[3vw] flex flex-col">
                 {/* User Info */}
-                <div className=" flex items-center">
+                <div className="flex items-center">
                     <UserIcon/>
                     <h6 className="ml-3 font-medium">{user?.username}</h6>
                 </div>
