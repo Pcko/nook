@@ -8,7 +8,7 @@ function SidebarItem({ label, icon: Icon, active, onClick, className = "", svgCl
             }`}
             onClick={onClick}
         >
-            {Icon && <Icon className={`${svgClass} h-5 mr-1 !text-text-subtle `} />}
+            <Icon className={`${svgClass} h-5 mr-1 !text-text-subtle `} />
             <span>{label}</span>
         </div>
     );

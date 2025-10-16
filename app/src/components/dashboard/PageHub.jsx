@@ -9,6 +9,7 @@ import DashboardService from "../../services/DashboardService";
 import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
+import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 
 /**
  * All Options that the user can sort by
@@ -73,6 +74,15 @@ const pageExamples = {
     "MyPage 3": {
         createdAt: "1.12.2005", updatedAt: "1.1.2101", deploymentStatus: "Not Deployed"
     }
+}
+
+const dateFormat = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
 }
 
 function convertOptionToHTML(option) {
@@ -146,21 +156,8 @@ function PageHub({pages, setPages}) {
                 {/* Top Bar */}
                 <div className="flex">
                     {/* Search */}
-                    <div className="flex w-1/3 p-2 border-[1px] border-ui-border rounded-[5px]">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="size-6 my-auto text-text-subtle mr-2"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                            />
-                        </svg>
+                    <div className="flex w-1/3 p-2 border border-ui-border rounded-[5px]">
+                        <MagnifyingGlassIcon className="h-5 mr-1 !text-text-subtle"/>
                         <input
                             type="text"
                             placeholder="Search"
@@ -218,27 +215,27 @@ function PageHub({pages, setPages}) {
                     </div>
                 </div>
 
-                <hr className="mt-8 mb-10 border-[1px] border-ui-border"/>
+                <hr className="mt-8 mb-10 border border-ui-border"/>
 
                 {/* Table */}
                 <div className="scroll-auto">
                     <div className="grid grid-cols-4 border-ui-border">
                         {/* Headers */}
-                        <div className="sticky bg-ui-bg top-0 border-ui-border border-[1px] rounded-tl-[5px]">
+                        <div className="sticky bg-ui-bg top-0 border-ui-border border rounded-tl-[5px]">
                             <h6
                                 className="py-2 px-4">
                                 Page Name
                             </h6>
                         </div>
                         <h6
-                            className="sticky bg-ui-bg top-0 border-ui-border border-[1px] py-2 px-4">
+                            className="sticky bg-ui-bg top-0 border-ui-border border py-2 px-4">
                             Created
                         </h6>
                         <h6
-                            className="sticky bg-ui-bg top-0 border-ui-border border-[1px] py-2 px-4">
+                            className="sticky bg-ui-bg top-0 border-ui-border border py-2 px-4">
                             Last Modified
                         </h6>
-                        <div className="sticky bg-ui-bg top-0 border-ui-border border-[1px] rounded-tr-[5px]">
+                        <div className="sticky bg-ui-bg top-0 border-ui-border border rounded-tr-[5px]">
                             <h6
                                 className="py-2 px-4 ">
                                 Deployment Status
@@ -251,7 +248,7 @@ function PageHub({pages, setPages}) {
                             .sort(compareTableEntries)
                             .map(([name, details], index, filtered) => (<Fragment key={name}>
                                 <div
-                                    className={`flex py-2 pl-4 pr-2 border-ui-border border-[1px] border-t-0 items-center select-none ${index === filtered.length - 1 ? "rounded-bl-[5px]" : ""}`}>
+                                    className={`flex py-2 pl-4 pr-2 border-ui-border border border-t-0 items-center select-none ${index === filtered.length - 1 ? "rounded-bl-[5px]" : ""}`}>
                                     <span
                                         className="underline text-primary hover:cursor-pointer font-medium"
                                         onClick={() => onPageClick(name)}>
@@ -298,29 +295,15 @@ function PageHub({pages, setPages}) {
                                 </div>
 
                                 <div
-                                    className="p-4 align-middle border-ui-border border-[1px] border-t-0 flex items-center">
-                                    {new Date(details.createdAt).toLocaleString(navigator.language, {
-                                        year: "numeric",
-                                        month: "2-digit",
-                                        day: "2-digit",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        hour12: false,
-                                    })}
+                                    className="p-4 align-middle border-ui-border border border-t-0 flex items-center">
+                                    {new Date(details.createdAt).toLocaleString(navigator.language,dateFormat )}
                                 </div>
                                 <div
-                                    className="p-4 border-ui-border border-[1px] border-t-0 flex items-center">
-                                    {new Date(details.updatedAt).toLocaleString(navigator.language, {
-                                        year: "numeric",
-                                        month: "2-digit",
-                                        day: "2-digit",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        hour12: false,
-                                    })}
+                                    className="p-4 border-ui-border border border-t-0 flex items-center">
+                                    {new Date(details.updatedAt).toLocaleString(navigator.language, dateFormat)}
                                 </div>
                                 <div
-                                    className={`p-4 border-ui-border border-[1px] border-t-0 flex items-center ${index === filtered.length - 1 ? "rounded-br-[5px]" : ""}`}>
+                                    className={`p-4 border-ui-border border border-t-0 flex items-center ${index === filtered.length - 1 ? "rounded-br-[5px]" : ""}`}>
                                 <span className="inline-flex items-center gap-1">
                                     {deploymentStates[details.deploymentStatus.toLowerCase()]}
                                     {details.deploymentStatus}

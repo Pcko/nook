@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import HR from './SettingsHR';
 import AccountDeletionConfirmationForm from "./AccountDeletionConfirmationForm";
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur"
 
 function AccountSettings({changeHandler, options}) {
     const [accountDeletionFormActive, setAccountDeletionFormActive] = useState(false);
@@ -12,11 +13,10 @@ function AccountSettings({changeHandler, options}) {
     } = options;
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="min-h-0 flex flex-col flex-1">
             <h1 className="font-medium mb-10">Account</h1>
 
-            <div
-                className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border rounded-[5px]">
+            <div className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border rounded-[5px]">
                 {/* Email Field */}
                 <h6 className="block my-auto">Email</h6>
                 <input
@@ -78,10 +78,9 @@ function AccountSettings({changeHandler, options}) {
                 />
             </div>
 
-            <div className="w-full mt-44 mb-5 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border bg-ui-bg rounded-[5px]">
+            <div className="mt-[375px] py-3 px-5 w-full grid grid-cols-[70%_30%] border-ui-border border bg-ui-bg rounded-[5px]">
                 <h6 className="my-auto">Want to delete your Account?</h6>
                 <button
-                    type="button"
                     onClick={() => setAccountDeletionFormActive(true)}
                     className="btn bg-website-bg w-[180px] h-[40px] text-h6 font-normal mr-0 ml-auto flex items-center justify-center"
                 >
@@ -89,9 +88,10 @@ function AccountSettings({changeHandler, options}) {
                 </button>
             </div>
 
-            {accountDeletionFormActive ?
-                <div
-                    className="top-0 left-0 absolute w-full h-full backdrop-blur backdrop-opacity-80"
+            {accountDeletionFormActive &&
+            <>
+               <div
+                    className="fixed inset-0 w-full h-full z-20 items-center justify-center"
                     onClick={(e) => {
                         e.stopPropagation();
                         setAccountDeletionFormActive(false);
@@ -99,7 +99,10 @@ function AccountSettings({changeHandler, options}) {
                     <div className="bg-ui-bg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <AccountDeletionConfirmationForm/>
                     </div>
-                </div> : ''}
+                </div> 
+                <CenteredWindowWithBackgroundBlur/>
+            </>}
+        
         </div>
     );
 }

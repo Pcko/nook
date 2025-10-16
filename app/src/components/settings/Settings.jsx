@@ -87,7 +87,7 @@ function Settings({activeTab}) {
     }
 
     return (
-        <div className="h-full pt-8 px-[175px] bg-website-bg text-text">
+        <div className="h-full pt-8 px-[200px] bg-website-bg text-text">
             <form onSubmit={applyChanges} className="h-full relative">
                 <AnimatePresence mode="wait">
                     <motion.div

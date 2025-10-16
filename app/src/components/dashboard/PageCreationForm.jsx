@@ -37,7 +37,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
     };
 
     return (
-        <div className="bg-ui-bg border-[1px] border-ui-border rounded-[5px] w-[30vw]">
+        <div className="bg-ui-bg border border-ui-border rounded-[5px] w-[30vw]">
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
                 <h5 className="font-semibold">Create a new Page!</h5>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
@@ -54,7 +54,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                     name="pageName"
                     required
                     minLength="2"
-                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
                     onChange={(e) => setPageName(e.target.value)}
                     value={pageName}
                     placeholder="Example: My Page"
@@ -65,7 +65,7 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                     id="folderName"
                     name="folderName"
                     minLength="2"
-                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
                     onChange={(e) => setFolderName(e.target.value)}
                     value={folderName}
                     placeholder="Default: General"
