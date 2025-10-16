@@ -1,18 +1,18 @@
 .dark {
     --primary: #666BE2;
-    --secondary: #A79FCC;
+    --secondary: #767BDB;
     --primary-hover: #797dd9;
     --text-subtle: #949597;
     --far-bg: #090909;
     --website-bg: #101012;
     --ui-bg: #17181B;
     --ui-bg-selected: #1E1F23;
-    --ui-default: #FFFFFF;
+    --ui-default: #1E1F23;
     --ui-button: #2D3036;
     --ui-button-hover: #1E1F23;
     --ui-border: #2D3036;
     --ui-border-selected: #54585E;
-    --ui-subtle: #6D54B5;
+    --ui-subtle: #575BC7;
     --text: #FFFFFF;
     --text-on-primary: #FFFFFF;
     --dangerous: #FF4d4d;

@@ -10,6 +10,10 @@ import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIc
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 
+/**
+ * All Options that the user can sort by
+ * @type {[{svg: string, id: number, option: string},{svg: string, id: number, option: string},{svg: string, id: number, option: string},{svg: string, id: number, option: string}]}
+ */
 const sortByOptions = [
     {
         id: 1,
@@ -25,11 +29,15 @@ const sortByOptions = [
         svg: 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
     }, {
         id: 4,
-        option: 'Page Count',
+        option: 'Deployment',
         svg: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z'
     },
 ];
 
+/**
+ *  States of Deployment and their icons for the Table
+ * @type {{"not deployed": React.JSX.Element, inactive: React.JSX.Element, online: React.JSX.Element}}
+ */
 const deploymentStates = {
     "online":
         (
@@ -45,15 +53,25 @@ const deploymentStates = {
         )
 }
 
+/**
+ * The priority that is used for sorting Pages by Deployment Status
+ * @type {{Inactive: number, "Not Deployed": number, Online: number}}
+ */
+const deploymentPriority = {
+    "Online": 0,
+    "Inactive": 1,
+    "Not Deployed": 2
+};
+
 const pageExamples = {
     "MyPage 1": {
-        createdAt: "1.12.2005", updatedAt: "1.1.1111", deploymentStatus: "Online"
+        createdAt: "1.12.2008", updatedAt: "1.1.208", deploymentStatus: "Inactive"
     },
     "MyPage 2": {
-        createdAt: "1.12.2005", updatedAt: "1.1.1111", deploymentStatus: "Inactive"
+        createdAt: "1.12.2005", updatedAt: "1.1.2009", deploymentStatus: "Online"
     },
     "MyPage 3": {
-        createdAt: "1.12.2005", updatedAt: "1.1.1111", deploymentStatus: "Not Deployed"
+        createdAt: "1.12.2005", updatedAt: "1.1.2101", deploymentStatus: "Not Deployed"
     }
 }
 
@@ -72,70 +90,6 @@ function convertOptionToHTML(option) {
             </svg>
             <div className="my-auto">{option.option}</div>
         </div>);
-}
-
-function TopBar(props) {
-    return <div className="flex">
-        {/* Search */}
-        <div className="flex w-1/3 p-2 border-2 border-ui-border rounded-[5px]">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6 my-auto text-text-subtle mr-2"
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-            </svg>
-            <input
-                type="text"
-                placeholder="Search"
-                onChange={props.onChange}
-                className="w-full my-auto bg-inherit focus:outline-none placeholder:text-text-subtle"
-            />
-        </div>
-
-        {/* Sorting + New Page */}
-        <div className="flex ml-auto space-x-4">
-            <Listbox value={props.value} onChange={props.onChange1}>
-                <div className="relative">
-                    <ListboxButton
-                        className="flex items-center justify-center w-[180px] h-[42px] pr-3 border-2 border-ui-border rounded-[5px] bg-ui-bg hover:bg-ui-bg-selected transition-colors text-text"
-                    >
-                        {convertOptionToHTML(props.value)}
-                    </ListboxButton>
-
-                    <ListboxOptions
-                        className="absolute z-10 mt-1 w-[180px] bg-ui-bg border-2 border-ui-border rounded-[5px] shadow-lg overflow-hidden text-text-subtle">
-                        <h6 className="px-3 py-2 text-sm font-semibold text-text hover:cursor-default">Sort</h6>
-                        <div className="divide-y divide-ui-border">
-                            {sortByOptions.map(props.callbackfn)}
-                        </div>
-                    </ListboxOptions>
-                </div>
-            </Listbox>
-
-            <button
-                type="button"
-                className="prim-btn w-[180px] h-[42px] rounded-[5px] !text-text-son-primary !border border-secondary flex items-center justify-center gap-2"
-                onClick={props.onClick}
-            >
-                {/* Plus-Icon als SVG */}
-                <svg width="14" height="13" viewBox="0 0 18 17" fill="none"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613" stroke="white"
-                          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                New Page
-            </button>
-
-        </div>
-    </div>;
 }
 
 function PageHub({pages, setPages}) {
@@ -157,15 +111,20 @@ function PageHub({pages, setPages}) {
     const compareTableEntries = ([keyA, valueA], [keyB, valueB]) => {
         switch (sortByOption) {
             case sortByOptions[0]:
-                return (keyA > keyB) ^ sortReversed;
+                return (keyA.localeCompare(keyB)) * (sortReversed ? -1 : 1);
             case sortByOptions[1]:
-                return (valueA.createdAt < valueB.createdAt) ^ sortReversed;
+                return (new Date(valueA.createdAt) - new Date(valueB.createdAt)) * (sortReversed ? -1 : 1);
             case sortByOptions[2]:
-                return (valueA.updatedAt < valueB.updatedAt) ^ sortReversed;
+                return (new Date(valueA.updatedAt) - new Date(valueB.updatedAt)) * (sortReversed ? -1 : 1);
             case sortByOptions[3]:
-                return (valueA.deploymentStatus > valueB.deploymentStatus) ^ sortReversed;
+                const rankA = deploymentPriority[valueA.deploymentStatus];
+                const rankB = deploymentPriority[valueB.deploymentStatus];
+                return (rankA - rankB) * (sortReversed ? -1 : 1);
+            default:
+                return 0;
         }
     };
+
 
     const handlePageDelete = async (pageName) => {
         try {
@@ -185,30 +144,89 @@ function PageHub({pages, setPages}) {
         <div className="w-full h-full flex flex-col pt-3 px-20">
             <div>
                 {/* Top Bar */}
-                <TopBar onChange={(e) => setSearchQuery(e.target.value)} value={sortByOption}
-                        onChange1={setSortByOption} callbackfn={(option) => (
-                    <ListboxOption key={option.id} value={option}>
-                        {({active, selected}) => (
-                            <button
-                                className={`w-full text-left px-3 py-2 text-sm transition-colors rounded ${
-                                    active ? "bg-ui-bg-selected" : ""
-                                } ${selected ? "font-medium" : "font-normal"}`}
-                            >
-                                {convertOptionToHTML(option)}
-                            </button>
-                        )}
-                    </ListboxOption>
-                )} onClick={() => setPageCreationFormActive(true)}/>
+                <div className="flex">
+                    {/* Search */}
+                    <div className="flex w-1/3 p-2 border-[1px] border-ui-border rounded-[5px]">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6 my-auto text-text-subtle mr-2"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                            />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full my-auto bg-inherit focus:outline-none placeholder:text-text-subtle"
+                        />
+                    </div>
+
+                    {/* Sorting + New Page */}
+                    <div className="flex ml-auto space-x-4">
+                        <Listbox value={sortByOption} onChange={setSortByOption}>
+                            <div className="relative">
+                                <ListboxButton
+                                    className="flex items-center justify-center w-[180px] h-[42px] pr-3 border-2 border-ui-border rounded-[5px] bg-ui-bg hover:bg-ui-bg-selected transition-colors text-text"
+                                >
+                                    {convertOptionToHTML(sortByOption)}
+                                </ListboxButton>
+
+                                <ListboxOptions
+                                    className="absolute z-10 mt-1 w-[180px] bg-ui-bg border-2 border-ui-border rounded-[5px] shadow-lg overflow-hidden text-text-subtle">
+                                    <h6 className="px-3 py-2 text-sm font-semibold text-text hover:cursor-default">Sort</h6>
+                                    <div className="divide-y divide-ui-border">
+                                        {sortByOptions.map((option) => (
+                                            <ListboxOption key={option.id} value={option}>
+                                                {({active, selected}) => (
+                                                    <button
+                                                        className={`w-full text-left px-3 py-2 text-sm transition-colors rounded ${
+                                                            active ? "bg-ui-bg-selected" : ""
+                                                        } ${selected ? "font-medium" : "font-normal"}`}
+                                                    >
+                                                        {convertOptionToHTML(option)}
+                                                    </button>
+                                                )}
+                                            </ListboxOption>
+                                        ))}
+                                    </div>
+                                </ListboxOptions>
+                            </div>
+                        </Listbox>
+
+                        <button
+                            type="button"
+                            className="prim-btn w-[180px] h-[42px] rounded-[5px] !text-text-on-primary !border border-secondary flex items-center justify-center gap-2"
+                            onClick={() => setPageCreationFormActive(true)}
+                        >
+                            {/* Plus-Icon als SVG */}
+                            <svg width="14" height="13" viewBox="0 0 18 17" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613" stroke="white"
+                                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            New Page
+                        </button>
+
+                    </div>
+                </div>
 
                 <hr className="mt-8 mb-10 border-[1px] border-ui-border"/>
 
                 {/* Table */}
                 <div className="scroll-auto">
-                    <div className="grid grid-cols-4 border-ui-border rounded-[5px]">
+                    <div className="grid grid-cols-4 border-ui-border">
                         {/* Headers */}
-                        <div className="sticky bg-ui-bg top-0">
+                        <div className="sticky bg-ui-bg top-0 border-ui-border border-[1px] rounded-tl-[5px]">
                             <h6
-                                className="border-ui-border border-[1px] py-2 px-4 rounded-tl-[3px]">
+                                className="py-2 px-4">
                                 Page Name
                             </h6>
                         </div>
@@ -220,9 +238,9 @@ function PageHub({pages, setPages}) {
                             className="sticky bg-ui-bg top-0 border-ui-border border-[1px] py-2 px-4">
                             Last Modified
                         </h6>
-                        <div className="sticky bg-ui-bg top-0">
+                        <div className="sticky bg-ui-bg top-0 border-ui-border border-[1px] rounded-tr-[5px]">
                             <h6
-                                className="border-ui-border border-[1px] py-2 px-4 rounded-tr-[3px]">
+                                className="py-2 px-4 ">
                                 Deployment Status
                             </h6>
                         </div>
