@@ -31,3 +31,23 @@ export const toggleOutlines = (editorRef) => {
     editor.runCommand(CMD);  // turn outlines ON
   }
 };
+
+
+/**
+ * Change editor to desktop.
+ * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
+ */
+export const setDesktop = (editorRef) => {editorRef?.current?.setDevice?.("Desktop")};
+
+/**
+ * Change editor to tablet.
+ * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
+ */
+export const setTablet  = (editorRef) => {editorRef?.current?.setDevice?.("Tablet")};
+
+/**
+ * Change editor to mobile.
+ * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
+ */
+export const setMobile  = (editorRef) => {editorRef?.current?.setDevice?.("Mobile")};
+

@@ -4,6 +4,10 @@
 }
 
 #gjs-blocks{
+ .gjs-one-bg {
+    background-color: var(--ui-default) !important;
+  }
+
   .gjs-block {
     background-color: var(--ui-default);
     color: var(--text);
@@ -34,6 +38,8 @@
 }
 
 #gjs-layers{
+ 
+
   .gjs-layer-title{
     background-color: var(--ui-bg) !important;
     border-bottom: 2px solid var(--far-bg) !important;
@@ -42,6 +48,9 @@
 
    .gjs-hovered{
     background-color: none !important;
+  }
+  .gjs-one-bg {
+    background-color: var(--ui-default) !important;
   }
 
 }
@@ -52,6 +61,10 @@
   color: var(--text);
 }
 
-.gjs-one-bg {
-  background-color: var(--ui-default) !important;
+
+#gjs-editor{
+  .gjs-one-bg {
+    background-color: var(--far-bg) !important;
+  }
 }
+
