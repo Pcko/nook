@@ -14,7 +14,7 @@ import { handleUndo, handleRedo, toggleOutlines } from "../../utils/grapesAction
  */
 function TopPanel({ editorRef }) {
   return (
-    <div className="h-12 ui-border flex items-center px-4 space-x-5">
+    <div className="h-12 flex items-center px-4 space-x-5 border border-ui-border bg-ui-bg text-text font-sans">
        <ToolbarButton
         icon={<AiOutlineUndo size={18} />}
         label="Str+Z"
@@ -41,30 +41,31 @@ function ToolbarButton({ icon, label, onClick }) {
       className="
         flex items-center gap-1.5
         px-2 py-1
-        bg-gray-50 hover:bg-gray-100
+        bg-ui-bg hover:bg-ui-button-hover
         rounded
-        border border-gray-200
-        text-[12px] font-medium text-gray-700
+        border border-ui-border
+        text-tiny font-medium text-text-subtle
         transition
       "
     >
       <span
         className="
           flex items-center justify-center
-          bg-white
+          bg-ui-default
           rounded-full
           w-6 h-6
-          border border-gray-300
+          border border-ui-border
+          text-text
         "
       >
         {icon}
       </span>
       <span
         className="
-          bg-gray-200 text-gray-800
+          bg-ui-bg-selected text-text
           px-1.5 py-0.5
           rounded
-          font-mono text-[11px]
+          font-mono text-micro
           tracking-tight
         "
       >
@@ -73,5 +74,6 @@ function ToolbarButton({ icon, label, onClick }) {
     </button>
   );
 }
+
 
 export default TopPanel;
