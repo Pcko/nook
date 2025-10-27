@@ -24,9 +24,9 @@ class AuthService {
     }
 
     static async logout() {
+        await axios.post('/api/settings/logout');
         localStorage.clear();
         sessionStorage.clear();
-        return await axios.post('/api/settings/logout');
     }
 
     static async login2FA(username: string, password: string, twoFactorAuthenticationCode: string) {
