@@ -37,8 +37,6 @@ function WebsiteBuilder() {
         { name: "Desktop", width: "" },
         { name: "Tablet",  width: "768px" },
         { name: "Mobile",  width: "375px" },
-        { name: "Tablet", width: "768px" },
-        { name: "Mobile", width: "375px" },
       ],
     },
   });
