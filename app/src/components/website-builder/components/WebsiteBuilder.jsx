@@ -30,16 +30,23 @@ function WebsiteBuilder() {
     blockManager: { appendTo: "#gjs-blocks" },    // Render blocks inside #blocks
     layerManager: { appendTo: "#gjs-layers" },
     styleManager: { appendTo: ".right-panel" },   // Render style manager inside .right-panel
+     deviceManager: {
+      devices: [
+        { name: "Desktop", width: "" },
+        { name: "Tablet",  width: "768px" },
+        { name: "Mobile",  width: "375px" },
+      ],
+    },
   });
 
   return (
-     <div className="flex flex-col h-screen w-screen bg-gray-100">
+     <div className="flex flex-col h-screen w-screen">
       <TopPanel editorRef={editorRef} /> {/* Top Panel */}
       
       <div className="flex flex-1 overflow-hidden"> {/* Main Layout */}
         <LeftPanel /> {/* Left Panel */}
 
-        <div className="flex-1 border border-gray-300"> {/* Editor (Center) */}
+        <div id="gjs-editor" className="flex-1 border border-gray-300"> {/* Editor (Center) */}
           <div className="h-full bg-white" ref={containerRef}/>
         </div>
 
