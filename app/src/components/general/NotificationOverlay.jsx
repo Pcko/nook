@@ -1,4 +1,4 @@
-import { useNotifications } from "./NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 
 function NotificationOverlay() {
     const { notifications, removeNotification } = useNotifications();

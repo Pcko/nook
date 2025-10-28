@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {isInvalidStringForURL} from "../general/FormChecks";
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 import DashboardService from "../../services/DashboardService";
 import useErrorHandler from "../general/ErrorHandler";
 

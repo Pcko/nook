@@ -1,4 +1,4 @@
-import { useNotifications } from './NotificationContext';
+import {useNotifications} from "../context/NotificationContext";
 import { useNavigate } from 'react-router-dom';
 
 const useErrorHandler = () => {

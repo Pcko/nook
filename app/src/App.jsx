@@ -1,22 +1,16 @@
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import React, {useEffect} from 'react';
-import Dashboard from "./components/dashboard/Dashboard"
 
 import './index.css';
-
-import {NotificationProvider} from "./components/general/NotificationContext";
-import NotificationOverlay from "./components/general/NotificationOverlay";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AuthRedirect from "./components/general/AuthRedirect";
-import Login from "./components/auth/Login";
-import Settings from "./components/settings/Settings";
-import EditorHub from "./components/editor-hub/EditorHub";
-import Register from "./components/auth/Registration";
+import {NotificationProvider} from "./components/context/NotificationContext";
+import {AnimationProvider} from "./components/context/AnimationContext";
+import AppContent from "./AppContent";
 
 function App() {
+
     useEffect(() => {
         const accessibilityMode = localStorage.getItem('accessibility');
         let theme = localStorage.getItem('theme');
+
         if (!theme) {
             theme = 'system';
             localStorage.setItem('theme', theme);
@@ -39,24 +33,9 @@ function App() {
 
     return (
         <NotificationProvider>
-            <NotificationOverlay/>
-            <Router>
-                <div className={'h-full'}>
-                    <main className={'h-full bg-far-bg text-text'}>
-                        <Routes>
-                            <Route path="/" element={<AuthRedirect/>}/>
-                            <Route path="/login" element={<Login/>}/>
-                            <Route path="/register" element={<Register/>}/>
-
-                            <Route element={<ProtectedRoute/>}>
-                                <Route path="/settings" element={<Settings/>}/>
-                                <Route path="/dashboard" element={<Dashboard/>}/>
-                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
-                            </Route>
-                        </Routes>
-                    </main>
-                </div>
-            </Router>
+            <AnimationProvider>
+                <AppContent/>
+            </AnimationProvider>
         </NotificationProvider>
     );
 }

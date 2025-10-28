@@ -3,7 +3,7 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import DashboardService from "../../services/DashboardService";
 import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";

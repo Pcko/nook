@@ -1,0 +1,28 @@
+import React, {createContext, useContext, useEffect, useState} from "react";
+
+const AnimationContext = createContext();
+
+export function AnimationProvider({children}) {
+    const [animationEnabled, setAnimationEnabled] = useState(true);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("animation");
+        setAnimationEnabled(stored !== "off"); // default to on
+    }, []);
+
+    const toggleAnimation = () => {
+        const newValue = !animationEnabled;
+        setAnimationEnabled(newValue);
+        localStorage.setItem("animation", newValue ? "on" : "off");
+    };
+
+    return (
+        <AnimationContext.Provider value={{animationEnabled, toggleAnimation}}>
+            {children}
+        </AnimationContext.Provider>
+    );
+}
+
+export function useAnimation() {
+    return useContext(AnimationContext);
+}

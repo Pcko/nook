@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useNotifications } from "../general/NotificationContext"
+import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import SettingsService from "../../services/SettingsService";
 

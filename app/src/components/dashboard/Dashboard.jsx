@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useNotifications} from "../general/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import PageHub from "./PageHub";
 import Settings from "../settings/Settings";
@@ -16,6 +15,7 @@ import {
     UserCircleIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
+import {useNotifications} from "../context/NotificationContext";
 
 
 function Dashboard() {
