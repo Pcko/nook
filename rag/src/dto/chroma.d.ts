@@ -1,4 +1,4 @@
-import type {Metadata} from "chromadb";
+import type {Metadata, Where} from "chromadb";
 
 export interface ChromaDBAddDocumentsRequestBody {
     ids: string[];
@@ -8,6 +8,7 @@ export interface ChromaDBAddDocumentsRequestBody {
 
 export interface ChromaDBQuery {
     query: string,
+    where?: Where;
     nResults?: number,
     distanceCutoff?: number,
 }

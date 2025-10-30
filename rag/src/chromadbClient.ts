@@ -30,6 +30,7 @@ async function getChromaDBQueryResponse(request : ChromaDBQuery): Promise<Chroma
         queryTexts: [request.query],
         nResults: request.nResults || defaultNResults,
         include: ["documents", "metadatas", "distances"],
+        ...(request.where ? { where: request.where } : {})
     });
 
     const distances = queryResult.distances?.[0] || [];
