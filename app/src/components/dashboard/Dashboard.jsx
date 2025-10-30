@@ -96,8 +96,9 @@ function Dashboard() {
                     <div className="mt-auto mb-5">
                         <div className="border-t-2 border-ui-border my-4"/>
                         <SidebarItem
+                            className="text-dangerous"
                             label="Log Out"
-                            svgClass={"rotate-[-90deg]"}
+                            svgClass={"rotate-[-90deg] stroke-dangerous"}
                             icon={ArrowUpTrayIcon}
                             onClick={handleLogout}
                         />
