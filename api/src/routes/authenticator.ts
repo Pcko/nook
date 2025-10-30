@@ -5,7 +5,7 @@ import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
 import { Document } from 'mongoose';
 
-import User from '../database/models/user-schema.js';
+import { User } from '../util/internal.js';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
@@ -20,13 +20,13 @@ import {
     TokenContent
 } from '../types/auth.js';
 import IUser from '../types/user.js';
-
 type IUserDocument = IUser & Document;
+
 const router = express.Router();
 
 const loginLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
-    max: 5,
+    max: 15,
     message: {
         message: 'Too many login attempts. Please try again in 5 minutes.'
     },

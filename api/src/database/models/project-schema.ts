@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import Page from './page-schema.js';
 import IProject from '../../types/project.js';
+import { Page } from '../../util/internal.js';
 
 const ProjectSchema = new Schema<IProject>(
     {
@@ -62,4 +62,4 @@ ProjectSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-export default mongoose.model<IProject>('Project', ProjectSchema);
+export const Project = mongoose.model<IProject>('Project', ProjectSchema);

@@ -1,7 +1,7 @@
 import React from "react";
 
-import {AiOutlineBorder, AiOutlineRedo, AiOutlineUndo} from "react-icons/ai";
-import { handleUndo, handleRedo, toggleOutlines } from "../../utils/grapesActions";
+import {AiOutlineBorder, AiOutlineRedo, AiOutlineUndo, AiOutlineMobile, AiOutlineTablet, AiOutlineLaptop} from "react-icons/ai";
+import { handleUndo, handleRedo, toggleOutlines, setDesktop, setTablet, setMobile } from "../../utils/grapesActions";
 
 /**
  * TopPanel component
@@ -14,64 +14,92 @@ import { handleUndo, handleRedo, toggleOutlines } from "../../utils/grapesAction
  */
 function TopPanel({ editorRef }) {
   return (
-    <div className="h-12 ui-border flex items-center px-4 space-x-5">
-       <ToolbarButton
-        icon={<AiOutlineUndo size={18} />}
-        label="Str+Z"
-        onClick={() => handleUndo(editorRef)}
-      />
-      <ToolbarButton
-        icon={<AiOutlineRedo size={18} />}
-        label="Str+Y"
-        onClick={() => handleRedo(editorRef)}
-      />
-      <ToolbarButton
-        icon={<AiOutlineBorder size={18} />}
-        label="Alt+O"
-        onClick={() => toggleOutlines(editorRef)}
-      />
+    <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+       {/* left group */}
+      <div className="flex items-center gap-2">
+        <ToolbarButton
+          icon={<AiOutlineUndo size={18} />}
+          label="Str+Z"
+          onClick={() => handleUndo(editorRef)}
+        />
+        <ToolbarButton
+          icon={<AiOutlineRedo size={18} />}
+          label="Str+Y"
+          onClick={() => handleRedo(editorRef)}
+        />
+        <ToolbarButton
+          icon={<AiOutlineBorder size={18} />}
+          label="Alt+O"
+          onClick={() => toggleOutlines(editorRef)}
+        />
+      </div>
+
+
+      {/* center group */}
+      <div className="flex items-center justify-center gap-2">
+        <ToolbarButton
+          icon={<AiOutlineLaptop size={18} />}
+          onClick={() => setDesktop(editorRef)}
+        />
+        <ToolbarButton
+          icon={<AiOutlineTablet size={18} />}
+          onClick={() => setTablet(editorRef)}
+        />
+        <ToolbarButton
+          icon={<AiOutlineMobile size={18} />}
+          onClick={() => setMobile(editorRef)}
+        />
+      </div>
+
+       {/* right group */}
+      <div className="flex items-center justify-end gap-2">
+        {/* add buttons later Save / Preview / publish */}
+      </div>
     </div>
   );
 }
 
 function ToolbarButton({ icon, label, onClick }) {
+  const hasLabel = !!label;
+
   return (
     <button
       onClick={onClick}
-      className="
-        flex items-center gap-1.5
-        px-2 py-1
-        bg-gray-50 hover:bg-gray-100
-        rounded
-        border border-gray-200
-        text-[12px] font-medium text-gray-700
-        transition
-      "
+      aria-label={label || "toolbar button"}
+      title={label || undefined}
+      className={[
+        "flex items-center rounded border border-ui-border transition",
+        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+        "py-1",                             // ← same vertical padding always
+        hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5", // ← only width/gap changes
+      ].join(" ")}
     >
       <span
         className="
           flex items-center justify-center
-          bg-white
-          rounded-full
-          w-6 h-6
-          border border-gray-300
+          bg-ui-default text-text
+          rounded-full w-6 h-6
+          border border-ui-border
         "
       >
         {icon}
       </span>
-      <span
-        className="
-          bg-gray-200 text-gray-800
-          px-1.5 py-0.5
-          rounded
-          font-mono text-[11px]
-          tracking-tight
-        "
-      >
-        {label}
-      </span>
+
+      {hasLabel && (
+        <span
+          className="
+            bg-ui-bg-selected text-text
+            px-1.5 py-0.5
+            rounded
+            font-mono text-micro tracking-tight
+          "
+        >
+          {label}
+        </span>
+      )}
     </button>
   );
 }
+
 
 export default TopPanel;

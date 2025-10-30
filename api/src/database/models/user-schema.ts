@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import IUser from '../../types/user.js';
+import { Project } from '../../util/internal.js';
 
 const UserSchema = new Schema<IUser>({
     _id: {
@@ -50,7 +51,6 @@ const UserSchema = new Schema<IUser>({
 
 async function handleUserDeletion(user: IUser | null) {
     if (!user) return;
-    const { default: Project } = await import('./project-schema.js');
 
     await Project.deleteMany({ author: user._id });
 }
@@ -93,4 +93,4 @@ UserSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-export default mongoose.model<IUser>('User', UserSchema);
+export const User = mongoose.model<IUser>('User', UserSchema);

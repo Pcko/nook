@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import TabSelector from "./TabSelector";
+
 
 /**
  * LeftPanel component
@@ -9,10 +11,15 @@ import React from "react";
  * @returns {JSX.Element} The rendered left panel
  */
 function LeftPanel() {
+  const [activeTab, setActiveTab] = useState("layers");
+
   return (
     <div className="w-1/5 min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
-      <p className="font-semibold mb-2">Left Panel</p>
-      <div id="blocks" />
+      <TabSelector activeTab={activeTab} onChange={setActiveTab} />
+
+      {/* Both exist at load; visibility only */}
+      <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"} />
+      <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"} />
     </div>
   );
 }

@@ -19,7 +19,7 @@ function LoadingScreen() {
             <BackgroundText/>
             <div id="Window"
                  className="w-[500px] text-text bg-ui-bg border-[1px] border-ui-border rounded-[10px] z-10 p-10">
-                {LoadingBubble}
+                <LoadingBubble/>
             </div>
         </div>
     );

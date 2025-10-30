@@ -1,27 +1,26 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
+import { Document } from 'mongoose';
 
-import User from '../database/models/user-schema.js';
+import { User } from '../util/internal.js';
+import IUser from '../types/user.js';
+import { SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/settings.js';
+type IUserDocument = IUser & Document;
 
 const router = express.Router();
 
 // SAVE SETTINGS REQUEST
-router.patch('/', async (req, res) => {
+router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) => {
   try {
     const { userId } = req;
-    const { account } = req.body.changes;
-
-    //make sure request body is not invalid
-    if (!userId) {
-      return res.sendStatus(400);
-    }
+    const { account } = req.body.changes || {};
 
     if (account) {
       //find user and alter the corresponding userdata
-      const user = await User.findOne({ _id: userId });
+      const user = await User.findOne({ _id: userId }) as IUserDocument;
       Object.keys(account).forEach(key => {
         if (key !== 'username') {
-          user[key] = account[key];
+          (user as any)[key] = account[key];
         }
       });
       await user.save();
@@ -31,29 +30,22 @@ router.patch('/', async (req, res) => {
   }
   catch (err) {
     console.error("❌ Alter settings error: ", err);
-    return res.sendStatus(500);
+    res.sendStatus(500);
+    return;
   }
 });
 
 // ACCOUNT DELETION REQUEST
-router.delete('/delete-account', async (req, res) => {
+router.delete('/delete-account', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
     const { username } = req.body;
 
-    //make sure request body has all required information
-    if (!userId || !username) {
+    if(userId !== username){
       return res.sendStatus(400);
     }
 
-    //make sure all parameters are trimmed
-    const usernameTrimmed = username.trim();
-
-    if (usernameTrimmed !== req.userId) {
-      return res.status(403).send({ error: 'username_inconsistency' });
-    }
-
-    const user = await User.findOneAndDelete({ _id: usernameTrimmed });
+    const user = await User.findOneAndDelete({ _id: username });
     //make sure username exists
     if (!user) {
       return res.sendStatus(404);
@@ -68,15 +60,15 @@ router.delete('/delete-account', async (req, res) => {
 });
 
 // ACTIVATE TWO FACTOR AUTH REQUEST
-router.get('/twoFactorAuth', async (req, res) => {
+router.get('/twoFactorAuth', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId) as IUserDocument;
 
     const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
-    user.twoFactorAuthSecret = secret.base32;
-    await user.save();
+    user!.twoFactorAuthSecret = secret.base32;
+    await user!.save();
 
     return res.json({ qrCodeUrl: secret.otpauth_url });
   }
@@ -87,13 +79,13 @@ router.get('/twoFactorAuth', async (req, res) => {
 });
 
 // TOGGLE TWO FACTOR AUTH REQUEST
-router.post('/twoFactorAuth', async (req, res) => {
+router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBody>, res: Response) => {
   try {
     const { userId } = req;
     const { otp, isEnabled } = req.body;
 
-    const user = await User.findById(userId);
-    const userSecret = user.twoFactorAuthSecret;
+    const user = await User.findById(userId) as IUserDocument;
+    const userSecret = user!.twoFactorAuthSecret as string;
 
     if (!speakeasy.totp.verify({
       secret: userSecret, encoding: 'base32', token: otp
@@ -101,8 +93,8 @@ router.post('/twoFactorAuth', async (req, res) => {
       return res.status(403).send({ message: 'One time password is invalid!' })
     }
 
-    user.twoFactorAuthOn = isEnabled;
-    await user.save();
+    user!.twoFactorAuthOn = isEnabled;
+    await user!.save();
 
     return res.sendStatus(200);
   }
@@ -113,11 +105,11 @@ router.post('/twoFactorAuth', async (req, res) => {
 })
 
 // LOGOUT REQUEST
-router.post('/logout', async (req, res) => {
+router.post('/logout', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findOne({ _id: userId })
+    const user = await User.findOne({ _id: userId }) as IUserDocument;
     await user.updateTokenVersion();
 
     return res.sendStatus(200);

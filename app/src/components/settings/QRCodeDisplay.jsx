@@ -18,7 +18,7 @@ function QRCodeDisplay({ onClose, onContinue, qrCodeURL }){
 
     return(
         <CenteredWindowWithBackgroundBlur>
-            <div className="p-4 bg-ui-bg rounded-xl border-ui-border border-[1px] w-[350px]">
+            <div className="p-4 bg-ui-bg rounded-xl border-ui-border border w-[350px]">
                 <h1>Scan QR-Code</h1>
                 <img src={url} alt="Generating QR Code..." className="px-[15%] pt-5 pb-10 w-full" />
                 <div className="flex">

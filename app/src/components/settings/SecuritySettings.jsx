@@ -1,8 +1,7 @@
 import HR from './SettingsHR';
 import {useState} from 'react';
-import axios from '../auth/AxiosInstance.js'
-import { isInvalidStringForPassword } from "../general/FormChecks";
-import { useNotifications } from "../general/NotificationContext";
+import {isInvalidStringForPassword} from "../general/FormChecks";
+import {useNotifications} from "../general/NotificationContext";
 import QRCodeDisplay from "./QRCodeDisplay";
 import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
 import useErrorHandler from "../general/ErrorHandler";
@@ -13,7 +12,7 @@ function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [qrCodeUrl, setQRCodeUrl] = useState();
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
     const [twoFactorAuthFormActive, setTwoFactorAuthFormActive] = useState(false);
     const handleError = useErrorHandler();
 
@@ -30,7 +29,6 @@ function SecuritySettings({changeHandler}) {
         }
 
         try {
-            const username = JSON.parse(localStorage.getItem('user')).username;
             const response = await SettingsService.updatePassword(newPassword);
 
             showNotification('success', 'Your password was updated successfully.');
@@ -41,20 +39,20 @@ function SecuritySettings({changeHandler}) {
 
     const handle2FAToggleButtonClick = async (event) => {
         event.preventDefault();
-        if(JSON.parse(localStorage.getItem('user')).twoFactorAuthOn){
+        if (JSON.parse(localStorage.getItem('user')).twoFactorAuthOn) {
             setTwoFactorAuthFormActive(true);
-        } else{
-            try{
+        } else {
+            try {
                 const response = await AuthService.toggle2FA();
                 setQRCodeUrl(response.data.qrCodeUrl);
-            } catch(err){
+            } catch (err) {
                 showNotification('error', err);
             }
         }
     };
 
     const handle2FASubmit = async (otp) => {
-        if(!otp){
+        if (!otp) {
             return setTwoFactorAuthFormActive(false);
         }
 
@@ -65,8 +63,7 @@ function SecuritySettings({changeHandler}) {
             localStorage.setItem('user', JSON.stringify(user));
             showNotification('success', `2-Factor-Authentication has successfully been ${user.twoFactorAuthOn ? 'enabled' : 'disabled'}`);
             setTwoFactorAuthFormActive(false);
-        }
-        catch (err) {
+        } catch (err) {
             handleError(err);
         }
     }
@@ -78,11 +75,12 @@ function SecuritySettings({changeHandler}) {
             <form onSubmit={sendPasswordChangeRequest}>
                 <div
                     className="w-full py-3 px-5 grid grid-cols-[60%_40%] border-ui-border border bg-ui-bg rounded-[5px]">
-                    <h6 className="font-bold">Change password</h6>
+                    <h6>Change password</h6>
 
                     <input type="submit"
-                           className="btn ml-auto mr-0 mb-1 !text-text-on-primary"
-                           value="Update Password"/>
+                           className="prim-btn w-[55%] font-light !py-1 ml-auto mr-0 mb-1 !text-text-on-primary cursor-pointer border-secondary"
+                           value="Update Password"
+                    />
 
                     <div>
                         {/* Current Password Field */}
@@ -91,9 +89,10 @@ function SecuritySettings({changeHandler}) {
                             type="password"
                             id="currentPassword"
                             name="currentPassword"
+                            placeholder="************"
                             required
                             minLength="10"
-                            className="h-8 w-2/3 mb-3 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg pl-1 pr-1"
+                            className="settings-pw-input mb-3"
                             onChange={(e) => setCurrentPassword(e.target.value)}
                         />
 
@@ -103,33 +102,38 @@ function SecuritySettings({changeHandler}) {
                             type="password"
                             id="newPassword"
                             name="newPassword"
+                            placeholder="************"
                             required
                             autoComplete="off"
                             minLength="10"
-                            className="h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg pl-1 pr-1"
+                            className="settings-pw-input"
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </div>
-                    <div/>
                     {/* this div is a filler for the right column */}
+                    <div/>
 
                     <HR/>
                     <HR/>
 
-                    <div className="my-auto">Two-factor authentication</div>
+                    <h6>Two-factor authentication</h6>
 
-                    <div className="btn bg-ui-button border border-ui-border ml-auto mr-0" onClick={handle2FAToggleButtonClick}>{JSON.parse(localStorage.getItem('user')).twoFactorAuthOn ? "Disable" : "Enable"}</div>
+                    <div
+                        className="w-[55%] ml-auto mr-0 mb-[7px] p-1 rounded-[5px] text-text text-center bg-website-bg border-2 border-ui-border cursor-pointer hover:bg-ui-bg transition-colors"
+                        onClick={handle2FAToggleButtonClick}>
+                        {JSON.parse(localStorage.getItem('user')).twoFactorAuthOn ? "Disable" : "Enable"}
+                    </div>
                 </div>
             </form>
 
             {/* Two-Factor Auth Form */}
-            {twoFactorAuthFormActive ? <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit} /> : ''}
-            {qrCodeUrl? <QRCodeDisplay onClose={()=>{
+            {twoFactorAuthFormActive ? <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/> : ''}
+            {qrCodeUrl ? <QRCodeDisplay onClose={() => {
                 setQRCodeUrl(undefined);
-            }} onContinue={()=>{
+            }} onContinue={() => {
                 setQRCodeUrl(undefined);
                 setTwoFactorAuthFormActive(true);
-            }} qrCodeURL={qrCodeUrl} /> : ''}
+            }} qrCodeURL={qrCodeUrl}/> : ''}
         </div>
     );
 }
