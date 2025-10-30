@@ -1,6 +1,6 @@
 import {type Request, type Response, Router} from "express";
 import chromaClient from "../chromadbClient.js";
-import type {ChromaDBAddDocumentsRequestBody} from "../dto/chromaDBAddDocumentsRequestBody.dto.js";
+import type {ChromaDBAddDocumentsRequestBody, ChromaDBQuery} from "../dto/chroma.js";
 
 const chromaRouter = Router();
 
@@ -8,8 +8,8 @@ chromaRouter.get('/entries', async (req : Request, res : Response) => {
     res.status(200).send(await chromaClient.getEntries());
 });
 
-chromaRouter.post('/query', async (req: Request<{}, {}, { query: string }>, res: Response) => {
-    res.status(200).send(await chromaClient.query(req.body.query));
+chromaRouter.post('/query', async (req: Request<{}, {}, ChromaDBQuery>, res: Response) => {
+    res.status(200).send(await chromaClient.query(req.body));
 });
 
 chromaRouter.post('/addDocuments', async (req: Request<{}, {}, ChromaDBAddDocumentsRequestBody>, res: Response) => {

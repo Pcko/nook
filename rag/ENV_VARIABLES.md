@@ -25,3 +25,9 @@ LLM_PORT=11434
 
 ### the local port on the server that servers the chromadb api
 CHROMADB_API_PORT=8000
+
+### the maximum number of results chroma will return
+CHROMADB_N_RESULTS=15
+
+### the distance limit of how related query results may be (lower = more related)
+CHROMADB_QUERY_DISTANCE_CUTOFF=0.5

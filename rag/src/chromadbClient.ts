@@ -1,10 +1,13 @@
-import type {ChromaDBQueryResponseBody} from './dto/chromadbQueryResponseBody.dto.js';
 import { ChromaClient } from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
-import type {ChromaDBGetResponseBody} from "./dto/chromaDBGetResponseBody.dto.js";
-import type {ChromaDBAddDocumentsRequestBody} from "./dto/chromaDBAddDocumentsRequestBody.dto.js";
+import type {
+    ChromaDBAddDocumentsRequestBody,
+    ChromaDBGetResponseBody, ChromaDBQuery,
+    ChromaDBQueryResultItem
+} from "./dto/chroma.js";
 
-const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "5");
+const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "15");
+const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF || "0.5");
 
 const embedder = new OllamaEmbeddingFunction({
     url: 'http://localhost:11434',
@@ -22,15 +25,28 @@ const collection = await client.getOrCreateCollection({
     embeddingFunction: embedder
 });
 
-async function getChromaDBQueryResponse(query: string, nResults: number=defaultNResults): Promise<ChromaDBQueryResponseBody> {
+async function getChromaDBQueryResponse(request : ChromaDBQuery): Promise<ChromaDBQueryResultItem[]> {
     const queryResult = await collection.query({
-        queryTexts: [query],
-        nResults: nResults,
+        queryTexts: [request.query],
+        nResults: request.nResults || defaultNResults,
+        include: ["documents", "metadatas", "distances"],
     });
 
-    return {
-        documents: queryResult.documents,
-    };
+    const distances = queryResult.distances?.[0] || [];
+    const documents = queryResult.documents?.[0] || [];
+    const metadatas = queryResult.metadatas?.[0] || [];
+    const ids = queryResult.ids?.[0] || [];
+
+    const filtered = distances
+        .map((dist, i) => ({
+            distance: dist || 1,
+            document: documents[i],
+            metadata: metadatas[i],
+            id: ids[i],
+        }))
+        .filter((item) => item.distance <= (request.distanceCutoff || defaultDistanceCutoff));
+
+    return filtered;
 }
 
 async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
