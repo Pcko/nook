@@ -7,7 +7,7 @@ export function AnimationProvider({children}) {
 
     useEffect(() => {
         const stored = localStorage.getItem("animation");
-        setAnimationEnabled(stored !== "off"); // default to on
+        setAnimationEnabled(stored !== "off"); // apply user's settings or default to true if not set
     }, []);
 
     const toggleAnimation = () => {
