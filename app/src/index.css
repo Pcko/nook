@@ -149,3 +149,7 @@ h1{
     @apply h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none
     border rounded-[5px] bg-website-bg pl-2 pr-1 [&::placeholder]:relative [&::placeholder]:top-[3px];
 }
+
+.icon path {
+    stroke: var(--text-on-primary);
+}

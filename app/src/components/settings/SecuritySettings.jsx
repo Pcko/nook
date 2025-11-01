@@ -1,12 +1,12 @@
 import HR from './SettingsHR';
 import {useState} from 'react';
 import {isInvalidStringForPassword} from "../general/FormChecks";
-import {useNotifications} from "../general/NotificationContext";
 import QRCodeDisplay from "./QRCodeDisplay";
 import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
 import useErrorHandler from "../general/ErrorHandler";
 import SettingsService from "../../services/SettingsService";
 import AuthService from "../../services/AuthService";
+import {useNotifications} from "../context/NotificationContext";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState('');

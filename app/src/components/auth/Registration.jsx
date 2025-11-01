@@ -1,6 +1,5 @@
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNotifications} from '../general/NotificationContext';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
@@ -14,6 +13,7 @@ import Divider from "./FormDivider";
 import {FcGoogle} from "react-icons/fc";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 import AuthService from "../../services/AuthService";
+import {useNotifications} from "../context/NotificationContext";
 
 function Registration() {
     const [formData, setFormData] = useState({

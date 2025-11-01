@@ -3,7 +3,7 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import DashboardService from "../../services/DashboardService";
 import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";
@@ -204,9 +204,9 @@ function PageHub({pages, setPages}) {
                             onClick={() => setPageCreationFormActive(true)}
                         >
                             {/* Plus-Icon als SVG */}
-                            <svg width="14" height="13" viewBox="0 0 18 17" fill="none"
+                            <svg className="icon" width="14" height="13" viewBox="0 0 18 17" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613" stroke="white"
+                                <path d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613"
                                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                             New Page
