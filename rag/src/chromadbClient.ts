@@ -40,7 +40,7 @@ async function getChromaDBQueryResponse(request : ChromaDBQuery): Promise<Chroma
 
     const filtered = distances
         .map((dist, i) => ({
-            distance: dist || 1,
+            distance: dist ?? 1,
             document: documents[i],
             metadata: metadatas[i],
             id: ids[i],
