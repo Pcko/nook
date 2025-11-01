@@ -15,7 +15,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         const chromaResponse = await chromaClient.query({query});
         query = query+`\nContext: ${JSON.stringify(chromaResponse)}`;
     }
-console.log(query);
+
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
