@@ -1,7 +1,9 @@
+/* eslint-disable react/jsx-sort-props */
+// WebsiteBuilder.jsx
 import React from "react";
 
 import { useGrapesEditor } from "../hooks/useGrapesEditor";
-
+import ResizablePanelsLayout from "./ResizablePanelsLayout";
 import LeftPanel from "./Panels/LeftPanel";
 import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
@@ -30,7 +32,7 @@ function WebsiteBuilder() {
     blockManager: { appendTo: "#gjs-blocks" },    // Render blocks inside #blocks
     layerManager: { appendTo: "#gjs-layers" },
     styleManager: { appendTo: ".right-panel" },   // Render style manager inside .right-panel
-     deviceManager: {
+    deviceManager: {
       devices: [
         { name: "Desktop", width: "" },
         { name: "Tablet",  width: "768px" },
@@ -39,18 +41,27 @@ function WebsiteBuilder() {
     },
   });
 
+  /**
+   * ensure GrapesJS canvas recalculates when the layout changes
+   * @returns void
+   */
+  const handleLayout = () => editorRef.current?.refresh?.();
+
   return (
-     <div className="flex flex-col h-screen w-screen">
-      <TopPanel editorRef={editorRef} /> {/* Top Panel */}
-      
-      <div className="flex flex-1 overflow-hidden"> {/* Main Layout */}
-        <LeftPanel /> {/* Left Panel */}
+    <div className="flex flex-col h-screen w-screen">
+      <TopPanel editorRef={editorRef} />
 
-        <div id="gjs-editor" className="flex-1 border border-gray-300"> {/* Editor (Center) */}
-          <div className="h-full bg-white" ref={containerRef}/>
-        </div>
-
-        <RightPanel /> {/* Right Panel */}
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelsLayout
+          onLayout={handleLayout}
+          left={<LeftPanel />}   /* Left Panel */
+          editor={               /* Editor Area */
+            <div id="gjs-editor" className="h-full min-w-0 border border-gray-300 overflow-hidden">
+              <div className="h-full bg-white" ref={containerRef} />
+            </div>
+          }
+          right={<RightPanel />}  /* Right Panel */
+        />
       </div>
     </div>
   );

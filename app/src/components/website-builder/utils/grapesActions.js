@@ -50,4 +50,3 @@ export const setTablet  = (editorRef) => {editorRef?.current?.setDevice?.("Table
  * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
  */
 export const setMobile  = (editorRef) => {editorRef?.current?.setDevice?.("Mobile")};
-
