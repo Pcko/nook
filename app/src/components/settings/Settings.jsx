@@ -1,7 +1,7 @@
 import AppearanceSettings from "./AppearanceSettings";
 import AccountSettings from "./AccountSettings";
 import SecuritySettings from "./SecuritySettings";
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 import React, {useState} from "react";
 import useErrorHandler from "../general/ErrorHandler";
 import SettingsService from "../../services/SettingsService";

@@ -78,9 +78,10 @@ function AccountSettings({changeHandler, options}) {
                 />
             </div>
 
-            <div className="mt-[375px] py-3 px-5 w-full grid grid-cols-[70%_30%] border-ui-border border bg-ui-bg rounded-[5px]">
+            <div className="w-full mt-44 mb-5 py-3 px-5 grid grid-cols-[70%_30%] border-ui-border border bg-ui-bg rounded-[5px]">
                 <h6 className="my-auto">Want to delete your Account?</h6>
                 <button
+                    type="button"
                     onClick={() => setAccountDeletionFormActive(true)}
                     className="btn bg-website-bg w-[180px] h-[40px] text-h6 font-normal mr-0 ml-auto flex items-center justify-center"
                 >

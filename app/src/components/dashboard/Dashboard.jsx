@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useNotifications} from "../general/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import PageHub from "./PageHub";
 import Settings from "../settings/Settings";
@@ -16,6 +15,7 @@ import {
     UserCircleIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
+import {useNotifications} from "../context/NotificationContext";
 
 
 function Dashboard() {
@@ -96,8 +96,9 @@ function Dashboard() {
                     <div className="mt-auto mb-5">
                         <div className="border-t-2 border-ui-border my-4"/>
                         <SidebarItem
+                            className="text-dangerous"
                             label="Log Out"
-                            svgClass={"rotate-[-90deg]"}
+                            svgClass={"rotate-[-90deg] stroke-dangerous"}
                             icon={ArrowUpTrayIcon}
                             onClick={handleLogout}
                         />

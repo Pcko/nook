@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
 

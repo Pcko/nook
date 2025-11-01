@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
-import {useNotifications} from "../general/NotificationContext";
+import {useNotifications} from "../context/NotificationContext";
 
 function TwoFactorAuthenticationCodeInputForm({ submitForm }) {
     const [authenticationCode, setAuthenticationCode] = useState('');
