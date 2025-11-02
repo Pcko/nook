@@ -7,13 +7,13 @@ import groqClient from "../groqClient.js";
 
 const ragRouter = Router();
 
-ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody| { error: string }>) => {
+ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody | { error: string }>) => {
     const queryRequest = req.body;
 
     let query = queryRequest.query;
     if(!queryRequest.skipContext) {
-        const chromaResponse = await chromaClient.query(query);
-        query = query+`\nContext: ${chromaResponse.documents}`;
+        const chromaResponse = await chromaClient.query({query});
+        query = query+`\nContext: ${JSON.stringify(chromaResponse)}`;
     }
 
     if(queryRequest.stream) {
