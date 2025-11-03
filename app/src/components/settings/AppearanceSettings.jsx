@@ -98,7 +98,7 @@ function AppearanceSettings({changeHandler, options}) {
                         onClick={handleAnimationToggleChange}
                         onKeyDown={(e) => e.key === 'Enter' && handleAnimationToggleChange()}
                         whileTap={{scale: 0.9}}
-                        className={`w-1/2 ml-auto mr-0 border-2 cursor-pointer select-none px-4 py-1.5 rounded-[5px] transition-colors text-center ${
+                        className={`w-1/2 p-1 ml-auto mr-0 border-2 cursor-pointer select-none rounded-[5px] transition-colors text-center ${
                             animationEnabled
                                 ? 'bg-primary border-ui-border-selected text-text-on-primary'
                                 : 'bg-ui-default border-ui-border text-ui-text'

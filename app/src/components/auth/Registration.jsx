@@ -77,10 +77,11 @@ function Registration() {
                  className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
 
                 {/* Left side: Registration form */}
-                <div className="bg-blue w-[45%] flex-none justify-items-center self-center">
+                <div className="bg-blue w-[45%] flex flex-col justify-center items-center">
                     <h1>Create an Account</h1>
-                    <p>Already have an account? <a className={"text-ui-subtle hover:cursor-pointer"}
-                                                   onClick={() => navigate('/login')}>Sign in.</a></p>
+                    <p>Already have an account?
+                        <a className={"text-ui-subtle hover:cursor-pointer"} onClick={() => navigate('/login')}> Sign in.</a>
+                    </p>
 
                     <div className={"w-[60%]"}>
                         <form onSubmit={handleSubmit} className="mt-2">
