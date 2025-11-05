@@ -1,7 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 import IPage from '../../types/page.js';
-import IProject from '../../types/project.js';
-import { Project } from '../../util/internal.js';
 
 const PageSchema = new Schema<IPage>(
     {
@@ -13,9 +11,9 @@ const PageSchema = new Schema<IPage>(
             type: String,
             default: "",
         },
-        projectId: {
-            type: Schema.Types.ObjectId,
-            ref: "Project",
+        author: {
+            type: String,
+            ref: "User",
             required: true,
         },
         folderName: {
@@ -30,13 +28,6 @@ const PageSchema = new Schema<IPage>(
     }
 );
 
-PageSchema.index({ name: 1, projectId: 1 }, { unique: true });
-
-PageSchema.pre('save', async function (next) {
-    const project = await Project.findById(this.projectId) as IProject;
-    await project.updatePageCount();
-
-    next();
-})
+PageSchema.index({ name: 1, author: 1 }, { unique: true });
 
 export const Page = mongoose.model<IPage>('Page', PageSchema);

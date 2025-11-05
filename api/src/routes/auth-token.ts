@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../util/internal.js';
 import { Request, Response, NextFunction } from 'express';
-import { TokenContent } from '../types/auth.js';
+import { TokenContent } from '../types/requests/auth.js';
 
 function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
@@ -27,7 +27,7 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 
-        req.userId = id;
+        req.userId = user._id;
         next();
     })
 }

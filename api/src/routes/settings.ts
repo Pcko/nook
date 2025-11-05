@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
 import IUser from '../types/user.js';
-import { SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/settings.js';
+import { SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
 type IUserDocument = IUser & Document;
 
 const router = express.Router();
@@ -41,7 +41,7 @@ router.delete('/delete-account', async (req: Request, res: Response) => {
     const { userId } = req;
     const { username } = req.body;
 
-    if(userId !== username){
+    if (userId !== username) {
       return res.sendStatus(400);
     }
 
