@@ -101,7 +101,7 @@ function AppearanceSettings({changeHandler, options}) {
                         className={`w-1/2 p-1 ml-auto mr-0 border-2 cursor-pointer select-none rounded-[5px] transition-colors text-center ${
                             animationEnabled
                                 ? 'bg-primary border-ui-border-selected text-text-on-primary'
-                                : 'bg-ui-default border-ui-border text-ui-text'
+                                : 'bg-ui-bg-ui-bg border-ui-border text-ui-text'
                         }`}
                     >
                         {animationEnabled ? ' On' : ' Off'}

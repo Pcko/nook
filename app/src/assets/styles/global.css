@@ -41,22 +41,22 @@
 }
 
 .high-contrast {
-    --primary: #FF0000 !important;
-    --secondary: #FFFF00 !important;
-    --primary-hover: #00FF00 !important;
-    --text-subtle: #FFFFFF !important;
-    --far-bg: #000000 !important;
-    --website-bg: #000000 !important;
-    --ui-bg: #000000 !important;
-    --ui-bg-selected: #FF0000 !important;
-    --ui-default: #FFFFFF;
-    --ui-button: #000000 !important;
-    --ui-button-hover: #333333 !important;
-    --ui-border: #FFFFFF !important;
-    --ui-border-selected: #00FF00 !important;
-    --ui-subtle: #FFFF00 !important;
+    --primary: #007BFF !important;
+    --primary-hover: #339CFF !important;
+    --secondary: #FFD600 !important;
+    --dangerous: #FF3B00 !important;
+    --success: #00C853 !important;
     --text: #FFFFFF !important;
     --text-on-primary: #000000 !important;
-    --dangerous: #FFA500 !important;
-    --success: #00FF00 !important;
+    --text-subtle: #E0E0E0 !important;
+    --far-bg: #000000 !important;
+    --website-bg: #000000 !important;
+    --ui-bg: #111111 !important;
+    --ui-bg-selected: #007BFF !important;
+    --ui-default: #FFFFFF;
+    --ui-button: #000000 !important;
+    --ui-button-hover: #1A1A1A !important;
+    --ui-border: #FFFFFF !important;
+    --ui-border-selected: #FFD600 !important;
+    --ui-subtle: #BDBDBD !important;
 }
