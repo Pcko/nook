@@ -55,7 +55,7 @@ function EditorHub() {
         }
     }, [pageName, page, location.state]);
 
-    return s(
+    return (
         <WebsiteBuilder page={page}/>
     );
 }
