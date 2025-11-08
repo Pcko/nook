@@ -1,15 +1,16 @@
-import React, {Fragment, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
 import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
-import DashboardService from "../../services/DashboardService";
+import PageService from "../../services/PageService";
 import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
+import {useNavigate} from "react-router-dom";
 
 /**
  * All Options that the user can sort by
@@ -64,18 +65,6 @@ const deploymentPriority = {
     "Not Deployed": 2
 };
 
-const pageExamples = {
-    "MyPage 1": {
-        createdAt: "1.12.2008", updatedAt: "1.1.208", deploymentStatus: "Inactive"
-    },
-    "MyPage 2": {
-        createdAt: "1.12.2005", updatedAt: "1.1.2009", deploymentStatus: "Online"
-    },
-    "MyPage 3": {
-        createdAt: "1.12.2005", updatedAt: "1.1.2101", deploymentStatus: "Not Deployed"
-    }
-}
-
 const dateFormat = {
     year: "numeric",
     month: "2-digit",
@@ -102,20 +91,34 @@ function convertOptionToHTML(option) {
         </div>);
 }
 
-function PageHub({pages, setPages}) {
+function PageHub() {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortByOption, setSortByOption] = useState(sortByOptions[0]);
     const [sortReversed, setSortReversed] = useState(false);
     const [pageCreationFormActive, setPageCreationFormActive] = useState(false);
     const [pageNameToEdit, setPageNameToEdit] = useState();
+    const [pages, setPages] = useState({});
+
     const {showNotification} = useNotifications();
     const handleError = useErrorHandler();
+    const navigate = useNavigate();
 
-    pages = pageExamples;
-    const onPageClick = () => {
-        /**
-         * Implementiere hier das öffnen von Pages
-         */
+    useEffect(() => {
+        PageService.getPages()
+            .then(pages => {
+                const pageMap = {};
+                pages.forEach(page => {
+                    pageMap[page.name] = page;
+                })
+                setPages(pageMap);
+            })
+            .catch(error => {
+                handleError(error);
+            });
+    }, []);
+
+    const onPageClick = (page) => {
+        navigate(`/editor/${page.name}`, {state: {page}});
     };
 
     const compareTableEntries = ([keyA, valueA], [keyB, valueB]) => {
@@ -135,10 +138,9 @@ function PageHub({pages, setPages}) {
         }
     };
 
-
     const handlePageDelete = async (pageName) => {
         try {
-            await DashboardService.deletePage(pageName);
+            await PageService.deletePage(pageName);
             setPages((prev) => {
                 const updated = {...prev};
                 delete updated[pageName];
@@ -251,7 +253,7 @@ function PageHub({pages, setPages}) {
                                     className={`flex py-2 pl-4 pr-2 border-ui-border border border-t-0 items-center select-none ${index === filtered.length - 1 ? "rounded-bl-[5px]" : ""}`}>
                                     <span
                                         className="underline text-primary hover:cursor-pointer font-medium"
-                                        onClick={() => onPageClick(name)}>
+                                        onClick={() => onPageClick(details)}>
                                         {name}
                                     </span>
 
@@ -296,7 +298,7 @@ function PageHub({pages, setPages}) {
 
                                 <div
                                     className="p-4 align-middle border-ui-border border border-t-0 flex items-center">
-                                    {new Date(details.createdAt).toLocaleString(navigator.language,dateFormat )}
+                                    {new Date(details.createdAt).toLocaleString(navigator.language, dateFormat)}
                                 </div>
                                 <div
                                     className="p-4 border-ui-border border border-t-0 flex items-center">
@@ -305,7 +307,7 @@ function PageHub({pages, setPages}) {
                                 <div
                                     className={`p-4 border-ui-border border border-t-0 flex items-center ${index === filtered.length - 1 ? "rounded-br-[5px]" : ""}`}>
                                 <span className="inline-flex items-center gap-1">
-                                    {deploymentStates[details.deploymentStatus.toLowerCase()]}
+                                    {deploymentStates[details.deploymentStatus?.toLowerCase()]}
                                     {details.deploymentStatus}
                                 </span>
                                 </div>

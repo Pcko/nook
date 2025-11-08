@@ -17,16 +17,37 @@ body {
 }
 
 @layer base {
-    h1 { @apply text-h1; }
-    h2 { @apply text-h2; }
-    h3 { @apply text-h3; }
-    h4 { @apply text-h4; }
-    h5 { @apply text-h5; }
-    h6 { @apply text-h6; }
-    p,div, label, input, input::placeholder, button {
+    h1 {
+        @apply text-h1;
+    }
+
+    h2 {
+        @apply text-h2;
+    }
+
+    h3 {
+        @apply text-h3;
+    }
+
+    h4 {
+        @apply text-h4;
+    }
+
+    h5 {
+        @apply text-h5;
+    }
+
+    h6 {
+        @apply text-h6;
+    }
+
+    p, div, label, input, input::placeholder, button {
         @apply text-regular;
     }
-    small { @apply text-small; }
+
+    small {
+        @apply text-small;
+    }
 }
 
 .full-screen-grid {
@@ -132,11 +153,11 @@ body {
     @apply px-4 py-2 text-sm font-medium text-white
 }
 
-h1{
+h1 {
     @apply font-semibold leading-tight;
 }
 
-.table-head{
+.table-head {
     @apply bg-ui-bg-selected border-ui-border border-[1px] py-2 px-4 rounded-tl-lg
 }
 
@@ -145,7 +166,7 @@ h1{
     focus:border-ui-border-selected transition-colors duration-200 outline-none;
 }
 
-.settings-pw-input{
+.settings-pw-input {
     @apply h-8 w-2/3 border-ui-border focus:border-ui-border-selected focus:outline-none
     border rounded-[5px] bg-website-bg pl-2 pr-1 [&::placeholder]:relative [&::placeholder]:top-[3px];
 }
@@ -153,3 +174,17 @@ h1{
 .icon path {
     stroke: var(--text-on-primary);
 }
+
+.btn-wb {
+    @apply flex items-center justify-center
+    min-w-[95px]
+    px-4 py-0.5
+    rounded-[5px] border border-ui-border
+    bg-ui-bg text-text font-medium
+    transition-all hover:bg-ui-button-hover active:scale-[0.97];
+}
+
+.btn-wb.btn-wb--primary {
+    @apply bg-primary text-text-on-primary hover:bg-primary-hover;
+}
+

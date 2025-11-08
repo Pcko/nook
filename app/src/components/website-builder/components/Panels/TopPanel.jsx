@@ -1,7 +1,16 @@
 import React from "react";
 
-import {AiOutlineBorder, AiOutlineRedo, AiOutlineUndo, AiOutlineMobile, AiOutlineTablet, AiOutlineLaptop} from "react-icons/ai";
-import { handleUndo, handleRedo, toggleOutlines, setDesktop, setTablet, setMobile } from "../../utils/grapesActions";
+import {
+    AiOutlineBorder,
+    AiOutlineLaptop,
+    AiOutlineMobile,
+    AiOutlineRedo,
+    AiOutlineTablet,
+    AiOutlineUndo
+} from "react-icons/ai";
+import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines} from "../../utils/grapesActions";
+import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
+import useErrorHandler from "../../../general/ErrorHandler";
 
 /**
  * TopPanel component
@@ -12,70 +21,82 @@ import { handleUndo, handleRedo, toggleOutlines, setDesktop, setTablet, setMobil
  * @component
  * @returns {JSX.Element} The rendered top panel
  */
-function TopPanel({ editorRef }) {
-  return (
-    <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
-       {/* left group */}
-      <div className="flex items-center gap-2">
-        <ToolbarButton
-          icon={<AiOutlineUndo size={18} />}
-          label="Str+Z"
-          onClick={() => handleUndo(editorRef)}
-        />
-        <ToolbarButton
-          icon={<AiOutlineRedo size={18} />}
-          label="Str+Y"
-          onClick={() => handleRedo(editorRef)}
-        />
-        <ToolbarButton
-          icon={<AiOutlineBorder size={18} />}
-          label="Alt+O"
-          onClick={() => toggleOutlines(editorRef)}
-        />
-      </div>
+function TopPanel({editorRef, page}) {
+    const handleError = useErrorHandler();
 
+    function handleSave() {
+        WebsiteBuilderService.savePageState(editorRef.current, page)
+            .catch((err) => {
+                handleError(err);
+            });
+    }
 
-      {/* center group */}
-      <div className="flex items-center justify-center gap-2">
-        <ToolbarButton
-          icon={<AiOutlineLaptop size={18} />}
-          onClick={() => setDesktop(editorRef)}
-        />
-        <ToolbarButton
-          icon={<AiOutlineTablet size={18} />}
-          onClick={() => setTablet(editorRef)}
-        />
-        <ToolbarButton
-          icon={<AiOutlineMobile size={18} />}
-          onClick={() => setMobile(editorRef)}
-        />
-      </div>
+    return (
+        <div
+            className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+            {/* left group */}
+            <div className="flex items-center gap-2">
+                <ToolbarButton
+                    icon={<AiOutlineUndo size={18}/>}
+                    label="Str+Z"
+                    onClick={() => handleUndo(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineRedo size={18}/>}
+                    label="Str+Y"
+                    onClick={() => handleRedo(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineBorder size={18}/>}
+                    label="Alt+O"
+                    onClick={() => toggleOutlines(editorRef)}
+                />
+            </div>
 
-       {/* right group */}
-      <div className="flex items-center justify-end gap-2">
-        {/* add buttons later Save / Preview / publish */}
-      </div>
-    </div>
-  );
+            {/* center group */}
+            <div className="flex items-center justify-center gap-2">
+                <ToolbarButton
+                    icon={<AiOutlineLaptop size={18}/>}
+                    onClick={() => setDesktop(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineTablet size={18}/>}
+                    onClick={() => setTablet(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineMobile size={18}/>}
+                    onClick={() => setMobile(editorRef)}
+                />
+            </div>
+
+            {/* right group */}
+            <div className="flex items-center justify-end gap-2">
+                {/* add buttons later Save / Preview / publish */}
+                <TopActionButton label={"Save"} onClick={() => handleSave()}/>
+                <TopActionButton label={"Preview"}/>
+                <TopActionButton label={"Publish"} primary={true}/>
+            </div>
+        </div>
+    );
 }
 
-function ToolbarButton({ icon, label, onClick }) {
-  const hasLabel = !!label;
+function ToolbarButton({icon, label, onClick}) {
+    const hasLabel = !!label;
 
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label || "toolbar button"}
-      title={label || undefined}
-      className={[
-        "flex items-center rounded border border-ui-border transition",
-        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-        "py-1",                             // ← same vertical padding always
-        hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5", // ← only width/gap changes
-      ].join(" ")}
-    >
+    return (
+        <button
+            onClick={onClick}
+            aria-label={label || "toolbar button"}
+            title={label || undefined}
+            className={[
+                "flex items-center rounded border border-ui-border transition",
+                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+                "py-1",                             // ← same vertical padding always
+                hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5", // ← only width/gap changes
+            ].join(" ")}
+        >
       <span
-        className="
+          className="
           flex items-center justify-center
           bg-ui-default text-text
           rounded-full w-6 h-6
@@ -85,20 +106,36 @@ function ToolbarButton({ icon, label, onClick }) {
         {icon}
       </span>
 
-      {hasLabel && (
-        <span
-          className="
+            {hasLabel && (
+                <span
+                    className="
             bg-ui-bg-selected text-text
             px-1.5 py-0.5
             rounded
             font-mono text-micro tracking-tight
           "
-        >
+                >
           {label}
         </span>
-      )}
-    </button>
-  );
+            )}
+        </button>
+    );
+}
+
+function TopActionButton({label, primary = false, onClick}) {
+    return (
+        <button
+            onClick={onClick}
+            className={[
+                "btn-wb",
+                primary ? "btn-wb--primary" : ""
+            ].join(" ")}
+        >
+            <span className="px-1.5 py-0.5 font-mono text-micro">
+              {label}
+            </span>
+        </button>
+    );
 }
 
 

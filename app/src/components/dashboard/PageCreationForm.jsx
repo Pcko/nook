@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
+import PageService from "../../services/PageService";
 
-function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
+function PageCreationForm({closeForm, setPages}) {
     const [pageName, setPageName] = useState('');
     const [folderName, setFolderName] = useState('');
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
     const handleError = useErrorHandler();
 
     const handleFormSubmit = async (e) => {
@@ -14,22 +15,22 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
 
         /* Form Checks */
         const result = isInvalidStringForURL(pageName);
-        if(result){
+        if (result) {
             return showNotification('error', result);
         }
 
-        try{
+        try {
             const trimmedFolderName = folderName?.trim();
-            const response = await createPage(selectedProjectId, pageName, trimmedFolderName);
+            const response = await PageService.createPage(pageName);
 
-            setPages((prevPages)=>{
-                const updatedPages = { ...prevPages };
+            setPages((prevPages) => {
+                const updatedPages = {...prevPages};
                 updatedPages[response.data.pageName] = response.data.pageDetails;
                 return updatedPages;
             })
 
             showNotification('success', 'Successfully added your new page.');
-        }catch (err) {
+        } catch (err) {
             return handleError(err);
         }
 
@@ -41,7 +42,8 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
                 <h5 className="font-semibold">Create a new Page!</h5>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer" onClick={()=>closeForm()}>
+                     stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer"
+                     onClick={() => closeForm()}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
                 </svg>
             </div>
@@ -72,8 +74,10 @@ function PageCreationForm({ closeForm, selectedProjectId, pages, setPages }){
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
-                        <input type="button" value="Cancel" onClick={() => closeForm()} className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Page" className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
+                        <input type="button" value="Cancel" onClick={() => closeForm()}
+                               className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
+                        <input type="submit" value="Create Page"
+                               className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
                     </div>
                 </div>
             </form>

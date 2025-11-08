@@ -1,11 +1,9 @@
-import PageState from "./PageState.ts";
-
-class Page {
+class RequestPage {
     name: string;
     updatedAt : string;
     createdAt : string;
     deploymentStatus: string;
-    data: PageState;
+    data: string;
 }
 
-export default Page;
+export default RequestPage;
