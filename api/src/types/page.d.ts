@@ -5,4 +5,5 @@ export default interface IPage extends Document {
     data: string;
     author: string;
     folderName: string;
+    deploymentStatus: string;
 }

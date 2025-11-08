@@ -20,7 +20,12 @@ const PageSchema = new Schema<IPage>(
             type: String,
             required: true,
             default: "General",
-        }
+        },
+        deploymentStatus: {
+            type: String,
+            required: true,
+            default: "not deployed",
+        },
     },
     {
         timestamps: true,
