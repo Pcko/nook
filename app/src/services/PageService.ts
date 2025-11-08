@@ -1,7 +1,6 @@
 import axios from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
-import RequestPage from "./interfaces/RequestPage.ts";
-import PageState from "./interfaces/PageState.ts";
+import PageDTO from "./interfaces/PageDTO.ts";
 
 class PageService {
 
@@ -28,19 +27,24 @@ class PageService {
         const pages: Page[] = [];
 
         // Page from Request saves state as string
-        response.data.forEach((requestPage: RequestPage) => {
-            const rawState = JSON.parse(requestPage.data !== '' ? requestPage.data : '{"components": [],"styles": []}');
-            const pageState: PageState = new PageState(rawState.components, rawState.styles);
-            const page: Page = {...requestPage, data: pageState}
+        response.data.forEach((requestPage: PageDTO) => {
+            const projectState = JSON.parse(requestPage.data !== '' ? requestPage.data : '{}');
+            const page: Page = {...requestPage, data: projectState}
 
             pages.push(page)
         });
 
         return pages;
     }
+
+    static async getPage(pageName: string): Promise<Page> {
+        const response = await axios.get(`/api/pages/${pageName}`);
+        const requestPage: PageDTO = response.data;
+        const projectState = JSON.parse(requestPage.data !== '' ? requestPage.data : '{}');
+
+        return {...requestPage, data: projectState};
+    }
 }
-
-
 
 
 export default PageService;

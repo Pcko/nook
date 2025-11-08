@@ -1,11 +1,18 @@
-import PageState from "./PageState.ts";
+import {ProjectData} from "grapesjs";
 
-class Page {
+/**
+ * Represents a website page managed by the WebsiteBuilder.
+ *
+ * @property name - The unique name of the page.
+ * @property createdAt - Timestamp when the page was created.
+ * @property updatedAt - Timestamp of the last update.
+ * @property deploymentStatus - Current publishing/deployment status.
+ * @property data - The GrapesJS project data for this page.
+ */
+export interface Page {
     name: string;
-    updatedAt : string;
-    createdAt : string;
+    createdAt: string;
+    updatedAt: string;
     deploymentStatus: string;
-    data: PageState;
+    data: ProjectData;
 }
-
-export default Page;

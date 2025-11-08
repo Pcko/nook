@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-sort-props */
 // WebsiteBuilder.jsx
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import ResizablePanelsLayout from "./ResizablePanelsLayout";
@@ -8,8 +8,6 @@ import LeftPanel from "./Panels/LeftPanel";
 import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
-import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
-import {useNotifications} from "../../context/NotificationContext";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import useErrorHandler from "../../general/ErrorHandler";
 
@@ -28,8 +26,6 @@ import useErrorHandler from "../../general/ErrorHandler";
  * @returns {JSX.Element} The rendered website builder layout with editor and panels
  */
 function WebsiteBuilder({page}) {
-    const {showNotification} = useNotifications();
-    const {handleError} = useErrorHandler();
     const {editorRef, containerRef} = useGrapesEditor({
         height: '100%',           // Editor canvas height
         fromElement: false,       // Don't take initial HTML from container
@@ -45,29 +41,7 @@ function WebsiteBuilder({page}) {
                 {name: "Mobile", width: "375px"},
             ],
         },
-    });
-
-    const [loaded, setLoaded] = useState(false);
-
-    useEffect(() => {
-        const editor = editorRef.current;
-        if (!editor || !page || loaded) return;
-
-        const onEditorLoad = () => {
-            WebsiteBuilderService.loadPageState(editor, page)
-                .then(() => {
-                    setLoaded(true);
-                    showNotification("success", "Page loaded successfully!");
-                })
-                .catch(() => handleError(editor, page));
-        };
-
-        editor.on("load", onEditorLoad);
-
-        return () => {
-            editor.off("load", onEditorLoad);
-        };
-    }, [editorRef.current, page.name]);
+    }, page);
 
     /**
      * ensure GrapesJS canvas recalculates when the layout changes
@@ -85,7 +59,7 @@ function WebsiteBuilder({page}) {
                     left={<LeftPanel/>}
                     editor={
                         <div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
-                            {!loaded && (
+                            {editorRef.loaded && (
                                 <div className="absolute inset-0 flex items-center justify-center z-50 bg-white">
                                     <LoadingBubble/>
                                 </div>

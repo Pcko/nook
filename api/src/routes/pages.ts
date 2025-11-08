@@ -61,10 +61,28 @@ router.get('/', async (req: Request, res: Response) => {
 
         return res.send(pages);
     } catch (err) {
-        console.error('❌ Get page error: ', err);
+        console.error('❌ Get pages error: ', err);
         return res.sendStatus(500);
     }
 })
+
+//GET SINGLE PAGE
+router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
+    try {
+        const { userId } = req;
+        const { pageName } = req.params;
+
+        const page = await Page.findOne({ name: pageName, author: userId }).lean();
+        if (!page) {
+            return res.status(404).send({ message: 'Page not found!' });
+        }
+
+        return res.status(200).json(page);
+    } catch (err) {
+        console.error('❌ Get page error: ', err);
+        return res.sendStatus(500);
+    }
+});
 
 //UPDATE PAGE
 router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody>, res: Response) => {

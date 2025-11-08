@@ -25,7 +25,7 @@ function PageCreationForm({closeForm, setPages}) {
 
             setPages((prevPages) => {
                 const updatedPages = {...prevPages};
-                updatedPages[response.data.pageName] = response.data.pageDetails;
+                updatedPages[response.data.name] = response.data.pageDetails;
                 return updatedPages;
             })
 
