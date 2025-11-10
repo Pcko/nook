@@ -20,12 +20,11 @@ function PageCreationForm({closeForm, setPages}) {
         }
 
         try {
-            const trimmedFolderName = folderName?.trim();
-            const response = await PageService.createPage(pageName);
+            const page = await PageService.createPage(pageName);
 
             setPages((prevPages) => {
                 const updatedPages = {...prevPages};
-                updatedPages[response.data.name] = response.data.pageDetails;
+                updatedPages[page.name] = page;
                 return updatedPages;
             })
 

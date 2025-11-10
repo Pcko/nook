@@ -1,8 +1,8 @@
 import {useNotifications} from "../context/NotificationContext";
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const useErrorHandler = () => {
-    const { showNotification } = useNotifications();
+    const {showNotification} = useNotifications();
     const navigate = useNavigate();
 
     const handleError = (err) => {
@@ -10,7 +10,7 @@ const useErrorHandler = () => {
             navigate('/login');
         }
         const errorMessage = err.response?.data?.message || (err.response?.data?.error ? undefined : err.message);
-        if(errorMessage) {
+        if (errorMessage) {
             showNotification('error', errorMessage);
         }
     };

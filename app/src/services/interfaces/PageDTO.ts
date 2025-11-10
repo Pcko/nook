@@ -14,7 +14,7 @@ class PageDTO {
     createdAt: string;
     updatedAt: string;
     deploymentStatus: string;
-    data: string;
+    data: string | null;
 }
 
 export default PageDTO;

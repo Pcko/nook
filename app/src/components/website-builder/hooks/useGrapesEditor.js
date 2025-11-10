@@ -6,20 +6,20 @@ import {loadCustomBlocks} from "../utils/grapesBlocks";
 
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
-import useErrorHandler from "../../general/ErrorHandler";
+import ErrorHandler from "../../general/ErrorHandler";
 
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
  *
- * @param {object} config - GrapesJS configuration object passed to grapesjs.init
+ * @param {object} config - GrapesJS configuration object passed to grapesjs.init()
  * @param {Page} page - Page that is loaded in GrapesJSEditor
  * @returns {{editorRef, containerRef}}
  */
 export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
-    const {handleError} = useErrorHandler();
+    const handleError = ErrorHandler();
 
     useEffect(() => {
         if (containerRef.current && !editorRef.current) {
