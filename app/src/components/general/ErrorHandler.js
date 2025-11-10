@@ -7,7 +7,7 @@ const useErrorHandler = () => {
 
     const handleError = (err) => {
         if (err.redirectToLogin) {
-            navigate('/');
+            navigate('/login');
         }
         const errorMessage = err.response?.data?.message || (err.response?.data?.error ? undefined : err.message);
         if (errorMessage) {

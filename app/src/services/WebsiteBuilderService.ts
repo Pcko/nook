@@ -37,7 +37,7 @@ class WebsiteBuilderService {
             // Persist to backend
             await PageService.updatePage(page);
         } catch (err) {
-            throw {...err, redirectToLogin: true}
+            throw {...err, redirectToLogin: true};
         }
     }
 
@@ -56,7 +56,7 @@ class WebsiteBuilderService {
 
             // Try local cache first
             const cached = localStorage.getItem(storageKey);
-            if (cached != null) {
+            if (cached !== null) {
                 editor.loadProjectData(JSON.parse(cached));
                 return;
             }
@@ -64,13 +64,13 @@ class WebsiteBuilderService {
             // Fallback: load from backend
             const {data} = await PageService.getPage(page.name);
 
-            if (data == null)
-                return
+            if (data === null)
+                return;
 
             localStorage.setItem(storageKey, JSON.stringify(data));
             editor.loadProjectData(data);
         } catch (err) {
-            throw {...err, redirectToLogin: true}
+            throw {...err, redirectToLogin: true};
         }
     }
 }
