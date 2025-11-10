@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
 
 const app = express();
-const PORT: number = parseInt(process.env.PORT || '8080', 10);
+const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));

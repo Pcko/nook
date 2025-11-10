@@ -24,7 +24,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         let duplicateNumber = 1;
         let pageExists = undefined;
         do {
-            pageExists = await Page.findOne({ name: pageName, author: userId }).lean();
+            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean();
 
             if (pageExists) {
                 duplicateNumber += 1;
@@ -36,12 +36,8 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         const pageData = {
             name: updatedPageName,
             author: userId,
-            folderName: "General"
+            folderName: folderName || 'GENERAL'
         };
-
-        if (folderName) {
-            pageData.folderName = folderName
-        }
 
         const pageDetails = await Page.create(pageData);
 
@@ -52,7 +48,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
     }
 });
 
-//READ PAGE
+//READ PAGES
 router.get('/', async (req: Request, res: Response) => {
     try {
         const { userId } = req;
@@ -66,7 +62,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 })
 
-//GET SINGLE PAGE
+//READ SINGLE PAGE
 router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
     try {
         const { userId } = req;
