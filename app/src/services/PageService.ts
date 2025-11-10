@@ -7,7 +7,6 @@ class PageService {
     static async updatePage(page: Page, newPageName?: string): Promise<Page> {
         const response = await axios.patch(`/api/pages/${page.name}`, {
             newPageName: newPageName,
-            newFolderName: undefined,
             pageContent: JSON.stringify(page.data),
         });
         return response.data;
@@ -18,7 +17,7 @@ class PageService {
     }
 
     static async createPage(pageName: string): Promise<Page> {
-        const response = await axios.post(`/api/pages`, {pageName: pageName, folderName: "default"})
+        const response = await axios.post(`/api/pages`, {pageName: pageName})
         return response.data;
     }
 
@@ -26,7 +25,6 @@ class PageService {
         const response = await axios.get(`/api/pages`);
         const pages: Page[] = [];
 
-        // Page from Request saves state as string
         response.data.forEach((requestPage: PageDTO) => {
             const projectState = JSON.parse(requestPage.data !== '' ? requestPage.data : '{}');
             const page: Page = {...requestPage, data: projectState}

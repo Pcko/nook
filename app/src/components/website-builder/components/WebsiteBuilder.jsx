@@ -9,13 +9,12 @@ import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
-import useErrorHandler from "../../general/ErrorHandler";
 
 /**
  * WebsiteBuilder component
  *
  * Provides the main layout for the website builder application.
- * Integrates the GrapesJS editor witsh panels:
+ * Integrates the GrapesJS editor with panels:
  * - {@link TopPanel} for toolbar controls
  * - {@link LeftPanel} for block management
  * - {@link RightPanel} for style management

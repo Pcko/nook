@@ -15,7 +15,7 @@
  * ```
  */
 
-import { Editor } from "grapesjs";
+import {Editor} from "grapesjs";
 import Page from "./interfaces/Page.ts";
 import PageService from "./PageService.ts";
 
@@ -37,7 +37,6 @@ class WebsiteBuilderService {
             // Persist to backend
             await PageService.updatePage(page);
         } catch (err) {
-            console.error("Error saving page state:", err);
             throw new Error("Save has failed!");
         }
     }
@@ -63,12 +62,11 @@ class WebsiteBuilderService {
             }
 
             // Fallback: load from backend
-            const { data } = await PageService.getPage(page.name);
+            const {data} = await PageService.getPage(page.name);
 
             localStorage.setItem(storageKey, JSON.stringify(data));
             editor.loadProjectData(data);
         } catch (err) {
-            console.error("Error loading page state:", err);
             throw new Error("Load has failed!");
         }
     }

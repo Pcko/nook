@@ -6,6 +6,7 @@ import {loadCustomBlocks} from "../utils/grapesBlocks";
 
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
+import useErrorHandler from "../../general/ErrorHandler";
 
 
 /**
@@ -18,6 +19,7 @@ import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
+    const {handleError} = useErrorHandler();
 
     useEffect(() => {
         if (containerRef.current && !editorRef.current) {
@@ -29,7 +31,9 @@ export function useGrapesEditor(config, page) {
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editorRef.current); // Loads blocks
 
-            WebsiteBuilderService.loadPageState(editorRef.current, page);
+            WebsiteBuilderService.loadPageState(editorRef.current, page).catch((err) => {
+                handleError(err);
+            });
         }
 
         return () => {

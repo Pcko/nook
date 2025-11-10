@@ -26,7 +26,7 @@ function EditorHub() {
     const navigate = useNavigate();
 
     /** @type {[object | null, Function]} Page state pulled from router or fallback */
-    const [page, setPage] = useState(location.state?.page ?? null);
+    const [page, setPage] = useState(location.state?.page);
 
     /**
      * Clears cache for the page so that the WebsiteBuilder doesn't load locally

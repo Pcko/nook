@@ -9,10 +9,12 @@ import {ProjectData} from "grapesjs";
  * @property deploymentStatus - Current publishing/deployment status.
  * @property data - The GrapesJS project data for this page.
  */
-export interface Page {
+interface Page {
     name: string;
     createdAt: string;
     updatedAt: string;
     deploymentStatus: string;
     data: ProjectData;
 }
+
+export default Page;
