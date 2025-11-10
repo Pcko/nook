@@ -325,12 +325,6 @@ function PageHub() {
 
                 {pageNameToEdit && (<CenteredWindowWithBackgroundBlur>
                     <PageEditForm
-                        onPageEdit={(newPageName, data) => {
-                            setPages((prev) => {
-                                const {[pageNameToEdit]: _, ...updated} = prev;
-                                return {...updated, [newPageName]: data};
-                            });
-                        }}
                         pageName={pageNameToEdit}
                         closeForm={() => setPageNameToEdit(undefined)}
                         pages={pages}

@@ -41,7 +41,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         const pageDetails = await Page.create(pageData);
 
-        return res.status(200).json({ pageName: updatedPageName, pageDetails });
+        return res.status(200).json(pageDetails);
     } catch (err) {
         console.error('❌ Create page error: ', err);
         return res.sendStatus(500);

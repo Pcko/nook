@@ -4,7 +4,7 @@ import {useNotifications} from "../context/NotificationContext";
 import PageService from "../../services/PageService";
 import useErrorHandler from "../general/ErrorHandler";
 
-function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
+function PageEditForm({closeForm, pageName, pages}) {
     const [newPageName, setNewPageName] = useState(pageName);
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
     const {showNotification} = useNotifications();
@@ -30,7 +30,7 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
         }
 
         try {
-            const response = await PageService.updatePage(selectedProjectId, pageName, newPageName, trimmedFolderName, pages);
+            const response = await PageService.updatePage(pages[pageName], newPageName);
 
             if (trimmedFolderName) {
                 pages[pageName].folderName = trimmedFolderName;
@@ -39,7 +39,7 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
             if (newPageName) {
                 const page = {...pages[pageName]};
                 delete pages[pageName];
-                pages[response.data.newPageName] = page;
+                pages[response.newPageName] = page;
             }
 
             showNotification('success', 'Successfully applied changes to your page.');

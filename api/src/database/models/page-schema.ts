@@ -9,7 +9,7 @@ const PageSchema = new Schema<IPage>(
         },
         data: {
             type: String,
-            default: "",
+            default: null,
         },
         author: {
             type: String,
