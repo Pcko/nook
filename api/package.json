@@ -9,7 +9,7 @@
     "build": "tsc",
     "prod": "node dist/server.js",
     "dev": "nodemon",
-    "typecheck": "tsx tsc --noEmit"
+    "typecheck": "npx tsc --noEmit"
   },
   "author": "",
   "license": "ISC",

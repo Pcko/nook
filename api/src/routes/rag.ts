@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
-import {RAGQueryBody, RAGResponseBody} from "../types/rag";
+import { RAGQueryBody, RAGResponseBody } from "../types/requests/rag";
 
 const router = express.Router();
 
 router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) => {
-    try{
+    try {
         const response = await fetch(`${process.env.RAG_URL}/generation/query`, {
             method: 'POST',
             headers: {
@@ -14,12 +14,12 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
             body: JSON.stringify(req.body)
         });
 
-        if(!response.ok || !response.body){
+        if (!response.ok || !response.body) {
             console.error(await response.text());
             return res.sendStatus(500);
         }
 
-        if(req.body.stream) {
+        if (req.body.stream) {
             const reader = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
 

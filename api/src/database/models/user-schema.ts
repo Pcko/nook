@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import IUser from '../../types/user.js';
-import { Project } from '../../util/internal.js';
+import { Page } from '../../util/internal.js';
 
 const UserSchema = new Schema<IUser>({
     _id: {
@@ -52,7 +52,7 @@ const UserSchema = new Schema<IUser>({
 async function handleUserDeletion(user: IUser | null) {
     if (!user) return;
 
-    await Project.deleteMany({ author: user._id });
+    await Page.deleteMany({ author: user._id });
 }
 
 UserSchema.methods.updateTokenVersion = async function () {

@@ -29,7 +29,7 @@ function AppContent() {
                             <Route element={<ProtectedRoute/>}>
                                 <Route path="/settings" element={<Settings/>}/>
                                 <Route path="/dashboard" element={<Dashboard/>}/>
-                                <Route path="/editor/:projectName/:pageName" element={<EditorHub/>}/>
+                                <Route path="/editor/:pageName" element={<EditorHub/>}/>
                             </Route>
                         </Routes>
                     </main>

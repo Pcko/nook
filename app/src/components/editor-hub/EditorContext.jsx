@@ -1,3 +1,10 @@
+/**
+ * @deprecated
+ * This EditorContext is no longer in use.
+ * GrapesJS state is now managed entirely by WebsiteBuilderService.
+ * Keep temporarily for reference — scheduled for removal.
+ */
+
 import {createContext, useContext, useReducer} from 'react';
 
 const EditorContext = createContext(undefined);

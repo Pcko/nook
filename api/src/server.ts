@@ -9,7 +9,6 @@ import './database/connection.js'; //<-- database connection script
 import authenticateToken from './routes/auth-token.js';
 import authRouter from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRouter from './routes/settings.js';
-import projectRouter from './routes/projects.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 
@@ -23,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, '..', 'app', 'dist');
 
 const app = express();
-const PORT: number = parseInt(process.env.PORT || '8080', 10);
+const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));
@@ -31,8 +30,7 @@ app.use(express.static(clientPath));
 
 app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
-app.use('/api/projects', authenticateToken, projectRouter);
-app.use('/api/projects', authenticateToken, pageRouter);
+app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', ragRouter);
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));

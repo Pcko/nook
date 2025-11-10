@@ -18,7 +18,7 @@ import {
     RegisterBody,
     TokenBody,
     TokenContent
-} from '../types/auth.js';
+} from '../types/requests/auth.js';
 import IUser from '../types/user.js';
 type IUserDocument = IUser & Document;
 

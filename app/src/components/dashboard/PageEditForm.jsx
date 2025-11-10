@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {isInvalidStringForURL} from "../general/FormChecks";
 import {useNotifications} from "../context/NotificationContext";
-import DashboardService from "../../services/DashboardService";
+import PageService from "../../services/PageService";
 import useErrorHandler from "../general/ErrorHandler";
 
 function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
@@ -30,7 +30,7 @@ function PageEditForm({closeForm, selectedProjectId, pageName, pages}) {
         }
 
         try {
-            const response = await DashboardService.updatePage(selectedProjectId, pageName, newPageName, trimmedFolderName, pages);
+            const response = await PageService.updatePage(selectedProjectId, pageName, newPageName, trimmedFolderName, pages);
 
             if (trimmedFolderName) {
                 pages[pageName].folderName = trimmedFolderName;

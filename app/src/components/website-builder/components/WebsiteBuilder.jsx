@@ -2,12 +2,13 @@
 // WebsiteBuilder.jsx
 import React from "react";
 
-import { useGrapesEditor } from "../hooks/useGrapesEditor";
+import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import ResizablePanelsLayout from "./ResizablePanelsLayout";
 import LeftPanel from "./Panels/LeftPanel";
 import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
+import {LoadingBubble} from "../../general/LoadingScreen";
 
 /**
  * WebsiteBuilder component
@@ -22,49 +23,56 @@ import "./WebsiteBuilder.css";
  *
  * @component
  * @returns {JSX.Element} The rendered website builder layout with editor and panels
-*/
-function WebsiteBuilder() {
-  const { editorRef, containerRef } = useGrapesEditor({
-    height: '100%',           // Editor canvas height
-    fromElement: false,       // Don't take initial HTML from container
-    storageManager: false,    // Disable built-in localStorage/remote storage
-    panels: {defaults: []},   // Remove default GrapesJS panels
-    blockManager: { appendTo: "#gjs-blocks" },    // Render blocks inside #blocks
-    layerManager: { appendTo: "#gjs-layers" },
-    styleManager: { appendTo: ".right-panel" },   // Render style manager inside .right-panel
-    deviceManager: {
-      devices: [
-        { name: "Desktop", width: "" },
-        { name: "Tablet",  width: "768px" },
-        { name: "Mobile",  width: "375px" },
-      ],
-    },
-  });
+ */
+function WebsiteBuilder({page}) {
+    const {editorRef, containerRef} = useGrapesEditor({
+        height: '100%',           // Editor canvas height
+        fromElement: false,       // Don't take initial HTML from container
+        storageManager: false,    // Disable built-in localStorage/remote storage
+        panels: {defaults: []},   // Remove default GrapesJS panels
+        blockManager: {appendTo: "#gjs-blocks"},    // Render blocks inside #blocks
+        layerManager: {appendTo: "#gjs-layers"},
+        styleManager: {appendTo: ".right-panel"},   // Render style manager inside .right-panel
+        deviceManager: {
+            devices: [
+                {name: "Desktop", width: ""},
+                {name: "Tablet", width: "768px"},
+                {name: "Mobile", width: "375px"},
+            ],
+        },
+    }, page);
 
-  /**
-   * ensure GrapesJS canvas recalculates when the layout changes
-   * @returns void
-   */
-  const handleLayout = () => editorRef.current?.refresh?.();
+    /**
+     * ensure GrapesJS canvas recalculates when the layout changes
+     * @returns void
+     */
+    const handleLayout = () => editorRef.current?.refresh?.();
 
-  return (
-    <div className="flex flex-col h-screen w-screen">
-      <TopPanel editorRef={editorRef} />
+    return (
+        <div className="flex flex-col h-screen w-screen">
+            <TopPanel editorRef={editorRef} page={page}/>
 
-      <div className="flex-1 overflow-hidden">
-        <ResizablePanelsLayout
-          onLayout={handleLayout}
-          left={<LeftPanel />}   /* Left Panel */
-          editor={               /* Editor Area */
-            <div id="gjs-editor" className="h-full min-w-0 border border-gray-300 overflow-hidden">
-              <div className="h-full bg-white" ref={containerRef} />
+            <div className="flex-1 overflow-hidden">
+                <ResizablePanelsLayout
+                    onLayout={handleLayout}
+                    left={<LeftPanel/>}
+                    editor={
+                        <div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
+                            {editorRef.loaded && (
+                                <div className="absolute inset-0 flex items-center justify-center z-50 bg-white">
+                                    <LoadingBubble/>
+                                </div>
+                            )}
+
+                            <div className="h-full bg-white" ref={containerRef}/>
+                        </div>
+                    }
+                    right={<RightPanel/>}
+                />
             </div>
-          }
-          right={<RightPanel />}  /* Right Panel */
-        />
-      </div>
-    </div>
-  );
+        </div>
+
+    );
 }
 
 export default WebsiteBuilder;
