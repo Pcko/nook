@@ -1,4 +1,5 @@
 import {createContext, useContext, useState} from "react";
+import {useLogger} from "./LoggerContext";
 
 const NotificationContext = createContext();
 
@@ -8,6 +9,7 @@ export const useNotifications = () => {
 
 export const NotificationProvider = ({children}) => {
     const [notifications, setNotifications] = useState([]);
+    const {log} = useLogger();
 
     const addNotification = (type, notification) => {
         const key = Date.now();
@@ -27,14 +29,15 @@ export const NotificationProvider = ({children}) => {
 
     const showNotification = (type, notification) => {
         const key = addNotification(type, notification);
+        log(type === "error" ? "error" : "info", notification);
 
-        setTimeout(()=>{
+        setTimeout(() => {
             removeNotification(key);
         }, 5000);
     }
 
     return (
-        <NotificationContext.Provider value={{ notifications, showNotification, removeNotification }}>
+        <NotificationContext.Provider value={{notifications, showNotification, removeNotification}}>
             {children}
         </NotificationContext.Provider>
     );
