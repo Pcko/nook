@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 import {
-  AiOutlineBorder,
-  AiOutlineLaptop,
-  AiOutlineMobile,
-  AiOutlineRedo,
-  AiOutlineTablet,
-  AiOutlineUndo,
+    AiOutlineBorder,
+    AiOutlineLaptop,
+    AiOutlineMobile,
+    AiOutlineRedo,
+    AiOutlineTablet,
+    AiOutlineUndo,
 } from "react-icons/ai";
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
+import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
 import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../general/ErrorHandler";
@@ -32,24 +32,24 @@ function TopPanel({editorRef, page}) {
             });
     }
 
-    
+
     const [zoom, setZoom] = useState(100); // track active zoom (for highlighting)
     const setCanvasZoom = (val) => {
-    const ed = editorRef?.current;
-    if (!ed) return;
+        const editor = editorRef?.current;
+        if (!editor) return;
 
-    // 1) Set zoom level (expects a percentage like 25, 50, 75, 100)
-    ed.Canvas.setZoom(val);
-    setZoom(val);
+        // 1) Set zoom level (expects a percentage like 25, 50, 75, 100)
+        editor.Canvas.setZoom(val);
+        setZoom(val);
 
-    // 2) Adjust the iframe height inversely to zoom, so zooming out shows more
-    const frameEl = ed.Canvas.getFrameEl?.();
-    const canvasEl = ed.Canvas.getElement?.();
-    if (!frameEl || !canvasEl) return;
+        // 2) Adjust the iframe height inversely to zoom, so zooming out shows more
+        const frameEl = editor.Canvas.getFrameEl?.();
+        const canvasEl = editor.Canvas.getElement?.();
+        if (!frameEl || !canvasEl) return;
 
-    const baseHeight = canvasEl.clientHeight || 800; // fallback height
-    const newHeight = baseHeight * (100 / val);
-    frameEl.style.height = `${newHeight}px`;
+        const baseHeight = canvasEl.clientHeight || 800; // fallback height
+        const newHeight = baseHeight * (100 / val);
+        frameEl.style.height = `${newHeight}px`;
     };
 
     return (
@@ -89,9 +89,9 @@ function TopPanel({editorRef, page}) {
                     onClick={() => setMobile(editorRef)}
                 />
                 <ZoomListbox
-                  value={zoom}
-                  onChange={(val) => setCanvasZoom(val)}
-                  options={[25, 50, 75, 100]}
+                    value={zoom}
+                    onChange={(val) => setCanvasZoom(val)}
+                    options={[25, 50, 75, 100]}
                 />
             </div>
 
@@ -164,22 +164,22 @@ function TopActionButton({label, primary = false, onClick}) {
     );
 }
 
-function ZoomListbox({ value, onChange, options }) {
-  return (
-    <Listbox value={value} onChange={onChange}>
-      <div className="relative">
-        <ListboxButton
-          className={[
-            // match ToolbarButton outer styles
-            "flex items-center rounded border border-ui-border transition",
-            "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-            "py-1 px-2 gap-1.5 text-tiny",
-            "focus:outline-none",
-          ].join(" ")}
-        >
-          {/* pill gets the same intrinsic height as the old icon: h-6 */}
-          <span
-            className="
+function ZoomListbox({value, onChange, options}) {
+    return (
+        <Listbox value={value} onChange={onChange}>
+            <div className="relative">
+                <ListboxButton
+                    className={[
+                        // match ToolbarButton outer styles
+                        "flex items-center rounded border border-ui-border transition",
+                        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+                        "py-1 px-2 gap-1.5 text-tiny",
+                        "focus:outline-none",
+                    ].join(" ")}
+                >
+                    {/* pill gets the same intrinsic height as the old icon: h-6 */}
+                    <span
+                        className="
               flex items-center
               h-6
               bg-ui-bg-selected text-text
@@ -188,48 +188,47 @@ function ZoomListbox({ value, onChange, options }) {
               font-mono text-micro tracking-tight
               leading-none
             "
-          >
+                    >
             {value}%
           </span>
 
-          {/* chevron */}
-          <span
-            aria-hidden
-            className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
-          />
-        </ListboxButton>
+                    {/* chevron */}
+                    <span
+                        aria-hidden
+                        className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
+                    />
+                </ListboxButton>
 
-        <ListboxOptions
-          className={[
-            "absolute right-0 z-10 mt-0.5",
-            "bg-ui-bg border border-ui-border rounded-[5px]",
-            "shadow-lg overflow-hidden",
-            "py-1",
-            "focus:outline-none",
-            "min-w-[3.7rem]",
-          ].join(" ")}
-        >
-          {options.map((opt) => (
-            <ListboxOption key={opt} value={opt}>
-              {({ active, selected }) => (
-                <div
-                  className={[
-                    "w-full text-left px-2 py-1 text-tiny transition-colors",
-                    active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
-                    selected ? "font-semibold text-text" : "font-normal",
-                  ].join(" ")}
+                <ListboxOptions
+                    className={[
+                        "absolute right-0 z-10 mt-0.5",
+                        "bg-ui-bg border border-ui-border rounded-[5px]",
+                        "shadow-lg overflow-hidden",
+                        "py-1",
+                        "focus:outline-none",
+                        "min-w-[3.7rem]",
+                    ].join(" ")}
                 >
-                  {opt}%
-                </div>
-              )}
-            </ListboxOption>
-          ))}
-        </ListboxOptions>
-      </div>
-    </Listbox>
-  );
+                    {options.map((opt) => (
+                        <ListboxOption key={opt} value={opt}>
+                            {({active, selected}) => (
+                                <div
+                                    className={[
+                                        "w-full text-left px-2 py-1 text-tiny transition-colors",
+                                        active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
+                                        selected ? "font-semibold text-text" : "font-normal",
+                                    ].join(" ")}
+                                >
+                                    {opt}%
+                                </div>
+                            )}
+                        </ListboxOption>
+                    ))}
+                </ListboxOptions>
+            </div>
+        </Listbox>
+    );
 }
-
 
 
 export default TopPanel;
