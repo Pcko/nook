@@ -30,7 +30,6 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
                 }
 
                 const chunk = decoder.decode(value, { stream: true });
-
                 res.write(chunk);
             }
 
