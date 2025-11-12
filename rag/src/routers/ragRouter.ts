@@ -1,10 +1,9 @@
 import {type Request, type Response, Router} from "express";
-import { type QueryRequestBody} from "../dto/queryRequestBody.dto.js";
-import chromaClient from "../chromadbClient.js";
-import localLLMClient from "../localLLMClient.js";
-import type {QueryResponseBody} from "../dto/queryResponseBody.dto.js";
-import groqClient from "../groqClient.js";
+import chromaClient from "../clients/chromadbClient.js";
+import localLLMClient from "../clients/localLLMClient.js";
+import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
+import type {ElementEditRequestBody, ElementEditResponseBody, QueryRequestBody, QueryResponseBody} from "../dto/rag.js";
 
 const ragRouter = Router();
 
@@ -37,6 +36,12 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
         return res.status(200).send(queryResponse);
     }
+});
+
+ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
+    const messages = await promptBuilder.buildElementEditMessages(req.body);
+    console.log(messages);
+    return res.status(200).send(await groqClient.getElementEditResponse(messages));
 });
 
 export default ragRouter;

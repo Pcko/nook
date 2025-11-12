@@ -4,7 +4,7 @@ import type {
     ChromaDBAddDocumentsRequestBody,
     ChromaDBGetResponseBody, ChromaDBQuery,
     ChromaDBQueryResultItem
-} from "./dto/chroma.js";
+} from "../dto/chroma.js";
 
 const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "15");
 const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF || "0.5");

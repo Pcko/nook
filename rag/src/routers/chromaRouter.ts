@@ -1,5 +1,5 @@
 import {type Request, type Response, Router} from "express";
-import chromaClient from "../chromadbClient.js";
+import chromaClient from "../clients/chromadbClient.js";
 import type {ChromaDBAddDocumentsRequestBody, ChromaDBQuery} from "../dto/chroma.js";
 
 const chromaRouter = Router();

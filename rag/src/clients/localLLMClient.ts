@@ -1,5 +1,5 @@
-import type {QueryResponseBody} from "./dto/queryResponseBody.dto.js";
-import {type StreamCallback} from './types/StreamCallback.js';
+import {type StreamCallback} from '../types/StreamCallback.js';
+import type {QueryResponseBody} from "../dto/rag.js";
 
 function getPort() {
     return process.env.LLM_API_PORT || '11434';
