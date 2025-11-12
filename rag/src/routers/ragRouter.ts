@@ -4,17 +4,14 @@ import chromaClient from "../chromadbClient.js";
 import localLLMClient from "../localLLMClient.js";
 import type {QueryResponseBody} from "../dto/queryResponseBody.dto.js";
 import groqClient from "../groqClient.js";
+import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
 
 const ragRouter = Router();
 
 ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody | { error: string }>) => {
     const queryRequest = req.body;
 
-    let query = queryRequest.query;
-    if(!queryRequest.skipContext) {
-        const chromaResponse = await chromaClient.query({query});
-        query = query+`\nContext: ${JSON.stringify(chromaResponse)}`;
-    }
+    const prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
 
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
@@ -26,16 +23,16 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         }
 
         if(queryRequest.useLocalLLM) {
-            await localLLMClient.streamLLMResponse(query, callback);
+            await localLLMClient.streamLLMResponse(prompt, callback);
         } else {
-            await groqClient.streamGroqResponse(query, callback);
+            await groqClient.streamGroqResponse(prompt, callback);
         }
 
         return res.end();
     } else {
         let queryResponse = await (queryRequest.useLocalLLM ?
-            localLLMClient.getLLMResponse(query) :
-            groqClient.getGroqResponse(query)
+            localLLMClient.getLLMResponse(prompt) :
+            groqClient.getGroqResponse(prompt)
         );
 
         return res.status(200).send(queryResponse);
