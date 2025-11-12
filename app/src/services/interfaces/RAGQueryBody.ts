@@ -4,3 +4,9 @@ export interface RAGQueryBody {
     useLocalLLM?: boolean;
     stream?: boolean;
 }
+
+export interface RAGResponseDTO {
+    think: string;
+    response: string;
+    total_duration: number;
+}

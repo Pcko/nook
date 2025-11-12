@@ -22,43 +22,49 @@ import user from "../../services/interfaces/User";
  * @returns {JSX.Element} The main editor view for a specific page.
  */
 function EditorHub() {
-    const {pageName} = useParams();
-    const location = useLocation();
-    const navigate = useNavigate();
+    try{
+        const {pageName} = useParams();
+        const location = useLocation();
+        const navigate = useNavigate();
 
-    /** @type {[Page | null, Function]} Page state pulled from router or fallback */
-    const [page, setPage] = useState(location.state?.page);
+        /** @type {[Page | null, Function]} Page state pulled from router or fallback */
+        const [page, setPage] = useState(location.state?.page);
 
-    /**
-     * Clears cache for the page so that the WebsiteBuilder doesn't load locally
-     * and fetches the actual state from DB
-     */
-    useEffect(() => {
-        localStorage.removeItem(`page_${page.name}`);
-    }, [])
+        /**
+         * Clears cache for the page so that the WebsiteBuilder doesn't load locally
+         * and fetches the actual state from DB
+         */
+        useEffect(() => {
+            console.log(page)
+            localStorage.removeItem(`page_${page.name}`);
+        }, [])
 
-    /**
-     * Redirects to the homepage if no page data is present.
-     */
-    useEffect(() => {
-        if (!page) {
-            navigate('/');
-        }
-    }, [page, pageName, navigate]);
+        /**
+         * Redirects to the homepage if no page data is present.
+         */
+        useEffect(() => {
+            if (!page) {
+                navigate('/');
+            }
+        }, [page, pageName, navigate]);
 
-    /**
-     * Updates the editor when the URL parameter changes (e.g., user switches pages).
-     * This ensures the correct page is loaded when using navigation links.
-     */
-    useEffect(() => {
-        if (page && pageName !== page.name && location.state?.page) {
-            setPage(location.state.page);
-        }
-    }, [pageName, page, location.state]);
+        /**
+         * Updates the editor when the URL parameter changes (e.g., user switches pages).
+         * This ensures the correct page is loaded when using navigation links.
+         */
+        useEffect(() => {
+            if (page && pageName !== page.name && location.state?.page) {
+                setPage(location.state.page);
+            }
+        }, [pageName, page, location.state]);
 
-    return (
-        <WebsiteBuilder page={page}/>
-    );
+        return (
+            <WebsiteBuilder page={page}/>
+        );
+    }catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 export default EditorHub;

@@ -191,3 +191,7 @@ h1 {
 .creation-form-field {
     @apply w-[700px] h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg mb-3;
 }
+
+.page-creation-window{
+    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[680px] max-w-[90%];
+}

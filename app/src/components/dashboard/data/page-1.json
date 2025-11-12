@@ -1,0 +1,354 @@
+{
+  "dataSources": [],
+  "assets": [],
+  "styles": [
+    {
+      "selectors": [
+        "#ia25"
+      ],
+      "style": {
+        "background": "#ffffff",
+        "background-color": "#ffffff"
+      }
+    },
+    {
+      "selectors": [
+        "#hero-section"
+      ],
+      "style": {
+        "text-align": "center",
+        "padding": "100px 10%",
+        "background-color": "#0d3b66"
+      }
+    },
+    {
+      "selectors": [
+        "#hero-title"
+      ],
+      "style": {
+        "font-size": "2.5rem",
+        "font-weight": "700",
+        "color": "#ffffff",
+        "margin-bottom": "10px"
+      }
+    },
+    {
+      "selectors": [
+        "#hero-subtext"
+      ],
+      "style": {
+        "font-size": "1.2rem",
+        "color": "#d0ecff",
+        "margin-bottom": "20px"
+      }
+    },
+    {
+      "selectors": [
+        "#hero-button"
+      ],
+      "style": {
+        "background-color": "#ffffff",
+        "color": "#0d3b66",
+        "padding": "12px 24px",
+        "border": "none",
+        "border-radius": "6px",
+        "font-size": "1rem",
+        "font-weight": "600",
+        "cursor": "pointer"
+      }
+    },
+    {
+      "selectors": [
+        "#about-section"
+      ],
+      "style": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center",
+        "padding": "60px 10%",
+        "flex-wrap": "wrap",
+        "background-color": "#f9fbfd"
+      }
+    },
+    {
+      "selectors": [
+        "#about-title"
+      ],
+      "style": {
+        "font-size": "1.75rem",
+        "font-weight": "700",
+        "color": "#0d3b66",
+        "margin-bottom": "20px"
+      }
+    },
+    {
+      "selectors": [
+        "#about-content"
+      ],
+      "style": {
+        "font-size": "1rem",
+        "color": "#3a4a5b",
+        "line-height": "1.6",
+        "max-width": "500px"
+      }
+    },
+    {
+      "selectors": [
+        "#services-grid"
+      ],
+      "style": {
+        "display": "grid",
+        "grid-template-columns": "repeat(auto-fit, minmax(250px, 1fr))",
+        "gap": "2rem",
+        "padding": "40px 10%",
+        "background-color": "#ffffff"
+      }
+    },
+    {
+      "selectors": [
+        "#service-card"
+      ],
+      "style": {
+        "background-color": "#f0f4ff",
+        "padding": "20px",
+        "border-radius": "8px",
+        "text-align": "center"
+      }
+    },
+    {
+      "selectors": [
+        "#service-title"
+      ],
+      "style": {
+        "font-size": "1.25rem",
+        "font-weight": "600",
+        "margin-bottom": "10px",
+        "color": "#0d3b66"
+      }
+    },
+    {
+      "selectors": [
+        "#contact-section"
+      ],
+      "style": {
+        "text-align": "center",
+        "padding": "60px 10%",
+        "background-color": "#f9fbfd"
+      }
+    },
+    {
+      "selectors": [
+        "#contact-title"
+      ],
+      "style": {
+        "font-size": "1.75rem",
+        "font-weight": "700",
+        "color": "#0d3b66",
+        "margin-bottom": "20px"
+      }
+    },
+    {
+      "selectors": [
+        "#contact-info"
+      ],
+      "style": {
+        "font-size": "1rem",
+        "color": "#3a4a5b",
+        "line-height": "2",
+        "max-width": "500px",
+        "margin": "0 auto"
+      }
+    },
+    {
+      "selectors": [
+        "#contact-button"
+      ],
+      "style": {
+        "margin-top": "25px",
+        "background-color": "#0d3b66",
+        "color": "#ffffff",
+        "padding": "12px 24px",
+        "border": "none",
+        "border-radius": "6px",
+        "font-size": "1rem",
+        "font-weight": "600",
+        "cursor": "pointer"
+      }
+    }
+  ],
+  "pages": [
+    {
+      "frames": [
+        {
+          "component": {
+            "type": "wrapper",
+            "stylable": [
+              "background",
+              "background-color",
+              "background-image",
+              "background-repeat",
+              "background-attachment",
+              "background-position",
+              "background-size"
+            ],
+            "attributes": {
+              "id": "ia25"
+            },
+            "components": [
+              {
+                "type": "div",
+                "attributes": {
+                  "id": "hero-section"
+                },
+                "components": [
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "hero-title"
+                    },
+                    "content": "Professional Plumbing Solutions"
+                  },
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "hero-subtext"
+                    },
+                    "content": "Fast, reliable plumbing services for residential and commercial clients"
+                  },
+                  {
+                    "type": "button",
+                    "attributes": {
+                      "id": "hero-button"
+                    },
+                    "content": "Contact Us"
+                  }
+                ]
+              },
+              {
+                "type": "div",
+                "attributes": {
+                  "id": "about-section"
+                },
+                "components": [
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "about-title"
+                    },
+                    "content": "Trusted Plumbing You Can Rely On"
+                  },
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "about-content"
+                    },
+                    "content": "With over 15 years of experience, we provide top-quality plumbing solutions. Licensed, insured, and committed to excellent customer service."
+                  },
+                  {
+                    "type": "image",
+                    "attributes": {
+                      "id": "about-image",
+                      "src": "https://placehold.it/400x300"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "div",
+                "attributes": {
+                  "id": "services-grid"
+                },
+                "components": [
+                  {
+                    "type": "div",
+                    "attributes": {
+                      "id": "service-card"
+                    },
+                    "components": [
+                      {
+                        "type": "text",
+                        "attributes": {
+                          "id": "service-title"
+                        },
+                        "content": "Emergency Repairs"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "div",
+                    "attributes": {
+                      "id": "service-card"
+                    },
+                    "components": [
+                      {
+                        "type": "text",
+                        "attributes": {
+                          "id": "service-title"
+                        },
+                        "content": "Drain Cleaning"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "div",
+                    "attributes": {
+                      "id": "service-card"
+                    },
+                    "components": [
+                      {
+                        "type": "text",
+                        "attributes": {
+                          "id": "service-title"
+                        },
+                        "content": "Pipe Installations"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "div",
+                "attributes": {
+                  "id": "contact-section"
+                },
+                "components": [
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "contact-title"
+                    },
+                    "content": "Get in Touch"
+                  },
+                  {
+                    "type": "text",
+                    "attributes": {
+                      "id": "contact-info"
+                    },
+                    "content": "123 Main St | (555) 123-4567 | plumber@example.com"
+                  },
+                  {
+                    "type": "button",
+                    "attributes": {
+                      "id": "contact-button"
+                    },
+                    "content": "Book Online Now"
+                  }
+                ]
+              }
+            ],
+            "head": {
+              "type": "head"
+            },
+            "docEl": {
+              "tagName": "html"
+            }
+          },
+          "id": "iWSWey0nuzoTfsNM"
+        }
+      ],
+      "type": "main",
+      "id": "s63W61KRotW7ELR4"
+    }
+  ],
+  "symbols": []
+}

@@ -318,6 +318,7 @@ function PageHub() {
                 {/* Forms */}
                 {pageCreationFormActive && (<CenteredWindowWithBackgroundBlur>
                     <PageCreationForm
+                        pages={pages}
                         setPages={setPages}
                         closeForm={() => setPageCreationFormActive(false)}
                     />
