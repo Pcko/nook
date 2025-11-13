@@ -7,6 +7,9 @@ Find and edit the component and its children (work recursively if the children h
 
 You may change any of the CSS attributes, components, texts, and similar, following the instruction the user gives you.
 
+Component rules:
+{{component-rules}}
+
 Component format (the generated component must follow this format, it may have nested components inside):
 {{component-format}}
 

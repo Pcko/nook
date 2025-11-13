@@ -40,7 +40,6 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
 ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
     const messages = await promptBuilder.buildElementEditMessages(req.body);
-    console.log(messages);
     return res.status(200).send(await groqClient.getElementEditResponse(messages));
 });
 
