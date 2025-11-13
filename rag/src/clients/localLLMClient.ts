@@ -1,13 +1,18 @@
 import {type StreamCallback} from '../types/StreamCallback.js';
 import type {QueryResponseBody} from "../dto/rag.js";
 
-function getPort() {
-    return process.env.LLM_API_PORT || '11434';
-}
+const port = process.env.LLM_API_PORT || '11434';
 
+/**
+ * Sends a chat completion request for a local LLM (served by ollama).
+ *
+ * @function getLLMResponse
+ * @param {string} query - The prompt for the LLM.
+ * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
+ */
 async function getLLMResponse(query: string): Promise<QueryResponseBody> {
     try {
-        const response = await fetch(`http://localhost:${getPort()}/api/generate`, {
+        const response = await fetch(`http://localhost:${port}/api/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,9 +45,17 @@ async function getLLMResponse(query: string): Promise<QueryResponseBody> {
     }
 }
 
-async function streamLLMResponse(query: string, onData: StreamCallback) {
+/**
+ * A streamed chat completion request for a local LLM (served by ollama).
+ *
+ * @function streamLLMResponse
+ * @param {string} query - The prompt for the LLM.
+ * @param {StreamCallback} onData - A callback to handle the streaming response.
+ * @returns {Promise<void>} A Promise that resolves when the stream is completed.
+ */
+async function streamLLMResponse(query: string, onData: StreamCallback): Promise<void> {
     try {
-        const response = await fetch(`http://localhost:${getPort()}/api/generate`, {
+        const response = await fetch(`http://localhost:${port}/api/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

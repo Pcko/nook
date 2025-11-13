@@ -1,5 +1,5 @@
 import {type Request, type Response, Router} from "express";
-import chromaClient from "../clients/chromadbClient.js";
+
 import localLLMClient from "../clients/localLLMClient.js";
 import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
@@ -40,7 +40,15 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
 ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
     const messages = await promptBuilder.buildElementEditMessages(req.body);
-    return res.status(200).send(await groqClient.getElementEditResponse(messages));
+    const queryResponseBody = await groqClient.getElementEditResponse(messages);
+
+    const parts: { styles: string, component: string } = JSON.parse(queryResponseBody.response);
+    return res.status(200).send({
+        think: queryResponseBody.think,
+        styles: parts.styles,
+        component: parts.component,
+        total_duration: queryResponseBody.total_duration
+    });
 });
 
 export default ragRouter;

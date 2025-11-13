@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import chromaClient from "../../clients/chromadbClient.js";
 import type ChatCompletionMessageParam from "../../types/ChatCompletionMessageParam.js"
 import type {ElementEditRequestBody} from "../../dto/rag.js";
@@ -24,7 +25,18 @@ const elementEditPrompt = readFileSync( path.resolve(__dirname, "elementEdit-pro
     .replace("{{component-format}}", componentsTemplate)
     .replace("{{style-format}}", stylesTemplate);
 
+/**
+ * Utility for building prompts and chat messages for LLM interactions.
+ */
 export const promptBuilder = {
+    /**
+     * Builds a text prompt for a given query, optionally including context from ChromaDB.
+     *
+     * @async
+     * @param {string} query - The main user query.
+     * @param {boolean} [skipContext=false] - If true, skips fetching additional context from ChromaDB.
+     * @returns {Promise<string>} A Promise that resolves to a fully constructed prompt string.
+     */
     async build(query: string, skipContext?: boolean): Promise<string> {
         let contextString = "No additional context available.";
         if (!skipContext) {
@@ -43,6 +55,14 @@ export const promptBuilder = {
         return prompt.trim();
     },
 
+    /**
+     * Builds chat messages for editing an element, including system instructions and user-provided messages.
+     *
+     * @async
+     * @param {ElementEditRequestBody} elementEditRequestBody - The data needed to construct the edit messages.
+     * @returns {Promise<ChatCompletionMessageParam[]>} A Promise that resolves
+     * to an array of messages ready for a chat completion API call.
+     */
     async buildElementEditMessages(elementEditRequestBody: ElementEditRequestBody): Promise<ChatCompletionMessageParam[]> {
         return [
             {

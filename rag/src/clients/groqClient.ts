@@ -1,13 +1,22 @@
 import Groq from 'groq-sdk';
+
 import {type StreamCallback} from '../types/StreamCallback.js';
-import type {ElementEditRequestBody, ElementEditResponseBody, QueryResponseBody} from "../dto/rag.js";
+import type {QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
-async function streamGroqResponse(query: string, onData: StreamCallback) {
+/**
+ * A streamed chat completion request for a Groq LLM.
+ *
+ * @function streamGroqResponse
+ * @param {string} query - The prompt for the LLM.
+ * @param {StreamCallback} onData - A callback to handle the streaming response.
+ * @returns {Promise<void>} A Promise that resolves when the stream is completed.
+ */
+async function streamGroqResponse(query: string, onData: StreamCallback): Promise<void> {
     try {
         const stream = await groq.chat.completions.create({
             messages: [{ role: 'user', content: query }],
@@ -27,6 +36,13 @@ async function streamGroqResponse(query: string, onData: StreamCallback) {
     }
 }
 
+/**
+ * Sends a chat completion request for a Groq LLM.
+ *
+ * @function getGroqResponse
+ * @param {string} query - The prompt for the LLM.
+ * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
+ */
 async function getGroqResponse(query: string): Promise<QueryResponseBody> {
     try{
         const startingTime = process.hrtime();
@@ -55,7 +71,14 @@ async function getGroqResponse(query: string): Promise<QueryResponseBody> {
     }
 }
 
-async function getElementEditResponse(messages: ChatCompletionMessageParam[]) : Promise<ElementEditResponseBody> {
+/**
+ * Sends a chat completion request for a Groq LLM using a messages array.
+ *
+ * @function getGroqResponseFromMessages
+ * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
+ * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
+ */
+async function getGroqResponseFromMessages(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
     try{
         const startingTime = process.hrtime();
         const response = await groq.chat.completions.create({
@@ -72,12 +95,10 @@ async function getElementEditResponse(messages: ChatCompletionMessageParam[]) : 
         const think = (thinkMatch ? thinkMatch[1]?.trim() : '') || '';
         const trimmedResponse = data.replace(/<think>.*?<\/think>/s, '').trim();
 
-        const parts: { styles: string, component: string } = JSON.parse(trimmedResponse);
 
         return {
             think: think,
-            styles: parts.styles,
-            component: parts.component,
+            response: trimmedResponse,
             total_duration: duration[1]
         }
     } catch (err) {
@@ -89,5 +110,5 @@ async function getElementEditResponse(messages: ChatCompletionMessageParam[]) : 
 export default {
     streamGroqResponse,
     getGroqResponse,
-    getElementEditResponse,
+    getElementEditResponse: getGroqResponseFromMessages,
 };
