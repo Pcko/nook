@@ -22,9 +22,6 @@ Component format (the generated components are to have this exact format):
 Style format (the generated styles are to have this exact format, every component you style must have a unique style object):
 {{styles-format}}
 
-User description:
-{{query}}
-
 Additional context (suggestions from vector database, optional):
 {{context}}
 

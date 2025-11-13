@@ -12,14 +12,14 @@ const groq = new Groq({
  * A streamed chat completion request for a Groq LLM.
  *
  * @function streamGroqResponse
- * @param {string} query - The prompt for the LLM.
+ * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
  * @param {StreamCallback} onData - A callback to handle the streaming response.
  * @returns {Promise<void>} A Promise that resolves when the stream is completed.
  */
-async function streamGroqResponse(query: string, onData: StreamCallback): Promise<void> {
+async function streamGroqResponse(messages: ChatCompletionMessageParam[], onData: StreamCallback): Promise<void> {
     try {
         const stream = await groq.chat.completions.create({
-            messages: [{ role: 'user', content: query }],
+            messages: messages,
             model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
             stream: true,
         });
@@ -40,45 +40,10 @@ async function streamGroqResponse(query: string, onData: StreamCallback): Promis
  * Sends a chat completion request for a Groq LLM.
  *
  * @function getGroqResponse
- * @param {string} query - The prompt for the LLM.
- * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
- */
-async function getGroqResponse(query: string): Promise<QueryResponseBody> {
-    try{
-        const startingTime = process.hrtime();
-        const response = await groq.chat.completions.create({
-            messages: [{ role: 'user', content: query }],
-            model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
-            stream: false,
-        });
-
-        const data = response.choices[0]?.message?.content || '';
-
-        const duration = process.hrtime(startingTime);
-
-        const thinkMatch = data.match(/<think>(.*?)<\/think>/s);
-        const think = (thinkMatch ? thinkMatch[1]?.trim() : '') || '';
-        const trimmedResponse = data.replace(/<think>.*?<\/think>/s, '').trim();
-
-        return {
-            think: think,
-            response: trimmedResponse,
-            total_duration: duration[1]
-        }
-    } catch (err) {
-        console.error('Response Error from Groq: ', err);
-        throw err;
-    }
-}
-
-/**
- * Sends a chat completion request for a Groq LLM using a messages array.
- *
- * @function getGroqResponseFromMessages
  * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
  * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
  */
-async function getGroqResponseFromMessages(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
+async function getGroqResponse(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
     try{
         const startingTime = process.hrtime();
         const response = await groq.chat.completions.create({
@@ -95,11 +60,10 @@ async function getGroqResponseFromMessages(messages: ChatCompletionMessageParam[
         const think = (thinkMatch ? thinkMatch[1]?.trim() : '') || '';
         const trimmedResponse = data.replace(/<think>.*?<\/think>/s, '').trim();
 
-
         return {
             think: think,
             response: trimmedResponse,
-            total_duration: duration[1]
+            total_duration: duration[0]*1e9 + duration[1]
         }
     } catch (err) {
         console.error('Response Error from Groq: ', err);
@@ -109,6 +73,5 @@ async function getGroqResponseFromMessages(messages: ChatCompletionMessageParam[
 
 export default {
     streamGroqResponse,
-    getGroqResponse,
-    getElementEditResponse: getGroqResponseFromMessages,
+    getGroqResponse
 };

@@ -49,7 +49,6 @@ export const promptBuilder = {
         }
 
         const prompt = promptTemplate
-            .replace("{{query}}", query)
             .replace("{{context}}", contextString);
 
         return prompt.trim();

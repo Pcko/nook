@@ -4,13 +4,29 @@ import localLLMClient from "../clients/localLLMClient.js";
 import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
 import type {ElementEditRequestBody, ElementEditResponseBody, QueryRequestBody, QueryResponseBody} from "../dto/rag.js";
+import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
 const ragRouter = Router();
 
 ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody | { error: string }>) => {
     const queryRequest = req.body;
 
-    const prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
+    let prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
+    let messages: ChatCompletionMessageParam[] = [];
+    if(queryRequest.useLocalLLM) {
+        prompt += "USER PROMPT:\r\n"+ queryRequest.query;
+    } else {
+        messages = [
+            {
+                role: "system",
+                content: prompt
+            },
+            {
+                role: "user",
+                content: queryRequest.query
+            }
+        ]
+    }
 
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
@@ -24,14 +40,14 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         if(queryRequest.useLocalLLM) {
             await localLLMClient.streamLLMResponse(prompt, callback);
         } else {
-            await groqClient.streamGroqResponse(prompt, callback);
+            await groqClient.streamGroqResponse(messages, callback);
         }
 
         return res.end();
     } else {
         let queryResponse = await (queryRequest.useLocalLLM ?
             localLLMClient.getLLMResponse(prompt) :
-            groqClient.getGroqResponse(prompt)
+            groqClient.getGroqResponse(messages)
         );
 
         return res.status(200).send(queryResponse);
@@ -40,7 +56,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
 ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
     const messages = await promptBuilder.buildElementEditMessages(req.body);
-    const queryResponseBody = await groqClient.getElementEditResponse(messages);
+    const queryResponseBody = await groqClient.getGroqResponse(messages);
 
     const parts: { styles: string, component: string } = JSON.parse(queryResponseBody.response);
     return res.status(200).send({
