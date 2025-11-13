@@ -1,13 +1,33 @@
 import React from "react";
-import {AIPageCreationIcon, EditorPageCreationIcon} from "../resources/DashboardIcons";
+import { AIPageCreationIcon, EditorPageCreationIcon } from "../resources/DashboardIcons";
 import FormTopBar from "./FormTopBar";
 
-function PageCreationChooseStep({closeForm, pageName, setPageName, handleFormSubmit, handleAiButtonClick}) {
+/**
+ * PageCreationChooseStep component
+ *
+ * Renders the initial step for creating a page. The user can enter a page name
+ * and choose whether to create a page manually or using AI.
+ *
+ * @param {Object} props
+ * @param {Function} props.closeForm - Callback to close the form modal.
+ * @param {string} props.pageName - Current value of the page name input.
+ * @param {Function} props.setPageName - Setter for updating the page name.
+ * @param {Function} props.handleFormSubmit - Handler for manual page creation. Receives `"self"`.
+ * @param {Function} props.handleAiButtonClick - Handler for AI-based page creation.
+ * @returns {JSX.Element}
+ */
+function PageCreationChooseStep({
+                                    closeForm,
+                                    pageName,
+                                    setPageName,
+                                    handleFormSubmit,
+                                    handleAiButtonClick
+                                }) {
     const maxNameLength = 50;
 
     return (
         <div className="page-creation-window">
-            <FormTopBar onClick={closeForm} title={"Create a new Page!"}/>
+            <FormTopBar onClick={closeForm} title={"Create a new Page!"} />
 
             <form>
                 <p className="text-text-subtle mb-4">
@@ -37,15 +57,15 @@ function PageCreationChooseStep({closeForm, pageName, setPageName, handleFormSub
 
                 <div className="flex gap-4 select-none">
                     <CreationOption
-                        icon={<EditorPageCreationIcon className="w-14 h-14"/>}
+                        icon={<EditorPageCreationIcon className="w-14 h-14" />}
                         title="Create a page yourself"
                         description="Take full control of the design process. Start from a blank canvas."
                         actionText="Start Building →"
-                        onClick={() => handleFormSubmit('self')}
+                        onClick={() => handleFormSubmit("self")}
                     />
 
                     <CreationOption
-                        icon={<AIPageCreationIcon className="w-14 h-14"/>}
+                        icon={<AIPageCreationIcon className="w-14 h-14" />}
                         title="Create a page using AI"
                         description="Describe your page and let AI build it for you."
                         actionText="Generate with AI →"
@@ -57,7 +77,20 @@ function PageCreationChooseStep({closeForm, pageName, setPageName, handleFormSub
     );
 }
 
-const CreationOption = ({icon, title, description, actionText, onClick}) => (
+/**
+ * CreationOption component
+ *
+ * Displays one selectable option (manual or AI). Used inside PageCreationChooseStep.
+ *
+ * @param {Object} props
+ * @param {JSX.Element} props.icon - The icon to display next to the option title.
+ * @param {string} props.title - Title of the option.
+ * @param {string} props.description - Short explanation of the option.
+ * @param {string} props.actionText - Text displayed at the bottom as a call to action.
+ * @param {Function} props.onClick - Click handler triggered when the option is chosen.
+ * @returns {JSX.Element}
+ */
+const CreationOption = ({ icon, title, description, actionText, onClick }) => (
     <div
         className="flex-1 p-4 border-2 border-ui-border rounded-md hover:shadow-md transition cursor-pointer"
         onClick={onClick}
@@ -66,6 +99,7 @@ const CreationOption = ({icon, title, description, actionText, onClick}) => (
             {icon}
             <h6 className="font-semibold m-0">{title}</h6>
         </div>
+
         <p className="text-text-subtle">{description}</p>
         <p className="block mt-4 text-primary font-semibold text-right">{actionText}</p>
     </div>

@@ -5,23 +5,48 @@ import useErrorHandler from "../general/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
 
 import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
+import PagePromptingStep from "./page-creation-components/PagePromptingStep";
 
 import PageService from "../../services/PageService";
-import PagePromptingStep from "./page-creation-components/PagePromptingStep";
 import AIService from "../../services/AIService";
 
 /**
- *  All steps of the AI-Page-Creation process
- * @type {{CHOOSE: string, AI_PREVIEW: string, AI_CHAT: string}}
+ * All steps of the AI-Page-Creation process.
+ * @readonly
+ * @enum {string}
  */
 const STEPS = {
-    CHOOSE: 'choose', AI_CHAT: 'ai-chat', AI_PREVIEW: 'ai-preview'
+    CHOOSE: "choose",
+    AI_CHAT: "ai-chat",
+    AI_PREVIEW: "ai-preview"
 };
 
+/**
+ * PageCreationForm component handles multi-step creation of pages,
+ * including the choice between manual page-editing or ai-generation.
+ *
+ * @component
+ * @param {Object} props
+ * @param {Function} props.closeForm - Function to close the creation modal.
+ * @param {Object<string, any>} props.pages - Existing pages.
+ * @param {Function} props.setPages - Setter to update pages.
+ * @returns {JSX.Element|null}
+ */
 function PageCreationForm({closeForm, pages, setPages}) {
+    /**
+     * @typedef {Object} FormData
+     * @property {string} pageName - The name of the new page.
+     * @property {string} aiPrompt - The prompt for generating AI pages.
+     * @property {Array<Object>} aiPages - List of generated AI page candidates.
+     * @property {boolean} loading - Loading state for AI generation or saving.
+     * @property {number} loadingStep - Current index in AI generation progress.
+     * @property {string} currentStep - Current UI step key from STEPS.
+     */
+
+    /** @type {[FormData, Function]} */
     const [formData, setFormData] = useState({
         pageName: "",
-        aiPrompt: '',
+        aiPrompt: "",
         aiPages: [],
         loading: false,
         loadingStep: 0,
@@ -34,19 +59,26 @@ function PageCreationForm({closeForm, pages, setPages}) {
 
     const GENERATED_PAGE_AMOUNT = 2;
 
+    /**
+     * Update form state.
+     * @param {Partial<FormData>} updates
+     */
     const updateFormData = (updates) => {
-        setFormData(prev => ({...prev, ...updates}));
+        setFormData((prev) => ({...prev, ...updates}));
     };
 
+    /**
+     * Submit handler for manual page creation.
+     *
+     * @param {"self"|"external"} cause - Determines whether to open the editor or just create silently.
+     * @returns {Promise<void>}
+     */
     const handleFormSubmit = async (cause) => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) return showNotification("error", result);
 
         try {
-            /**
-             * Page that is not yet initialized => data is not set
-             * @type {{name: string}}
-             */
+            /** @type {{name: string}} */
             const pageSkeleton = {name: formData.pageName};
             setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
 
@@ -62,15 +94,25 @@ function PageCreationForm({closeForm, pages, setPages}) {
         }
     };
 
+    /**
+     * Moves user into AI prompt mode.
+     */
     const handleAiButtonClick = () => {
         if (!formData.pageName || formData.pageName.length < 2) {
             return showNotification("error", "Enter a valid page name first.");
         }
+
         updateFormData({
-            aiPrompt: "", aiResponse: "", currentStep: STEPS.AI_CHAT
+            aiPrompt: "",
+            aiResponse: "",
+            currentStep: STEPS.AI_CHAT
         });
     };
 
+    /**
+     * Sends AI prompt to backend and loads generated pages.
+     * @returns {Promise<void>}
+     */
     const handleAiPromptSubmit = async () => {
         if (!formData.aiPrompt.trim()) {
             return showNotification("error", "Enter a prompt.");
@@ -94,6 +136,12 @@ function PageCreationForm({closeForm, pages, setPages}) {
         }
     };
 
+    /**
+     * Generates multiple pages via AI.
+     * Retries invalid JSON responses automatically.
+     *
+     * @returns {Promise<Array<{name: string, data: any}>>}
+     */
     const generateAIPages = async () => {
         const generatedPages = [];
         let failCount = 1;
@@ -102,19 +150,18 @@ function PageCreationForm({closeForm, pages, setPages}) {
             const {response} = await AIService.queryAIStream({query: formData.aiPrompt});
 
             try {
-                // Stitched together with given name and AI-ProjectData
-                let stitchedPage;
                 const parsedResponse = JSON.parse(response);
 
-                updateFormData(prev => ({
+                updateFormData((prev) => ({
                     loadingStep: prev.loadingStep + 1
                 }));
-                stitchedPage = {
-                    name: formData.pageName, data: parsedResponse
-                };
-                generatedPages.push(stitchedPage);
+
+                generatedPages.push({
+                    name: formData.pageName,
+                    data: parsedResponse
+                });
             } catch (err) {
-                console.log("FAIL TIMES", failCount)
+                console.log("FAIL TIMES", failCount);
                 failCount++;
                 i--;
             }
@@ -123,6 +170,12 @@ function PageCreationForm({closeForm, pages, setPages}) {
         return generatedPages;
     };
 
+    /**
+     * Saves an AI-generated page and navigates to the editor.
+     *
+     * @param {{name: string, data: any}} selectedPage
+     * @returns {Promise<void>}
+     */
     const handleSelectAiPage = async (selectedPage) => {
         try {
             updateFormData({loading: true});
@@ -130,12 +183,15 @@ function PageCreationForm({closeForm, pages, setPages}) {
             const page = await PageService.createPage(formData.pageName);
             const completePage = {...page, data: selectedPage.data};
 
-            setPages(prev => ({...prev, [completePage.name]: completePage}));
+            setPages((prev) => ({...prev, [completePage.name]: completePage}));
             showNotification("success", "Page created via AI.");
 
-            // Update to be sure the page is synced
             await PageService.updatePage(completePage);
-            navigate(`/editor/${completePage.name}`, {state: {page: completePage}});
+
+            navigate(`/editor/${completePage.name}`, {
+                state: {page: completePage}
+            });
+
             closeForm();
         } catch (err) {
             handleError(err);
@@ -144,6 +200,11 @@ function PageCreationForm({closeForm, pages, setPages}) {
         }
     };
 
+    /**
+     * Decides which step component should be rendered.
+     *
+     * @returns {JSX.Element|null}
+     */
     const renderStep = () => {
         switch (formData.currentStep) {
             case STEPS.CHOOSE:
@@ -156,6 +217,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
                         handleAiButtonClick={handleAiButtonClick}
                     />
                 );
+
             case STEPS.AI_CHAT:
             case STEPS.AI_PREVIEW:
                 return (
@@ -170,6 +232,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
                         aiPages={formData.aiPages}
                     />
                 );
+
             default:
                 return null;
         }
