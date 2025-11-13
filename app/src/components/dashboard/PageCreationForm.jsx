@@ -4,13 +4,11 @@ import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
 
-import PageCreationChooseStep from "./prompting-components/PageCreationChooseStep";
-import PageCreationAIChatStep from "./prompting-components/PageCreationAIChatStep";
-import PageCreationAIPreviewStep from "./prompting-components/PageCreationAIPreviewStep";
+import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
 
-import page0 from './data/page-0.json';
-import page1 from './data/page-1.json';
 import PageService from "../../services/PageService";
+import PagePromptingStep from "./page-creation-components/PagePromptingStep";
+import AIService from "../../services/AIService";
 
 /**
  *  All steps of the AI-Page-Creation process
@@ -35,9 +33,6 @@ function PageCreationForm({closeForm, pages, setPages}) {
     const navigate = useNavigate();
 
     const GENERATED_PAGE_AMOUNT = 2;
-
-    // Temporary for testing
-    const localPages = [page0, page1];
 
     const updateFormData = (updates) => {
         setFormData(prev => ({...prev, ...updates}));
@@ -81,9 +76,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
             return showNotification("error", "Enter a prompt.");
         }
 
-        updateFormData({
-            loading: true, loadingStep: 0, aiResponse: ""
-        });
+        updateFormData({loading: true, loadingStep: 0, aiResponse: ""});
 
         try {
             const generatedPages = await generateAIPages();
@@ -103,20 +96,28 @@ function PageCreationForm({closeForm, pages, setPages}) {
 
     const generateAIPages = async () => {
         const generatedPages = [];
+        let failCount = 1;
 
-        for (let i = 0; i < localPages.length; i++) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
+            const {response} = await AIService.queryAIStream({query: formData.aiPrompt});
 
-            const response = localPages[i]; // Request an ai hier
-            updateFormData(prev => ({
-                aiResponse: JSON.stringify(response), loadingStep: prev.loadingStep + 1
-            }));
+            try {
+                // Stitched together with given name and AI-ProjectData
+                let stitchedPage;
+                const parsedResponse = JSON.parse(response);
 
-            const combinedPage = {
-                name: formData.pageName, data: response
-            };
-
-            generatedPages.push(combinedPage);
+                updateFormData(prev => ({
+                    loadingStep: prev.loadingStep + 1
+                }));
+                stitchedPage = {
+                    name: formData.pageName, data: parsedResponse
+                };
+                generatedPages.push(stitchedPage);
+            } catch (err) {
+                console.log("FAIL TIMES", failCount)
+                failCount++;
+                i--;
+            }
         }
 
         return generatedPages;
@@ -129,12 +130,12 @@ function PageCreationForm({closeForm, pages, setPages}) {
             const page = await PageService.createPage(formData.pageName);
             const completePage = {...page, data: selectedPage.data};
 
-            setPages(prev => ({...prev, [page.name]: completePage}));
-
+            setPages(prev => ({...prev, [completePage.name]: completePage}));
             showNotification("success", "Page created via AI.");
-            console.log("Created page:", completePage);
 
-            navigate(`/editor/${page.name}`);
+            // Update to be sure the page is synced
+            await PageService.updatePage(completePage);
+            navigate(`/editor/${completePage.name}`, {state: {page: completePage}});
             closeForm();
         } catch (err) {
             handleError(err);
@@ -143,38 +144,32 @@ function PageCreationForm({closeForm, pages, setPages}) {
         }
     };
 
-    const goToStep = (step) => {
-        updateFormData({currentStep: step});
-    };
-
     const renderStep = () => {
         switch (formData.currentStep) {
             case STEPS.CHOOSE:
-                return (<PageCreationChooseStep
-                    closeForm={closeForm}
-                    pageName={formData.pageName}
-                    setPageName={(name) => updateFormData({pageName: name})}
-                    handleFormSubmit={handleFormSubmit}
-                    handleAiButtonClick={handleAiButtonClick}
-                />);
+                return (
+                    <PageCreationChooseStep
+                        closeForm={closeForm}
+                        pageName={formData.pageName}
+                        setPageName={(name) => updateFormData({pageName: name})}
+                        handleFormSubmit={handleFormSubmit}
+                        handleAiButtonClick={handleAiButtonClick}
+                    />
+                );
             case STEPS.AI_CHAT:
-                return (<PageCreationAIChatStep
-                    closeForm={closeForm}
-                    aiPrompt={formData.aiPrompt}
-                    setAiPrompt={(prompt) => updateFormData({aiPrompt: prompt})}
-                    loading={formData.loading}
-                    loadingStep={formData.loadingStep}
-                    handleAiPromptSubmit={handleAiPromptSubmit}
-                    onBack={() => goToStep(STEPS.CHOOSE)}
-                />);
             case STEPS.AI_PREVIEW:
-                return (<PageCreationAIPreviewStep
-                    closeForm={closeForm}
-                    aiPages={formData.aiPages}
-                    handleSelectAiPage={handleSelectAiPage}
-                    onBack={() => goToStep(STEPS.AI_CHAT)}
-                    loading={formData.loading}
-                />);
+                return (
+                    <PagePromptingStep
+                        closeForm={closeForm}
+                        aiPrompt={formData.aiPrompt}
+                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
+                        loading={formData.loading}
+                        loadingStep={formData.loadingStep}
+                        handleAiPromptSubmit={handleAiPromptSubmit}
+                        handleSelectAiPage={handleSelectAiPage}
+                        aiPages={formData.aiPages}
+                    />
+                );
             default:
                 return null;
         }

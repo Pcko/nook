@@ -1,6 +1,7 @@
 // SVG Paths
 
 import React from "react";
+import {ArrowRightIcon} from "@heroicons/react/24/outline";
 
 export const OnlineIcon = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -59,13 +60,13 @@ export const CrossIcon = () => (
     </svg>
 );
 
-export const AIIcon = ({
-                                  size = 31,
-                                  colorStart = "#D071D5",
-                                  colorMid = "#A26EDB",
-                                  colorEnd = "#666BE2",
-                                  radius = 10,
-                              }) => (
+export const DepAIIcon = ({
+                              size = 31,
+                              colorStart = "#D071D5",
+                              colorMid = "#A26EDB",
+                              colorEnd = "#666BE2",
+                              radius = 10,
+                          }) => (
     <svg
         width={size}
         height={size}
@@ -75,20 +76,19 @@ export const AIIcon = ({
     >
         <defs>
             <linearGradient id="diamondGradient" x1="0" y1="0" x2="500" y2="500" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor={colorStart} />
-                <stop offset="0.43" stopColor={colorMid} />
-                <stop offset="1" stopColor={colorEnd} />
+                <stop offset="0" stopColor={colorStart}/>
+                <stop offset="0.43" stopColor={colorMid}/>
+                <stop offset="1" stopColor={colorEnd}/>
             </linearGradient>
 
             <clipPath id="diamondClip">
-                <rect x="0" y="0" width="31" height="31" rx={radius} />
+                <rect x="0" y="0" width="31" height="31" rx={radius}/>
             </clipPath>
         </defs>
 
         <g clipPath="url(#diamondClip)">
-            {/* The four rotated layers replicate the Figma diamond gradient */}
             <g transform="matrix(-0.0272396 0.0215121 -0.0215121 -0.0285764 22.287 7.13939)">
-                <rect width="967.032" height="713.95" fill="url(#diamondGradient)" />
+                <rect width="967.032" height="713.95" fill="url(#diamondGradient)"/>
                 <rect
                     width="967.032"
                     height="713.95"
@@ -108,6 +108,17 @@ export const AIIcon = ({
                     fill="url(#diamondGradient)"
                 />
             </g>
+            <g transform="translate(9.5, 8.5)">
+                <ArrowRightIcon
+                    color="#FFFFFF"
+                    style={{
+                        transform: "translate(-50%, -50%) scale(0.8)",
+                        transformBox: "fill-box",
+                        transformOrigin: "center",
+                    }}
+                    className={"h-8"}
+                />
+            </g>
         </g>
 
         <rect
@@ -122,3 +133,137 @@ export const AIIcon = ({
         />
     </svg>
 );
+
+export function AIIcon({
+                           size = 34,
+                           colorStart = "#D071D5",
+                           colorMid = "#A26EDB",
+                           colorEnd = "#666BE2",
+                           strokeColor = "#575BC7",
+                           radius = 10.75,
+                       }) {
+    const idBase = React.useId ? React.useId() : String(Math.random()).slice(2);
+    const gradId = `diamondGrad-${idBase}`;
+    const clipDiamondId = `clipDiamond-${idBase}`;
+    const clipOuterId = `clipOuter-${idBase}`;
+
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 34 34"
+            fill="none"
+            role="img"
+            aria-label="AI icon"
+        >
+            <defs>
+                {/* Diamond Gradient: abgestimmt auf die viewBox (0..34) */}
+                <linearGradient
+                    id={gradId}
+                    x1="0"
+                    y1="0"
+                    x2="34"
+                    y2="34"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop offset="0" stopColor={colorStart}/>
+                    <stop offset="0.430146" stopColor={colorMid}/>
+                    <stop offset="1" stopColor={colorEnd}/>
+                </linearGradient>
+
+                {/* exakte ClipPaths (aus original) */}
+                <clipPath id={clipDiamondId}>
+                    <path
+                        d="M23.3284 1.5H10.6716C5.60626 1.5 1.5 5.70581 1.5 10.8939V23.1061C1.5 28.2942 5.60626 32.5 10.6716 32.5H23.3284C28.3937 32.5 32.5 28.2942 32.5 23.1061V10.8939C32.5 5.70581 28.3937 1.5 23.3284 1.5Z"/>
+                </clipPath>
+
+                <clipPath id={clipOuterId}>
+                    <rect x="1.5" y="1.5" width="31" height="31" rx="10"/>
+                </clipPath>
+            </defs>
+
+            {/* Hintergrundschicht mit den vier rect-Layers (repliziert Figma diamond) */}
+            <g clipPath={`url(#${clipOuterId})`}>
+                <g clipPath={`url(#${clipDiamondId})`}>
+                    <g transform="matrix(-0.0272396 0.0215121 -0.0215121 -0.0285764 23.787 8.63939)">
+                        <rect
+                            x="0"
+                            y="0"
+                            width="967.032"
+                            height="713.95"
+                            fill={`url(#${gradId})`}
+                            opacity="1"
+                            shapeRendering="crispEdges"
+                        />
+                        <rect
+                            x="0"
+                            y="0"
+                            width="967.032"
+                            height="713.95"
+                            transform="scale(1 -1)"
+                            fill={`url(#${gradId})`}
+                            opacity="1"
+                            shapeRendering="crispEdges"
+                        />
+                        <rect
+                            x="0"
+                            y="0"
+                            width="967.032"
+                            height="713.95"
+                            transform="scale(-1 1)"
+                            fill={`url(#${gradId})`}
+                            opacity="1"
+                            shapeRendering="crispEdges"
+                        />
+                        <rect
+                            x="0"
+                            y="0"
+                            width="967.032"
+                            height="713.95"
+                            transform="scale(-1)"
+                            fill={`url(#${gradId})`}
+                            opacity="1"
+                            shapeRendering="crispEdges"
+                        />
+                    </g>
+                </g>
+
+                {/* zentrale Raute-Form (original shape) */}
+                <path
+                    d="M23.3284 1.5H10.6716C5.60626 1.5 1.5 5.70581 1.5 10.8939V23.1061C1.5 28.2942 5.60626 32.5 10.6716 32.5H23.3284C28.3937 32.5 32.5 28.2942 32.5 23.1061V10.8939C32.5 5.70581 28.3937 1.5 23.3284 1.5Z"
+                    fill={`url(#${gradId})`}
+                />
+
+                {/* weißer Pfeil + Akzente (original Pfade) */}
+                <path
+                    d="M9.54347 15.9816C8.96719 15.9816 8.5 16.4376 8.5 17C8.5 17.5625 8.96719 18.0185 9.54347 18.0185V17V15.9816ZM26.1942 17.7202C26.6019 17.3225 26.6019 16.6776 26.1942 16.2799L19.5537 9.79831C19.1462 9.40056 18.4855 9.40056 18.078 9.79831C17.6705 10.196 17.6705 10.8409 18.078 11.2387L23.9807 17L18.078 22.7613C17.6705 23.1593 17.6705 23.804 18.078 24.2017C18.4855 24.5994 19.1462 24.5994 19.5537 24.2017L26.1942 17.7202ZM9.54347 17V18.0185H25.4565V17V15.9816H9.54347V17Z"
+                    fill="#FFFFFF"
+                />
+                <path
+                    d="M29.5 7.45146C29.4833 7.45419 29.4657 7.45668 29.4472 7.45885C28.8991 7.53409 27.6696 7.67624 26.7334 8.5884C25.7658 9.5312 25.484 10.8345 25.4659 11.5C25.3978 10.9454 25.2342 9.80849 24.4438 8.87955C23.6534 7.95061 22.2177 7.58087 21.5 7.45146C22.0861 7.34979 23.3944 7.21577 24.321 6.16205C25.2479 5.10833 25.4387 4.05922 25.4659 3.5C25.4977 4.1008 25.7658 5.53812 26.897 6.48092C27.9834 7.38654 28.9946 7.51181 29.4472 7.45885C29.4655 7.45633 29.4831 7.45386 29.5 7.45146Z"
+                    fill="#FFFFFF"
+                />
+                <path
+                    d="M8.94342 19.5728C9.04689 20.3261 9.24232 22.0168 10.4965 23.304C11.7929 24.6345 13.5849 25.0218 14.5 25.0469C13.7374 25.1405 12.1742 25.3655 10.8969 26.4522C9.61958 27.5392 9.11119 29.5131 8.93327 30.5C8.79348 29.6943 8.60918 27.8952 7.16032 26.621C5.71144 25.3466 4.26892 25.0844 3.5 25.0469C4.3261 25.0031 6.30243 24.6345 7.59878 23.0793C8.84396 21.5853 9.01625 20.195 8.94342 19.5728Z"
+                    fill="#FFFFFF"
+                />
+                <path
+                    d="M11.5 28.5363C11.5125 28.5344 11.5257 28.5325 11.5397 28.5308C11.9507 28.4744 12.8728 28.3677 13.575 27.6837C14.3007 26.9765 14.5119 25.9991 14.5256 25.5C14.5767 25.9159 14.6993 26.7687 15.2922 27.4653C15.885 28.1621 16.9617 28.4395 17.5 28.5363C17.0605 28.6126 16.0792 28.7133 15.3842 29.5034C14.6891 30.2937 14.546 31.0805 14.5256 31.5C14.5017 31.0495 14.3007 29.9714 13.4523 29.2642C12.6374 28.5851 11.8791 28.4913 11.5397 28.5308C11.5259 28.5327 11.5126 28.5346 11.5 28.5363Z"
+                    fill="#FFFFFF"
+                />
+            </g>
+
+            {/* Außenrahmen */}
+            <rect
+                x="0.75"
+                y="0.75"
+                width="32.5"
+                height="32.5"
+                rx={radius}
+                stroke={strokeColor}
+                strokeWidth="1.5"
+            />
+        </svg>
+    );
+}

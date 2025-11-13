@@ -193,5 +193,5 @@ h1 {
 }
 
 .page-creation-window{
-    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[680px] max-w-[90%];
+    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[750px] max-w-[90%];
 }
