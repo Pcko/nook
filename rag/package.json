@@ -9,7 +9,9 @@
     "build": "tsc",
     "postbuild": "copyfiles -u 1 src/**/*.txt dist/",
     "prod": "node dist/server.js",
-    "start": "npm run prod"
+    "start": "npm run prod",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "author": "",
   "license": "ISC",
@@ -27,8 +29,15 @@
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^9.36.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^60.7.1",
+    "@eslint/js": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "typescript-eslint": "^8.46.4",
+    "globals": "^16.5.0",
     "nodemon": "^3.1.10",
-    "typescript": "^5.9.2",
-    "copyfiles": "^2.4.1"
+    "typescript": "^5.9.2"
   }
 }

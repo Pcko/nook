@@ -1,0 +1,7 @@
+- Every component must have EITHER a "type" OR "tagName" attribute set.
+  - in "type", you may use one of these: "text", "div", "Box", "link", "button", "image"
+  - in "tagName", you may use one of these: "u", "i", "b"
+- Text must be represented as a "textnode" inside of a "text" element
+- "u", "i", "b" are all wrappers of "textnode", they must be children of "text"
+- Every visually relevant element should have an entry in "styles" referencing its id using "#id".
+- For images, set a reasonable public placeholder URL (stock content) if none is provided.
