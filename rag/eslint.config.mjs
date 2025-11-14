@@ -10,7 +10,6 @@ export default [
         ignores: ["dist/**", "node_modules/**"],
     },
 
-    // 🌐 Base JS + Node setup
     {
         languageOptions: {
             ecmaVersion: "latest",
@@ -25,7 +24,6 @@ export default [
         rules: {
             ...js.configs.recommended.rules,
 
-            // Import order and hygiene
             "import/order": [
                 "warn",
                 {
@@ -37,39 +35,34 @@ export default [
                     "newlines-between": "always",
                 },
             ],
-            "import/no-unresolved": "off", // handled by TS
+            "import/no-unresolved": "off",
         },
     },
-
-    // 🟦 TypeScript + Plugins setup
     {
         files: ["**/*.ts", "**/*.tsx"],
         languageOptions: {
-            parser: tseslint.parser, // ✅ Tell ESLint to use the TS parser
+            parser: tseslint.parser,
             parserOptions: {
                 project: "./tsconfig.json",
                 tsconfigRootDir: process.cwd(),
             },
         },
         plugins: {
-            "@typescript-eslint": tseslint.plugin, // ✅ Register the plugin properly
+            "@typescript-eslint": tseslint.plugin,
             import: importPlugin,
             jsdoc,
         },
         rules: {
-            // ✅ TypeScript-specific rules
-            "no-unused-vars": "off", // disable base
+            "no-unused-vars": "off",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
-                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+                {argsIgnorePattern: "^_", varsIgnorePattern: "^_"},
             ],
 
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/no-var-requires": "off",
             "no-console": "off",
-
-            // 🧩 Import rules
             "import/order": [
                 "warn",
                 {
@@ -82,7 +75,6 @@ export default [
                 },
             ],
 
-            // 📚 JSDoc rules
             "jsdoc/check-alignment": "warn",
             "jsdoc/check-indentation": "warn",
             "jsdoc/check-param-names": "error",
@@ -105,6 +97,5 @@ export default [
         },
     },
 
-    // 🧹 Prettier disables formatting conflicts
     prettier,
 ];
