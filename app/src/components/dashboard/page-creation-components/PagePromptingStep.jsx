@@ -4,6 +4,29 @@ import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
 import { AIIcon } from "../resources/DashboardIcons";
 
+/**
+ * PagePromptingStep
+ *
+ * Step in the page creation flow that:
+ * - collects an AI prompt from the user
+ * - triggers AI generation
+ * - shows loading skeletons while AI-generated layouts are being fetched
+ * - shows GrapesJS-based previews once layouts are available
+ *
+ * This component is intentionally UI-focused and does not handle any
+ * API calls directly; it delegates actions to the callbacks passed in via props.
+ *
+ * @component
+ * @param {Object} props
+ * @param {Function} props.closeForm - Callback to close the page creation window.
+ * @param {string} props.aiPrompt - Current text value of the AI prompt textarea.
+ * @param {Function} props.setAiPrompt - Setter for updating the AI prompt string.
+ * @param {boolean} props.loading - Whether AI generation is currently running.
+ * @param {Function} props.handleAiPromptSubmit - Called when the user submits the prompt.
+ * @param {Array<Object>} props.aiPages - Array of AI-generated page objects.
+ * @param {Function} props.handleSelectAiPage - Called when a user clicks on a generated page preview.
+ * @returns {JSX.Element}
+ */
 function PagePromptingStep({
                                closeForm,
                                aiPrompt,
@@ -13,14 +36,26 @@ function PagePromptingStep({
                                aiPages,
                                handleSelectAiPage,
                            }) {
+    /**
+     * True when there is at least one AI-generated page to preview.
+     * Used to decide whether to show skeletons vs. real previews.
+     */
     const hasPages = Array.isArray(aiPages) && aiPages.length > 0;
 
+    /**
+     * Local wrapper for triggering AI generation.
+     * Guards against empty prompts and concurrent loading.
+     */
     const handleSubmit = () => {
         if (!loading && aiPrompt.trim()) {
             handleAiPromptSubmit();
         }
     };
 
+    /**
+     * Lightweight skeleton card shown while waiting for AI-generated layouts.
+     * This mirrors the shape of the real preview cards without GrapesJS overhead.
+     */
     const SkeletonPreviewCard = () => (
         <div className="rounded-[6px] border border-ui-border bg-ui-bg overflow-hidden animate-pulse">
             <div className="h-[250px] w-full bg-website-bg" />
@@ -39,6 +74,7 @@ function PagePromptingStep({
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
         >
+            {/* Top bar with close button */}
             <FormTopBar onClick={closeForm} title="Create a new page with AI" />
 
             {/* Prompt input area */}
@@ -64,6 +100,7 @@ function PagePromptingStep({
                         onChange={(e) => setAiPrompt(e.target.value)}
                         disabled={loading}
                         onKeyDown={(e) => {
+                            // Submit on Cmd/Ctrl + Enter
                             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                                 e.preventDefault();
                                 handleSubmit();
@@ -71,6 +108,7 @@ function PagePromptingStep({
                         }}
                     />
 
+                    {/* Submit button (AI icon) */}
                     <motion.button
                         type="button"
                         onClick={handleSubmit}
@@ -159,8 +197,7 @@ function PagePromptingStep({
                                         layout
                                         whileHover={{
                                             y: -4,
-                                            boxShadow:
-                                                "0 10px 24px rgba(0,0,0,0.12)",
+                                            boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
                                         }}
                                         transition={{
                                             type: "spring",
@@ -173,9 +210,7 @@ function PagePromptingStep({
                                         <GrapesPagePreview
                                             index={i}
                                             page={page}
-                                            onSelect={() =>
-                                                handleSelectAiPage(page)
-                                            }
+                                            onSelect={() => handleSelectAiPage(page)}
                                         />
                                     </motion.div>
                                 ))}
