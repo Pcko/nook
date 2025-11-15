@@ -83,10 +83,10 @@ function PageCreationForm({closeForm, pages, setPages}) {
             setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
 
             if (cause === "self") {
-                await PageService.createPage(formData.pageName);
-                navigate(`/editor/${formData.pageName}`);
-            } else {
+                const newPage = await PageService.createPage(formData.pageName);
                 showNotification("success", "Page created.");
+                navigate(`/editor/${formData.pageName}`, {state: {page: newPage}});
+            } else {
                 closeForm();
             }
         } catch (err) {
@@ -155,7 +155,6 @@ function PageCreationForm({closeForm, pages, setPages}) {
                 updateFormData((prev) => ({
                     loadingStep: prev.loadingStep + 1
                 }));
-
                 generatedPages.push({
                     name: formData.pageName,
                     data: parsedResponse
@@ -226,7 +225,6 @@ function PageCreationForm({closeForm, pages, setPages}) {
                         aiPrompt={formData.aiPrompt}
                         setAiPrompt={(value) => updateFormData({aiPrompt: value})}
                         loading={formData.loading}
-                        loadingStep={formData.loadingStep}
                         handleAiPromptSubmit={handleAiPromptSubmit}
                         handleSelectAiPage={handleSelectAiPage}
                         aiPages={formData.aiPages}

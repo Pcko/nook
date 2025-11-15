@@ -1,5 +1,9 @@
 import React from "react";
-import { AIPageCreationIcon, EditorPageCreationIcon } from "../resources/DashboardIcons";
+import {motion} from "framer-motion";
+import {
+    AIPageCreationIcon,
+    EditorPageCreationIcon,
+} from "../resources/DashboardIcons";
 import FormTopBar from "./FormTopBar";
 
 /**
@@ -21,20 +25,35 @@ function PageCreationChooseStep({
                                     pageName,
                                     setPageName,
                                     handleFormSubmit,
-                                    handleAiButtonClick
+                                    handleAiButtonClick,
                                 }) {
     const maxNameLength = 50;
 
     return (
-        <div className="page-creation-window">
-            <FormTopBar onClick={closeForm} title={"Create a new Page!"} />
+        <motion.div
+            className="page-creation-window max-w-xl mx-auto p-4 md:p-5 rounded-[8px] bg-website-bg border border-ui-border shadow-sm"
+            initial={{opacity: 0, y: 8, scale: 0.98}}
+            animate={{opacity: 1, y: 0, scale: 1}}
+            exit={{opacity: 0, y: 8, scale: 0.98}}
+            transition={{duration: 0.2, ease: "easeOut"}}
+        >
+            <FormTopBar onClick={closeForm} title="Create a new page"/>
 
-            <form>
-                <p className="text-text-subtle mb-4">
+            <form
+                className="mt-3"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleFormSubmit("self");
+                }}
+            >
+                <p className="text-text-subtle mb-4 text-small">
                     Enter a name for your new page below. This will be used for the URL and navigation.
                 </p>
 
-                <label htmlFor="pageName" className="block mb-2 font-medium text-sm">
+                <label
+                    htmlFor="pageName"
+                    className="block mb-2 font-medium text-small text-text"
+                >
                     Page Name
                 </label>
 
@@ -45,27 +64,28 @@ function PageCreationChooseStep({
                     required
                     minLength={2}
                     maxLength={maxNameLength}
-                    className="w-full h-[48px] p-3 border-2 border-ui-border rounded-[5px] focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    className="w-full h-[48px] px-3 pt-1 border-2 border-ui-border rounded-[6px] bg-website-bg text-small text-text placeholder-text-subtle
+                               focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                     onChange={(e) => setPageName(e.target.value)}
                     value={pageName}
                     placeholder="Example: MyFirstPageWithNook"
                 />
 
-                <p className="text-sm text-text-subtle mt-1 mb-6">
+                <p className="text-small text-text-subtle mt-1 mb-6">
                     {pageName.length}/{maxNameLength}
                 </p>
 
-                <div className="flex gap-4 select-none">
+                <div className="flex flex-col gap-3 md:flex-row md:gap-4 select-none">
                     <CreationOption
-                        icon={<EditorPageCreationIcon className="w-14 h-14" />}
+                        icon={<EditorPageCreationIcon className="w-14 h-14"/>}
                         title="Create a page yourself"
                         description="Take full control of the design process. Start from a blank canvas."
-                        actionText="Start Building →"
+                        actionText="Start building →"
                         onClick={() => handleFormSubmit("self")}
                     />
 
                     <CreationOption
-                        icon={<AIPageCreationIcon className="w-14 h-14" />}
+                        icon={<AIPageCreationIcon className="w-14 h-14"/>}
                         title="Create a page using AI"
                         description="Describe your page and let AI build it for you."
                         actionText="Generate with AI →"
@@ -73,7 +93,7 @@ function PageCreationChooseStep({
                     />
                 </div>
             </form>
-        </div>
+        </motion.div>
     );
 }
 
@@ -90,19 +110,32 @@ function PageCreationChooseStep({
  * @param {Function} props.onClick - Click handler triggered when the option is chosen.
  * @returns {JSX.Element}
  */
-const CreationOption = ({ icon, title, description, actionText, onClick }) => (
-    <div
-        className="flex-1 p-4 border-2 border-ui-border rounded-md hover:shadow-md transition cursor-pointer"
+const CreationOption = ({icon, title, description, actionText, onClick}) => (
+    <motion.div
+        className="flex-1 p-4 border-2 border-ui-border rounded-[6px] bg-website-bg
+                   hover:border-primary hover:shadow-md transition-colors"
         onClick={onClick}
+        role="button"
+        tabIndex={0}
+        whileHover={{y: -3}}
+        whileTap={{scale: 0.97}}
+        onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+            }
+        }}
     >
         <div className="flex items-center gap-3 mb-3">
             {icon}
-            <h6 className="font-semibold m-0">{title}</h6>
+            <h6 className="font-semibold m-0 text-text">{title}</h6>
         </div>
 
-        <p className="text-text-subtle">{description}</p>
-        <p className="block mt-4 text-primary font-semibold text-right">{actionText}</p>
-    </div>
+        <p className="text-small text-text-subtle leading-snug">{description}</p>
+        <p className="mt-4 text-right text-small font-semibold text-primary">
+            {actionText}
+        </p>
+    </motion.div>
 );
 
 export default PageCreationChooseStep;

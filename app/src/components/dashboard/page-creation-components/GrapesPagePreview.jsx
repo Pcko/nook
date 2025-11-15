@@ -1,5 +1,5 @@
 import "grapesjs/dist/css/grapes.min.css";
-import React, {useEffect, useRef} from "react";
+import React, { useEffect, useRef } from "react";
 import grapesjs from "grapesjs";
 
 /**
@@ -13,7 +13,7 @@ import grapesjs from "grapesjs";
  * @param {number} props.index - Numerical index used to label the preview option.
  * @returns {JSX.Element}
  */
-function GrapesPagePreview({page, onSelect, index}) {
+function GrapesPagePreview({ page, onSelect, index }) {
     /** @type {React.MutableRefObject<HTMLDivElement|null>} */
     const containerRef = useRef(null);
 
@@ -21,7 +21,7 @@ function GrapesPagePreview({page, onSelect, index}) {
     const editorRef = useRef(null);
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !page) return;
 
         // Clean up previous editor instance if any
         if (editorRef.current) {
@@ -39,21 +39,25 @@ function GrapesPagePreview({page, onSelect, index}) {
             height: "250px",
             width: "100%",
             storageManager: false,
-            panels: {defaults: []},
+            panels: { defaults: [] },
         });
 
         editorRef.current = editor;
 
-        // Load project data into GrapesJS instance
         try {
+            // Load project data into GrapesJS instance
             editor.loadProjectData(page.data);
 
             // Disable selection/hover in preview
-            editor.getWrapper().set({selectable: false, hoverable: false});
-            editor.getComponents().forEach(c => c.set({selectable: false, hoverable: false}));
+            editor.getWrapper().set({ selectable: false, hoverable: false });
+            editor.getComponents().forEach((c) =>
+                c.set({ selectable: false, hoverable: false })
+            );
 
             // Remove all blocks to prevent accidental UI artifacts
-            editor.BlockManager.getAll().forEach(b => editor.BlockManager.remove(b?.id));
+            editor.BlockManager.getAll().forEach((b) =>
+                editor.BlockManager.remove(b?.id)
+            );
         } catch {
             // Non-fatal if project data is partially invalid
         }
@@ -77,6 +81,7 @@ function GrapesPagePreview({page, onSelect, index}) {
                 try {
                     editorRef.current.destroy();
                 } catch {
+                    // Ignore GrapesJS cleanup inconsistencies
                 }
                 editorRef.current = null;
             }
@@ -85,13 +90,16 @@ function GrapesPagePreview({page, onSelect, index}) {
 
     return (
         <div
-            className="border-2 border-ui-border rounded overflow-hidden relative cursor-pointer group hover:border-ui-border-selected hover:shadow-xl"
+            className="border-2 border-ui-border rounded-[5px] overflow-hidden relative cursor-pointer group hover:border-ui-border-selected hover:shadow-xl transition"
             onClick={onSelect}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && onSelect?.()}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    onSelect?.();
+                }
+            }}
         >
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition" />
             <div
                 ref={containerRef}
                 style={{
@@ -99,9 +107,10 @@ function GrapesPagePreview({page, onSelect, index}) {
                     width: "100%",
                     overflow: "hidden",
                     background: "var(--website-bg)",
-                    userSelect: "none"
+                    userSelect: "none",
                 }}
             />
+
             <div className="absolute bottom-2 right-3 bg-website-bg/80 text-sm px-3 py-1 rounded font-semibold">
                 Option {index + 1}
             </div>
