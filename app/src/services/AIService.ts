@@ -24,12 +24,12 @@ const axiosConfig = {
  */
 class AIService {
     /**
-     * queryAIStream
+     * getGeneratedPage
      *
      * Sends a RAG (Retrieval-Augmented Generation) query to the backend and
      * returns the structured AI response.
      *
-     * This uses a preconfigured Axios instance (`AxiosInstance.ts`) so auth
+     * This uses a preconfigured Axios instance (`AxiosInstance.js`) so auth
      * headers, base URL, interceptors, etc. are handled in a single place.
      *
      * @param {RAGQueryBody} body
@@ -45,7 +45,7 @@ class AIService {
      *   wrap this in try/catch and surface user-friendly messages via the
      *   notification system or other UI.
      */
-    static async queryAIStream(body: RAGQueryBody): Promise<RAGResponseDTO> {
+    static async getGeneratedPage(body: RAGQueryBody): Promise<RAGResponseDTO> {
         const response = await axios.post<RAGResponseDTO>(
             "/api/generation/query",
             body,

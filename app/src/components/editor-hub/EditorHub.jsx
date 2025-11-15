@@ -33,7 +33,6 @@ function EditorHub() {
      * and fetches the actual state from DB
      */
     useEffect(() => {
-        console.log(page.data)
         localStorage.removeItem(`page_${page.name}`);
     }, [])
 

@@ -147,7 +147,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
         let failCount = 1;
 
         for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
-            const {response} = await AIService.queryAIStream({query: formData.aiPrompt});
+            const {response} = await AIService.getGeneratedPage({query: formData.aiPrompt});
 
             try {
                 const parsedResponse = JSON.parse(response);

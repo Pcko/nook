@@ -1,8 +1,9 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, {useEffect, useState} from "react";
+import {motion, AnimatePresence} from "framer-motion";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import { AIIcon } from "../resources/DashboardIcons";
+import {AIIcon} from "../resources/DashboardIcons";
+import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
 
 /**
  * PagePromptingStep
@@ -41,7 +42,12 @@ function PagePromptingStep({
      * Used to decide whether to show skeletons vs. real previews.
      */
     const hasPages = Array.isArray(aiPages) && aiPages.length > 0;
-
+    /**
+     *  Step of the form
+     *  STEP 1 - a prompt can be entered to generate a Page
+     *  STEP 2 - a preview of the generated Page to choose is shown
+     */
+    const step = loading || hasPages ? 2 : 1;
     /**
      * Local wrapper for triggering AI generation.
      * Guards against empty prompts and concurrent loading.
@@ -57,34 +63,33 @@ function PagePromptingStep({
      * This mirrors the shape of the real preview cards without GrapesJS overhead.
      */
     const SkeletonPreviewCard = () => (
-        <div className="rounded-[6px] border border-ui-border bg-ui-bg overflow-hidden animate-pulse">
+        <div className="relative overflow-hidden rounded-md border border-ui-border bg-ui-bg animate-pulse">
+            {/* Page-Placeholder */}
             <div className="h-[250px] w-full bg-website-bg" />
-            <div className="p-3 flex items-center justify-between">
-                <div className="h-3 w-24 bg-ui-border/70 rounded" />
-                <div className="h-6 w-20 bg-ui-border/70 rounded-full" />
-            </div>
+            {/* Overlay-Spinner mittig */}
+            <LoadingCircleSpinner className="pointer-events-none absolute inset-0" />
         </div>
-    );
+    )
 
     return (
         <motion.div
             className="page-creation-window max-w-3xl p-4 md:p-5 rounded-[8px] mx-auto bg-website-bg border border-ui-border shadow-sm"
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            initial={{opacity: 0, y: 8, scale: 0.98}}
+            animate={{opacity: 1, y: 0, scale: 1}}
+            exit={{opacity: 0, y: 8, scale: 0.98}}
+            transition={{duration: 0.2, ease: "easeOut"}}
         >
             {/* Top bar with close button */}
-            <FormTopBar onClick={closeForm} title="Create a new page with AI" />
+            <FormTopBar onClick={closeForm} title="Create a new page with AI"/>
 
             {/* Prompt input area */}
             <div className="mt-4 space-y-2">
                 <div className="flex items-baseline justify-between gap-4">
                     <p className="text-small font-medium text-text">
-                        Describe the page you want to create
+                        Describe the page you want to create:
                     </p>
                     <span className="text-[11px] text-text-subtle tracking-wide uppercase">
-                        Step 1 of 2
+                        Step {step} of 2
                     </span>
                 </div>
 
@@ -100,8 +105,7 @@ function PagePromptingStep({
                         onChange={(e) => setAiPrompt(e.target.value)}
                         disabled={loading}
                         onKeyDown={(e) => {
-                            // Submit on Cmd/Ctrl + Enter
-                            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                            if (e.shiftKey && (e.metaKey || e.ctrlKey)) {
                                 e.preventDefault();
                                 handleSubmit();
                             }
@@ -126,7 +130,7 @@ function PagePromptingStep({
                             whileTap={
                                 loading || !aiPrompt.trim()
                                     ? undefined
-                                    : { scale: 0.95 }
+                                    : {scale: 0.95}
                             }
                             className="flex items-center justify-center w-full h-full"
                         >
@@ -148,10 +152,10 @@ function PagePromptingStep({
                     <motion.div
                         key="ai-previews"
                         className="mt-8 border-t border-ui-border pt-5"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.2 }}
+                        initial={{opacity: 0, y: 8}}
+                        animate={{opacity: 1, y: 0}}
+                        exit={{opacity: 0, y: 8}}
+                        transition={{duration: 0.2}}
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div>
@@ -180,7 +184,7 @@ function PagePromptingStep({
                         {loading && !hasPages && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {[0, 1].map((i) => (
-                                    <SkeletonPreviewCard key={i} />
+                                    <SkeletonPreviewCard key={i}/>
                                 ))}
                             </div>
                         )}
