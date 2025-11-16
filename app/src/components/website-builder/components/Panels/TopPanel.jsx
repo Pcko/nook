@@ -9,7 +9,7 @@ import {
     AiOutlineUndo,
 } from "react-icons/ai";
 import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
-import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines} from "../../utils/grapesActions";
+import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../general/ErrorHandler";
 
@@ -96,10 +96,10 @@ function TopPanel({editorRef, page}) {
             </div>
 
             {/* right group */}
-            <div className="flex items-center justify-end gap-2">
-                {/* add buttons later Save / Preview / publish */}
+            <div className="flex items-center justify-end gap-2">          
                 <TopActionButton label={"Save"} onClick={() => handleSave()}/>
-                <TopActionButton label={"Preview"}/>
+                <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)}/>
+                {/*<TopActionButton label={"Preview"}/>*/}
                 <TopActionButton label={"Publish"} primary={true}/>
             </div>
         </div>
@@ -157,7 +157,7 @@ function TopActionButton({label, primary = false, onClick}) {
                 primary ? "btn-wb--primary" : ""
             ].join(" ")}
         >
-            <span className="px-1.5 py-0.5 font-mono text-micro">
+            <span className="py-0.5 font-mono text-micro">
               {label}
             </span>
         </button>

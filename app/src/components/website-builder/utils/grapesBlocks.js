@@ -246,9 +246,9 @@ export const coreStructureBlocks = [
       type: "div",
       style: { display: "flex", gap: "10px" },
       components: [
-        { type: "div", style: { flex: "1", padding: "20px", "min-height": "60px", border: "1px solid #ddd" } },
-        { type: "div", style: { flex: "1", padding: "20px", "min-height": "60px", border: "1px solid #ddd" } },
-        { type: "div", style: { flex: "1", padding: "20px", "min-height": "60px", border: "1px solid #ddd" } }
+        { type: "div", style: { flex: "1", padding: "20px", border: "1px solid #ddd" } },
+        { type: "div", style: { flex: "1", padding: "20px", border: "1px solid #ddd" } },
+        { type: "div", style: { flex: "1", padding: "20px",  border: "1px solid #ddd" } }
       ]
     }
   },
