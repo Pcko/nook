@@ -20,7 +20,7 @@
 
   .gjs-block:hover {
     background-color: var(--primary);
-    color: var(--text-on-primary);
+    color: var(--primary-hover);
     transform: scale(1.03);
     border: 3px solid var(--ui-subtle);
   }
