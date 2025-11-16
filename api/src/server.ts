@@ -11,6 +11,7 @@ import authRouter from './routes/authenticator.js'; //<-- account authenticator 
 import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
+import hostingPrototype from './routes/website-hosting-prototype.js';
 
 if (!process.env.APP_URL || !process.env.RAG_URL) {
     console.error('Cors environment missing!')
@@ -35,9 +36,7 @@ app.use('/api/generation', ragRouter);
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
-});
+app.use('/', hostingPrototype);
 
 if (process.env.DEVENV) {
     app.listen(PORT, () => {

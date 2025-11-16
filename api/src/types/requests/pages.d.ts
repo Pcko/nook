@@ -11,4 +11,5 @@ export interface UpdatePageBody {
     newPageName?: string;
     newFolderName?: string;
     pageContent?: string;
+    deploymentStatus?: string;
 }

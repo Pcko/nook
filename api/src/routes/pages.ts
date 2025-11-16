@@ -55,7 +55,7 @@ router.get('/', async (req: Request, res: Response) => {
 
         const pages = await Page.find({ author: userId }).lean();
 
-        return res.send(pages);
+        return res.json(pages);
     } catch (err) {
         console.error('❌ Get pages error: ', err);
         return res.sendStatus(500);
@@ -85,7 +85,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
     try {
         const { userId } = req;
         const { pageName } = req.params;
-        const { newPageName, newFolderName, pageContent } = req.body;
+        const { newPageName, newFolderName, pageContent, deploymentStatus } = req.body;
 
         const page = await Page.findOne({ name: pageName, author: userId }) as IPageDocument;
         if (!page) {
@@ -125,6 +125,10 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         //Update Folder
         if (newFolderName) {
             page.folderName = newFolderName;
+        }
+
+        if (deploymentStatus) {
+            page.deploymentStatus = deploymentStatus;
         }
 
         await page.save();
