@@ -13,7 +13,7 @@ const router = express.Router();
 router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) => {
   try {
     const { userId } = req;
-    const { account } = req.body.changes || {};
+    const { account } = req.body.changes;
 
     if (account) {
       //find user and alter the corresponding userdata
@@ -67,8 +67,8 @@ router.get('/twoFactorAuth', async (req: Request, res: Response) => {
     const user = await User.findById(userId) as IUserDocument;
 
     const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
-    user!.twoFactorAuthSecret = secret.base32;
-    await user!.save();
+    user.twoFactorAuthSecret = secret.base32;
+    await user.save();
 
     return res.json({ qrCodeUrl: secret.otpauth_url });
   }
@@ -85,7 +85,7 @@ router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBod
     const { otp, isEnabled } = req.body;
 
     const user = await User.findById(userId) as IUserDocument;
-    const userSecret = user!.twoFactorAuthSecret as string;
+    const userSecret = user.twoFactorAuthSecret as string;
 
     if (!speakeasy.totp.verify({
       secret: userSecret, encoding: 'base32', token: otp
@@ -93,8 +93,8 @@ router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBod
       return res.status(403).send({ message: 'One time password is invalid!' })
     }
 
-    user!.twoFactorAuthOn = isEnabled;
-    await user!.save();
+    user.twoFactorAuthOn = isEnabled;
+    await user.save();
 
     return res.sendStatus(200);
   }

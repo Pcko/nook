@@ -40,11 +40,6 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
     try {
         const { username, password, otp } = req.body;
 
-        //make sure request body has all required information
-        if (![username, password].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
         const user = await User.findOne({ _id: username }) as IUserDocument | null;
 
         //make sure username exists
@@ -87,11 +82,6 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
     try {
         const { username, password, firstName, lastName, email } = req.body;
 
-        //make sure request body has all required information
-        if (![username, password, firstName, lastName, email].every(Boolean)) {
-            return res.sendStatus(400);
-        }
-
         //make sure all parameters are valid
         const result =
             isInvalidStringForUsername(username) ||
@@ -133,10 +123,6 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     try {
         const { token: refreshToken } = req.body;
-
-        if (!refreshToken) {
-            return res.sendStatus(400);
-        }
 
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: any, tokenContent: any) => {
             if (err) {

@@ -24,7 +24,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         let duplicateNumber = 1;
         let pageExists = undefined;
         do {
-            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean();
+            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
             if (pageExists) {
                 duplicateNumber += 1;
@@ -53,9 +53,9 @@ router.get('/', async (req: Request, res: Response) => {
     try {
         const { userId } = req;
 
-        const pages = await Page.find({ author: userId }).lean();
+        const pages = await Page.find({ author: userId }).lean<IPage>();
 
-        return res.send(pages);
+        return res.json(pages);
     } catch (err) {
         console.error('❌ Get pages error: ', err);
         return res.sendStatus(500);
@@ -68,7 +68,7 @@ router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Respon
         const { userId } = req;
         const { pageName } = req.params;
 
-        const page = await Page.findOne({ name: pageName, author: userId }).lean();
+        const page = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
         if (!page) {
             return res.status(404).send({ message: 'Page not found!' });
         }
@@ -105,7 +105,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
             let duplicateNumber = 1;
             let pageExists;
             do {
-                pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean();
+                pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
                 if (pageExists) {
                     duplicateNumber += 1;
