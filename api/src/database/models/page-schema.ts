@@ -6,6 +6,7 @@ const PageSchema = new Schema<IPage>(
         name: {
             type: String,
             required: true,
+            maxLength: 50,
         },
         data: {
             type: String,

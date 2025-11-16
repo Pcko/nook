@@ -1,5 +1,8 @@
 // SVG Paths
 
+import React from "react";
+import {ArrowRightIcon} from "@heroicons/react/24/outline";
+
 export const OnlineIcon = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd"
@@ -24,3 +27,216 @@ export const NotDeployedIcon = () => (
     </svg>
 );
 
+export const EditorPageCreationIcon = ({className}) => (
+    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"
+         className={className}>
+        <circle cx="30" cy="30" r="28.75" className={"fill-primary stroke-text-on-primary"} strokeWidth="2.5"/>
+        <path
+            d="M38.961 19.2216L41.3903 16.7909C41.8967 16.2845 42.5835 16 43.2997 16C44.0158 16 44.7027 16.2845 45.2091 16.7909C45.7155 17.2973 46 17.9842 46 18.7003C46 19.4165 45.7155 20.1033 45.2091 20.6097L29.9179 35.9009C29.1567 36.6617 28.2178 37.221 27.1863 37.5281L23.3199 38.6801L24.4719 34.8137C24.779 33.7822 25.3383 32.8433 26.0991 32.0821L38.961 19.2216ZM38.961 19.2216L42.7597 23.0203M40.5997 32.9201V39.76C40.5997 40.6193 40.2584 41.4434 39.6508 42.051C39.0431 42.6586 38.219 43 37.3598 43H22.24C21.3807 43 20.5566 42.6586 19.949 42.051C19.3414 41.4434 19 40.6193 19 39.76V24.6402C19 23.781 19.3414 22.9569 19.949 22.3492C20.5566 21.7416 21.3807 21.4003 22.24 21.4003H29.0799"
+            stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+export const AIPageCreationIcon = ({className}) => (
+    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"
+         className={className}>
+        <circle cx="30" cy="30" r="28.75" className={"fill-primary stroke-text-on-primary"} strokeWidth="2.5"/>
+        <path
+            d="M26.0232 35.7064L24.7308 40.2308L23.4383 35.7064C23.1043 34.5377 22.4779 33.4734 21.6185 32.6139C20.759 31.7544 19.6947 31.1281 18.526 30.7941L14 29.5L18.5244 28.2075C19.6931 27.8735 20.7574 27.2472 21.6169 26.3877C22.4764 25.5282 23.1027 24.4639 23.4367 23.2952L24.7308 18.7692L26.0232 23.2936C26.3573 24.4623 26.9836 25.5266 27.8431 26.3861C28.7026 27.2456 29.7669 27.8719 30.9355 28.2059L35.4615 29.5L30.9371 30.7925C29.7684 31.1265 28.7041 31.7528 27.8447 32.6123C26.9852 33.4718 26.3589 34.5361 26.0248 35.7048L26.0232 35.7064ZM39.4502 24.2777L39.0385 25.9231L38.6267 24.2777C38.391 23.3343 37.9034 22.4727 37.216 21.785C36.5286 21.0973 35.6672 20.6093 34.7239 20.3733L33.0769 19.9615L34.7239 19.5498C35.6672 19.3137 36.5286 18.8258 37.216 18.1381C37.9034 17.4503 38.391 16.5888 38.6267 15.6454L39.0385 14L39.4502 15.6454C39.686 16.589 40.1739 17.4507 40.8616 18.1384C41.5493 18.8261 42.411 19.314 43.3546 19.5498L45 19.9615L43.3546 20.3733C42.411 20.6091 41.5493 21.0969 40.8616 21.7847C40.1739 22.4724 39.686 23.3341 39.4502 24.2777ZM37.2802 43.1193L36.6538 45L36.0275 43.1193C35.8519 42.5925 35.556 42.1139 35.1634 41.7212C34.7707 41.3286 34.2921 41.0327 33.7653 40.8571L31.8846 40.2308L33.7653 39.6044C34.2921 39.4288 34.7707 39.133 35.1634 38.7403C35.556 38.3477 35.8519 37.869 36.0275 37.3422L36.6538 35.4615L37.2802 37.3422C37.4558 37.869 37.7516 38.3477 38.1443 38.7403C38.5369 39.133 39.0156 39.4288 39.5424 39.6044L41.4231 40.2308L39.5424 40.8571C39.0156 41.0327 38.5369 41.3286 38.1443 41.7212C37.7516 42.1139 37.4558 42.5925 37.2802 43.1193Z"
+            stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+export const CrossIcon = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-6 h-6 stroke-2"
+    >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+);
+
+export const DepAIIcon = ({
+                              size = 31,
+                              colorStart = "#D071D5",
+                              colorMid = "#A26EDB",
+                              colorEnd = "#666BE2",
+                              radius = 10,
+                          }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 31 31"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <defs>
+            <linearGradient id="diamondGradient" x1="0" y1="0" x2="500" y2="500" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor={colorStart}/>
+                <stop offset="0.43" stopColor={colorMid}/>
+                <stop offset="1" stopColor={colorEnd}/>
+            </linearGradient>
+
+            <clipPath id="diamondClip">
+                <rect x="0" y="0" width="31" height="31" rx={radius}/>
+            </clipPath>
+        </defs>
+
+        <g clipPath="url(#diamondClip)">
+            <g transform="matrix(-0.0272396 0.0215121 -0.0215121 -0.0285764 22.287 7.13939)">
+                <rect width="967.032" height="713.95" fill="url(#diamondGradient)"/>
+                <rect
+                    width="967.032"
+                    height="713.95"
+                    transform="scale(1 -1)"
+                    fill="url(#diamondGradient)"
+                />
+                <rect
+                    width="967.032"
+                    height="713.95"
+                    transform="scale(-1 1)"
+                    fill="url(#diamondGradient)"
+                />
+                <rect
+                    width="967.032"
+                    height="713.95"
+                    transform="scale(-1)"
+                    fill="url(#diamondGradient)"
+                />
+            </g>
+            <g transform="translate(9.5, 8.5)">
+                <ArrowRightIcon
+                    color="#FFFFFF"
+                    style={{
+                        transform: "translate(-50%, -50%) scale(0.8)",
+                        transformBox: "fill-box",
+                        transformOrigin: "center",
+                    }}
+                    className={"h-8"}
+                />
+            </g>
+        </g>
+
+        <rect
+            x="0.75"
+            y="0.75"
+            width="29.5"
+            height="29.5"
+            rx={radius - 0.75}
+            stroke={colorEnd}
+            strokeWidth="1.5"
+            fill="none"
+        />
+    </svg>
+);
+
+export function AIIcon({
+                           size = 34,
+                           colorStart = "#D071D5",
+                           colorMid = "#A26EDB",
+                           colorEnd = "#666BE2",
+                           strokeColor = "#575BC7",
+                           radius = 10.75,
+                       }) {
+    const idBase = React.useId ? React.useId() : String(Math.random()).slice(2);
+    const gradId = `aiGrad-${idBase}`;
+    const glossId = `aiGloss-${idBase}`;
+
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 34 34"
+            fill="none"
+            role="img"
+            aria-label="AI icon"
+            className="block"
+            shapeRendering="geometricPrecision"
+        >
+            <defs>
+                {/* main gradient, same direction as before */}
+                <linearGradient
+                    id={gradId}
+                    x1="0"
+                    y1="0"
+                    x2="34"
+                    y2="34"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop offset="0" stopColor={colorStart} />
+                    <stop offset="0.430146" stopColor={colorMid} />
+                    <stop offset="1" stopColor={colorEnd} />
+                </linearGradient>
+
+                {/* soft top-left highlight */}
+                <radialGradient
+                    id={glossId}
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="translate(10 6) rotate(45) scale(18)"
+                >
+                    <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.8" />
+                    <stop offset="0.4" stopColor="#FFFFFF" stopOpacity="0.25" />
+                    <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+                </radialGradient>
+            </defs>
+
+            {/* background rounded square with gradient */}
+            <rect
+                x="1.5"
+                y="1.5"
+                width="31"
+                height="31"
+                rx={radius}
+                fill={`url(#${gradId})`}
+            />
+            {/* subtle gloss overlay */}
+            <rect
+                x="1.5"
+                y="1.5"
+                width="31"
+                height="16"
+                rx={radius}
+                fill={`url(#${glossId})`}
+                opacity="0.5"
+            />
+
+            {/* white arrow + accents (unchanged geometry) */}
+            <path
+                d="M9.54347 15.9816C8.96719 15.9816 8.5 16.4376 8.5 17C8.5 17.5625 8.96719 18.0185 9.54347 18.0185V17V15.9816ZM26.1942 17.7202C26.6019 17.3225 26.6019 16.6776 26.1942 16.2799L19.5537 9.79831C19.1462 9.40056 18.4855 9.40056 18.078 9.79831C17.6705 10.196 17.6705 10.8409 18.078 11.2387L23.9807 17L18.078 22.7613C17.6705 23.1593 17.6705 23.804 18.078 24.2017C18.4855 24.5994 19.1462 24.5994 19.5537 24.2017L26.1942 17.7202ZM9.54347 17V18.0185H25.4565V17V15.9816H9.54347V17Z"
+                fill="#FFFFFF"
+            />
+            <path
+                d="M29.5 7.45146C29.4833 7.45419 29.4657 7.45668 29.4472 7.45885C28.8991 7.53409 27.6696 7.67624 26.7334 8.5884C25.7658 9.5312 25.484 10.8345 25.4659 11.5C25.3978 10.9454 25.2342 9.80849 24.4438 8.87955C23.6534 7.95061 22.2177 7.58087 21.5 7.45146C22.0861 7.34979 23.3944 7.21577 24.321 6.16205C25.2479 5.10833 25.4387 4.05922 25.4659 3.5C25.4977 4.1008 25.7658 5.53812 26.897 6.48092C27.9834 7.38654 28.9946 7.51181 29.4472 7.45885C29.4655 7.45633 29.4831 7.45386 29.5 7.45146Z"
+                fill="#FFFFFF"
+            />
+            <path
+                d="M8.94342 19.5728C9.04689 20.3261 9.24232 22.0168 10.4965 23.304C11.7929 24.6345 13.5849 25.0218 14.5 25.0469C13.7374 25.1405 12.1742 25.3655 10.8969 26.4522C9.61958 27.5392 9.11119 29.5131 8.93327 30.5C8.79348 29.6943 8.60918 27.8952 7.16032 26.621C5.71144 25.3466 4.26892 25.0844 3.5 25.0469C4.3261 25.0031 6.30243 24.6345 7.59878 23.0793C8.84396 21.5853 9.01625 20.195 8.94342 19.5728Z"
+                fill="#FFFFFF"
+            />
+            <path
+                d="M11.5 28.5363C11.5125 28.5344 11.5257 28.5325 11.5397 28.5308C11.9507 28.4744 12.8728 28.3677 13.575 27.6837C14.3007 26.9765 14.5119 25.9991 14.5256 25.5C14.5767 25.9159 14.6993 26.7687 15.2922 27.4653C15.885 28.1621 16.9617 28.4395 17.5 28.5363C17.0605 28.6126 16.0792 28.7133 15.3842 29.5034C14.6891 30.2937 14.546 31.0805 14.5256 31.5C14.5017 31.0495 14.3007 29.9714 13.4523 29.2642C12.6374 28.5851 11.8791 28.4913 11.5397 28.5308C11.5259 28.5327 11.5126 28.5346 11.5 28.5363Z"
+                fill="#FFFFFF"
+            />
+
+            {/* outer stroke */}
+            <rect
+                x="1.5"
+                y="1.5"
+                width="31"
+                height="31"
+                rx={radius}
+                stroke={strokeColor}
+                strokeWidth="1.5"
+                fill="none"
+            />
+        </svg>
+    );
+}
