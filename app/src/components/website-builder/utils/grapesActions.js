@@ -50,3 +50,11 @@ export const setTablet  = (editorRef) => {editorRef?.current?.setDevice?.("Table
  * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
  */
 export const setMobile  = (editorRef) => {editorRef?.current?.setDevice?.("Mobile")};
+
+/**
+ * Export the current website as a ZIP (using gjs-plugin-export).
+ * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
+ */
+export const exportWebsite = (editorRef) => {
+  editorRef?.current?.runCommand("gjs-export-zip");
+};

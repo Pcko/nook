@@ -17,6 +17,7 @@
     "framer-motion": "^12.5.0",
     "grapesjs": "^0.22.5",
     "grapesjs-blocks-basic": "^1.0.2",
+    "grapesjs-plugin-export": "^1.0.12",
     "js-beautify": "^1.15.3",
     "pako": "^2.1.0",
     "qrcode": "^1.5.4",
