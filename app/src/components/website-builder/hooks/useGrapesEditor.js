@@ -31,8 +31,6 @@ export function useGrapesEditor(config, page) {
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editorRef.current); // Loads blocks
 
-            
-
             WebsiteBuilderService.loadPageState(editorRef.current, page).catch((err) => {
                 handleError(err);
             });
