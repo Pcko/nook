@@ -131,7 +131,6 @@ function ToolbarButton({icon, label, onClick}) {
       >
         {icon}
       </span>
-
             {hasLabel && (
                 <span
                     className="
@@ -157,7 +156,7 @@ function TopActionButton({label, primary = false, onClick}) {
                 primary ? "btn-wb--primary" : ""
             ].join(" ")}
         >
-            <span className="py-0.5 font-mono text-micro">
+            <span className="py-0.5 font-mono">
               {label}
             </span>
         </button>

@@ -22,7 +22,10 @@ function base64ToBinary(base64) {
  */
 function getExtFromDataUrl(dataUrl) {
   const match = dataUrl.match(/^data:image\/([^;]+);/);
-  return match ? match[1].toLowerCase() : "png";
+  if (!match) return "png";
+  const mimeExt = match[1].toLowerCase();
+  if (mimeExt === "svg+xml") return "svg";
+  return mimeExt;
 }
 
 /**
