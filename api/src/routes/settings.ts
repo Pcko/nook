@@ -1,15 +1,22 @@
 import express, { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
-import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
-import IUser from '../types/user.js';
-import { SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
-type IUserDocument = IUser & Document;
+import IUser from '../types/IUser.js';
+import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
 
 const router = express.Router();
 
-// SAVE SETTINGS REQUEST
+/**
+ * @route PATCH /api/settings/
+ * @summary Updates the user's settings based on the provided information
+ * 
+ * @param {Request<{}, {}, SaveSettingsBody>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {Object} req.body.changes - An object containing all settings that should be changed (including new settings)
+ * 
+ * @returns 200
+ */
 router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) => {
   try {
     const { userId } = req;
@@ -17,7 +24,7 @@ router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) 
 
     if (account) {
       //find user and alter the corresponding userdata
-      const user = await User.findOne({ _id: userId }) as IUserDocument;
+      const user = await User.findOne({ _id: userId }) as IUser;
       Object.keys(account).forEach(key => {
         if (key !== 'username') {
           (user as any)[key] = account[key];
@@ -35,8 +42,17 @@ router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) 
   }
 });
 
-// ACCOUNT DELETION REQUEST
-router.delete('/delete-account', async (req: Request, res: Response) => {
+/**
+ * @route DELETE /api/settings/delete-account
+ * @summary Deletes a user's account
+ * 
+ * @param {Request<{}, {}, DeleteAccountBody>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.body.username - Username (for additional account deletion confirmation)
+ * 
+ * @returns 200
+ */
+router.delete('/delete-account', async (req: Request<{}, {}, DeleteAccountBody>, res: Response) => {
   try {
     const { userId } = req;
     const { username } = req.body;
@@ -59,18 +75,26 @@ router.delete('/delete-account', async (req: Request, res: Response) => {
   }
 });
 
-// ACTIVATE TWO FACTOR AUTH REQUEST
+/**
+ * @route GET /api/settings/twoFactorAuth
+ * @summary Generates a QR-Code for setting up 2FA
+ * 
+ * @param {Request} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ * 
+ * @returns 200 - JSON{qrCodeUrl<string>}
+ */
 router.get('/twoFactorAuth', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findById(userId) as IUserDocument;
+    const user = await User.findById(userId) as IUser;
 
     const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
     user.twoFactorAuthSecret = secret.base32;
     await user.save();
 
-    return res.json({ qrCodeUrl: secret.otpauth_url });
+    return res.status(200).json({ qrCodeUrl: secret.otpauth_url });
   }
   catch (err) {
     console.error("❌ Activate TwoFactorAuth error:", err);
@@ -78,13 +102,23 @@ router.get('/twoFactorAuth', async (req: Request, res: Response) => {
   }
 });
 
-// TOGGLE TWO FACTOR AUTH REQUEST
+/**
+ * @route POST /api/settings/twoFactorAuth
+ * @summary Sets 2FA on a user's account, if the correct One-Time-Password is provided
+ * 
+ * @param {Request<{}, {}, TwoFactorAuthToggleBody>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.body.otp - One-Time-Password
+ *      @property {boolean} req.body.isEnabled - To choose if 2FA should be switched on or off
+ * 
+ * @returns 200
+ */
 router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBody>, res: Response) => {
   try {
     const { userId } = req;
     const { otp, isEnabled } = req.body;
 
-    const user = await User.findById(userId) as IUserDocument;
+    const user = await User.findById(userId) as IUser;
     const userSecret = user.twoFactorAuthSecret as string;
 
     if (!speakeasy.totp.verify({
@@ -104,12 +138,20 @@ router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBod
   }
 })
 
-// LOGOUT REQUEST
+/**
+ * @route POST /api/settings/logout
+ * @summary Handles user logout
+ * 
+ * @param {Request} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ * 
+ * @returns 200
+ */
 router.post('/logout', async (req: Request, res: Response) => {
   try {
     const { userId } = req;
 
-    const user = await User.findOne({ _id: userId }) as IUserDocument;
+    const user = await User.findOne({ _id: userId }) as IUser;
     await user.updateTokenVersion();
 
     return res.sendStatus(200);

@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import express, { Request, Response, NextFunction } from 'express';
 import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
-import { Document } from 'mongoose';
 
 import { User } from '../util/internal.js';
 import {
@@ -19,8 +18,7 @@ import {
     TokenBody,
     TokenContent
 } from '../types/requests/auth.js';
-import IUser from '../types/user.js';
-type IUserDocument = IUser & Document;
+import IUser from '../types/IUser.js';
 
 const router = express.Router();
 
@@ -35,12 +33,22 @@ const loginLimiter = rateLimit({
 });
 
 
-// LOGIN AUTHENTICATOR REQUEST
+/**
+ * @route POST /auth/login
+ * @summary Handles user login
+ * 
+ * @param {Request<{}, {}, LoginBody>} req
+ *      @property {string} req.body.username - Username
+ *      @property {string} req.body.password - User-password
+ *      @property {string} [req.body.otp] - Optional 2FA One-Time-Password
+ * 
+ * @returns 200 - JSON{user<UserObject>, accessToken<string>, refreshToken<string>}
+ */
 router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
     try {
         const { username, password, otp } = req.body;
 
-        const user = await User.findOne({ _id: username }) as IUserDocument | null;
+        const user = await User.findOne({ _id: username }) as IUser | null;
 
         //make sure username exists
         if (!user) {
@@ -70,14 +78,43 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
             }
         }
 
-        return await createAndSendTokensAndUser(res, user);
+        //create tokens for authentication
+        await user.updateTokenVersion();
+        const userid = user._id;
+        const tokenVersion = Number(user.tokenVersion);
+        const tokenUser = { id: userid, version: tokenVersion };
+
+        const { accessToken, refreshToken } = createTokens(tokenUser);
+
+        //create new userobject to return for settings
+        const newUser = {
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            twoFactorAuthOn: user.twoFactorAuthOn,
+        }
+
+        return res.status(200).json({ user: newUser, accessToken, refreshToken });
     } catch (err) {
         console.error("❌ Login error: ", err);
         return res.sendStatus(500);
     }
 });
 
-// ACCOUNT REGISTRATION REQUEST
+/**
+ * @route POST /auth/register
+ * @summary Handles user registration
+ * 
+ * @param {Request<{}, {}, RegisterBody>} req
+ *      @property {string} req.body.username - Username
+ *      @property {string} req.body.password - User-Password
+ *      @property {string} req.body.firstName - User's first name
+ *      @property {string} req.body.lastName - User's last name
+ *      @property {string} req.body.email - User's email address
+ * 
+ * @returns 201
+ */
 router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Response) => {
     try {
         const { username, password, firstName, lastName, email } = req.body;
@@ -119,7 +156,15 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
     }
 });
 
-// REFRESH TOKEN REQUEST
+/**
+ * @route POST /auth/token
+ * @summary Generates new tokens
+ * 
+ * @param {Request<{}, {}, TokenBody>} req
+ *      @property {string} req.body.token - User's refreshToken
+ * 
+ * @returns 200 - JSON{accessToken<string>, refreshToken<string>}
+ */
 router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     try {
         const { token: refreshToken } = req.body;
@@ -130,7 +175,7 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
             }
 
             const { id, version } = tokenContent;
-            const user = await User.findOne({ _id: id }) as IUserDocument | null;
+            const user = await User.findOne({ _id: id }) as IUser | null;
 
             if (!user) {
                 return res.status(401).json({ error: 'unkown_user' })
@@ -150,27 +195,6 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
         return res.sendStatus(500);
     }
 });
-
-async function createAndSendTokensAndUser(res: Response, user: IUser) {
-    //create tokens for authentication
-    await user.updateTokenVersion();
-    const userid = user._id;
-    const tokenVersion = Number(user.tokenVersion);
-    const tokenUser = { id: userid, version: tokenVersion };
-
-    const { accessToken, refreshToken } = createTokens(tokenUser);
-
-    //create new userobject to return for settings
-    const newUser = {
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        twoFactorAuthOn: user.twoFactorAuthOn,
-    }
-
-    return res.status(200).json({ user: newUser, accessToken, refreshToken });
-}
 
 function createTokens(tokenContent: TokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15min' }); //valid for 15min after creation

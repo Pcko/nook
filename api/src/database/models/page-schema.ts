@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import IPage from '../../types/page.js';
+import IPage from '../../types/IPage.js';
 
 const PageSchema = new Schema<IPage>(
     {
