@@ -1,6 +1,8 @@
-import { isEmail } from 'validator';
+import validator from 'validator';
 
-export function isInvalidStringForURL(pageName){
+const { isEmail } = validator;
+
+export function isInvalidStringForURL(pageName: string): string | undefined {
   const regex = /^[a-zA-Z0-9_]+$/;
 
   if (!pageName || !regex.test(pageName)) {
@@ -8,7 +10,7 @@ export function isInvalidStringForURL(pageName){
   }
 }
 
-export function isInvalidStringForUsername(username){
+export function isInvalidStringForUsername(username: string): string | undefined {
   const regex = /^[a-zA-Z0-9_]+$/;
 
   if (!username || !regex.test(username)) {
@@ -20,7 +22,7 @@ export function isInvalidStringForUsername(username){
   }
 }
 
-export function isInvalidStringForPassword(password){
+export function isInvalidStringForPassword(password: string): string | undefined {
   if (!password) {
     return 'Password is required';
   }
@@ -30,7 +32,7 @@ export function isInvalidStringForPassword(password){
   }
 }
 
-export function isInvalidStringForFirstName(firstName){
+export function isInvalidStringForFirstName(firstName: string): string | undefined {
   if (!firstName) {
     return 'First name is required';
   }
@@ -40,7 +42,7 @@ export function isInvalidStringForFirstName(firstName){
   }
 }
 
-export function isInvalidStringForLastName(lastName){
+export function isInvalidStringForLastName(lastName: string): string | undefined {
   if (!lastName) {
     return 'Last name is required';
   }
@@ -50,7 +52,7 @@ export function isInvalidStringForLastName(lastName){
   }
 }
 
-export function isInvalidStringForEmail(email){
+export function isInvalidStringForEmail(email: string): string | undefined {
   if (!email) {
     return 'Email is required';
   }
