@@ -48,9 +48,20 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
     try {
         const { username, password, otp } = req.body;
 
+        //make sure all parameters are valid
+        const result =
+            isInvalidStringForUsername(username) ||
+            isInvalidStringForPassword(password);
+        if (result) {
+            return res.status(403).send({
+                error: 'invalid_parameters',
+                message: result,
+            });
+        }
+
         const user = await User.findOne({ _id: username }) as IUser | null;
 
-        //make sure username exists
+        //make sure user exists
         if (!user) {
             return res.status(403).send({ message: 'Username or password is invalid!' });
         }
@@ -169,6 +180,10 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     try {
         const { token: refreshToken } = req.body;
 
+        if (!refreshToken) {
+            return res.sendStatus(400);
+        }
+
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: any, tokenContent: any) => {
             if (err) {
                 return res.status(401).json({ error: 'invalid_token' });
@@ -178,7 +193,7 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
             const user = await User.findOne({ _id: id }) as IUser | null;
 
             if (!user) {
-                return res.status(401).json({ error: 'unkown_user' })
+                return res.status(401).json({ error: 'unknown_user' })
             }
 
             if (user.tokenVersion !== version) {

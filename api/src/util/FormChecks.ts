@@ -28,7 +28,7 @@ export function isInvalidStringForPassword(password: string): string | undefined
   }
 
   if (password.length < 10) {
-    return 'Password must be greater than 10 characters';
+    return 'Password must be at least 10 characters long';
   }
 }
 

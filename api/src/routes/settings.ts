@@ -61,11 +61,7 @@ router.delete('/delete-account', async (req: Request<{}, {}, DeleteAccountBody>,
       return res.sendStatus(400);
     }
 
-    const user = await User.findOneAndDelete({ _id: username });
-    //make sure username exists
-    if (!user) {
-      return res.sendStatus(404);
-    }
+    await User.findOneAndDelete({ _id: username });
 
     return res.sendStatus(200);
   }
@@ -117,6 +113,10 @@ router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBod
   try {
     const { userId } = req;
     const { otp, isEnabled } = req.body;
+
+    if (![otp, isEnabled].every(Boolean)) {
+      return res.sendStatus(400);
+    }
 
     const user = await User.findById(userId) as IUser;
     const userSecret = user.twoFactorAuthSecret as string;
