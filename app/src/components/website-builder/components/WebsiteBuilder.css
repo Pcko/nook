@@ -6,6 +6,7 @@
 #gjs-blocks{
  .gjs-one-bg {
     background-color: var(--ui-default) !important;
+      
   }
 
   .gjs-block {
@@ -20,9 +21,9 @@
 
   .gjs-block:hover {
     background-color: var(--primary);
-    color: var(--text-on-primary);
+    color: var(--primary-hover);
     transform: scale(1.03);
-    border: 3px solid var(--ui-subtle);
+    border: 2px solid var(--ui-subtle);
   }
 
   .gjs-block-category {

@@ -6,7 +6,11 @@ export interface SaveSettingsBody {
     };
 }
 
+export interface DeleteAccountBody {
+    username: string;
+}
+
 export interface TwoFactorAuthToggleBody {
-    otp: string, 
-    isEnabled: boolean
+    otp: string;
+    isEnabled: boolean;
 }

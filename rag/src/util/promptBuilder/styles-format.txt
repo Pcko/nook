@@ -1,0 +1,8 @@
+{
+  "selectors": [
+    "#ia25" // use a unique ID here for each component
+  ],
+  "style": {
+    // CSS ATTRIBUTES HERE
+  }
+}

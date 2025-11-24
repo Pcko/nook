@@ -1,15 +1,23 @@
 import express, { Request, Response } from 'express';
-import { Document } from 'mongoose';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
 import { Page } from '../util/internal.js';
-import IPage from '../types/page.js';
+import IPage from '../types/IPage.js';
 import { CreatePageBody, PageNameParam, UpdatePageBody } from '../types/requests/pages.js';
-type IPageDocument = IPage & Document;
 
 const router = express.Router();
 
-//CREATE PAGE
+/**
+ * @route POST /api/pages/
+ * @summary Creates page
+ * 
+ * @param {Request<{}, {}, CreatePageBody>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.body.pageName - Page name
+ *      @property {string} [req.body.folderName] - Optional folder name
+ * 
+ * @returns 200 - JSON{pageDetails<IPage>}
+ */
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
         const { userId } = req;
@@ -24,7 +32,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         let duplicateNumber = 1;
         let pageExists = undefined;
         do {
-            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean();
+            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
             if (pageExists) {
                 duplicateNumber += 1;
@@ -39,7 +47,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
             folderName: folderName || 'GENERAL'
         };
 
-        const pageDetails = await Page.create(pageData);
+        const pageDetails = await Page.create(pageData) as IPage;
 
         return res.status(200).json(pageDetails);
     } catch (err) {
@@ -48,27 +56,44 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
     }
 });
 
-//READ PAGES
+/**
+ * @route GET /api/pages/
+ * @summary Fetches a list of all pages the user has
+ * 
+ * @param {Request} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ * 
+ * @returns 200 - JSON{pages<[IPage]>}
+ */
 router.get('/', async (req: Request, res: Response) => {
     try {
         const { userId } = req;
 
-        const pages = await Page.find({ author: userId }).lean();
+        const pages = await Page.find({ author: userId }).lean<IPage>();
 
-        return res.send(pages);
+        return res.status(200).json(pages);
     } catch (err) {
         console.error('❌ Get pages error: ', err);
         return res.sendStatus(500);
     }
 })
 
-//READ SINGLE PAGE
+/**
+ * @route GET /api/pages/:pageName
+ * @summary Fetches a single specified page
+ * 
+ * @param {Request<PageNameParam, {}, {}>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.params.pageName - Page name
+ * 
+ * @returns 200 - JSON{page<IPage>}
+ */
 router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
     try {
         const { userId } = req;
         const { pageName } = req.params;
 
-        const page = await Page.findOne({ name: pageName, author: userId }).lean();
+        const page = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
         if (!page) {
             return res.status(404).send({ message: 'Page not found!' });
         }
@@ -80,14 +105,26 @@ router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Respon
     }
 });
 
-//UPDATE PAGE
+/**
+ * @route PATCH /api/pages/:pageName
+ * @summary Updates a page based on the provided information
+ * 
+ * @param {Request<PageNameParam, {}, UpdatePageBody>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.params.pageName - Page name
+ *      @property {string} [req.body.newPageName] - Optional new page name
+ *      @property {string} [req.body.newFolderName] - Optional new page name
+ *      @property {string} [req.body.pageContent] - Optional page content
+ * 
+ * @returns 200 - JSON{newPageName<string>}
+ */
 router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody>, res: Response) => {
     try {
         const { userId } = req;
         const { pageName } = req.params;
         const { newPageName, newFolderName, pageContent } = req.body;
 
-        const page = await Page.findOne({ name: pageName, author: userId }) as IPageDocument;
+        const page = await Page.findOne({ name: pageName, author: userId }) as IPage;
         if (!page) {
             return res.status(404).send({ message: 'Page not found!' });
         }
@@ -105,7 +142,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
             let duplicateNumber = 1;
             let pageExists;
             do {
-                pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean();
+                pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
                 if (pageExists) {
                     duplicateNumber += 1;
@@ -136,7 +173,16 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
     }
 });
 
-//DELETE PAGE
+/**
+ * @route DELETE /api/pages/:pageName
+ * @summary Deletes the specified page
+ * 
+ * @param {Request<PageNameParam, {}, {}>} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.params.pageName - Page name
+ * 
+ * @returns 202
+ */
 router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
     try {
         const { userId } = req;
@@ -147,7 +193,7 @@ router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Res
             return res.status(404).send({ message: 'Page not found!' });
         }
 
-        return res.sendStatus(200);
+        return res.sendStatus(202);
     } catch (err) {
         console.error('❌ Delete page error: ', err);
         return res.sendStatus(500);
