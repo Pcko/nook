@@ -197,3 +197,19 @@ h1 {
 .page-creation-window{
     @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[750px] max-w-[90%];
 }
+
+/* Hide scrollbar but keep scrolling (Chrome, Edge, Safari) */
+.prompt-textarea::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Hide scrollbar in Firefox */
+.prompt-textarea {
+    scrollbar-width: none;       /* Firefox */
+}
+
+/* Old IE/Edge */
+.prompt-textarea {
+    -ms-overflow-style: none;    /* IE/Edge legacy */
+}

@@ -76,7 +76,6 @@ function WebsiteBuilder({page}) {
                 />
             </div>
         </div>
-
     );
 }
 
