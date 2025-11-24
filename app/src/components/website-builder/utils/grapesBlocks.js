@@ -119,7 +119,6 @@ export const textBlocks = [
   },
 ];
 
-
 export const coreStructureBlocks = [
 
   // Box Block

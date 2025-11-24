@@ -68,3 +68,18 @@
     background-color: var(--far-bg) !important;
   }
 }
+
+.gjs-traits-c{
+  background-color: white !important;
+  color: var(--text);
+}
+
+.gjs-field-text, .gjs-field-select{
+  background-color: white;
+  border: 2px solid var(--ui-border);
+  border-radius: 5px;
+}
+
+.gjs-d-s-arrow{
+  border-top: 5px solid black !important;
+}
