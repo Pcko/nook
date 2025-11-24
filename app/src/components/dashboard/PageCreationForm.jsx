@@ -76,9 +76,13 @@ function PageCreationForm({closeForm, setPages}) {
      */
     const handleFormSubmit = async (cause) => {
         const result = isInvalidStringForURL(formData.pageName);
-        if (result) return showNotification("error", result);
+        if (result) {
+            return showNotification("error", result);
+        }
 
-        if (formData.submitted) return;
+        if (formData.submitted) {
+            return;
+        }
         updateFormData({submitted: true});
 
         try {
