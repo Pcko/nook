@@ -1,10 +1,11 @@
 import { ChromaClient } from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
+
 import type {
     ChromaDBAddDocumentsRequestBody,
     ChromaDBGetResponseBody, ChromaDBQuery,
     ChromaDBQueryResultItem
-} from "./dto/chroma.js";
+} from "../dto/chroma.js";
 
 const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "15");
 const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF || "0.5");
@@ -25,7 +26,16 @@ const collection = await client.getOrCreateCollection({
     embeddingFunction: embedder
 });
 
-async function getChromaDBQueryResponse(request : ChromaDBQuery): Promise<ChromaDBQueryResultItem[]> {
+/**
+ * Performs a similarity search using Chroma.
+ *
+ * @async
+ * @function getChromaDBQueryResponse
+ * @param {ChromaDBQuery} request - The request for Chroma.
+ * @returns {Promise<ChromaDBQueryResultItem[]>} A promise that resolves
+ * to an array of similar documents, sorted by their distances from Chroma.
+ */
+async function getChromaDBQueryResponse(request: ChromaDBQuery): Promise<ChromaDBQueryResultItem[]> {
     const queryResult = await collection.query({
         queryTexts: [request.query],
         nResults: request.nResults || defaultNResults,
@@ -50,6 +60,13 @@ async function getChromaDBQueryResponse(request : ChromaDBQuery): Promise<Chroma
     return filtered;
 }
 
+/**
+ * Retrieves all entries from the current ChromaDB collection.
+ *
+ * @async
+ * @function getChromaDBEntries
+ * @returns {Promise<ChromaDBGetResponseBody>} A promise that resolves to the Chroma Entries.
+ */
 async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
     const getResult = await collection.get();
 
@@ -60,10 +77,27 @@ async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
     };
 }
 
+/**
+ * Removes one or more entries from the current ChromaDB collection.
+ *
+ * @async
+ * @function removeChromaDBEntries
+ * @param {string[]} ids - An array of document IDs to delete from the collection.
+ * If an id from this list does not exist in Chroma, it is skipped.
+ * @returns {Promise<void>} A Promise that resolves when the specified entries have been removed.
+ */
 async function removeChromaDBEntries(ids: string[]): Promise<void> {
     await collection.delete({ids});
 }
 
+/**
+ * Adds new documents and their associated metadata to the current ChromaDB collection.
+ *
+ * @async
+ * @function addChromaDBDocuments
+ * @param {ChromaDBAddDocumentsRequestBody} chromaAddDocumentsBody - The documents, metadata, and IDs to add.
+ * @returns {Promise<void>} Resolves when the documents have been successfully added to the collection.
+ */
 async function addChromaDBDocuments(chromaAddDocumentsBody: ChromaDBAddDocumentsRequestBody): Promise<void> {
     await collection.add(chromaAddDocumentsBody);
 }

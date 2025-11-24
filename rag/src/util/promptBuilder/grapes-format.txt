@@ -1,0 +1,43 @@
+{
+  "dataSources": [],
+  "assets": [],
+  "styles": [
+    // STYLES HERE
+  ],
+  "pages": [
+    {
+      "frames": [
+        {
+          "component": {
+            "type": "wrapper",
+            "stylable": [
+              "background",
+              "background-color",
+              "background-image",
+              "background-repeat",
+              "background-attachment",
+              "background-position",
+              "background-size"
+            ],
+            "attributes": {
+              "id": "ia25"
+            },
+            "components": [
+              // WEBSITE CONTENT HERE
+            ],
+            "head": {
+              "type": "head"
+            },
+            "docEl": {
+              "tagName": "html"
+            }
+          },
+          "id": "iWSWey0nuzoTfsNM"
+        }
+      ],
+      "type": "main",
+      "id": "s63W61KRotW7ELR4"
+    }
+  ],
+  "symbols": []
+}

@@ -19,6 +19,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
+    "jsdoc": "^4.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.0",
     "speakeasy": "^2.0.0",

@@ -1,9 +1,10 @@
 import "dotenv/config";
 import express, { type Request, type Response } from 'express';
+import cors from 'cors';
+
 import chromaRouter from "./routers/chromaRouter.js";
 import ragRouter from "./routers/ragRouter.js";
 import authenticate from "./interceptors/authenticateRoute.js";
-import cors from 'cors';
 
 if(
   !(process.env.RAG_API_KEY &&

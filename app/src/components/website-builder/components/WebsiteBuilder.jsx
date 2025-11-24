@@ -2,6 +2,7 @@
 // WebsiteBuilder.jsx
 import React from "react";
 
+import { grapesjsExportPlugin, grapesjsExportConfig } from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import ResizablePanelsLayout from "./ResizablePanelsLayout";
 import LeftPanel from "./Panels/LeftPanel";
@@ -40,6 +41,10 @@ function WebsiteBuilder({page}) {
                 {name: "Mobile", width: "375px"},
             ],
         },
+        plugins: [grapesjsExportPlugin],
+        pluginsOpts: {
+             [grapesjsExportPlugin]: grapesjsExportConfig,
+        }
     }, page);
 
     /**
