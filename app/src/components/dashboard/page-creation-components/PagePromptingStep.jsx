@@ -94,23 +94,23 @@ function PagePromptingStep({
                 </div>
 
                 <div className="relative">
-                    <textarea
-                        className={`w-full border-2 border-ui-border rounded-[6px] pl-4 pr-14 py-3
-                            bg-ui-bg text-text placeholder-text-subtle text-small
-                            focus:outline-none focus:border-primary transition-all 
-                            duration-200 resize-none min-h-[72px]
-                            ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
-                        placeholder="e.g. A clean portfolio landing page for a minimalist architect..."
-                        value={aiPrompt}
-                        onChange={(e) => setAiPrompt(e.target.value)}
-                        disabled={loading}
-                        onKeyDown={(e) => {
-                            if (e.shiftKey && (e.metaKey || e.ctrlKey)) {
-                                e.preventDefault();
-                                handleSubmit();
-                            }
-                        }}
-                    />
+                   <textarea
+                       className={`prompt-textarea w-full border-2 border-ui-border rounded-[6px] pl-4 pr-14 py-3
+                        bg-ui-bg text-text placeholder-text-subtle text-small
+                        focus:outline-none focus:border-primary transition-all 
+                        duration-200 resize-none min-h-[72px]
+                        ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                       placeholder="e.g. A clean portfolio landing page for a minimalist architect..."
+                       value={aiPrompt}
+                       onChange={(e) => setAiPrompt(e.target.value)}
+                       disabled={loading}
+                       onKeyDown={(e) => {
+                           if (e.shiftKey && (e.metaKey || e.ctrlKey)) {
+                               e.preventDefault();
+                               handleSubmit();
+                           }
+                       }}
+                   />
 
                     {/* Submit button (AI icon) */}
                     <motion.button

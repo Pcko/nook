@@ -22,17 +22,16 @@ const STEPS = {
 };
 
 /**
- * PageCreationForm component handles multi-step creation of pages,
+ * PageCreationForm component handles multistep creation of pages,
  * including the choice between manual page-editing or ai-generation.
  *
  * @component
  * @param {Object} props
  * @param {Function} props.closeForm - Function to close the creation modal.
- * @param {Object<string, any>} props.pages - Existing pages.
  * @param {Function} props.setPages - Setter to update pages.
  * @returns {JSX.Element|null}
  */
-function PageCreationForm({closeForm, pages, setPages}) {
+function PageCreationForm({closeForm, setPages}) {
     /**
      * @typedef {Object} FormData
      * @property {string} pageName - The name of the new page.
@@ -41,6 +40,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
      * @property {boolean} loading - Loading state for AI generation or saving.
      * @property {number} loadingStep - Current index in AI generation progress.
      * @property {string} currentStep - Current UI step key from STEPS.
+     * @property {boolean} submitted - Prevents double creation of pages.
      */
 
     /** @type {[FormData, Function]} */
@@ -50,7 +50,8 @@ function PageCreationForm({closeForm, pages, setPages}) {
         aiPages: [],
         loading: false,
         loadingStep: 0,
-        currentStep: STEPS.CHOOSE
+        currentStep: STEPS.CHOOSE,
+        submitted: false,
     });
 
     const {showNotification} = useNotifications();
@@ -77,10 +78,12 @@ function PageCreationForm({closeForm, pages, setPages}) {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) return showNotification("error", result);
 
+        if (formData.submitted) return;
+        updateFormData({submitted: true});
+
         try {
-            /** @type {{name: string}} */
             const pageSkeleton = {name: formData.pageName};
-            setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
+            setPages(prev => ({...prev, [pageSkeleton.name]: pageSkeleton}));
 
             if (cause === "self") {
                 const newPage = await PageService.createPage(formData.pageName);
@@ -90,6 +93,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
                 closeForm();
             }
         } catch (err) {
+            updateFormData({submitted: false});
             handleError(err);
         }
     };
@@ -104,7 +108,6 @@ function PageCreationForm({closeForm, pages, setPages}) {
 
         updateFormData({
             aiPrompt: "",
-            aiResponse: "",
             currentStep: STEPS.AI_CHAT
         });
     };
@@ -118,7 +121,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
             return showNotification("error", "Enter a prompt.");
         }
 
-        updateFormData({loading: true, loadingStep: 0, aiResponse: ""});
+        updateFormData({loading: true, loadingStep: 0});
 
         try {
             const generatedPages = await generateAIPages();
@@ -130,7 +133,6 @@ function PageCreationForm({closeForm, pages, setPages}) {
                 loading: false
             });
         } catch (err) {
-            console.error("Failed to generate pages:", err);
             handleError(err);
             updateFormData({loading: false});
         }
@@ -152,15 +154,12 @@ function PageCreationForm({closeForm, pages, setPages}) {
             try {
                 const parsedResponse = JSON.parse(response);
 
-                updateFormData((prev) => ({
-                    loadingStep: prev.loadingStep + 1
-                }));
+                updateFormData({loadingStep: formData.loadingStep + 1})
                 generatedPages.push({
                     name: formData.pageName,
                     data: parsedResponse
                 });
             } catch (err) {
-                console.log("FAIL TIMES", failCount);
                 failCount++;
                 i--;
             }
@@ -176,13 +175,15 @@ function PageCreationForm({closeForm, pages, setPages}) {
      * @returns {Promise<void>}
      */
     const handleSelectAiPage = async (selectedPage) => {
-        try {
-            updateFormData({loading: true});
+        if (formData.submitted || formData.loading) return;
 
+        updateFormData({submitted: true, loading: true});
+
+        try {
             const page = await PageService.createPage(formData.pageName);
             const completePage = {...page, data: selectedPage.data};
 
-            setPages((prev) => ({...prev, [completePage.name]: completePage}));
+            setPages(prev => ({...prev, [completePage.name]: completePage}));
             showNotification("success", "Page created via AI.");
 
             await PageService.updatePage(completePage);
@@ -193,6 +194,7 @@ function PageCreationForm({closeForm, pages, setPages}) {
 
             closeForm();
         } catch (err) {
+            updateFormData({submitted: false});
             handleError(err);
         } finally {
             updateFormData({loading: false});
