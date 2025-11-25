@@ -53,7 +53,7 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
             isInvalidStringForUsername(username) ||
             isInvalidStringForPassword(password);
         if (result) {
-            return res.status(403).send({
+            return res.status(400).send({
                 error: 'invalid_parameters',
                 message: result,
             });
@@ -63,13 +63,13 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
 
         //make sure user exists
         if (!user) {
-            return res.status(403).send({ message: 'Username or password is invalid!' });
+            return res.status(400).send({ message: 'Username or password is invalid!' });
         }
 
         //validate password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(403).send({ message: 'Username or password is invalid!' });
+            return res.status(400).send({ message: 'Username or password is invalid!' });
         }
 
         //check for twoFactorAuthentication
@@ -85,7 +85,7 @@ router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res:
                 encoding: 'base32',
                 token: otp
             })) {
-                return res.status(403).send({ message: 'One time password is invalid!' })
+                return res.status(400).send({ message: 'One time password is invalid!' })
             }
         }
 
@@ -138,7 +138,7 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
             isInvalidStringForLastName(lastName) ||
             isInvalidStringForEmail(email);
         if (result) {
-            return res.status(403).send({
+            return res.status(400).send({
                 error: 'invalid_parameters',
                 message: result,
             });
@@ -193,11 +193,11 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
             const user = await User.findOne({ _id: id }) as IUser | null;
 
             if (!user) {
-                return res.status(401).json({ error: 'unknown_user' })
+                return res.status(404).json({ error: 'unknown_user' })
             }
 
             if (user.tokenVersion !== version) {
-                return res.status(401).json({ error: 'invalid_token' });
+                return res.status(401).json({ error: 'old_token' });
             }
 
             await user.updateTokenVersion();
