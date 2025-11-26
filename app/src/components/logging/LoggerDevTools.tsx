@@ -223,7 +223,7 @@ export function LogVisualizer(): React.JSX.Element {
 
                                         <div className="flex items-center justify-between text-[11px] text-text-subtle">
                                             <span className="truncate max-w-[60%]">
-                                                {log.route || "/"} - {log.meta.url || log.meta.route || '/'}
+                                                {log.meta.component || "/"} - {log.meta.url || log.meta.feature || '/'}
                                             </span>
                                             <span className="truncate max-w-[40%] text-right">
                                                 {log.userId ? `user: ${log.userId}` : ""}

@@ -8,7 +8,7 @@ type NotifyFn = (
     type: LogLevel,
     message: string,
     extraMeta?: Record<string, unknown>,
-    section?: string
+    section?: string,
 ) => void;
 
 export function useMetaNotify(base: BaseMeta): { notify: NotifyFn } {
@@ -22,14 +22,11 @@ export function useMetaNotify(base: BaseMeta): { notify: NotifyFn } {
 
     const notify: NotifyFn = useCallback(
         (type, message, extraMeta = {}, section = "general") => {
-            const {route} = baseMeta;
-            delete baseMeta.route;
 
             showNotification(type, message, {
                 logMeta: {
                     ...baseMeta,
                     section,
-                    route,
                     ...extraMeta
                 }
             });
