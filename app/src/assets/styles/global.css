@@ -1,3 +1,4 @@
+
 .dark {
     --primary: #666BE2;
     --secondary: #767BDB;
@@ -17,31 +18,6 @@
     --text-on-primary: #FFFFFF;
     --dangerous: #FF4d4d;
     --success: #4CAF50;
-
-    /* Log-Level (dark) */
-    --log-debug-border: #94A3B8;  /* slate-400 */
-    --log-debug-bg: #020617;      /* slate-950 */
-    --log-debug-text: #E5E7EB;    /* slate-200 */
-
-    --log-info-border: #3B82F6;   /* blue-500 */
-    --log-info-bg: #0B1120;       /* navy-ish, dunkel */
-    --log-info-text: #BFDBFE;     /* blue-200 */
-
-    --log-warn-border: #F59E0B;   /* amber-500 */
-    --log-warn-bg: #451A03;       /* amber-950 */
-    --log-warn-text: #FDE68A;     /* amber-200 */
-
-    --log-error-border: #EF4444;  /* red-500 */
-    --log-error-bg: #450A0A;      /* red-950 */
-    --log-error-text: #FECACA;    /* red-200 */
-
-    --log-fatal-border: #9333EA;  /* purple-600 */
-    --log-fatal-bg: #2E1065;      /* purple-950 */
-    --log-fatal-text: #E9D5FF;    /* purple-200 */
-
-    --log-default-border: #CBD5F5; /* leicht bläuliches Grau */
-    --log-default-bg: #020617;     /* slate-950 */
-    --log-default-text: #E5E7EB;   /* slate-200 */
 }
 
 .light {
@@ -63,31 +39,6 @@
     --text-on-primary: #FFFFFF;
     --dangerous: #FF4d4d;
     --success: #4CAF50;
-
-    /* Log-Level (light) – original Farben nachgebaut */
-    --log-debug-border: #94A3B8;  /* slate-400 */
-    --log-debug-bg: #F1F5F9;      /* slate-100 */
-    --log-debug-text: #374151;    /* slate-700 */
-
-    --log-info-border: #3B82F6;   /* blue-500 */
-    --log-info-bg: #EFF6FF;       /* blue-50 */
-    --log-info-text: #1D4ED8;     /* blue-700 */
-
-    --log-warn-border: #F59E0B;   /* amber-500 */
-    --log-warn-bg: #FFFBEB;       /* amber-50 */
-    --log-warn-text: #B45309;     /* amber-700 */
-
-    --log-error-border: #EF4444;  /* red-500 */
-    --log-error-bg: #FEF2F2;      /* red-50 */
-    --log-error-text: #B91C1C;    /* red-700 */
-
-    --log-fatal-border: #9333EA;  /* purple-600 */
-    --log-fatal-bg: #FAF5FF;      /* purple-50 */
-    --log-fatal-text: #7C3AED;    /* purple-700 */
-
-    --log-default-border: #CBD5E1; /* slate-300 */
-    --log-default-bg: #F8FAFC;     /* slate-50 */
-    --log-default-text: #374151;   /* slate-700 */
 }
 
 .high-contrast {
@@ -109,29 +60,4 @@
     --ui-border: #FFFFFF !important;
     --ui-border-selected: #FFD600 !important;
     --ui-subtle: #BDBDBD !important;
-
-    /* Log-Level (high contrast) */
-    --log-debug-border: #FFFFFF;
-    --log-debug-bg: #000000;
-    --log-debug-text: #FFFFFF;
-
-    --log-info-border: #007BFF;
-    --log-info-bg: #000000;
-    --log-info-text: #007BFF;
-
-    --log-warn-border: #FFD600;
-    --log-warn-bg: #000000;
-    --log-warn-text: #FFD600;
-
-    --log-error-border: #FF3B00;
-    --log-error-bg: #000000;
-    --log-error-text: #FF3B00;
-
-    --log-fatal-border: #FF3B00;
-    --log-fatal-bg: #000000;
-    --log-fatal-text: #FF3B00;
-
-    --log-default-border: #FFFFFF;
-    --log-default-bg: #000000;
-    --log-default-text: #FFFFFF;
 }

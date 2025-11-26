@@ -30,20 +30,14 @@ const formatTimestamp = (ts?: string): string => {
     return d.toLocaleString();
 };
 
-export const LogVisualizer: React.FC = () => {
-    const {
-        logs: inMemoryLogs,
-        persistedLogs,
-        combinedLogs,
-        clearLogs,
-        reloadPersisted
-    } = useLogger();
-
+export function LogVisualizer(): React.JSX.Element {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedLevels, setSelectedLevels] = useState<Set<LogLevel>>(
         () => new Set(ALL_LEVELS)
     );
     const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+
+    const {logs: inMemoryLogs, persistedLogs, combinedLogs, clearLogs, reloadPersisted} = useLogger();
 
     const filteredLogs = useMemo<LogEntry[]>(() => {
         const term = searchTerm.trim().toLowerCase();
@@ -73,8 +67,7 @@ export const LogVisualizer: React.FC = () => {
         });
     }, [combinedLogs, selectedLevels, searchTerm]);
 
-    const selectedLog =
-        filteredLogs.find((l) => l.id === selectedLogId) ?? null;
+    const selectedLog = filteredLogs.find((l) => l.id === selectedLogId) ?? null;
 
     const toggleLevel = (level: LogLevel) => {
         setSelectedLevels((prev) => {
@@ -102,7 +95,8 @@ export const LogVisualizer: React.FC = () => {
             "
         >
             {/* Kopfbereich */}
-            <div className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div
+                className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">
                     <p className="text-[11px] uppercase tracking-[0.14em] text-text-subtle m-0">
                         System
@@ -140,7 +134,8 @@ export const LogVisualizer: React.FC = () => {
             </div>
 
             {/* Filterleiste */}
-            <div className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-2 flex flex-wrap items-center gap-3">
+            <div
+                className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-2 flex flex-wrap items-center gap-3">
                 <div className="flex-1 min-w-[200px]">
                     <input
                         type="text"
