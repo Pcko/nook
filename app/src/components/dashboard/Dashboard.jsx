@@ -9,6 +9,7 @@ import SidebarItem from "./SidebarItem";
 import AuthService from "../../services/AuthService";
 import {
     ArrowUpTrayIcon,
+    CodeBracketIcon,
     FolderOpenIcon,
     PaintBrushIcon,
     ShieldCheckIcon,
@@ -16,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
 import {useNotifications} from "../context/NotificationContext";
+import {LogVisualizer} from "../logging/LoggerDevTools";
 
 
 function Dashboard() {
@@ -47,6 +49,12 @@ function Dashboard() {
                 return <Settings activeTab="appearance"/>;
             case 'securitySettings':
                 return <Settings activeTab="security"/>;
+            case 'logging':
+                return (
+                    <div className="h-full">
+                        <LogVisualizer/>
+                    </div>
+                );
             default:
                 return <LoadingBubble className="mt-[200px]"/>;
         }
@@ -92,6 +100,18 @@ function Dashboard() {
                             active={activeTab === 'securitySettings'}
                             onClick={() => setActiveTab('securitySettings')}
                         />
+
+                        {import.meta.env.VITE_ENV.toLowerCase() === "dev" &&
+                            <>
+                                <h6 className="!text-text">Admin</h6>
+                                <SidebarItem
+                                    label="Logging"
+                                    icon={CodeBracketIcon}
+                                    active={activeTab === 'logging'}
+                                    onClick={() => setActiveTab('logging')}
+                                />
+                            </>
+                        }
                     </div>
                     <div className="mt-auto mb-5">
                         <div className="border-t-2 border-ui-border my-4"/>

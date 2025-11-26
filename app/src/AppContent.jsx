@@ -12,7 +12,7 @@ import {MotionConfig,} from "framer-motion";
 import NotificationOverlay from "./components/general/NotificationOverlay";
 import {useAnimation} from "./components/context/AnimationContext";
 
-function AppContent() {
+function AppContent({getRoute}) {
     const {animationEnabled} = useAnimation();
 
     return (

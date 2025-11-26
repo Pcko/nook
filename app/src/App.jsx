@@ -5,6 +5,7 @@ import {NotificationProvider} from "./components/context/NotificationContext";
 import {AnimationProvider} from "./components/context/AnimationContext";
 import AppContent from "./AppContent";
 import {LoggerProvider} from "./components/context/LoggerContext";
+import {Route} from "react-router-dom";
 
 function App() {
 
@@ -33,7 +34,7 @@ function App() {
     }, []);
 
     return (
-        <LoggerProvider>
+        <LoggerProvider getUserId={() => JSON.parse(localStorage.getItem('user'))?.username} getRoute={()=> webkitURL.getRoute}>
             <NotificationProvider>
                 <AnimationProvider>
                     <AppContent/>

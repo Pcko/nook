@@ -12,7 +12,7 @@ import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui
 import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../general/ErrorHandler";
-import {useNotifications} from "../../../context/NotificationContext";
+import {useNotificationLogger} from "../../../logging/NotificationLoggerHook";
 
 /**
  * TopPanel component
@@ -25,7 +25,7 @@ import {useNotifications} from "../../../context/NotificationContext";
  */
 function TopPanel({editorRef, page}) {
     const handleError = useErrorHandler();
-    const {showNotification} = useNotifications();
+    const {showNotification} = useNotificationLogger();
 
     function handleSave() {
         WebsiteBuilderService.savePageState(editorRef.current, page)

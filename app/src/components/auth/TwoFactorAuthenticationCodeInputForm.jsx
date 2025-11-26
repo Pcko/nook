@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
-import {useNotifications} from "../context/NotificationContext";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
-function TwoFactorAuthenticationCodeInputForm({ submitForm }) {
+function TwoFactorAuthenticationCodeInputForm({submitForm}) {
     const [authenticationCode, setAuthenticationCode] = useState('');
-    const { showNotification } = useNotifications();
+    const {notify} = useMetaNotify({feature: "auth", component: "Login"});
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
 
-        if(authenticationCode.length !== 6) {
-            return showNotification('error', `Authentication code must be 6 characters long.`);
+        if (authenticationCode.length !== 6) {
+            return notify('error', `Authentication code must be 6 characters long.`);
         }
 
         submitForm(authenticationCode);
@@ -44,7 +44,8 @@ function TwoFactorAuthenticationCodeInputForm({ submitForm }) {
                     <div className="w-full flex mt-5">
                         <input type="button" value="Cancel" onClick={handleFormCancel}
                                className="w-[40%] py-1 text-text px-4 bg-ui-button rounded-lg ml-0 mr-auto hover:cursor-pointer hover:bg-ui-button-hover btn"/>
-                        <input type="submit" value="Confirm" onClick={handleFormSubmit} disabled={authenticationCode.length !== 6}
+                        <input type="submit" value="Confirm" onClick={handleFormSubmit}
+                               disabled={authenticationCode.length !== 6}
                                className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover prim-btn disabled:text-text-subtle disabled:bg-ui-button"/>
                     </div>
                 </form>

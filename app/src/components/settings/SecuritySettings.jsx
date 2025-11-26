@@ -78,7 +78,7 @@ function SecuritySettings({changeHandler}) {
                     <h6>Change password</h6>
 
                     <input type="submit"
-                           className="w-[55%] ml-auto mr-0 mb-[7px] p-1 rounded-[5px] text-text text-center bg-primary border-2 border-primary cursor-pointer hover:bg-primary-hover transition-colors"
+                           className="w-[55%] ml-auto mr-0 mb-[7px] p-1 rounded-[5px] text-text-on-primary text-center bg-primary border-2 border-primary cursor-pointer hover:bg-primary-hover transition-colors"
                            value="Update Password"
                     />
 

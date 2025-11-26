@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useNotifications} from "../context/NotificationContext";
 import useErrorHandler from "../general/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
 
@@ -9,6 +8,7 @@ import PagePromptingStep from "./page-creation-components/PagePromptingStep";
 
 import PageService from "../../services/PageService";
 import AIService from "../../services/AIService";
+import {useNotificationLogger} from "../logging/NotificationLoggerHook";
 
 /**
  * All steps of the AI-Page-Creation process.
@@ -51,10 +51,10 @@ function PageCreationForm({closeForm, setPages}) {
         loading: false,
         loadingStep: 0,
         currentStep: STEPS.CHOOSE,
-        submitted: false,
+        submitted: false
     });
 
-    const {showNotification} = useNotifications();
+    const {showNotification} = useNotificationLogger();
     const handleError = useErrorHandler();
     const navigate = useNavigate();
 
@@ -77,7 +77,14 @@ function PageCreationForm({closeForm, setPages}) {
     const handleFormSubmit = async (cause) => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) {
-            return showNotification("error", result);
+            return showNotification("error", result, {
+                logMeta: {
+                    feature: "page-creation",
+                    step: "manual-submit",
+                    pageName: formData.pageName,
+                    cause
+                }
+            });
         }
 
         if (formData.submitted) {
@@ -87,18 +94,32 @@ function PageCreationForm({closeForm, setPages}) {
 
         try {
             const pageSkeleton = {name: formData.pageName};
-            setPages(prev => ({...prev, [pageSkeleton.name]: pageSkeleton}));
+            setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
 
             if (cause === "self") {
                 const newPage = await PageService.createPage(formData.pageName);
-                showNotification("success", "Page created.");
+                showNotification("success", "Page created.", {
+                    logMeta: {
+                        feature: "page-creation",
+                        step: "manual-submit",
+                        pageName: formData.pageName,
+                        cause: "self"
+                    }
+                });
                 navigate(`/editor/${formData.pageName}`, {state: {page: newPage}});
             } else {
                 closeForm();
             }
         } catch (err) {
             updateFormData({submitted: false});
-            handleError(err);
+            handleError(err, {
+                meta: {
+                    feature: "page-creation",
+                    step: "manual-submit",
+                    pageName: formData.pageName,
+                    cause
+                }
+            });
         }
     };
 
@@ -107,7 +128,13 @@ function PageCreationForm({closeForm, setPages}) {
      */
     const handleAiButtonClick = () => {
         if (!formData.pageName || formData.pageName.length < 2) {
-            return showNotification("error", "Enter a valid page name first.");
+            return showNotification("error", "Enter a valid page name first.", {
+                logMeta: {
+                    feature: "page-creation",
+                    step: "choose",
+                    pageName: formData.pageName
+                }
+            });
         }
 
         updateFormData({
@@ -122,7 +149,13 @@ function PageCreationForm({closeForm, setPages}) {
      */
     const handleAiPromptSubmit = async () => {
         if (!formData.aiPrompt.trim()) {
-            return showNotification("error", "Enter a prompt.");
+            return showNotification("error", "Enter a prompt.", {
+                logMeta: {
+                    feature: "page-creation",
+                    step: "ai-chat",
+                    pageName: formData.pageName
+                }
+            });
         }
 
         updateFormData({loading: true, loadingStep: 0});
@@ -137,7 +170,13 @@ function PageCreationForm({closeForm, setPages}) {
                 loading: false
             });
         } catch (err) {
-            handleError(err);
+            handleError(err, {
+                meta: {
+                    feature: "page-creation",
+                    step: "ai-generate",
+                    pageName: formData.pageName
+                }
+            });
             updateFormData({loading: false});
         }
     };
@@ -153,12 +192,14 @@ function PageCreationForm({closeForm, setPages}) {
         let failCount = 1;
 
         for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
-            const {response} = await AIService.getGeneratedPage({query: formData.aiPrompt});
+            const {response} = await AIService.getGeneratedPage({
+                query: formData.aiPrompt
+            });
 
             try {
                 const parsedResponse = JSON.parse(response);
 
-                updateFormData({loadingStep: formData.loadingStep + 1})
+                updateFormData({loadingStep: formData.loadingStep + 1});
                 generatedPages.push({
                     name: formData.pageName,
                     data: parsedResponse
@@ -187,8 +228,15 @@ function PageCreationForm({closeForm, setPages}) {
             const page = await PageService.createPage(formData.pageName);
             const completePage = {...page, data: selectedPage.data};
 
-            setPages(prev => ({...prev, [completePage.name]: completePage}));
-            showNotification("success", "Page created via AI.");
+            setPages((prev) => ({...prev, [completePage.name]: completePage}));
+
+            showNotification("success", "Page created via AI.", {
+                logMeta: {
+                    feature: "page-creation",
+                    step: "ai-preview",
+                    pageName: completePage.name
+                }
+            });
 
             await PageService.updatePage(completePage);
 
@@ -199,7 +247,13 @@ function PageCreationForm({closeForm, setPages}) {
             closeForm();
         } catch (err) {
             updateFormData({submitted: false});
-            handleError(err);
+            handleError(err, {
+                meta: {
+                    feature: "page-creation",
+                    step: "ai-save",
+                    pageName: formData.pageName
+                }
+            });
         } finally {
             updateFormData({loading: false});
         }
