@@ -1,56 +1,98 @@
-import { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import axios from '../auth/AxiosInstance';
+import {useEffect, useMemo, useState} from "react";
+import {Navigate} from "react-router-dom";
+import axios from "../auth/AxiosInstance";
 import LoadingScreen from "../general/LoadingScreen";
-import useErrorHandler from "./ErrorHandler";
+import useErrorHandler from "../logging/ErrorHandler";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
+import AuthService from "../../services/AuthService";
 
 function AuthRedirect() {
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
-    const handleError = useErrorHandler();
+
+    const baseMeta = useMemo(
+        () => ({
+            feature: "auth",
+            component: "AuthRedirect",
+            route: window.location.href,
+        }), []
+    );
+
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            const accessToken = localStorage.getItem('accessToken');
-            const refreshToken = localStorage.getItem('refreshToken');
+            const accessToken = localStorage.getItem("accessToken");
+            const refreshToken = localStorage.getItem("refreshToken");
 
             if (!refreshToken) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                setLoading(false);
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
                 setIsAuthenticated(false);
+                setLoading(false);
                 return;
             }
 
             try {
-                const response = await axios.post('/auth/token', { 'token': refreshToken });
+                const response = await AuthService.getTokens(refreshToken);
 
-                const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+                const {
+                    accessToken: newAccessToken,
+                    refreshToken: newRefreshToken
+                } = response.data || {};
 
-                if (response.status === 200) {
-                    localStorage.setItem('accessToken', newAccessToken);
-                    localStorage.setItem('refreshToken', newRefreshToken);
+                if (response.status === 200 && newAccessToken && newRefreshToken) {
+                    localStorage.setItem("accessToken", newAccessToken);
+                    localStorage.setItem("refreshToken", newRefreshToken);
 
                     setIsAuthenticated(true);
+
+                    notify(
+                        "info",
+                        "Session restored successfully.",
+                        {
+                            hadAccessToken: Boolean(accessToken),
+                            stage: "token-refresh"
+                        },
+                        "token-refresh"
+                    );
+                } else {
+                    setIsAuthenticated(false);
+                    notify(
+                        "error",
+                        "Could not refresh your session.",
+                        {
+                            stage: "token-refresh-invalid-response"
+                        },
+                        "token-refresh"
+                    );
                 }
-            }
-            catch (err) {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                handleError({err, redirectToLogin: true});
-            }
-            finally {
+            } catch (err) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+                setIsAuthenticated(false);
+                setError(err);
+
+                handleError(err, {
+                    fallbackMessage: "Your session has expired. Please log in again.",
+                    meta: {
+                        stage: "token-refresh",
+                        hadAccessToken: Boolean(accessToken)
+                    },
+                    redirectToLogin: true
+                });
+            } finally {
                 setLoading(false);
             }
-        }
+        };
 
         checkAuthStatus();
-    });
+    }, [handleError, notify, baseMeta]);
 
     if (loading) {
-        return <LoadingScreen />;
+        return <LoadingScreen/>;
     }
 
     if (error) {
@@ -58,10 +100,10 @@ function AuthRedirect() {
     }
 
     if (isAuthenticated) {
-        return <Navigate to="/dashboard" />;
-    } else {
-        return <Navigate to="/login" />;
+        return <Navigate to="/dashboard" replace/>;
     }
+
+    return <Navigate to="/login" replace/>;
 }
 
 export default AuthRedirect;

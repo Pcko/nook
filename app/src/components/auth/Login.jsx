@@ -1,14 +1,14 @@
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {isInvalidStringForPassword, isInvalidStringForUsername} from "../general/FormChecks";
 import TwoFactorAuthenticationCodeInputForm from "./TwoFactorAuthenticationCodeInputForm";
 import LoadingScreen from "../general/LoadingScreen";
-import useErrorHandler from "../general/ErrorHandler";
 import AuthService from "../../services/AuthService";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 import {FcGoogle} from "react-icons/fc";
 import Divider from "./FormDivider";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
+import useErrorHandler from "../logging/ErrorHandler";
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -19,17 +19,29 @@ function Login() {
     const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
 
     const navigate = useNavigate();
-    const handleError = useErrorHandler();
-    const baseMeta = {
-        feature: "login",
-        component: "Login"
-    };
+
+    const baseMeta = useMemo(
+        () => ({
+            feature: "auth",
+            component: "Login",
+            route: window.location.href
+        }),
+        []
+    );
+
     const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
     const closeLogin = (accessToken, refreshToken, user) => {
-        notify("success", "Login successful!", "success", {
-            username: formData.username
-        });
+        notify(
+            "info",
+            "Login successful.",
+            {
+                username: formData.username,
+                stage: "success"
+            },
+            "success"
+        );
 
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
@@ -44,12 +56,21 @@ function Login() {
 
         const {username, password} = formData;
 
-        const error =
+        const validationError =
             isInvalidStringForUsername(username) ||
             isInvalidStringForPassword(password);
 
-        if (error) {
-            notify("error", error, "validation", {username});
+        if (validationError) {
+            notify(
+                "error",
+                "Invalid username or password.",
+                {
+                    username,
+                    validationError,
+                    stage: "validation"
+                },
+                "validation"
+            );
             return;
         }
 
@@ -60,7 +81,15 @@ function Login() {
 
             if (response.status === 202) {
                 setTwoFactorAuthenticationFormActive(true);
-                notify("info", "2FA required.", "2FA-init", {username});
+                notify(
+                    "info",
+                    "Two-factor authentication required.",
+                    {
+                        username,
+                        stage: "2FA-init"
+                    },
+                    "2fa-init"
+                );
             } else {
                 closeLogin(
                     response.data.accessToken,
@@ -71,9 +100,8 @@ function Login() {
         } catch (err) {
             handleError(err, {
                 meta: {
-                    ...baseMeta,
-                    section: "submit",
-                    username
+                    username,
+                    stage: "submit"
                 }
             });
         } finally {
@@ -89,8 +117,11 @@ function Login() {
             notify(
                 "error",
                 "Please enter the 2FA code.",
-                "2FA-empty",
-                {username}
+                {
+                    username,
+                    stage: "2FA-empty"
+                },
+                "validation"
             );
             return;
         }
@@ -111,9 +142,8 @@ function Login() {
         } catch (err) {
             handleError(err, {
                 meta: {
-                    ...baseMeta,
-                    section: "2FA-submit",
-                    username
+                    username,
+                    stage: "2FA-submit"
                 }
             });
         } finally {
@@ -151,7 +181,6 @@ function Login() {
                     </p>
                     <div className="w-[60%]">
                         <form onSubmit={handleSubmit} className="mt-2">
-                            {/* Username Field */}
                             <label htmlFor="username" className="block mb-1">
                                 Username
                             </label>
@@ -169,7 +198,6 @@ function Login() {
                                 value={formData.username}
                             />
 
-                            {/* Password Field */}
                             <label htmlFor="password" className="block">
                                 Password
                                 <a
@@ -193,7 +221,6 @@ function Login() {
                                 value={formData.password}
                             />
 
-                            {/* Sign-in Button */}
                             <input
                                 type="submit"
                                 id="sign-up"
@@ -210,26 +237,24 @@ function Login() {
                         </form>
 
                         <button
-                            className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${
+                            className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center 
+                                    gap-2 hover:bg-ui-button-hover select-none ${
                                 loading ? "animate-pulse" : ""
                             }`}
                         >
-                            <FcGoogle className="text-xl" />
+                            <FcGoogle className="text-xl"/>
                             <span className="font-normal">Google</span>
                         </button>
                     </div>
                 </div>
 
                 <div className="flex-1 justify-items-center self-center p-[100px]">
-                    <AuthScreenDesktopIcon />
+                    <AuthScreenDesktopIcon/>
                 </div>
             </div>
 
-            {/* Dynamically rendered form */}
             {twoFactorAuthenticationFormActive && (
-                <TwoFactorAuthenticationCodeInputForm
-                    submitForm={handle2FASubmit}
-                />
+                <TwoFactorAuthenticationCodeInputForm submitForm={handle2FASubmit}/>
             )}
         </div>
     );

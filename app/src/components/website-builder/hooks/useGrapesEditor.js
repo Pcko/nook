@@ -6,7 +6,7 @@ import {loadCustomBlocks} from "../utils/grapesBlocks";
 
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
-import ErrorHandler from "../../general/ErrorHandler";
+import ErrorHandler from "../../logging/ErrorHandler";
 
 
 /**
@@ -19,7 +19,11 @@ import ErrorHandler from "../../general/ErrorHandler";
 export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
-    const handleError = ErrorHandler();
+    const handleError = ErrorHandler({
+        feature: 'Website Builder',
+        component: 'useGrapesEditor',
+        route: window.location.href
+    });
 
     useEffect(() => {
         if (containerRef.current && !editorRef.current) {
@@ -32,7 +36,12 @@ export function useGrapesEditor(config, page) {
             loadCustomBlocks(editorRef.current); // Loads blocks
 
             WebsiteBuilderService.loadPageState(editorRef.current, page).catch((err) => {
-                handleError(err);
+                handleError(err,{
+                    fallbackMessage: "Failed load page.",
+                    meta: {
+                        page,
+                    }
+                });
             });
         }
 

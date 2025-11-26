@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import useErrorHandler from "../general/ErrorHandler";
+import React, {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import useErrorHandler from "../logging/ErrorHandler";
 import PageHub from "./PageHub";
 import Settings from "../settings/Settings";
 import {LoadingBubble} from "../general/LoadingScreen";
@@ -8,53 +8,58 @@ import UserIcon from "../general/UserIcon";
 import SidebarItem from "./SidebarItem";
 import AuthService from "../../services/AuthService";
 import {
-    ArrowUpTrayIcon,
-    CodeBracketIcon,
-    FolderOpenIcon,
-    PaintBrushIcon,
-    ShieldCheckIcon,
-    UserCircleIcon
+    ArrowUpTrayIcon, CodeBracketIcon, FolderOpenIcon, PaintBrushIcon, ShieldCheckIcon, UserCircleIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
-import {useNotifications} from "../context/NotificationContext";
 import {LogVisualizer} from "../logging/LoggerDevTools";
-
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 function Dashboard() {
-    const [activeTab, setActiveTab] = useState('pages');
+    const [activeTab, setActiveTab] = useState("pages");
 
     const navigate = useNavigate();
-    const {showNotification} = useNotifications();
-    const handleError = useErrorHandler();
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const baseMeta = useMemo(() => ({
+        feature: "dashboard", component: "Dashboard", route: window.location.href
+    }), []);
+
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
+
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const handleLogout = async () => {
-        await AuthService.logout()
-            .catch(err => {
-                handleError(err);
-            }).finally(() => {
-                navigate('/');
-                showNotification('success', 'Successfully logged out.');
+        try {
+            await AuthService.logout();
+
+            notify("info", "Successfully logged out.", {
+                stage: "logout", username: user?.username ?? null
+            }, "submit");
+
+            navigate("/");
+        } catch (err) {
+            handleError(err, {
+                fallbackMessage: "Logout failed.", meta: {
+                    stage: "logout", username: user?.username ?? null
+                }
             });
+        }
     };
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'pages':
+            case "pages":
                 return <PageHub/>;
-            case 'accountSettings':
+            case "accountSettings":
                 return <Settings activeTab="account"/>;
-            case 'appearanceSettings':
+            case "appearanceSettings":
                 return <Settings activeTab="appearance"/>;
-            case 'securitySettings':
+            case "securitySettings":
                 return <Settings activeTab="security"/>;
-            case 'logging':
-                return (
-                    <div className="h-full">
-                        <LogVisualizer/>
-                    </div>
-                );
+            case "logging":
+                return (<div className="h-full">
+                    <LogVisualizer/>
+                </div>);
             default:
                 return <LoadingBubble className="mt-[200px]"/>;
         }
@@ -78,47 +83,45 @@ function Dashboard() {
                         <SidebarItem
                             label="Pages"
                             icon={FolderOpenIcon}
-                            active={activeTab === 'pages'}
-                            onClick={() => setActiveTab('pages')}
+                            active={activeTab === "pages"}
+                            onClick={() => setActiveTab("pages")}
                         />
                         <h6 className="!text-text">Settings</h6>
                         <SidebarItem
                             label="Account"
                             icon={UserCircleIcon}
-                            active={activeTab === 'accountSettings'}
-                            onClick={() => setActiveTab('accountSettings')}
+                            active={activeTab === "accountSettings"}
+                            onClick={() => setActiveTab("accountSettings")}
                         />
                         <SidebarItem
                             label="Appearence"
                             icon={PaintBrushIcon}
-                            active={activeTab === 'appearanceSettings'}
-                            onClick={() => setActiveTab('appearanceSettings')}
+                            active={activeTab === "appearanceSettings"}
+                            onClick={() => setActiveTab("appearanceSettings")}
                         />
                         <SidebarItem
                             label="Security"
                             icon={ShieldCheckIcon}
-                            active={activeTab === 'securitySettings'}
-                            onClick={() => setActiveTab('securitySettings')}
+                            active={activeTab === "securitySettings"}
+                            onClick={() => setActiveTab("securitySettings")}
                         />
 
-                        {import.meta.env.VITE_ENV.toLowerCase() === "dev" &&
-                            <>
-                                <h6 className="!text-text">Admin</h6>
-                                <SidebarItem
-                                    label="Logging"
-                                    icon={CodeBracketIcon}
-                                    active={activeTab === 'logging'}
-                                    onClick={() => setActiveTab('logging')}
-                                />
-                            </>
-                        }
+                        {import.meta.env.VITE_ENV.toLowerCase() === "dev" && (<>
+                            <h6 className="!text-text">Admin</h6>
+                            <SidebarItem
+                                label="Logging"
+                                icon={CodeBracketIcon}
+                                active={activeTab === "logging"}
+                                onClick={() => setActiveTab("logging")}
+                            />
+                        </>)}
                     </div>
                     <div className="mt-auto mb-5">
                         <div className="border-t-2 border-ui-border my-4"/>
                         <SidebarItem
                             className="text-dangerous"
                             label="Log Out"
-                            svgClass={"rotate-[-90deg] stroke-dangerous"}
+                            svgClass="rotate-[-90deg] stroke-dangerous"
                             icon={ArrowUpTrayIcon}
                             onClick={handleLogout}
                         />
@@ -140,7 +143,8 @@ function Dashboard() {
                     </motion.div>
                 </AnimatePresence>
             </main>
-        </div>);
+        </div>
+    );
 }
 
 export default Dashboard;
