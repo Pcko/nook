@@ -25,7 +25,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         //make sure the pageName is valid
         if (isInvalidStringForURL(pageName)) {
-            return res.sendStatus(403);
+            return res.sendStatus(400).json({ error: 'invalid_pageName' });
         }
 
         let updatedPageName = pageName;
@@ -134,7 +134,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         if (newPageName) {
             //make sure the pageName is valid
             if (isInvalidStringForURL(newPageName)) {
-                return res.sendStatus(403);
+                return res.sendStatus(400).json({ error: 'invalid_pageName' });
             }
 
             updatedPageName = newPageName;
