@@ -8,7 +8,6 @@ function TwoFactorAuthenticationCodeInputForm({submitForm}) {
     const {notify} = useMetaNotify({
         feature: "auth",
         component: "TwoFactorAuthenticationCodeInputForm",
-        route: window.location.href
     });
 
     const handleFormSubmit = (event) => {

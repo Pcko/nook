@@ -24,7 +24,6 @@ function Login() {
         () => ({
             feature: "auth",
             component: "Login",
-            route: window.location.href
         }),
         []
     );

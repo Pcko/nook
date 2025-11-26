@@ -9,7 +9,7 @@ function PageEditForm({closeForm, pageName, pages}) {
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
 
     const baseMeta = useMemo(() => ({
-        feature: "pages", component: "PageEditForm", route: window.location.href
+        feature: "pages", component: "PageEditForm",
     }), [pageName]);
 
     const {notify} = useMetaNotify(baseMeta);

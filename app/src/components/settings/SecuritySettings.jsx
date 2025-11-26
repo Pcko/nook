@@ -18,7 +18,6 @@ function SecuritySettings({changeHandler}) {
         () => ({
             feature: "settings",
             component: "SecuritySettings",
-            route: window.location.href
         }),
         []
     );

@@ -22,7 +22,6 @@ export function useGrapesEditor(config, page) {
     const handleError = ErrorHandler({
         feature: 'Website Builder',
         component: 'useGrapesEditor',
-        route: window.location.href
     });
 
     useEffect(() => {

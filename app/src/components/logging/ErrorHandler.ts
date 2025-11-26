@@ -24,10 +24,12 @@ const useErrorHandler = (baseMeta: BaseMeta) => {
             const {
                 silent = false,
                 fallbackMessage = "Ein Fehler ist aufgetreten.",
-                meta = {}
+                meta = {},
             } = options;
 
-            if (options?.redirectToLogin) {
+            console.log(options);
+
+            if (options.redirectToLogin) {
                 navigate("/login");
             }
 

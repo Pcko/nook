@@ -31,7 +31,6 @@ function Registration() {
         () => ({
             feature: "auth",
             component: "Registration",
-            route: window.location.href
         }),
         []
     );

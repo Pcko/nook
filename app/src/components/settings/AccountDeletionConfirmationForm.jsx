@@ -8,7 +8,7 @@ function AccountDeletionConfirmationForm({onCancel}) {
     const navigate = useNavigate();
 
     const baseMeta = useMemo(() => ({
-        feature: "settings", component: "AccountDeletionConfirmationForm", route: window.location.href
+        feature: "settings", component: "AccountDeletionConfirmationForm",
     }), []);
 
     const {notify} = useMetaNotify(baseMeta);

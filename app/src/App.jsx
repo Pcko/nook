@@ -34,7 +34,7 @@ function App() {
     }, []);
 
     return (
-        <LoggerProvider getUserId={() => JSON.parse(localStorage.getItem('user'))?.username} getRoute={()=> webkitURL.getRoute}>
+        <LoggerProvider getUserId={() => JSON.parse(localStorage.getItem('user'))?.username} getRoute={()=> window.location.href}>
             <NotificationProvider>
                 <AnimationProvider>
                     <AppContent/>

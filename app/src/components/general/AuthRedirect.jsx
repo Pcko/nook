@@ -15,7 +15,6 @@ function AuthRedirect() {
         () => ({
             feature: "auth",
             component: "AuthRedirect",
-            route: window.location.href,
         }), []
     );
 

@@ -20,7 +20,7 @@ function Dashboard() {
     const navigate = useNavigate();
 
     const baseMeta = useMemo(() => ({
-        feature: "dashboard", component: "Dashboard", route: window.location.href
+        feature: "dashboard", component: "Dashboard",
     }), []);
 
     const {notify} = useMetaNotify(baseMeta);

@@ -81,7 +81,7 @@ function PageCreationForm({closeForm, setPages}) {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) {
             return notify("error", result, {
-                step: "manual-submit", pageName: formData.pageName, route: window.location.href
+                step: "manual-submit", pageName: formData.pageName
             }, "validation");
         }
 

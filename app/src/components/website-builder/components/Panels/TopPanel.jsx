@@ -27,7 +27,6 @@ function TopPanel({editorRef, page}) {
         () => ({
             feature: "builder",
             component: "TopPanel",
-            route: window.location.href
         }),
         []
     );

@@ -81,7 +81,7 @@ function PageHub() {
     const navigate = useNavigate();
 
     const baseMeta = useMemo(() => ({
-        feature: "pages", component: "PageHub", route: window.location.href
+        feature: "pages", component: "PageHub"
     }), []);
 
     const {notify} = useMetaNotify(baseMeta);
