@@ -1,9 +1,8 @@
 import AppearanceSettings from "./AppearanceSettings";
 import AccountSettings from "./AccountSettings";
 import SecuritySettings from "./SecuritySettings";
-import {useNotifications} from "../context/NotificationContext";
-import React, {useState} from "react";
-import useErrorHandler from "../general/ErrorHandler";
+import React, {useMemo, useState} from "react";
+import useErrorHandler from "../logging/ErrorHandler";
 import SettingsService from "../../services/SettingsService";
 import {
     isInvalidStringForEmail,
@@ -13,76 +12,139 @@ import {
     isInvalidStringForUsername
 } from "../general/FormChecks";
 import {AnimatePresence, motion} from "framer-motion";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 function Settings({activeTab}) {
     const [changes, setChanges] = useState({});
 
-    const {showNotification} = useNotifications();
-    const handleError = useErrorHandler();
+    const baseMeta = useMemo(
+        () => ({
+            feature: "settings",
+            component: "Settings"
+        }),
+        []
+    );
+
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
     const originalSettings = loadSettings();
     const settingsHaveChanges = Object.keys(changes).length > 0;
 
-
     const handleSettingsChange = (category, setting, data) => {
-        setChanges(prev => ({
+        setChanges((prev) => ({
             ...prev,
             [category]: {
                 ...prev[category],
-                [setting]: data,
+                [setting]: data
             }
         }));
     };
 
     const applyChanges = async (e) => {
         e.preventDefault();
-        // Remove unchanged values
+
+        // Unveränderte Werte ausfiltern (nicht direkt state mutieren)
+        const cleanedChanges = {};
+
         for (const category in changes) {
+            const categoryChanges = {};
             for (const key in changes[category]) {
-                if (changes[category][key] === originalSettings[category][key]) {
-                    delete changes[category][key];
-                    if (Object.keys(changes[category]).length === 0) {
-                        delete changes[category];
-                    }
+                if (
+                    changes[category][key] !==
+                    originalSettings[category][key]
+                ) {
+                    categoryChanges[key] = changes[category][key];
                 }
+            }
+            if (Object.keys(categoryChanges).length > 0) {
+                cleanedChanges[category] = categoryChanges;
             }
         }
 
-        if (Object.keys(changes).length === 0) {
-            showNotification('error', 'No changes to save.');
+        if (Object.keys(cleanedChanges).length === 0) {
+            notify(
+                "error",
+                "No changes to save.",
+                {
+                    stage: "settings-save"
+                },
+                "validation"
+            );
             return;
         }
 
-        const accountObject = changes['account'];
+        const accountObject = cleanedChanges["account"];
+        let result;
 
-        const result =
-            !accountObject.username ? undefined : isInvalidStringForUsername(accountObject.username) ||
-            !accountObject.password ? undefined : isInvalidStringForPassword(accountObject.password) ||
-            !accountObject.firstName ? undefined : isInvalidStringForFirstName(accountObject.firstName) ||
-            !accountObject.lastName ? undefined : isInvalidStringForLastName(accountObject.lastName) ||
-            !accountObject.email ? undefined : isInvalidStringForEmail(accountObject.email);
+        if (accountObject) {
+            result =
+                (accountObject.username
+                    ? isInvalidStringForUsername(accountObject.username)
+                    : undefined) ||
+                (accountObject.password
+                    ? isInvalidStringForPassword(accountObject.password)
+                    : undefined) ||
+                (accountObject.firstName
+                    ? isInvalidStringForFirstName(accountObject.firstName)
+                    : undefined) ||
+                (accountObject.lastName
+                    ? isInvalidStringForLastName(accountObject.lastName)
+                    : undefined) ||
+                (accountObject.email
+                    ? isInvalidStringForEmail(accountObject.email)
+                    : undefined);
+        }
 
         if (result) {
-            return showNotification('error', result);
+            notify(
+                "error",
+                result,
+                {
+                    stage: "settings-validate"
+                },
+                "validation"
+            );
+            return;
         }
 
         try {
-            await SettingsService.updateSettings({changes});
-            showNotification('success', 'Changes applied.');
+            await SettingsService.updateSettings({changes: cleanedChanges});
+
+            notify(
+                "info",
+                "Changes applied.",
+                {
+                    stage: "settings-save"
+                },
+                "submit"
+            );
+
             setChanges({});
 
-            const oldUserObject = JSON.parse(localStorage.getItem('user'));
-            const newUserObject = {...oldUserObject, ...changes.account};
-            localStorage.setItem('user', JSON.stringify(newUserObject));
+            const oldUserObject = JSON.parse(localStorage.getItem("user"));
+            const newUserObject = {
+                ...oldUserObject,
+                ...(cleanedChanges.account || {})
+            };
+            localStorage.setItem("user", JSON.stringify(newUserObject));
         } catch (err) {
-            handleError(err);
+            handleError(err, {
+                fallbackMessage: "Failed to apply your changes.",
+                meta: {
+                    stage: "settings-save"
+                }
+            });
         }
     };
 
     function loadSettings() {
         return {
-            account: JSON.parse(localStorage.getItem('user')),
-            appearance: {accessibility: localStorage.getItem('accessibility') || 'normal',},
+            account: JSON.parse(localStorage.getItem("user")),
+            appearance: {
+                accessibility:
+                    localStorage.getItem("accessibility") || "normal"
+            }
         };
     }
 
@@ -97,30 +159,52 @@ function Settings({activeTab}) {
                         exit={{opacity: 0, y: -10}}
                         transition={{duration: 0.25}}
                     >
-                        {activeTab === 'account' && (
+                        {activeTab === "account" && (
                             <AccountSettings
-                                options={{...originalSettings.account, ...changes.account}}
-                                changeHandler={(setting, data) => handleSettingsChange('account', setting, data)}
+                                options={{
+                                    ...originalSettings.account,
+                                    ...changes.account
+                                }}
+                                changeHandler={(setting, data) =>
+                                    handleSettingsChange(
+                                        "account",
+                                        setting,
+                                        data
+                                    )
+                                }
                             />
                         )}
-                        {activeTab === 'appearance' && (
+                        {activeTab === "appearance" && (
                             <AppearanceSettings
                                 options={originalSettings.appearance}
-                                changeHandler={(setting, data) => handleSettingsChange('appearance', setting, data)}
+                                changeHandler={(setting, data) =>
+                                    handleSettingsChange(
+                                        "appearance",
+                                        setting,
+                                        data
+                                    )
+                                }
                             />
                         )}
-                        {activeTab === 'security' && (
+                        {activeTab === "security" && (
                             <SecuritySettings
-                                changeHandler={(setting, data) => handleSettingsChange('security', setting, data)}
+                                changeHandler={(setting, data) =>
+                                    handleSettingsChange(
+                                        "security",
+                                        setting,
+                                        data
+                                    )
+                                }
                             />
                         )}
                     </motion.div>
                 </AnimatePresence>
 
                 {settingsHaveChanges && (
-                    <div
-                        className="absolute top-0 right-0 h-[60px] py-1 px-3 bg-ui-bg rounded-[5px] border border-ui-border flex items-center">
-                        <div className="mr-2 text-text my-auto">You have unsaved changes!</div>
+                    <div className="absolute top-0 right-0 h-[60px] py-1 px-3 bg-ui-bg rounded-[5px] border border-ui-border flex items-center">
+                        <div className="mr-2 text-text my-auto">
+                            You have unsaved changes!
+                        </div>
                         <button
                             type="submit"
                             className="prim-btn h-3/4 my-auto flex items-center justify-center !text-text-on-primary"

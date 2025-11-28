@@ -1,4 +1,5 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
+@import "./assets/styles/tokens-log-notifications.css";
 
 @tailwind base;
 @tailwind components;

@@ -1,5 +1,4 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import axios from '../auth/AxiosInstance';
 
 function ProtectedRoute() {
     const refreshToken = localStorage.getItem('refreshToken');

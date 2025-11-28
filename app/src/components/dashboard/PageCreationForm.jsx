@@ -1,7 +1,6 @@
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useNotifications} from "../context/NotificationContext";
-import useErrorHandler from "../general/ErrorHandler";
+import useErrorHandler from "../logging/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
 
 import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
@@ -9,6 +8,7 @@ import PagePromptingStep from "./page-creation-components/PagePromptingStep";
 
 import PageService from "../../services/PageService";
 import AIService from "../../services/AIService";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 /**
  * All steps of the AI-Page-Creation process.
@@ -16,9 +16,7 @@ import AIService from "../../services/AIService";
  * @enum {string}
  */
 const STEPS = {
-    CHOOSE: "choose",
-    AI_CHAT: "ai-chat",
-    AI_PREVIEW: "ai-preview"
+    CHOOSE: "choose", AI_CHAT: "ai-chat", AI_PREVIEW: "ai-preview"
 };
 
 /**
@@ -51,12 +49,17 @@ function PageCreationForm({closeForm, setPages}) {
         loading: false,
         loadingStep: 0,
         currentStep: STEPS.CHOOSE,
-        submitted: false,
+        submitted: false
     });
 
-    const {showNotification} = useNotifications();
-    const handleError = useErrorHandler();
     const navigate = useNavigate();
+
+    const baseMeta = useMemo(() => ({
+        feature: "pages", component: "PageCreationForm"
+    }), []);
+
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
     const GENERATED_PAGE_AMOUNT = 2;
 
@@ -77,7 +80,9 @@ function PageCreationForm({closeForm, setPages}) {
     const handleFormSubmit = async (cause) => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) {
-            return showNotification("error", result);
+            return notify("error", result, {
+                step: "manual-submit", pageName: formData.pageName
+            }, "validation");
         }
 
         if (formData.submitted) {
@@ -87,18 +92,26 @@ function PageCreationForm({closeForm, setPages}) {
 
         try {
             const pageSkeleton = {name: formData.pageName};
-            setPages(prev => ({...prev, [pageSkeleton.name]: pageSkeleton}));
+            setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
 
             if (cause === "self") {
                 const newPage = await PageService.createPage(formData.pageName);
-                showNotification("success", "Page created.");
+
+                notify("info", "Page created.", {
+                    step: "manual-submit", pageName: formData.pageName, cause: "self"
+                }, "submit");
+
                 navigate(`/editor/${formData.pageName}`, {state: {page: newPage}});
             } else {
                 closeForm();
             }
         } catch (err) {
             updateFormData({submitted: false});
-            handleError(err);
+            handleError(err, {
+                fallbackMessage: "Page creation failed.", meta: {
+                    step: "manual-submit", pageName: formData.pageName
+                }
+            });
         }
     };
 
@@ -107,12 +120,13 @@ function PageCreationForm({closeForm, setPages}) {
      */
     const handleAiButtonClick = () => {
         if (!formData.pageName || formData.pageName.length < 2) {
-            return showNotification("error", "Enter a valid page name first.");
+            return notify("error", "Enter a valid page name first.", {
+                step: "choose", pageName: formData.pageName
+            }, "validation");
         }
 
         updateFormData({
-            aiPrompt: "",
-            currentStep: STEPS.AI_CHAT
+            aiPrompt: "", currentStep: STEPS.AI_CHAT
         });
     };
 
@@ -122,7 +136,9 @@ function PageCreationForm({closeForm, setPages}) {
      */
     const handleAiPromptSubmit = async () => {
         if (!formData.aiPrompt.trim()) {
-            return showNotification("error", "Enter a prompt.");
+            return notify("error", "Enter a prompt.", {
+                step: "ai-chat", pageName: formData.pageName
+            }, "validation");
         }
 
         updateFormData({loading: true, loadingStep: 0});
@@ -137,7 +153,11 @@ function PageCreationForm({closeForm, setPages}) {
                 loading: false
             });
         } catch (err) {
-            handleError(err);
+            handleError(err, {
+                fallbackMessage: "AI-Prompting failed.", meta: {
+                    step: "ai-generate", pageName: formData.pageName
+                }
+            });
             updateFormData({loading: false});
         }
     };
@@ -153,15 +173,16 @@ function PageCreationForm({closeForm, setPages}) {
         let failCount = 1;
 
         for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
-            const {response} = await AIService.getGeneratedPage({query: formData.aiPrompt});
+            const {response} = await AIService.getGeneratedPage({
+                query: formData.aiPrompt
+            });
 
             try {
                 const parsedResponse = JSON.parse(response);
 
-                updateFormData({loadingStep: formData.loadingStep + 1})
+                updateFormData({loadingStep: formData.loadingStep + 1});
                 generatedPages.push({
-                    name: formData.pageName,
-                    data: parsedResponse
+                    name: formData.pageName, data: parsedResponse
                 });
             } catch (err) {
                 failCount++;
@@ -187,8 +208,11 @@ function PageCreationForm({closeForm, setPages}) {
             const page = await PageService.createPage(formData.pageName);
             const completePage = {...page, data: selectedPage.data};
 
-            setPages(prev => ({...prev, [completePage.name]: completePage}));
-            showNotification("success", "Page created via AI.");
+            setPages((prev) => ({...prev, [completePage.name]: completePage}));
+
+            notify("info", "Page created via AI.", {
+                step: "ai-preview", pageName: completePage.name
+            }, "submit");
 
             await PageService.updatePage(completePage);
 
@@ -199,7 +223,11 @@ function PageCreationForm({closeForm, setPages}) {
             closeForm();
         } catch (err) {
             updateFormData({submitted: false});
-            handleError(err);
+            handleError(err, {
+                fallbackMessage: "AI-Page selection failed.", meta: {
+                    step: "ai-save", pageName: formData.pageName
+                }
+            });
         } finally {
             updateFormData({loading: false});
         }
@@ -216,10 +244,10 @@ function PageCreationForm({closeForm, setPages}) {
                 return (
                     <PageCreationChooseStep
                         closeForm={closeForm}
+                        handleAiButtonClick={handleAiButtonClick}
+                        handleFormSubmit={handleFormSubmit}
                         pageName={formData.pageName}
                         setPageName={(name) => updateFormData({pageName: name})}
-                        handleFormSubmit={handleFormSubmit}
-                        handleAiButtonClick={handleAiButtonClick}
                     />
                 );
 
@@ -227,13 +255,13 @@ function PageCreationForm({closeForm, setPages}) {
             case STEPS.AI_PREVIEW:
                 return (
                     <PagePromptingStep
-                        closeForm={closeForm}
+                        aiPages={formData.aiPages}
                         aiPrompt={formData.aiPrompt}
-                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
-                        loading={formData.loading}
+                        closeForm={closeForm}
                         handleAiPromptSubmit={handleAiPromptSubmit}
                         handleSelectAiPage={handleSelectAiPage}
-                        aiPages={formData.aiPages}
+                        loading={formData.loading}
+                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
                     />
                 );
 
