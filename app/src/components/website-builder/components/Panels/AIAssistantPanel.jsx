@@ -1,4 +1,3 @@
-// src/components/website-builder/components/AIAssistantPanel.jsx
 import React from "react";
 
 function AIAssistantPanel() {

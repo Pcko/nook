@@ -1,4 +1,3 @@
-// RightPanel.jsx
 import React, { useState } from "react";
 import Divider from "../../../auth/FormDivider";
 import TabSelector from "./TabSelector";
@@ -31,7 +30,7 @@ function RightPanel() {
           <p className="font-semibold mb-1">Traits</p>
           <div className="traits-panel" />
         </div>
-        
+
         <div className="mt-2">
           <p className="font-semibold mb-1">Styles</p>
           <div className="right-panel" />

@@ -1,4 +1,3 @@
-// LeftPanel.jsx
 import React, { useState } from "react";
 import TabSelector from "./TabSelector";
 
