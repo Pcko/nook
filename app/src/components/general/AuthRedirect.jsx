@@ -35,7 +35,7 @@ function AuthRedirect() {
             }
 
             try {
-                const response = await AuthService.getTokens(refreshToken);
+                const response = await AuthService.refreshAccessToken(refreshToken);
 
                 const {
                     accessToken: newAccessToken,

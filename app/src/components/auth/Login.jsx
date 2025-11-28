@@ -62,10 +62,9 @@ function Login() {
         if (validationError) {
             notify(
                 "error",
-                "Invalid username or password.",
+                validationError,
                 {
                     username,
-                    validationError,
                     stage: "validation"
                 },
                 "validation"

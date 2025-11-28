@@ -2,12 +2,10 @@ import grapesjs from "grapesjs";
 import {useEffect, useRef} from "react";
 
 import "grapesjs/dist/css/grapes.min.css";
-import {loadCustomBlocks} from "../utils/grapesBlocks";
-
-import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 import ErrorHandler from "../../logging/ErrorHandler";
-
+import {loadCustomBlocks} from "../utils/grapesBlocks";
+import {replaceDefaultShortcuts} from "../utils/shortcuts";
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
@@ -20,35 +18,39 @@ export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
     const handleError = ErrorHandler({
-        feature: 'Website Builder',
-        component: 'useGrapesEditor',
+        feature: "Website Builder",
+        component: "useGrapesEditor",
     });
 
     useEffect(() => {
-        if (containerRef.current && !editorRef.current) {
-            editorRef.current = grapesjs.init({
-                ...config,
-                container: containerRef.current,
-            });
+        if (!containerRef.current || editorRef.current) return;
 
-            replaceDefaultShortcuts(editorRef);
-            loadCustomBlocks(editorRef.current); // Loads blocks
+        const editor = grapesjs.init({
+            ...config,
+            container: containerRef.current,
+        });
 
-            WebsiteBuilderService.loadPageState(editorRef.current, page).catch((err) => {
-                handleError(err,{
-                    fallbackMessage: "Failed load page.",
-                    meta: {
-                        page,
-                    }
-                });
-            });
-        }
+        editorRef.current = editor;
+
+        replaceDefaultShortcuts(editorRef);
+        loadCustomBlocks(editor);
 
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
         };
-    }, [config]);
+    }, []);
+
+    useEffect(() => {
+        if (!editorRef.current || !page) return;
+
+        WebsiteBuilderService.loadPageState(editorRef.current, page).catch((err) => {
+            handleError(err, {
+                fallbackMessage: "Failed load page.",
+                meta: {page},
+            });
+        });
+    }, [page, handleError]);
 
     return {editorRef, containerRef};
 }

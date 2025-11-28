@@ -45,7 +45,7 @@ const deploymentStates = {
  * @type {{Inactive: number, "Not Deployed": number, Online: number}}
  */
 const deploymentPriority = {
-    Online: 0, Inactive: 1, "Not Deployed": 2
+    "Online": 0, "Inactive": 1, "Not Deployed": 2
 };
 
 const dateFormat = {
@@ -56,12 +56,12 @@ function convertOptionToHTML(option) {
     return (
         <div className="flex text-text-subtle">
             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
                 className="size-5 my-auto mx-2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
             >
                 <path strokeLinecap="round" strokeLinejoin="round" d={option.svg}/>
             </svg>

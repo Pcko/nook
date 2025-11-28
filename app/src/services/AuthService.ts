@@ -44,7 +44,7 @@ class AuthService {
             otp
         });
     }
-    static async getTokens(refreshToken: any) {
+    static async refreshAccessToken(refreshToken: any) {
         return axios.post("/auth/token", {token: refreshToken});
     }
 

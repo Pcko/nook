@@ -94,7 +94,7 @@ export function LogVisualizer(): React.JSX.Element {
                 overflow-hidden
             "
         >
-            {/* Kopfbereich */}
+            {/* Header */}
             <div
                 className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-3 flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">
@@ -133,7 +133,7 @@ export function LogVisualizer(): React.JSX.Element {
                 </div>
             </div>
 
-            {/* Filterleiste */}
+            {/* Filter-Bar */}
             <div
                 className="border-2 border-ui-border rounded-[10px] bg-ui-bg px-4 py-2 flex flex-wrap items-center gap-3">
                 <div className="flex-1 min-w-[200px]">
@@ -168,9 +168,9 @@ export function LogVisualizer(): React.JSX.Element {
                 </div>
             </div>
 
-            {/* Hauptbereich: 2 Spalten */}
+            {/* Main-Area: 2 Columns */}
             <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Liste */}
+                {/* List */}
                 <div className="flex flex-col min-h-0 border-2 border-ui-border rounded-[10px] bg-website-bg">
                     <div className="px-4 py-2 border-b border-ui-border flex items-center justify-between">
                         <p className="text-xs font-semibold text-text m-0">
@@ -269,7 +269,7 @@ export function LogVisualizer(): React.JSX.Element {
                         ) : (
                             <div className="h-full flex items-center justify-center bg-ui-bg">
                                 <p className="text-[11px] text-text-subtle m-0">
-                                    Choose a entry on the left, to see details.
+                                    Choose an entry on the left, to see details.
                                 </p>
                             </div>
                         )}

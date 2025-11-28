@@ -84,7 +84,9 @@ function Registration() {
                 "Account creation was successful!",
                 {
                     username: formData.username,
-                    email: formData.email
+                    email: formData.email,
+                    firstname: formData.firstName,
+                    lastname: formData.lastName,
                 },
                 "submit"
             );
@@ -109,8 +111,8 @@ function Registration() {
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <div id="Window"
-                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
+            <div className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10"
+                 id="Window">
 
                 {/* Left side: Registration form */}
                 <div className="bg-blue w-[45%] flex flex-col justify-center items-center">

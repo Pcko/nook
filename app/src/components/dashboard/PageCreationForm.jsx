@@ -244,10 +244,10 @@ function PageCreationForm({closeForm, setPages}) {
                 return (
                     <PageCreationChooseStep
                         closeForm={closeForm}
+                        handleAiButtonClick={handleAiButtonClick}
+                        handleFormSubmit={handleFormSubmit}
                         pageName={formData.pageName}
                         setPageName={(name) => updateFormData({pageName: name})}
-                        handleFormSubmit={handleFormSubmit}
-                        handleAiButtonClick={handleAiButtonClick}
                     />
                 );
 
@@ -255,13 +255,13 @@ function PageCreationForm({closeForm, setPages}) {
             case STEPS.AI_PREVIEW:
                 return (
                     <PagePromptingStep
-                        closeForm={closeForm}
+                        aiPages={formData.aiPages}
                         aiPrompt={formData.aiPrompt}
-                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
-                        loading={formData.loading}
+                        closeForm={closeForm}
                         handleAiPromptSubmit={handleAiPromptSubmit}
                         handleSelectAiPage={handleSelectAiPage}
-                        aiPages={formData.aiPages}
+                        loading={formData.loading}
+                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
                     />
                 );
 

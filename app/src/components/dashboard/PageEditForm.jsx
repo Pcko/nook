@@ -29,14 +29,14 @@ function PageEditForm({closeForm, pageName, pages}) {
         if (!trimmedFolderName) {
             if (!newPageName.trim()) {
                 return notify("error", "At least one of the fields is required", {
-                    pageName, newPageName
+                    pageName, newPageName, trimmedFolderName
                 }, "validation");
             }
 
             const result = isInvalidStringForURL(newPageName);
             if (result) {
                 return notify("error", result, {
-                    pageName, newPageName
+                    pageName, newPageName, trimmedFolderName
                 }, "validation");
             }
         }

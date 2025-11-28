@@ -11,9 +11,9 @@ interface HandleErrorOptions {
 }
 
 /**
- * Zentrale Error-Handling-Logik auf Basis von useMetaNotify:
- * - optional Redirect (z.B. bei redirectToLogin)
- * - Notification + Logging mit Meta-Daten
+ * Central error-handling-logic on basic of useMetaNotify:
+ * - Optional redirect (for example in redirectToLogin)
+ * - Notification + Logging with meta-data
  */
 const useErrorHandler = (baseMeta: BaseMeta) => {
     const navigate = useNavigate();
@@ -23,11 +23,9 @@ const useErrorHandler = (baseMeta: BaseMeta) => {
         (err: any, options: HandleErrorOptions = {}) => {
             const {
                 silent = false,
-                fallbackMessage = "Ein Fehler ist aufgetreten.",
+                fallbackMessage = "An error has occured.",
                 meta = {},
             } = options;
-
-            console.log(options);
 
             if (options.redirectToLogin) {
                 navigate("/login");

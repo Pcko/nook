@@ -1,69 +1,68 @@
 .dark {
-    /* Log-Level (dark) – subtil, nah an ui-bg/ui-bg-selected */
-    --log-debug-border: #6B7280;  /* slate-500 */
-    --log-debug-bg: #20232A;      /* leicht heller als ui-bg */
-    --log-debug-text: #E5E7EB;    /* slate-200 */
+    /* Log-Level (dark)*/
+    --log-debug-border: #6B7280; /* slate-500 */
+    --log-debug-bg: #20232A; /* leicht heller als ui-bg */
+    --log-debug-text: #E5E7EB; /* slate-200 */
 
-    /* nutzt deine primäre Blau/Lila-Richtung */
-    --log-info-border: #666BE2;   /* dein primary */
-    --log-info-bg: #1D2233;       /* dunkles, leicht bläuliches Panel */
-    --log-info-text: #C7D2FE;     /* indigo-200 */
+    --log-info-border: #666BE2; /* primary */
+    --log-info-bg: #1D2233; /* dunkles, leicht bläuliches Panel */
+    --log-info-text: #C7D2FE; /* indigo-200 */
 
-    --log-warn-border: #F59E0B;   /* amber-500 */
-    --log-warn-bg: #2A2113;       /* warmes, dunkles Braun */
-    --log-warn-text: #FACC15;     /* amber-400 */
+    --log-warn-border: #F59E0B; /* amber-500 */
+    --log-warn-bg: #2A2113; /* warmes, dunkles Braun */
+    --log-warn-text: #FACC15; /* amber-400 */
 
-    --log-error-border: #FF4D4D;  /* dein dangerous */
-    --log-error-bg: #2A1416;      /* dunkles Rotbraun */
-    --log-error-text: #FCA5A5;    /* red-300 */
+    --log-error-border: #FF4D4D; /* dangerous */
+    --log-error-bg: #2A1416; /* dunkles Rotbraun */
+    --log-error-text: #FCA5A5; /* red-300 */
 
-    --log-fatal-border: #A855F7;  /* purple-500/600 Mix */
-    --log-fatal-bg: #261633;      /* dunkles Violett */
-    --log-fatal-text: #E9D5FF;    /* purple-200 */
+    --log-fatal-border: #A855F7; /* purple-500/600 Mix */
+    --log-fatal-bg: #261633; /* dunkles Violett */
+    --log-fatal-text: #E9D5FF; /* purple-200 */
 
     --log-default-border: #54585E; /* ui-border-selected */
-    --log-default-bg: #1A1B1F;     /* etwas über ui-bg */
-    --log-default-text: #E5E7EB;   /* helles Grau */
+    --log-default-bg: #1A1B1F; /* etwas über ui-bg */
+    --log-default-text: #E5E7EB; /* helles Grau */
 
     /* Notifications (dark) – eher neutral, mit farbigem Rand */
-    --notif-success-bg: #17181B;     /* ui-bg */
-    --notif-success-border: #4CAF50; /* dein success */
+    --notif-success-bg: #17181B; /* ui-bg */
+    --notif-success-border: #4CAF50; /* success */
     --notif-success-text: #E5E7EB;
 
     --notif-error-bg: #17181B;
-    --notif-error-border: #FF4D4D;   /* dein dangerous */
+    --notif-error-border: #FF4D4D; /* dangerous */
     --notif-error-text: #FCA5A5;
 
     --notif-info-bg: #17181B;
-    --notif-info-border: #666BE2;    /* primary */
+    --notif-info-border: #666BE2; /* primary */
     --notif-info-text: #E5E7EB;
 }
 
-.light{
-    /* Log-Level (light) – original Farben nachgebaut */
-    --log-debug-border: #94A3B8;  /* slate-400 */
-    --log-debug-bg: #F1F5F9;      /* slate-100 */
-    --log-debug-text: #374151;    /* slate-700 */
+.light {
+    /* Log-Level (light) */
+    --log-debug-border: #94A3B8; /* slate-400 */
+    --log-debug-bg: #F1F5F9; /* slate-100 */
+    --log-debug-text: #374151; /* slate-700 */
 
-    --log-info-border: #3B82F6;   /* blue-500 */
-    --log-info-bg: #EFF6FF;       /* blue-50 */
-    --log-info-text: #1D4ED8;     /* blue-700 */
+    --log-info-border: #3B82F6; /* blue-500 */
+    --log-info-bg: #EFF6FF; /* blue-50 */
+    --log-info-text: #1D4ED8; /* blue-700 */
 
-    --log-warn-border: #F59E0B;   /* amber-500 */
-    --log-warn-bg: #FFFBEB;       /* amber-50 */
-    --log-warn-text: #B45309;     /* amber-700 */
+    --log-warn-border: #F59E0B; /* amber-500 */
+    --log-warn-bg: #FFFBEB; /* amber-50 */
+    --log-warn-text: #B45309; /* amber-700 */
 
-    --log-error-border: #EF4444;  /* red-500 */
-    --log-error-bg: #FEF2F2;      /* red-50 */
-    --log-error-text: #B91C1C;    /* red-700 */
+    --log-error-border: #EF4444; /* red-500 */
+    --log-error-bg: #FEF2F2; /* red-50 */
+    --log-error-text: #B91C1C; /* red-700 */
 
-    --log-fatal-border: #9333EA;  /* purple-600 */
-    --log-fatal-bg: #FAF5FF;      /* purple-50 */
-    --log-fatal-text: #7C3AED;    /* purple-700 */
+    --log-fatal-border: #9333EA; /* purple-600 */
+    --log-fatal-bg: #FAF5FF; /* purple-50 */
+    --log-fatal-text: #7C3AED; /* purple-700 */
 
     --log-default-border: #CBD5E1; /* slate-300 */
-    --log-default-bg: #F8FAFC;     /* slate-50 */
-    --log-default-text: #374151;   /* slate-700 */
+    --log-default-bg: #F8FAFC; /* slate-50 */
+    --log-default-text: #374151; /* slate-700 */
 }
 
 .high-contrast {

@@ -16,7 +16,7 @@ function TwoFactorAuthenticationCodeInputForm({submitForm}) {
         if (authenticationCode.length !== 6) {
             notify(
                 "error",
-                "Authentication code must be 6 characters long.",
+                "Authentication code must be exactly 6 characters long.",
                 {
                     currentLength: authenticationCode.length
                 },
@@ -28,9 +28,7 @@ function TwoFactorAuthenticationCodeInputForm({submitForm}) {
         notify(
             "info",
             "Submitting 2FA code.",
-            {
-                length: authenticationCode.length
-            },
+            undefined,
             "submit"
         );
 
