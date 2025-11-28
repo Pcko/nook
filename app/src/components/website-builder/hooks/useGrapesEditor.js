@@ -3,11 +3,12 @@ import {useEffect, useRef} from "react";
 
 import "grapesjs/dist/css/grapes.min.css";
 import {loadCustomBlocks} from "../utils/grapesBlocks";
+import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait"
+import {registerButtonTestTrait} from "../utils/grapesAnchorButton"
 
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 import ErrorHandler from "../../general/ErrorHandler";
-
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
@@ -27,6 +28,9 @@ export function useGrapesEditor(config, page) {
                 ...config,
                 container: containerRef.current,
             });
+
+            removeGlobalTitleTrait(editorRef.current);
+            registerButtonTestTrait(editorRef.current);
 
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editorRef.current); // Loads blocks

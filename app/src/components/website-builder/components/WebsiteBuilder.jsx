@@ -33,7 +33,8 @@ function WebsiteBuilder({page}) {
         panels: {defaults: []},   // Remove default GrapesJS panels
         blockManager: {appendTo: "#gjs-blocks"},    // Render blocks inside #blocks
         layerManager: {appendTo: "#gjs-layers"},
-        styleManager: {appendTo: ".right-panel"},   // Render style manager inside .right-panel
+        styleManager: {appendTo: ".right-panel"},   // Render style manager inside RightPanel.jsx
+        traitManager: {appendTo: ".traits-panel"},  // Reders trait manager inside RightPanel.jsx   
         deviceManager: {
             devices: [
                 {name: "Desktop", width: ""},
