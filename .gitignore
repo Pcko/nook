@@ -481,3 +481,4 @@ sketch
 .vercel
 
 docs/
+.env*.local
