@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {motion, AnimatePresence} from "framer-motion";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import {AIIcon} from "../resources/DashboardIcons";
 import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
+import PromptingTextArea from "../../general/PromptingTextArea";
 
 /**
  * PagePromptingStep
@@ -65,9 +65,9 @@ function PagePromptingStep({
     const SkeletonPreviewCard = () => (
         <div className="relative overflow-hidden rounded-md border border-ui-border bg-ui-bg animate-pulse">
             {/* Page-Placeholder */}
-            <div className="h-[250px] w-full bg-website-bg" />
+            <div className="h-[250px] w-full bg-website-bg"/>
             {/* Overlay-Spinner mittig */}
-            <LoadingCircleSpinner className="pointer-events-none absolute inset-0" />
+            <LoadingCircleSpinner className="pointer-events-none absolute inset-0"/>
         </div>
     )
 
@@ -94,55 +94,9 @@ function PagePromptingStep({
                 </div>
 
                 <div className="relative">
-                   <textarea
-                       className={`prompt-textarea w-full border-2 border-ui-border rounded-[6px] pl-4 pr-14 py-3
-                        bg-ui-bg text-text placeholder-text-subtle text-small
-                        focus:outline-none focus:border-primary transition-all 
-                        duration-200 resize-none min-h-[72px]
-                        ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
-                       placeholder="e.g. A clean portfolio landing page for a minimalist architect..."
-                       value={aiPrompt}
-                       onChange={(e) => setAiPrompt(e.target.value)}
-                       disabled={loading}
-                       onKeyDown={(e) => {
-                           if (e.shiftKey && (e.metaKey || e.ctrlKey)) {
-                               e.preventDefault();
-                               handleSubmit();
-                           }
-                       }}
-                   />
-
-                    {/* Submit button (AI icon) */}
-                    <motion.button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={loading || !aiPrompt.trim()}
-                        className={`absolute inset-y-0 my-auto right-2 flex items-center justify-center
-                            w-9 h-9 rounded-2xl transition-all duration-150
-                            ${
-                            loading || !aiPrompt.trim()
-                                ? "opacity-60 cursor-not-allowed"
-                                : "hover:bg-ui-bg hover:border-primary hover:shadow-sm"
-                        }`}
-                        aria-label="Generate page from prompt"
-                    >
-                        <motion.div
-                            whileTap={
-                                loading || !aiPrompt.trim()
-                                    ? undefined
-                                    : {scale: 0.95}
-                            }
-                            className="flex items-center justify-center w-full h-full"
-                        >
-                            <AIIcon
-                                size={32}
-                                colorStart={aiPrompt.length === 0 ? "#CECECE" : undefined}
-                                colorMid={aiPrompt.length === 0 ? "#CECECE" : undefined}
-                                colorEnd={aiPrompt.length === 0 ? "#CECECE" : undefined}
-                                strokeColor={aiPrompt.length === 0 ? "#CECECE" : undefined}
-                            />
-                        </motion.div>
-                    </motion.button>
+                    <PromptingTextArea loading={loading} aiPrompt={aiPrompt} setAiPrompt={setAiPrompt}
+                                       handleSubmit={handleSubmit}
+                                       placeholder={"e.g. A clean portfolio landing page for a minimalist architect..."}/>
                 </div>
             </div>
 
