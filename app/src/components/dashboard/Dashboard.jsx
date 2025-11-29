@@ -106,7 +106,7 @@ function Dashboard() {
                             onClick={() => setActiveTab("securitySettings")}
                         />
 
-                        {import.meta.env.VITE_ENV.toLowerCase() === "dev" && (<>
+                        {import.meta.env.VITE_ENV?.toLowerCase() === "dev" && (<>
                             <h6 className="!text-text">Admin</h6>
                             <SidebarItem
                                 label="Logging"
