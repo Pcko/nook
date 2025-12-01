@@ -58,7 +58,7 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     const messages = await promptBuilder.buildElementEditMessages(req.body);
     const queryResponseBody = await groqClient.getGroqResponse(messages);
 
-    const parts: { styles: string, component: string, text: string } = JSON.parse(queryResponseBody.response);
+    const parts: { styles: Object, component: Object, text: string } = JSON.parse(queryResponseBody.response);
     return res.status(200).send({
         think: queryResponseBody.think,
         text: parts.text,
