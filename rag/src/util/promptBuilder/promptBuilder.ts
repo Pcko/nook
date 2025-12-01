@@ -49,9 +49,20 @@ export const promptBuilder = {
         }
 
         const prompt = promptTemplate
-            .replace("{{context}}", contextString);
+            .replace("{{context}}", contextString)
+            + `\r\n\r\nUSER PROMPT:\r\n${query}`;
 
         return prompt.trim();
+    },
+
+    /**
+     * Returns the system prompt for generating a website.
+     *
+     * @async
+     * @returns {string} The prompt template
+     */
+    getPromptTemplate(): string {
+        return promptTemplate;
     },
 
     /**
