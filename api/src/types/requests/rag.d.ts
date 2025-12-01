@@ -13,7 +13,7 @@ export interface RAGResponseBody {
 
 /**
  *
- * @interface ElementEditRequestBody
+ * @interface RAGElementEditResponseBody
  * @param {string} think - Reasoning of reasoning LLMs. (only qwen3 or gpt currently support this)
  * @param {string} component - The element data that was edited.
  * @param {string} styles - The website styles data that was edited.
@@ -44,7 +44,7 @@ export interface ChatCompletionMessageParam {
 /**
  * Represents a single message in a chat completion request sent by the user.
  *
- * @interface ChatCompletionMessageParam
+ * @interface UserChatCompletionMessageParam
  * @property {"user" | "assistant"} role - The role of the message sender.
  * user: The message a user has entered.
  * assistant: The response to a chat completion request.
