@@ -11,15 +11,15 @@ const ragRouter = Router();
 ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody | { error: string }>) => {
     const queryRequest = req.body;
 
-    let prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
     let messages: ChatCompletionMessageParam[] = [];
+    let prompt: string = "";
     if(queryRequest.useLocalLLM) {
-        prompt += "USER PROMPT:\r\n"+ queryRequest.query;
+        prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
     } else {
         messages = [
             {
                 role: "system",
-                content: prompt
+                content: promptBuilder.getPromptTemplate()
             },
             {
                 role: "user",
