@@ -53,6 +53,7 @@ export interface ElementEditRequestBody {
  */
 export interface ElementEditResponseBody {
     think: string;
+    text: string;
     component: string;
     styles: string;
     total_duration: number;

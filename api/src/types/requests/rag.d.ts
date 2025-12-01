@@ -21,6 +21,7 @@ export interface RAGResponseBody {
  */
 export interface RAGElementEditResponseBody {
     think: string;
+    text: string;
     component: string;
     styles: string;
     total_duration: number;
