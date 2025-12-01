@@ -58,7 +58,6 @@ export const promptBuilder = {
     /**
      * Returns the system prompt for generating a website.
      *
-     * @async
      * @returns {string} The prompt template
      */
     getPromptTemplate(): string {
