@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import Divider from "../../../auth/FormDivider";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
 
@@ -14,31 +13,48 @@ function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
 
     return (
-        <div className="h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
-            <TabSelector
-                active={activeTab}
-                onChange={setActiveTab}
-                options={[
-                    {value: "editor", label: "Editor"},
-                    {value: "assistant", label: "AI Assistant"},
-                ]}
-            />
+        <div className="h-full min-w-[200px] bg-ui-bg p-2">
+            <div className="flex h-full flex-col">
+                <TabSelector
+                    active={activeTab}
+                    onChange={setActiveTab}
+                    options={[
+                        {value: "editor", label: "Editor"},
+                        {value: "assistant", label: "AI Assistant"},
+                    ]}
+                />
 
-            {/* Both exist at load; visibility only */}
-            <div className={activeTab === "editor" ? "" : "hidden"}>
-                <div className="mb-2">
-                    <p className="font-semibold mb-1">Traits</p>
-                    <div className="traits-panel"/>
+                <div className="mt-2 flex-1 min-h-0">
+                    {/* Editor-Tab */}
+                    <div
+                        className={
+                            activeTab === "editor"
+                                ? "h-full overflow-y-auto"
+                                : "hidden h-full"
+                        }
+                    >
+                        <div className="mb-2">
+                            <p className="font-semibold mb-1">Traits</p>
+                            <div className="traits-panel"/>
+                        </div>
+
+                        <div className="mt-2">
+                            <p className="font-semibold mb-1">Styles</p>
+                            <div className="right-panel"/>
+                        </div>
+                    </div>
+
+                    {/* Assistant-Tab */}
+                    <div
+                        className={
+                            activeTab === "assistant"
+                                ? "h-full"
+                                : "hidden h-full"
+                        }
+                    >
+                        <AIAssistantPanel/>
+                    </div>
                 </div>
-
-                <div className="mt-2">
-                    <p className="font-semibold mb-1">Styles</p>
-                    <div className="right-panel"/>
-                </div>
-            </div>
-
-            <div className={activeTab === "assistant" ? "" : "hidden"}>
-                <AIAssistantPanel/>
             </div>
         </div>
     );

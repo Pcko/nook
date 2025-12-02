@@ -26,7 +26,6 @@ function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholde
                 onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        console.log("submit if not null")
                         handleSubmit?.();
                     }
                 }}
