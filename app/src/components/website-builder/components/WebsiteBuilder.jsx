@@ -2,7 +2,7 @@
 // WebsiteBuilder.jsx
 import React from "react";
 
-import { grapesjsExportPlugin, grapesjsExportConfig } from "../utils/grapesExportConfig";
+import {grapesjsExportPlugin, grapesjsExportConfig} from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import ResizablePanelsLayout from "./ResizablePanelsLayout";
 import LeftPanel from "./Panels/LeftPanel";
@@ -10,6 +10,7 @@ import RightPanel from "./Panels/RightPanel";
 import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
+import {BuilderProvider} from "../hooks/useBuilder";
 
 /**
  * WebsiteBuilder component
@@ -44,7 +45,7 @@ function WebsiteBuilder({page}) {
         },
         plugins: [grapesjsExportPlugin],
         pluginsOpts: {
-             [grapesjsExportPlugin]: grapesjsExportConfig,
+            [grapesjsExportPlugin]: grapesjsExportConfig,
         }
     }, page);
 
@@ -55,28 +56,30 @@ function WebsiteBuilder({page}) {
     const handleLayout = () => editorRef.current?.refresh?.();
 
     return (
-        <div className="flex flex-col h-screen w-screen">
-            <TopPanel editorRef={editorRef} page={page}/>
+        <BuilderProvider editorRef={editorRef} initialPage={initialPage}>
+            <div className="flex flex-col h-screen w-screen">
+                <TopPanel editorRef={editorRef} page={page}/>
 
-            <div className="flex-1 overflow-hidden">
-                <ResizablePanelsLayout
-                    onLayout={handleLayout}
-                    left={<LeftPanel/>}
-                    editor={
-                        <div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
-                            {editorRef.loaded && (
-                                <div className="absolute inset-0 flex items-center justify-center z-50 bg-white">
-                                    <LoadingBubble/>
-                                </div>
-                            )}
+                <div className="flex-1 overflow-hidden">
+                    <ResizablePanelsLayout
+                        onLayout={handleLayout}
+                        left={<LeftPanel/>}
+                        editor={
+                            <div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
+                                {editorRef.loaded && (
+                                    <div className="absolute inset-0 flex items-center justify-center z-50 bg-white">
+                                        <LoadingBubble/>
+                                    </div>
+                                )}
 
-                            <div className="h-full bg-white" ref={containerRef}/>
-                        </div>
-                    }
-                    right={<RightPanel/>}
-                />
+                                <div className="h-full bg-white" ref={containerRef}/>
+                            </div>
+                        }
+                        right={<RightPanel/>}
+                    />
+                </div>
             </div>
-        </div>
+        </BuilderProvider>
     );
 }
 
