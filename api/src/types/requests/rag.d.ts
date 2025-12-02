@@ -13,6 +13,19 @@ export interface RAGResponseBody {
 
 /**
  *
+ * @interface RAGElementEditRequestBody
+ * @param {ChatCompletionMessageParam[]} messages - Message history from the user/assistant.
+ * @param {string} elementId - The ID of the element to be edited.
+ * @param {string} websiteData - The website data to include in the prompt.
+ */
+export interface RAGElementEditRequestBody {
+    messages: UserChatCompletionMessageParam[];
+    elementId: string;
+    websiteData: string;
+}
+
+/**
+ *
  * @interface RAGElementEditResponseBody
  * @param {string} think - Reasoning of reasoning LLMs. (only qwen3 or gpt currently support this)
  * @param {Object} component - The element data that was edited.
