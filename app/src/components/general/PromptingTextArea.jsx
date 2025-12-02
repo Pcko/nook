@@ -1,7 +1,7 @@
 import {motion} from "framer-motion";
-import {AIIcon} from "../dashboard/resources/DashboardIcons";
 import React from "react";
-import PagePromptingStep from "../dashboard/page-creation-components/PagePromptingStep";
+
+import {AIIcon} from "../dashboard/resources/DashboardIcons";
 
 /**
  * @param {boolean} loading - A Boolean that disables the submit button if true
@@ -12,6 +12,7 @@ import PagePromptingStep from "../dashboard/page-creation-components/PagePrompti
  * @returns {React.JSX.Element}
  */
 function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholder}) {
+
     return (
         <>
             <textarea
@@ -20,23 +21,22 @@ function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholde
                 focus:outline-none focus:border-primary transition-all 
                 duration-200 resize-none min-h-[72px]
                 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
-                placeholder={placeholder}
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
                 disabled={loading}
+                onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        handleSubmit();
+                        console.log("submit if not null")
+                        handleSubmit?.();
                     }
                 }}
+                placeholder={placeholder}
+                value={prompt}
             />
 
             {/* Submit button (AI icon) */}
             <motion.button
-                type="button"
-                onClick={handleSubmit}
-                disabled={loading || !prompt.trim()}
+                aria-label="Generate page from prompt"
                 className={`absolute inset-y-0 my-auto right-2 flex items-center justify-center
                             w-9 h-9 rounded-2xl transition-all duration-150
                             ${
@@ -44,21 +44,23 @@ function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholde
                         ? "opacity-60 cursor-not-allowed"
                         : "hover:bg-ui-bg hover:border-primary hover:shadow-sm"
                 }`}
-                aria-label="Generate page from prompt"
+                disabled={loading || !prompt.trim()}
+                onClick={handleSubmit}
+                type="button"
             >
                 <motion.div
+                    className="flex items-center justify-center w-full h-full"
                     whileTap={
                         loading || !prompt.trim()
                             ? undefined
                             : {scale: 0.95}
                     }
-                    className="flex items-center justify-center w-full h-full"
                 >
                     <AIIcon
-                        size={32}
-                        colorStart={prompt.length === 0 ? "#CECECE" : undefined}
-                        colorMid={prompt.length === 0 ? "#CECECE" : undefined}
                         colorEnd={prompt.length === 0 ? "#CECECE" : undefined}
+                        colorMid={prompt.length === 0 ? "#CECECE" : undefined}
+                        colorStart={prompt.length === 0 ? "#CECECE" : undefined}
+                        size={32}
                         strokeColor={prompt.length === 0 ? "#CECECE" : undefined}
                     />
                 </motion.div>

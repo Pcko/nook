@@ -1,5 +1,5 @@
 import grapesjs from "grapesjs";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import "grapesjs/dist/css/grapes.min.css";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
@@ -17,6 +17,8 @@ import {replaceDefaultShortcuts} from "../utils/shortcuts";
 export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
+    const [isReady, setIsReady] = useState(false);
+
     const handleError = ErrorHandler({
         feature: "Website Builder",
         component: "useGrapesEditor",
@@ -35,6 +37,8 @@ export function useGrapesEditor(config, page) {
         replaceDefaultShortcuts(editorRef);
         loadCustomBlocks(editor);
 
+        setIsReady(true);
+
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
@@ -52,5 +56,5 @@ export function useGrapesEditor(config, page) {
         });
     }, [page, handleError]);
 
-    return {editorRef, containerRef};
+    return {editorRef, containerRef, isReady};
 }

@@ -8,7 +8,6 @@
  * @property {string} content - The text content of the message.
  */
 export interface ChatMessage {
-    id : string;
     role: "user" | "assistant";
     content: string;
 }

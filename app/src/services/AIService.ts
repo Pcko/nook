@@ -2,7 +2,7 @@ import {RAGQueryBody} from "./interfaces/RAGQueryBody.ts";
 import {RAGResponseDTO} from "./interfaces/RAGResponseDTO.ts";
 import axios from "../components/auth/AxiosInstance";
 import RAGElementEditResponseDTO from "./interfaces/RAGElementEditResponseBody.ts";
-import {ChatMessage, ChatObject} from "./interfaces/ChatMessage.ts";
+import {ChatObject} from "./interfaces/ChatMessage.ts";
 
 /**
  * Shared Axios configuration used for AI-related requests.
