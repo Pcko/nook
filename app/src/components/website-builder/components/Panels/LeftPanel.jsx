@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TabSelector from "./TabSelector";
+import WebsiteSettings from "./WebsiteSettings";
 
 /**
  * LeftPanel component
@@ -18,12 +19,15 @@ function LeftPanel() {
         options={[
           { value: "layers", label: "Layers" },
           { value: "blocks", label: "Blocks" },
+          { value: "config", label: "Config" },
         ]}
       />
 
       {/* Both exist at load; visibility only */}
       <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"} />
       <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"} />
+
+      {activeTab === "config" && <WebsiteSettings/>}
     </div>
   );
 }
