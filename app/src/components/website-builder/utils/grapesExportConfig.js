@@ -2,7 +2,7 @@
 import pluginExport from "grapesjs-plugin-export";
 
 import faviconDark from "../../../assets/resources/favicon-dark.png";
-import faviconlight from "../../../assets/resources/favicon-light.png";
+import faviconLight from "../../../assets/resources/favicon-light.png";
 
 import { getWebsiteExportSettings } from "./websiteExportSettings";
 
@@ -28,12 +28,15 @@ function base64ToBinary(base64) {
  */
 function arrayBufferToBinary(buffer) {
   const bytes = new Uint8Array(buffer);
-  let binary = "";
+  const chars = new Array(bytes.length);
+
   for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    chars[i] = String.fromCharCode(bytes[i]);
   }
-  return binary;
+
+  return chars.join("");
 }
+
 
 /**
  * Fetch a URL (e.g. imported image asset) and return its binary string.
@@ -52,10 +55,13 @@ async function urlToBinary(url) {
  * @returns {string} extension
  */
 function getExtFromDataUrl(dataUrl) {
-  const match = dataUrl.match(/^data:image\/([^;]+);/);
+  const match = dataUrl.match(/^data:image\/([^;]+);/i);
   if (!match) return "png";
+
   const mimeExt = match[1].toLowerCase();
   if (mimeExt === "svg+xml") return "svg";
+  if (mimeExt === "x-icon" || mimeExt === "vnd.microsoft.icon") return "ico";
+
   return mimeExt;
 }
 
@@ -117,8 +123,8 @@ async function exportFavicons(settings, output) {
     if (base64) {
       output[`favicon-light.${ext}`] = base64ToBinary(base64);
     }
-  } else if (faviconlight) {
-    output["favicon-light.png"] = await urlToBinary(faviconlight);
+  } else if (faviconLight) {
+    output["favicon-light.png"] = await urlToBinary(faviconLight);
   }
 
   // Dark favicon: prefer custom data URL, otherwise default black.png

@@ -20,13 +20,18 @@ let currentSettings = {
  * @returns {void}
  */
 export function useWebsiteExportSettings(settings) {
+  const { title, description, language, lightDataUrl, darkDataUrl } = settings;
+
   useEffect(() => {
     currentSettings = {
       ...currentSettings,
-      ...settings,
+      title,
+      description,
+      language,
+      lightDataUrl,
+      darkDataUrl,
     };
-  }, [ settings.title, settings.description, settings.language, settings.lightDataUrl, settings.darkDataUrl, settings,
-  ]);
+  }, [title, description, language, lightDataUrl, darkDataUrl]);
 }
 
 /**

@@ -34,11 +34,11 @@ function useFileDataUrl(file) {
 /**
  * Render a single favicon preview card with an upload button.
  *
- * @param {Object} root0
- * @param {"light"|"dark"} root0.theme Theme variant label.
- * @param {string} root0.frameSrc Background/frame image source.
- * @param {string} root0.iconSrc Icon image source used in the preview.
- * @param {(file: File|null) => void} root0.onPickFile Callback when a file is picked.
+ * @param {Object} props
+ * @param {"light"|"dark"} props.theme Theme variant label.
+ * @param {string} props.frameSrc Background/frame image source.
+ * @param {string} props.iconSrc Icon image source used in the preview.
+ * @param {(file: File|null) => void} props.onPickFile Callback when a file is picked.
  */
 function ImageThemeCard({
   theme,
@@ -105,7 +105,13 @@ function ImageThemeCard({
 /**
  * Two-theme favicon preview (light/dark) with change callback.
  */
-export default function FaviconPreviewThemes({ frameLightSrc, frameDarkSrc, defaultLightIconSrc, defaultDarkIconSrc, onChange,}) {
+export default function FaviconPreviewThemes({
+  frameLightSrc,
+  frameDarkSrc,
+  defaultLightIconSrc,
+  defaultDarkIconSrc,
+  onChange,
+}) {
   const [lightFile, setLightFile] = useState(null);
   const [darkFile, setDarkFile] = useState(null);
 
@@ -115,24 +121,19 @@ export default function FaviconPreviewThemes({ frameLightSrc, frameDarkSrc, defa
   const lightIconSrc = lightDataUrl || defaultLightIconSrc;
   const darkIconSrc = darkDataUrl || defaultDarkIconSrc;
 
+  const onChangeRef = useRef(onChange);
   useEffect(() => {
-    onChange?.({
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    onChangeRef.current?.({
       lightFile,
       darkFile,
       lightDataUrl,
       darkDataUrl,
-      lightIconSrc,
-      darkIconSrc,
     });
-  }, [
-    lightFile,
-    darkFile,
-    lightDataUrl,
-    darkDataUrl,
-    lightIconSrc,
-    darkIconSrc,
-    onChange,
-  ]);
+  }, [lightFile, darkFile, lightDataUrl, darkDataUrl]);
 
   return (
     <div className="w-full">

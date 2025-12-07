@@ -1,8 +1,7 @@
-/* eslint-disable no-magic-numbers */
 import React, { useState } from "react";
 
 import faviconDark from "../../../../assets/resources/favicon-dark.png";
-import faviconlight from "../../../../assets/resources/favicon-light.png";
+import faviconLight from "../../../../assets/resources/favicon-light.png";
 import frameDark from "../../../../assets/resources/frame-dark.png";
 import frameLight from "../../../../assets/resources/frame-light.png";
 import { useWebsiteExportSettings } from "../../utils/websiteExportSettings";
@@ -16,6 +15,10 @@ const LANGUAGES = [
   { code: "es", label: "Spanish", flag: "🇪🇸" },
   { code: "fr", label: "French", flag: "🇫🇷" },
 ];
+
+const MAX_TITLE_LENGTH = 60;
+const MAX_DESCRIPTION_LENGTH = 155;
+const ELLIPSIS = "…";
 
 
 /**
@@ -37,12 +40,14 @@ export default function WebsiteSettings() {
 
   const rawTitle = (title || "My Nook Site").trim();
   const previewTitle =
-    rawTitle.length > 60 ? rawTitle.slice(0, 59) + "…" : rawTitle;
+    rawTitle.length > MAX_TITLE_LENGTH
+      ? rawTitle.slice(0, MAX_TITLE_LENGTH - ELLIPSIS.length) + ELLIPSIS
+      : rawTitle;
 
   const rawDescription = (description || "Made with Nook").trim();
   const previewDescription =
-    rawDescription.length > 155
-      ? rawDescription.slice(0, 154) + "…"
+    rawDescription.length > MAX_DESCRIPTION_LENGTH
+      ? rawDescription.slice(0, MAX_DESCRIPTION_LENGTH - ELLIPSIS.length) + ELLIPSIS
       : rawDescription;
 
   const fieldClass =
@@ -51,8 +56,8 @@ export default function WebsiteSettings() {
 
   // Push current settings into the export store (read later by grapesjsExportConfig)
   useWebsiteExportSettings({
-    title: rawTitle || "My Nook Site",
-    description: rawDescription || "Made with Nook",
+    title: rawTitle,
+    description: rawDescription,
     language,
     lightDataUrl: favicons.lightDataUrl,
     darkDataUrl: favicons.darkDataUrl,
@@ -157,7 +162,7 @@ export default function WebsiteSettings() {
         <div className="mt-2">
           <FaviconPreviewThemes
             defaultDarkIconSrc={faviconDark}
-            defaultLightIconSrc={faviconlight}
+            defaultLightIconSrc={faviconLight}
             frameDarkSrc={frameDark}
             frameLightSrc={frameLight}
             onChange={v =>
