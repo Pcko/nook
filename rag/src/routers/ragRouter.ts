@@ -19,7 +19,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         messages = [
             {
                 role: "system",
-                content: promptBuilder.getPromptTemplate()
+                content: await promptBuilder.build(queryRequest.query, queryRequest.skipContext, false)
             },
             {
                 role: "user",
