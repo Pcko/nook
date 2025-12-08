@@ -57,7 +57,18 @@ class AIService {
     }
 
     static async editElement(body: ChatObject): Promise<RAGElementEditResponseDTO> {
+        const websiteData = JSON.parse(body.websiteData);
+        let trimmedWebsiteData = body.websiteData;
+        websiteData.assets.forEach((asset) => {
+            if(asset.type == "image" && asset.src.startsWith("data:image/")) {
+                trimmedWebsiteData = trimmedWebsiteData.replaceAll(asset.src, asset.name);
+            }
+        });
+
+        body.websiteData = trimmedWebsiteData;
+
         const response = await axios.post<RAGElementEditResponseDTO>("/api/generation/editElement", body, axiosConfig);
+
         return response.data;
     }
 }
