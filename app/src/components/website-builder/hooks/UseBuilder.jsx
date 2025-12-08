@@ -3,7 +3,7 @@ import React, {createContext, useCallback, useContext, useEffect, useState,} fro
 const BuilderContext = createContext(null);
 
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
-    const [page, setPage] = useState(initialPage);
+    const [page, setPage] = useState(initialPage.data);
     const [selectedElementId, setSelectedElementId] = useState(null);
 
     useEffect(() => {
