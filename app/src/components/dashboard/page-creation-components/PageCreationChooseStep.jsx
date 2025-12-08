@@ -29,10 +29,10 @@ function PageCreationChooseStep({
 
     return (
         <motion.div
-            className="page-creation-window max-w-xl mx-auto p-4 md:p-5 rounded-[8px] bg-website-bg border border-ui-border shadow-sm"
-            initial={{opacity: 0, y: 8, scale: 0.98}}
             animate={{opacity: 1, y: 0, scale: 1}}
+            className="page-creation-window max-w-xl mx-auto p-4 md:p-5 rounded-[8px] bg-website-bg border border-ui-border shadow-sm"
             exit={{opacity: 0, y: 8, scale: 0.98}}
+            initial={{opacity: 0, y: 8, scale: 0.98}}
             transition={{duration: 0.2, ease: "easeOut"}}
         >
             <FormTopBar onClick={closeForm} title="Create a new page"/>
@@ -49,24 +49,24 @@ function PageCreationChooseStep({
                 </p>
 
                 <label
-                    htmlFor="pageName"
                     className="block mb-2 font-medium text-small text-text"
+                    htmlFor="pageName"
                 >
                     Page Name
                 </label>
 
                 <input
-                    type="text"
-                    id="pageName"
-                    name="pageName"
-                    required
-                    minLength={2}
-                    maxLength={maxNameLength}
                     className="w-full h-[48px] px-3 pt-1 border-2 border-ui-border rounded-[6px] bg-website-bg text-small text-text placeholder-text-subtle
                                focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                    id="pageName"
+                    maxLength={maxNameLength}
+                    minLength={2}
+                    name="pageName"
                     onChange={(e) => setPageName(e.target.value)}
-                    value={pageName}
                     placeholder="Example: MyFirstPageWithNook"
+                    required
+                    type="text"
+                    value={pageName}
                 />
 
                 <p className="text-small text-text-subtle mt-1 mb-6">
@@ -75,18 +75,18 @@ function PageCreationChooseStep({
 
                 <div className="flex flex-col gap-3 md:flex-row md:gap-4 select-none">
                     <CreationOption
-                        icon={<EditorPageCreationIcon className="w-14 h-14"/>}
-                        title="Create a page yourself"
-                        description="Take full control of the design process. Start from a blank canvas."
                         actionText="Start building →"
+                        description="Take full control of the design process. Start from a blank canvas."
+                        icon={<EditorPageCreationIcon className="w-14 h-14"/>}
                         onClick={() => handleFormSubmit("self")}
+                        title="Create a page yourself"
                     />
                     <CreationOption
-                        icon={<AIPageCreationIcon className="w-14 h-14"/>}
-                        title="Create a page using AI"
-                        description="Describe your page and let AI build it for you."
                         actionText="Generate with AI →"
+                        description="Describe your page and let AI build it for you."
+                        icon={<AIPageCreationIcon className="w-14 h-14"/>}
                         onClick={handleAiButtonClick}
+                        title="Create a page using AI"
                     />
                 </div>
             </form>

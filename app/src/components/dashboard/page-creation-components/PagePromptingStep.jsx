@@ -1,8 +1,8 @@
 import React from "react";
 import {motion, AnimatePresence} from "framer-motion";
+import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
 import PromptingTextArea from "../../general/PromptingTextArea";
 
 /**
@@ -73,10 +73,10 @@ function PagePromptingStep({
 
     return (
         <motion.div
-            className="page-creation-window max-w-3xl p-4 md:p-5 rounded-[8px] mx-auto bg-website-bg border border-ui-border shadow-sm"
-            initial={{opacity: 0, y: 8, scale: 0.98}}
             animate={{opacity: 1, y: 0, scale: 1}}
+            className="page-creation-window max-w-3xl p-4 md:p-5 rounded-[8px] mx-auto bg-website-bg border border-ui-border shadow-sm"
             exit={{opacity: 0, y: 8, scale: 0.98}}
+            initial={{opacity: 0, y: 8, scale: 0.98}}
             transition={{duration: 0.2, ease: "easeOut"}}
         >
             {/* Top bar with close button */}
@@ -94,9 +94,9 @@ function PagePromptingStep({
                 </div>
 
                 <div className="relative">
-                    <PromptingTextArea loading={loading} aiPrompt={aiPrompt} setAiPrompt={setAiPrompt}
-                                       handleSubmit={handleSubmit}
-                                       placeholder={"e.g. A clean portfolio landing page for a minimalist architect..."}/>
+                    <PromptingTextArea prompt={aiPrompt} handleSubmit={handleSubmit} loading={loading}
+                                       placeholder={"e.g. A clean portfolio landing page for a minimalist architect..."}
+                                       setPrompt={setAiPrompt}/>
                 </div>
             </div>
 
@@ -104,11 +104,11 @@ function PagePromptingStep({
             <AnimatePresence>
                 {(loading || hasPages) && (
                     <motion.div
-                        key="ai-previews"
-                        className="mt-8 border-t border-ui-border pt-5"
-                        initial={{opacity: 0, y: 8}}
                         animate={{opacity: 1, y: 0}}
+                        className="mt-8 border-t border-ui-border pt-5"
                         exit={{opacity: 0, y: 8}}
+                        initial={{opacity: 0, y: 8}}
+                        key="ai-previews"
                         transition={{duration: 0.2}}
                     >
                         <div className="flex items-center justify-between mb-4">
@@ -151,19 +151,19 @@ function PagePromptingStep({
                             >
                                 {aiPages.map((page, i) => (
                                     <motion.div
+                                        className="rounded-[6px] border border-ui-border bg-ui-bg overflow-hidden cursor-pointer"
                                         key={i}
                                         layout
-                                        whileHover={{
-                                            y: -4,
-                                            boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
-                                        }}
+                                        onClick={() => handleSelectAiPage(page)}
                                         transition={{
                                             type: "spring",
                                             stiffness: 220,
                                             damping: 20,
                                         }}
-                                        className="rounded-[6px] border border-ui-border bg-ui-bg overflow-hidden cursor-pointer"
-                                        onClick={() => handleSelectAiPage(page)}
+                                        whileHover={{
+                                            y: -4,
+                                            boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
+                                        }}
                                     >
                                         <GrapesPagePreview
                                             index={i}
