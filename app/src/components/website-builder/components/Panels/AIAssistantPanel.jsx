@@ -64,7 +64,7 @@ function AIAssistantPanel() {
             const body = {
                 messages: updatedMessages,
                 elementId: selectedElementId,
-                websiteData: JSON.stringify(page),
+                websiteData: JSON.stringify(editorRef.current.getProjectData()),
             };
 
             const res = await AIService.editElement(body);
@@ -75,7 +75,13 @@ function AIAssistantPanel() {
             if (cmp && res.component) {
                 cmp.replaceWith(res.component);
                 res.styles.forEach(style => {
-                    editor.setStyle(style);
+                    style.selectors.forEach(selector => {
+                        const componentsToStyle = editor.getWrapper().find(selector);
+                        console.log(componentsToStyle)
+                        componentsToStyle.forEach(componentToStyle => {
+                            componentToStyle.setStyle(style.style);
+                        });
+                    });
                 });
             }
 
@@ -90,6 +96,7 @@ function AIAssistantPanel() {
                 },
             ]);
         } catch (err) {
+            console.error(err)
             setMessages(prev => [
                 ...prev,
                 {
