@@ -1,10 +1,10 @@
 {
-  "type": "text",
+  "type": "text",              // Type of the component (optional, unless required)
   "attributes": {
-    // ATTRIBUTES HERE (like id for styling)
+    // Component attributes (e.g., id for styling)
   },
   "components": [
-    // NESTED COMPONENTS HERE (optional, this is like innerHTML)
+    // Optional nested components (similar to innerHTML)
   ],
-  "content": "i am text!" // this is optional as well, use it for "textnode" elements
+  "content": "i am text!"      // Optional text content, used for "textnode" elements
 }
