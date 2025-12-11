@@ -14,7 +14,7 @@ function RightPanel() {
   const [activeTab, setActiveTab] = useState("editor");
 
   return (
-    <div className="h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
+    <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
       <TabSelector
         active={activeTab}
         onChange={setActiveTab}

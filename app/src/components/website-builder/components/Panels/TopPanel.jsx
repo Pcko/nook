@@ -7,17 +7,10 @@ import {
     AiOutlineRedo,
     AiOutlineTablet,
     AiOutlineUndo,
+    AiOutlineEye,
 } from "react-icons/ai";
-import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
-import {
-    exportWebsite,
-    handleRedo,
-    handleUndo,
-    setDesktop,
-    setMobile,
-    setTablet,
-    toggleOutlines
-} from "../../utils/grapesActions";
+import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
+import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite, togglePreview} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../logging/ErrorHandler";
 import {useMetaNotify} from "../../../logging/MetaNotifyHook";
@@ -104,6 +97,11 @@ function TopPanel({editorRef, page}) {
                     icon={<AiOutlineBorder size={18}/>}
                     label="Alt+O"
                     onClick={() => toggleOutlines(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineEye size={18}/>}
+                    label="Alt+P"
+                    onClick={() => togglePreview(editorRef)}
                 />
             </div>
 

@@ -12,7 +12,7 @@ function LeftPanel() {
   const [activeTab, setActiveTab] = useState("layers");
 
   return (
-    <div className="h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
+    <div className="left-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
       <TabSelector
         active={activeTab}
         onChange={setActiveTab}

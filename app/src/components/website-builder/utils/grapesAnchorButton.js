@@ -1,5 +1,3 @@
-// src/components/website-builder/utils/grapesAnchorButton.js
-
 /**
  * Buttons get:
  * - "Scroll to ID" (text)  -> value actually used
@@ -41,11 +39,13 @@ export function registerButtonTestTrait(editor) {
     selectTrait.set("options", options);
   };
 
-  editor.on("component:selected", (cmp) => {
-    if (!cmp) return;
-
-    const type = cmp.get("type");
-    if (type !== "button") return;
+  /**
+   * Ensure a button has the traits and script attached.
+   * This is the core "enhance this button" function.
+   * @param {*} cmp
+   */
+  const enhanceButton = (cmp) => {
+    if (!cmp || cmp.get("type") !== "button") return;
 
     const hasTextTrait = !!cmp.getTrait("scrollTo");
     const hasSelectTrait = !!cmp.getTrait("scrollToSelect");
@@ -109,7 +109,28 @@ export function registerButtonTestTrait(editor) {
       cmp.set("script", function () {
         var el = this;
 
+        // Scroll is enabled if:
+        // - we're on an exported/live page (no data-gjs-preview attribute), OR
+        // - we're in editor and data-gjs-preview === "1"
+        function isScrollEnabled() {
+          var body = document.body;
+          if (!body) return true;
+
+          var previewState = body.dataset.gjsPreview;
+
+          // If attribute is missing, assume exported/live site => always scroll
+          if (typeof previewState === "undefined") {
+            return true;
+          }
+
+          // Inside editor: only scroll when preview is active
+          return previewState === "1";
+        }
+
         function onClick(e) {
+          // In editor: do nothing unless preview is active
+          if (!isScrollEnabled()) return;
+
           var targetId = el.getAttribute("scrollTo");
           if (!targetId) return;
 
@@ -129,16 +150,76 @@ export function registerButtonTestTrait(editor) {
         el.addEventListener("click", onClick);
       });
     }
+  };
 
-    // 4) Populate the dropdown with current IDs
+  // When a button is selected in the editor, enhance it and update dropdown.
+  editor.on("component:selected", (cmp) => {
+    if (!cmp || cmp.get("type") !== "button") return;
+
+    enhanceButton(cmp);
     updateSelectOptions(cmp);
   });
 
+  // When components are added, immediately enhance any buttons.
+  editor.on("component:add", (cmp) => {
+    if (!cmp) return;
+
+    if (cmp.get("type") === "button") {
+      enhanceButton(cmp);
+      updateSelectOptions(cmp);
+    }
+
+    // Also check children (in case of blocks that add nested buttons)
+    const children = cmp.components && cmp.components();
+    if (children && children.length) {
+      children.forEach((child) => {
+        if (child.get("type") === "button") {
+          enhanceButton(child);
+          updateSelectOptions(child);
+        }
+      });
+    }
+  });
+
+  // mark preview state inside the canvas document
+  const setPreviewFlag = (on) => {
+    const doc = editor.Canvas.getDocument();
+    if (!doc || !doc.body) {
+      return;
+    }
+
+    doc.body.dataset.gjsPreview = on ? "1" : "0";
+  };
+
+  // On editor load, enhance all existing buttons and init preview flag
+  editor.on("load", () => {
+    const wrapper = editor.getWrapper();
+    if (!wrapper) return;
+
+    const buttons = wrapper.find("button");
+    buttons.forEach((btnCmp) => {
+      enhanceButton(btnCmp);
+      updateSelectOptions(btnCmp);
+    });
+
+    // Ensure preview flag is initialized to "not preview"
+    setPreviewFlag(false);
+  });
+
   // Keep the dropdown in sync when the document structure changes
-  editor.on("component:add component:remove component:update", () => {
+  editor.on("component:remove component:update", () => {
     const selected = editor.getSelected();
     if (selected && selected.get("type") === "button") {
       updateSelectOptions(selected);
     }
+  });
+
+  // IMPORTANT: use command events, not `run:core:preview`
+  editor.on("command:run:core:preview", () => {
+    setPreviewFlag(true);
+  });
+
+  editor.on("command:stop:core:preview", () => {
+    setPreviewFlag(false);
   });
 }
