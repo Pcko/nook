@@ -51,19 +51,6 @@ function WebsiteBuilder({page}) {
         page
     );
 
-    useEffect(() => {
-        const eventHandler = (event) => {
-            if (event.key === "Escape") {
-                editorRef.current.select(null);
-            }
-        }
-
-        addEventListener('keydown', eventHandler);
-        return () => {
-            removeEventListener('keydown', eventHandler)
-        };
-    }, []);
-
     const handleLayout = () => editorRef.current?.refresh?.();
 
     return (

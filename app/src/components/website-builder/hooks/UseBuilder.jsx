@@ -15,8 +15,21 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
             setSelectedElementId(cmp?.getId?.() || null);
         };
 
+        const eventHandler = (event) => {
+            event.preventDefault();
+            if (event.key === "Escape") {
+                editor.select(null);
+                setSelectedElementId(null);
+            }
+        }
+
+        addEventListener('keydown', eventHandler);
         editor.on("component:selected", onSelect);
-        return () => editor.off("component:selected", onSelect);
+
+        return () => {
+            editor.off("component:selected", onSelect);
+            removeEventListener('keydown', eventHandler);
+        };
     }, [editorReady, editorRef]);
 
     const refreshEditor = useCallback(() => {
