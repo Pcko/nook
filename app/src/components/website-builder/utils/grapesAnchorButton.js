@@ -109,7 +109,41 @@ export function registerButtonTestTrait(editor) {
       cmp.set("script", function () {
         var el = this;
 
+        // Scroll is enabled if:
+        // - we're on an exported/live page (no data-gjs-preview attribute), OR
+        // - we're in editor and data-gjs-preview === "1"
+        function isScrollEnabled() {
+          var body = document.body;
+          if (!body) return true;
+
+          var previewState = body.dataset.gjsPreview;
+
+          // DEBUG:
+          console.log(
+            "[Button script] isScrollEnabled? previewState=",
+            previewState
+          );
+
+          // If attribute is missing, assume exported/live site => always scroll
+          if (typeof previewState === "undefined") {
+            return true;
+          }
+
+          // Inside editor: only scroll when preview is active
+          return previewState === "1";
+        }
+
         function onClick(e) {
+          // DEBUG: log on every click in canvas
+          var body = document.body;
+          console.log(
+            "[Button script] click. previewState=",
+            body && body.dataset && body.dataset.gjsPreview
+          );
+
+          // In editor: do nothing unless preview is active
+          if (!isScrollEnabled()) return;
+
           var targetId = el.getAttribute("scrollTo");
           if (!targetId) return;
 
@@ -160,16 +194,38 @@ export function registerButtonTestTrait(editor) {
     }
   });
 
-  // On editor load, enhance all existing buttons so they work on first click.
+  // ---- mark preview state inside the canvas document ----
+  const setPreviewFlag = (on) => {
+    const doc = editor.Canvas.getDocument();
+    if (!doc || !doc.body) {
+      console.log("[Canvas] setPreviewFlag: no doc/body yet");
+      return;
+    }
+
+    doc.body.dataset.gjsPreview = on ? "1" : "0";
+
+    // DEBUG
+    console.log(
+      "[Canvas] setPreviewFlag",
+      on,
+      " -> body.dataset.gjsPreview=",
+      doc.body.dataset.gjsPreview
+    );
+  };
+
+  // On editor load, enhance all existing buttons and init preview flag
   editor.on("load", () => {
     const wrapper = editor.getWrapper();
     if (!wrapper) return;
 
-    const buttons = wrapper.find('button');
+    const buttons = wrapper.find("button");
     buttons.forEach((btnCmp) => {
       enhanceButton(btnCmp);
       updateSelectOptions(btnCmp);
     });
+
+    // Ensure preview flag is initialized to "not preview"
+    setPreviewFlag(false);
   });
 
   // Keep the dropdown in sync when the document structure changes
@@ -178,5 +234,16 @@ export function registerButtonTestTrait(editor) {
     if (selected && selected.get("type") === "button") {
       updateSelectOptions(selected);
     }
+  });
+
+  // IMPORTANT: use command events, not `run:core:preview`
+  editor.on("command:run:core:preview", () => {
+    console.log("[GrapesJS] command:run:core:preview (Preview ON)");
+    setPreviewFlag(true);
+  });
+
+  editor.on("command:stop:core:preview", () => {
+    console.log("[GrapesJS] command:stop:core:preview (Preview OFF)");
+    setPreviewFlag(false);
   });
 }
