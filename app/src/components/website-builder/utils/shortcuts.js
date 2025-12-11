@@ -22,5 +22,5 @@ export function replaceDefaultShortcuts(editorRef) {
   km.add('my:undo', 'ctrl+z', () => handleUndo(editorRef));
   km.add('my:redo', 'ctrl+y', () => handleRedo(editorRef));
   km.add('my:toggle-outlines', 'alt+o', () => toggleOutlines(editorRef));
-  km.add('my:toggle-preview', 'ctrl+p', () => togglePreview(editorRef));
+  km.add('my:toggle-preview', 'alt+p', () => togglePreview(editorRef));
 }
