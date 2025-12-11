@@ -1,15 +1,25 @@
-import type {QueryResponseBody} from "./dto/queryResponseBody.dto.js";
 import Groq from 'groq-sdk';
-import {type StreamCallback} from './types/StreamCallback.js';
+
+import {type StreamCallback} from '../types/StreamCallback.js';
+import type {QueryResponseBody} from "../dto/rag.js";
+import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
-async function streamGroqResponse(query: string, onData: StreamCallback) {
+/**
+ * A streamed chat completion request for a Groq LLM.
+ *
+ * @function streamGroqResponse
+ * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
+ * @param {StreamCallback} onData - A callback to handle the streaming response.
+ * @returns {Promise<void>} A Promise that resolves when the stream is completed.
+ */
+async function streamGroqResponse(messages: ChatCompletionMessageParam[], onData: StreamCallback): Promise<void> {
     try {
         const stream = await groq.chat.completions.create({
-            messages: [{ role: 'user', content: query }],
+            messages: messages,
             model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
             stream: true,
         });
@@ -26,11 +36,18 @@ async function streamGroqResponse(query: string, onData: StreamCallback) {
     }
 }
 
-async function getGroqResponse(query: string): Promise<QueryResponseBody> {
+/**
+ * Sends a chat completion request for a Groq LLM.
+ *
+ * @function getGroqResponse
+ * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
+ * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
+ */
+async function getGroqResponse(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
     try{
         const startingTime = process.hrtime();
         const response = await groq.chat.completions.create({
-            messages: [{ role: 'user', content: query }],
+            messages: messages,
             model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
             stream: false,
         });
@@ -46,7 +63,7 @@ async function getGroqResponse(query: string): Promise<QueryResponseBody> {
         return {
             think: think,
             response: trimmedResponse,
-            total_duration: duration[1]
+            total_duration: duration[0]*1e9 + duration[1]
         }
     } catch (err) {
         console.error('Response Error from Groq: ', err);

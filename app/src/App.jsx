@@ -4,6 +4,7 @@ import './index.css';
 import {NotificationProvider} from "./components/context/NotificationContext";
 import {AnimationProvider} from "./components/context/AnimationContext";
 import AppContent from "./AppContent";
+import {LoggerProvider} from "./components/context/LoggerContext";
 
 function App() {
 
@@ -32,11 +33,14 @@ function App() {
     }, []);
 
     return (
-        <NotificationProvider>
-            <AnimationProvider>
-                <AppContent/>
-            </AnimationProvider>
-        </NotificationProvider>
+        <LoggerProvider getUserId={() => JSON.parse(localStorage.getItem('user'))?.username}
+                        getRoute={() => window.location.href}>
+            <NotificationProvider>
+                <AnimationProvider>
+                    <AppContent/>
+                </AnimationProvider>
+            </NotificationProvider>
+        </LoggerProvider>
     );
 }
 

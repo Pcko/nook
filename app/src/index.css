@@ -1,4 +1,5 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
+@import "./assets/styles/tokens-log-notifications.css";
 
 @tailwind base;
 @tailwind components;
@@ -190,3 +191,26 @@ h1 {
     @apply bg-primary text-text-on-primary hover:bg-primary-hover;
 }
 
+.creation-form-field {
+    @apply w-[700px] h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg mb-3;
+}
+
+.page-creation-window{
+    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[750px] max-w-[90%];
+}
+
+/* Hide scrollbar but keep scrolling (Chrome, Edge, Safari) */
+.prompt-textarea::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Hide scrollbar in Firefox */
+.prompt-textarea {
+    scrollbar-width: none;       /* Firefox */
+}
+
+/* Old IE/Edge */
+.prompt-textarea {
+    -ms-overflow-style: none;    /* IE/Edge legacy */
+}

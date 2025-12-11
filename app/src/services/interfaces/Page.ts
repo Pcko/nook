@@ -14,7 +14,7 @@ interface Page {
     createdAt: string;
     updatedAt: string;
     deploymentStatus: string;
-    data: ProjectData;
+    data: ProjectData | null;
 }
 
 export default Page;

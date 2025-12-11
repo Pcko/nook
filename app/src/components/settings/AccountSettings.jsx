@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import HR from './SettingsHR';
+import {useState} from "react";
+import HR from "./SettingsHR";
 import AccountDeletionConfirmationForm from "./AccountDeletionConfirmationForm";
-import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur"
+import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 
 function AccountSettings({changeHandler, options}) {
     const [accountDeletionFormActive, setAccountDeletionFormActive] = useState(false);
@@ -26,7 +26,7 @@ function AccountSettings({changeHandler, options}) {
                     required
                     defaultValue={originalEmail}
                     className="settings-input"
-                    onChange={(e) => changeHandler('email', e.target.value)}
+                    onChange={(e) => changeHandler("email", e.target.value)}
                 />
 
                 <HR/>
@@ -42,7 +42,7 @@ function AccountSettings({changeHandler, options}) {
                     defaultValue={originalFirstName}
                     minLength="2"
                     className="settings-input"
-                    onChange={(e) => changeHandler('firstName', e.target.value)}
+                    onChange={(e) => changeHandler("firstName", e.target.value)}
                 />
 
                 <HR/>
@@ -58,7 +58,7 @@ function AccountSettings({changeHandler, options}) {
                     defaultValue={originalLastName}
                     minLength="2"
                     className="settings-input"
-                    onChange={(e) => changeHandler('lastName', e.target.value)}
+                    onChange={(e) => changeHandler("lastName", e.target.value)}
                 />
 
                 <HR/>
@@ -74,7 +74,7 @@ function AccountSettings({changeHandler, options}) {
                     defaultValue={originalUsername}
                     minLength="2"
                     className="settings-input"
-                    onChange={(e) => changeHandler('username', e.target.value)}
+                    onChange={(e) => changeHandler("username", e.target.value)}
                 />
             </div>
 
@@ -89,21 +89,13 @@ function AccountSettings({changeHandler, options}) {
                 </button>
             </div>
 
-            {accountDeletionFormActive &&
-            <>
-               <div
-                    className="fixed inset-0 w-full h-full z-20 items-center justify-center"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setAccountDeletionFormActive(false);
-                    }}>
-                    <div className="bg-ui-bg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <AccountDeletionConfirmationForm/>
-                    </div>
-                </div> 
-                <CenteredWindowWithBackgroundBlur/>
-            </>}
-        
+            {accountDeletionFormActive && (
+                <CenteredWindowWithBackgroundBlur>
+                    <AccountDeletionConfirmationForm
+                        onCancel={() => setAccountDeletionFormActive(false)}
+                    />
+                </CenteredWindowWithBackgroundBlur>
+            )}
         </div>
     );
 }

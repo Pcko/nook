@@ -25,7 +25,7 @@ function EditorHub() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    /** @type {[object | null, Function]} Page state pulled from router or fallback */
+    /** @type {[Page | null, Function]} Page state pulled from router or fallback */
     const [page, setPage] = useState(location.state?.page);
 
     /**
@@ -33,7 +33,7 @@ function EditorHub() {
      * and fetches the actual state from DB
      */
     useEffect(() => {
-        localStorage.setItem(`${page.name}`, null);
+        localStorage.removeItem(`page_${page.name}`);
     }, [])
 
     /**

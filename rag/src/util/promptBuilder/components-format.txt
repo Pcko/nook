@@ -1,0 +1,10 @@
+{
+  "type": "text",
+  "attributes": {
+    // ATTRIBUTES HERE (like id for styling)
+  },
+  "components": [
+    // NESTED COMPONENTS HERE (optional, this is like innerHTML)
+  ],
+  "content": "i am text!" // this is optional as well, use it for "textnode" elements
+}

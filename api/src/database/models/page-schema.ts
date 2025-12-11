@@ -1,15 +1,16 @@
 import mongoose, { Schema } from 'mongoose';
-import IPage from '../../types/page.js';
+import IPage from '../../types/IPage.js';
 
 const PageSchema = new Schema<IPage>(
     {
         name: {
             type: String,
             required: true,
+            maxLength: 50,
         },
         data: {
             type: String,
-            default: "",
+            default: null,
         },
         author: {
             type: String,

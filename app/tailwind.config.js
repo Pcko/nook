@@ -33,6 +33,30 @@ module.exports = {
                 "text-on-primary": "var(--text-on-primary)",
                 "dangerous": "var(--dangerous)",
                 "success": "var(--success)",
+
+                "log-debug-border": "var(--log-debug-border)",
+                "log-debug-bg": "var(--log-debug-bg)",
+                "log-debug-text": "var(--log-debug-text)",
+
+                "log-info-border": "var(--log-info-border)",
+                "log-info-bg": "var(--log-info-bg)",
+                "log-info-text": "var(--log-info-text)",
+
+                "log-warn-border": "var(--log-warn-border)",
+                "log-warn-bg": "var(--log-warn-bg)",
+                "log-warn-text": "var(--log-warn-text)",
+
+                "log-error-border": "var(--log-error-border)",
+                "log-error-bg": "var(--log-error-bg)",
+                "log-error-text": "var(--log-error-text)",
+
+                "log-fatal-border": "var(--log-fatal-border)",
+                "log-fatal-bg": "var(--log-fatal-bg)",
+                "log-fatal-text": "var(--log-fatal-text)",
+
+                "log-default-border": "var(--log-default-border)",
+                "log-default-bg": "var(--log-default-bg)",
+                "log-default-text": "var(--log-default-text)"
             },
             fontSize: {
                 h1: "32.5px",

@@ -1,88 +1,276 @@
-import {useState} from 'react';
-import {useNotifications} from "../context/NotificationContext";
-import useErrorHandler from "../general/ErrorHandler";
+import React, {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import useErrorHandler from "../logging/ErrorHandler";
 import {isInvalidStringForURL} from "../general/FormChecks";
+
+import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
+import PagePromptingStep from "./page-creation-components/PagePromptingStep";
+
 import PageService from "../../services/PageService";
+import AIService from "../../services/AIService";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
+/**
+ * All steps of the AI-Page-Creation process.
+ * @readonly
+ * @enum {string}
+ */
+const STEPS = {
+    CHOOSE: "choose", AI_CHAT: "ai-chat", AI_PREVIEW: "ai-preview"
+};
+
+/**
+ * PageCreationForm component handles multistep creation of pages,
+ * including the choice between manual page-editing or ai-generation.
+ *
+ * @component
+ * @param {Object} props
+ * @param {Function} props.closeForm - Function to close the creation modal.
+ * @param {Function} props.setPages - Setter to update pages.
+ * @returns {JSX.Element|null}
+ */
 function PageCreationForm({closeForm, setPages}) {
-    const [pageName, setPageName] = useState('');
-    const [folderName, setFolderName] = useState('');
-    const {showNotification} = useNotifications();
-    const handleError = useErrorHandler();
+    /**
+     * @typedef {Object} FormData
+     * @property {string} pageName - The name of the new page.
+     * @property {string} aiPrompt - The prompt for generating AI pages.
+     * @property {Array<Object>} aiPages - List of generated AI page candidates.
+     * @property {boolean} loading - Loading state for AI generation or saving.
+     * @property {number} loadingStep - Current index in AI generation progress.
+     * @property {string} currentStep - Current UI step key from STEPS.
+     * @property {boolean} submitted - Prevents double creation of pages.
+     */
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
+    /** @type {[FormData, Function]} */
+    const [formData, setFormData] = useState({
+        pageName: "",
+        aiPrompt: "",
+        aiPages: [],
+        loading: false,
+        loadingStep: 0,
+        currentStep: STEPS.CHOOSE,
+        submitted: false
+    });
 
-        /* Form Checks */
-        const result = isInvalidStringForURL(pageName);
-        if (result) {
-            return showNotification('error', result);
-        }
+    const navigate = useNavigate();
 
-        try {
-            const trimmedFolderName = folderName?.trim();
-            const response = await PageService.createPage(pageName);
+    const baseMeta = useMemo(() => ({
+        feature: "pages", component: "PageCreationForm"
+    }), []);
 
-            setPages((prevPages) => {
-                const updatedPages = {...prevPages};
-                updatedPages[response.data.name] = response.data.pageDetails;
-                return updatedPages;
-            })
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
-            showNotification('success', 'Successfully added your new page.');
-        } catch (err) {
-            return handleError(err);
-        }
+    const GENERATED_PAGE_AMOUNT = 2;
 
-        closeForm();
+    /**
+     * Update form state.
+     * @param {Partial<FormData>} updates
+     */
+    const updateFormData = (updates) => {
+        setFormData((prev) => ({...prev, ...updates}));
     };
 
-    return (
-        <div className="bg-ui-bg border border-ui-border rounded-[5px] w-[30vw]">
-            <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
-                <h5 className="font-semibold">Create a new Page!</h5>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-                     stroke="currentColor" className="size-5 ml-auto mr-1 hover:cursor-pointer"
-                     onClick={() => closeForm()}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                </svg>
-            </div>
+    /**
+     * Submit handler for manual page creation.
+     *
+     * @param {"self"|"external"} cause - Determines whether to open the editor or just create silently.
+     * @returns {Promise<void>}
+     */
+    const handleFormSubmit = async (cause) => {
+        const result = isInvalidStringForURL(formData.pageName);
+        if (result) {
+            return notify("error", result, {
+                step: "manual-submit", pageName: formData.pageName
+            }, "validation");
+        }
 
-            <form onSubmit={handleFormSubmit} className="m-3 mt-4">
-                <label htmlFor="pageName" className="block mb-1">Page Name</label>
-                <input
-                    type="text"
-                    id="pageName"
-                    name="pageName"
-                    required
-                    minLength="2"
-                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
-                    onChange={(e) => setPageName(e.target.value)}
-                    value={pageName}
-                    placeholder="Example: My Page"
-                />
-                <label htmlFor="folderName" className="block mb-1">Folder</label>
-                <input
-                    type="text"
-                    id="folderName"
-                    name="folderName"
-                    minLength="2"
-                    className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
-                    onChange={(e) => setFolderName(e.target.value)}
-                    value={folderName}
-                    placeholder="Default: General"
-                />
-                <div className="flex mt-2">
-                    <div className="mr-0 ml-auto">
-                        <input type="button" value="Cancel" onClick={() => closeForm()}
-                               className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"/>
-                        <input type="submit" value="Create Page"
-                               className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"/>
-                    </div>
-                </div>
-            </form>
-        </div>
-    );
+        if (formData.submitted) {
+            return;
+        }
+        updateFormData({submitted: true});
+
+        try {
+            const pageSkeleton = {name: formData.pageName};
+            setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
+
+            if (cause === "self") {
+                const newPage = await PageService.createPage(formData.pageName);
+
+                notify("info", "Page created.", {
+                    step: "manual-submit", pageName: formData.pageName, cause: "self"
+                }, "submit");
+
+                navigate(`/editor/${formData.pageName}`, {state: {page: newPage}});
+            } else {
+                closeForm();
+            }
+        } catch (err) {
+            updateFormData({submitted: false});
+            handleError(err, {
+                fallbackMessage: "Page creation failed.", meta: {
+                    step: "manual-submit", pageName: formData.pageName
+                }
+            });
+        }
+    };
+
+    /**
+     * Moves user into AI prompt mode.
+     */
+    const handleAiButtonClick = () => {
+        if (!formData.pageName || formData.pageName.length < 2) {
+            return notify("error", "Enter a valid page name first.", {
+                step: "choose", pageName: formData.pageName
+            }, "validation");
+        }
+
+        updateFormData({
+            aiPrompt: "", currentStep: STEPS.AI_CHAT
+        });
+    };
+
+    /**
+     * Sends AI prompt to backend and loads generated pages.
+     * @returns {Promise<void>}
+     */
+    const handleAiPromptSubmit = async () => {
+        if (!formData.aiPrompt.trim()) {
+            return notify("error", "Enter a prompt.", {
+                step: "ai-chat", pageName: formData.pageName
+            }, "validation");
+        }
+
+        updateFormData({loading: true, loadingStep: 0});
+
+        try {
+            const generatedPages = await generateAIPages();
+
+            updateFormData({
+                aiPages: generatedPages,
+                loadingStep: GENERATED_PAGE_AMOUNT,
+                currentStep: STEPS.AI_PREVIEW,
+                loading: false
+            });
+        } catch (err) {
+            handleError(err, {
+                fallbackMessage: "AI-Prompting failed.", meta: {
+                    step: "ai-generate", pageName: formData.pageName
+                }
+            });
+            updateFormData({loading: false});
+        }
+    };
+
+    /**
+     * Generates multiple pages via AI.
+     * Retries invalid JSON responses automatically.
+     *
+     * @returns {Promise<Array<{name: string, data: any}>>}
+     */
+    const generateAIPages = async () => {
+        const generatedPages = [];
+        let failCount = 1;
+
+        for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
+            const {response} = await AIService.getGeneratedPage({
+                query: formData.aiPrompt
+            });
+
+            try {
+                const parsedResponse = JSON.parse(response);
+
+                updateFormData({loadingStep: formData.loadingStep + 1});
+                generatedPages.push({
+                    name: formData.pageName, data: parsedResponse
+                });
+            } catch (err) {
+                failCount++;
+                i--;
+            }
+        }
+
+        return generatedPages;
+    };
+
+    /**
+     * Saves an AI-generated page and navigates to the editor.
+     *
+     * @param {{name: string, data: any}} selectedPage
+     * @returns {Promise<void>}
+     */
+    const handleSelectAiPage = async (selectedPage) => {
+        if (formData.submitted || formData.loading) return;
+
+        updateFormData({submitted: true, loading: true});
+
+        try {
+            const page = await PageService.createPage(formData.pageName);
+            const completePage = {...page, data: selectedPage.data};
+
+            setPages((prev) => ({...prev, [completePage.name]: completePage}));
+
+            notify("info", "Page created via AI.", {
+                step: "ai-preview", pageName: completePage.name
+            }, "submit");
+
+            await PageService.updatePage(completePage);
+
+            navigate(`/editor/${completePage.name}`, {
+                state: {page: completePage}
+            });
+
+            closeForm();
+        } catch (err) {
+            updateFormData({submitted: false});
+            handleError(err, {
+                fallbackMessage: "AI-Page selection failed.", meta: {
+                    step: "ai-save", pageName: formData.pageName
+                }
+            });
+        } finally {
+            updateFormData({loading: false});
+        }
+    };
+
+    /**
+     * Decides which step component should be rendered.
+     *
+     * @returns {JSX.Element|null}
+     */
+    const renderStep = () => {
+        switch (formData.currentStep) {
+            case STEPS.CHOOSE:
+                return (
+                    <PageCreationChooseStep
+                        closeForm={closeForm}
+                        handleAiButtonClick={handleAiButtonClick}
+                        handleFormSubmit={handleFormSubmit}
+                        pageName={formData.pageName}
+                        setPageName={(name) => updateFormData({pageName: name})}
+                    />
+                );
+
+            case STEPS.AI_CHAT:
+            case STEPS.AI_PREVIEW:
+                return (
+                    <PagePromptingStep
+                        aiPages={formData.aiPages}
+                        aiPrompt={formData.aiPrompt}
+                        closeForm={closeForm}
+                        handleAiPromptSubmit={handleAiPromptSubmit}
+                        handleSelectAiPage={handleSelectAiPage}
+                        loading={formData.loading}
+                        setAiPrompt={(value) => updateFormData({aiPrompt: value})}
+                    />
+                );
+
+            default:
+                return null;
+        }
+    };
+
+    return renderStep();
 }
 
 export default PageCreationForm;

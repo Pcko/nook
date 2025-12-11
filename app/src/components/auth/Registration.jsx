@@ -1,42 +1,53 @@
-import {useState} from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
     isInvalidStringForLastName,
     isInvalidStringForPassword,
     isInvalidStringForUsername
-} from '../general/FormChecks';
+} from "../general/FormChecks";
 import LoadingScreen from "../general/LoadingScreen";
-import useErrorHandler from "../general/ErrorHandler";
+import useErrorHandler from "../logging/ErrorHandler";
 import Divider from "./FormDivider";
 import {FcGoogle} from "react-icons/fc";
 import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 import AuthService from "../../services/AuthService";
-import {useNotifications} from "../context/NotificationContext";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 function Registration() {
     const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        email: ''
+        username: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        email: ""
     });
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const {showNotification} = useNotifications();
-    const handleError = useErrorHandler();
+
+    const baseMeta = useMemo(
+        () => ({
+            feature: "auth",
+            component: "Registration",
+        }),
+        []
+    );
+
+    const {notify} = useMetaNotify(baseMeta);
+    const handleError = useErrorHandler(baseMeta);
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value});
+        setFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        /* Form Checks */
         const error =
             isInvalidStringForUsername(formData.username) ||
             isInvalidStringForPassword(formData.password) ||
@@ -45,11 +56,21 @@ function Registration() {
             isInvalidStringForEmail(formData.email);
 
         if (error) {
-            return showNotification('error', error);
+            notify(
+                "error",
+                error,
+                {
+                    username: formData.username,
+                    email: formData.email
+                },
+                "validation"
+            );
+            return;
         }
 
         try {
             setLoading(true);
+
             await AuthService.register(
                 formData.username,
                 formData.password,
@@ -58,32 +79,50 @@ function Registration() {
                 formData.email
             );
 
-            showNotification('success', 'Account creation was successful!');
-            navigate('/login');
+            notify(
+                "info",
+                "Account creation was successful!",
+                {
+                    username: formData.username,
+                    email: formData.email,
+                    firstname: formData.firstName,
+                    lastname: formData.lastName,
+                },
+                "submit"
+            );
+
+            navigate("/login");
         } catch (err) {
-            handleError(err);
+            handleError(err, {
+                meta: {
+                    username: formData.username,
+                    email: formData.email,
+                    stage: "submit"
+                }
+            });
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) {
-        return <LoadingScreen/>
+        return <LoadingScreen/>;
     }
 
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
-            <div id="Window"
-                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10">
+            <div className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10"
+                 id="Window">
 
                 {/* Left side: Registration form */}
                 <div className="bg-blue w-[45%] flex flex-col justify-center items-center">
                     <h1>Create an Account</h1>
                     <p>Already have an account?
-                        <a className={"text-ui-subtle hover:cursor-pointer"} onClick={() => navigate('/login')}> Sign in.</a>
+                        <a className={"text-ui-subtle hover:cursor-pointer"} onClick={() => navigate('/login')}> Sign
+                            in.</a>
                     </p>
 
-                    <div className={"w-[60%]"}>
+                    <div className="w-[60%]">
                         <form onSubmit={handleSubmit} className="mt-2">
 
                             {/* Username */}
@@ -93,7 +132,7 @@ function Registration() {
                                 id="username"
                                 name="username"
                                 required
-                                minLength="2"
+                                minLength={2}
                                 autoComplete="username"
                                 placeholder="Username"
                                 className="form-field"
@@ -101,7 +140,6 @@ function Registration() {
                                 value={formData.username}
                             />
 
-                            {/* First/Last Name */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="firstName" className="block mb-1">First Name</label>
@@ -110,7 +148,7 @@ function Registration() {
                                         id="firstName"
                                         name="firstName"
                                         required
-                                        minLength="2"
+                                        minLength={2}
                                         placeholder="First Name"
                                         className="form-field"
                                         onChange={handleChange}
@@ -154,7 +192,7 @@ function Registration() {
                                 id="password"
                                 name="password"
                                 required
-                                minLength="10"
+                                minLength={10}
                                 autoComplete="new-password"
                                 placeholder="Password"
                                 className="form-field"
@@ -162,7 +200,6 @@ function Registration() {
                                 value={formData.password}
                             />
 
-                            {/* Submit */}
                             <input
                                 type="submit"
                                 className={`prim-btn w-full ${loading ? 'animate-pulse' : ''}`}
@@ -170,8 +207,8 @@ function Registration() {
                             />
 
                             <Divider className="mt-5" dividerText="Or Register With"/>
-
                         </form>
+
                         <button
                             className={`btn border-ui-border bg-ui-default w-full mt-5 flex items-center justify-center gap-2 hover:bg-ui-button-hover select-none ${loading ? 'animate-pulse' : ''}`}>
                             <FcGoogle className="text-xl"/>
@@ -180,7 +217,6 @@ function Registration() {
                     </div>
                 </div>
 
-                {/* Right side: illustration / graphic */}
                 <div className="flex-1 justify-items-center self-center p-[100px]">
                     <AuthScreenDesktopIcon/>
                 </div>
