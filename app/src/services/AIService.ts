@@ -59,17 +59,36 @@ class AIService {
     static async editElement(body: ChatObject): Promise<RAGElementEditResponseDTO> {
         const websiteData = JSON.parse(body.websiteData);
         let trimmedWebsiteData = body.websiteData;
-        websiteData.assets.forEach((asset) => {
+        let trimmedMessages = body.messages;
+        const replacedImages :{ base64: string, placeholder: string }[] = [];
+
+        for(let asset of websiteData.assets) {
             if(asset.type == "image" && asset.src.startsWith("data:image/")) {
-                trimmedWebsiteData = trimmedWebsiteData.replaceAll(asset.src, asset.name);
+                const hash = Array.from(new Uint8Array(
+                    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(asset.src))))
+                    .map(b=> b.toString(16).padStart(2, "0"))
+                    .join("").slice(0, 8);
+
+                const placeholderName = `__${hash}-${asset.name}__`
+                trimmedWebsiteData = trimmedWebsiteData.replaceAll(asset.src, placeholderName);
+                replacedImages.push({base64: asset.src, placeholder: placeholderName});
+                for(let message of trimmedMessages) {
+                    message.content = message.content.replaceAll(asset.src, placeholderName);
+                }
             }
-        });
+        }
 
         body.websiteData = trimmedWebsiteData;
+        body.messages = trimmedMessages;
 
         const response = await axios.post<RAGElementEditResponseDTO>("/api/generation/editElement", body, axiosConfig);
 
-        return response.data;
+        let dataString = JSON.stringify(response.data);
+        replacedImages.forEach((image) => {
+            dataString = dataString.replaceAll(image.placeholder, image.base64);
+        });
+
+        return JSON.parse(dataString);
     }
 }
 
