@@ -93,6 +93,7 @@ function AIAssistantPanel(): JSX.Element {
                 res.styles.forEach((style) => {
                     style.selectors.forEach((selector) => {
                         const componentsToStyle = editor.getWrapper().find(selector);
+
                         componentsToStyle.forEach((componentToStyle: any) => {
                             componentToStyle.setStyle(style.style);
                         });
@@ -159,7 +160,7 @@ function AIAssistantPanel(): JSX.Element {
                                         AI Assistant
                                     </h5>
                                     <p className="m-0 text-small text-text-subtle">
-                                        Redesign, rewrite copy, and regenerate single components
+                                       Selected Component: {selectedElementId}
                                     </p>
                                 </div>
                             </div>
@@ -264,14 +265,9 @@ function AIAssistantPanel(): JSX.Element {
                                 />
                             </div>
 
-                            <div className="mt-1 flex items-baseline justify-between gap-4">
-                                <p className="text-small text-text-subtle">
-                                    Tip: Enter = send, Shift+Enter = new line.
-                                </p>
-                                <p className="text-small text-text-subtle">
-                                    Component: {selectedElementId}
-                                </p>
-                            </div>
+                            <p className="mt-1 text-small text-text-subtle">
+                                Tip: Enter = send, Shift+Enter = new line.
+                            </p>
                         </div>
                     </motion.div>
                 ) : (
@@ -281,11 +277,9 @@ function AIAssistantPanel(): JSX.Element {
                         animate={{opacity: 1, y: 0}}
                         exit={{opacity: 0, y: -6}}
                         transition={{duration: 0.2}}
-                        className="flex h-full flex-col rounded-[10px] border-2 border-ui-border bg-ui-bg"
+                        className="flex h-full flex-col"
                     >
-                        <div className="flex flex-1">
-                            <SelectElementPlaceholder/>
-                        </div>
+                        <SelectElementPlaceholder/>
                     </motion.div>
                 )}
             </AnimatePresence>

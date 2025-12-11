@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-sort-props */
-import React from "react";
+import React, {useEffect} from "react";
 
-import {grapesjsExportPlugin, grapesjsExportConfig} from "../utils/grapesExportConfig";
+import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import ResizablePanelsLayout from "./ResizablePanelsLayout";
 import LeftPanel from "./Panels/LeftPanel";
@@ -50,6 +50,19 @@ function WebsiteBuilder({page}) {
         },
         page
     );
+
+    useEffect(() => {
+        const eventHandler = (event) => {
+            if (event.key === "Escape") {
+                editorRef.current.select(null);
+            }
+        }
+
+        addEventListener('keydown', eventHandler);
+        return () => {
+            removeEventListener('keydown', eventHandler)
+        };
+    }, []);
 
     const handleLayout = () => editorRef.current?.refresh?.();
 
