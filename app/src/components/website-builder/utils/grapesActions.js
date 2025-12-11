@@ -77,9 +77,19 @@ export const togglePreview = (editorRef) => {
     // Leave preview: stop preview, restore visibility
     editor.stopCommand(PREVIEW_CMD);
     editor.runCommand(VISIBILITY_CMD);
+
+    // NEW: remove preview class from body
+    if (typeof document !== "undefined") {
+      document.body.classList.remove("gjs-preview-active");
+    }
   } else {
     // Enter preview: stop visibility, start preview
     editor.stopCommand(VISIBILITY_CMD);
     editor.runCommand(PREVIEW_CMD);
+
+    // NEW: add preview class to body
+    if (typeof document !== "undefined") {
+      document.body.classList.add("gjs-preview-active");
+    }
   }
 };

@@ -83,3 +83,11 @@
 .gjs-d-s-arrow{
   border-top: 5px solid black !important;
 }
+
+body.gjs-preview-active .left-panel {
+  display: none;
+}
+
+body.gjs-preview-active .right-panel {
+  display: none;
+}

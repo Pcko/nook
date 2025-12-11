@@ -118,12 +118,6 @@ export function registerButtonTestTrait(editor) {
 
           var previewState = body.dataset.gjsPreview;
 
-          // DEBUG:
-          console.log(
-            "[Button script] isScrollEnabled? previewState=",
-            previewState
-          );
-
           // If attribute is missing, assume exported/live site => always scroll
           if (typeof previewState === "undefined") {
             return true;
@@ -134,13 +128,6 @@ export function registerButtonTestTrait(editor) {
         }
 
         function onClick(e) {
-          // DEBUG: log on every click in canvas
-          var body = document.body;
-          console.log(
-            "[Button script] click. previewState=",
-            body && body.dataset && body.dataset.gjsPreview
-          );
-
           // In editor: do nothing unless preview is active
           if (!isScrollEnabled()) return;
 
@@ -194,23 +181,14 @@ export function registerButtonTestTrait(editor) {
     }
   });
 
-  // ---- mark preview state inside the canvas document ----
+  // mark preview state inside the canvas document
   const setPreviewFlag = (on) => {
     const doc = editor.Canvas.getDocument();
     if (!doc || !doc.body) {
-      console.log("[Canvas] setPreviewFlag: no doc/body yet");
       return;
     }
 
     doc.body.dataset.gjsPreview = on ? "1" : "0";
-
-    // DEBUG
-    console.log(
-      "[Canvas] setPreviewFlag",
-      on,
-      " -> body.dataset.gjsPreview=",
-      doc.body.dataset.gjsPreview
-    );
   };
 
   // On editor load, enhance all existing buttons and init preview flag
@@ -238,12 +216,10 @@ export function registerButtonTestTrait(editor) {
 
   // IMPORTANT: use command events, not `run:core:preview`
   editor.on("command:run:core:preview", () => {
-    console.log("[GrapesJS] command:run:core:preview (Preview ON)");
     setPreviewFlag(true);
   });
 
   editor.on("command:stop:core:preview", () => {
-    console.log("[GrapesJS] command:stop:core:preview (Preview OFF)");
     setPreviewFlag(false);
   });
 }

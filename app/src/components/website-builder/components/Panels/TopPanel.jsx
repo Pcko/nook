@@ -7,6 +7,7 @@ import {
     AiOutlineRedo,
     AiOutlineTablet,
     AiOutlineUndo,
+    AiOutlineEye,
 } from "react-icons/ai";
 import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
 import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite, togglePreview} from "../../utils/grapesActions";
@@ -73,7 +74,7 @@ function TopPanel({editorRef, page}) {
                     onClick={() => toggleOutlines(editorRef)}
                 />
                 <ToolbarButton
-                    icon={<AiOutlineBorder size={18}/>}
+                    icon={<AiOutlineEye size={18}/>}
                     label="Alt+P"
                     onClick={() => togglePreview(editorRef)}
                 />
