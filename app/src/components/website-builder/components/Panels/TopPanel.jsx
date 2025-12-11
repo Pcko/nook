@@ -9,7 +9,7 @@ import {
     AiOutlineUndo,
 } from "react-icons/ai";
 import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
-import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite} from "../../utils/grapesActions";
+import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite, togglePreview} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../general/ErrorHandler";
 
@@ -71,6 +71,11 @@ function TopPanel({editorRef, page}) {
                     icon={<AiOutlineBorder size={18}/>}
                     label="Alt+O"
                     onClick={() => toggleOutlines(editorRef)}
+                />
+                <ToolbarButton
+                    icon={<AiOutlineBorder size={18}/>}
+                    label="Alt+P"
+                    onClick={() => togglePreview(editorRef)}
                 />
             </div>
 

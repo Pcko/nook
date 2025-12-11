@@ -1,5 +1,3 @@
-// src/components/website-builder/utils/grapesAnchorButton.js
-
 /**
  * Buttons get:
  * - "Scroll to ID" (text)  -> value actually used
@@ -41,11 +39,13 @@ export function registerButtonTestTrait(editor) {
     selectTrait.set("options", options);
   };
 
-  editor.on("component:selected", (cmp) => {
-    if (!cmp) return;
-
-    const type = cmp.get("type");
-    if (type !== "button") return;
+  /**
+   * Ensure a button has the traits and script attached.
+   * This is the core "enhance this button" function.
+   * @param {*} cmp
+   */
+  const enhanceButton = (cmp) => {
+    if (!cmp || cmp.get("type") !== "button") return;
 
     const hasTextTrait = !!cmp.getTrait("scrollTo");
     const hasSelectTrait = !!cmp.getTrait("scrollToSelect");
@@ -129,13 +129,51 @@ export function registerButtonTestTrait(editor) {
         el.addEventListener("click", onClick);
       });
     }
+  };
 
-    // 4) Populate the dropdown with current IDs
+  // When a button is selected in the editor, enhance it and update dropdown.
+  editor.on("component:selected", (cmp) => {
+    if (!cmp || cmp.get("type") !== "button") return;
+
+    enhanceButton(cmp);
     updateSelectOptions(cmp);
   });
 
+  // When components are added, immediately enhance any buttons.
+  editor.on("component:add", (cmp) => {
+    if (!cmp) return;
+
+    if (cmp.get("type") === "button") {
+      enhanceButton(cmp);
+      updateSelectOptions(cmp);
+    }
+
+    // Also check children (in case of blocks that add nested buttons)
+    const children = cmp.components && cmp.components();
+    if (children && children.length) {
+      children.forEach((child) => {
+        if (child.get("type") === "button") {
+          enhanceButton(child);
+          updateSelectOptions(child);
+        }
+      });
+    }
+  });
+
+  // On editor load, enhance all existing buttons so they work on first click.
+  editor.on("load", () => {
+    const wrapper = editor.getWrapper();
+    if (!wrapper) return;
+
+    const buttons = wrapper.find('button');
+    buttons.forEach((btnCmp) => {
+      enhanceButton(btnCmp);
+      updateSelectOptions(btnCmp);
+    });
+  });
+
   // Keep the dropdown in sync when the document structure changes
-  editor.on("component:add component:remove component:update", () => {
+  editor.on("component:remove component:update", () => {
     const selected = editor.getSelected();
     if (selected && selected.get("type") === "button") {
       updateSelectOptions(selected);
