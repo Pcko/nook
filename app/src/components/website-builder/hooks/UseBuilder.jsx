@@ -2,6 +2,10 @@ import React, {createContext, useCallback, useContext, useEffect, useState,} fro
 
 const BuilderContext = createContext(null);
 
+/**
+ * Builder provider which stores
+ * @param editorRef
+ */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
     const [page, setPage] = useState(initialPage.data);
     const [selectedElementId, setSelectedElementId] = useState(null);
@@ -16,7 +20,6 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         };
 
         const eventHandler = (event) => {
-            event.preventDefault();
             if (event.key === "Escape") {
                 editor.select(null);
                 setSelectedElementId(null);

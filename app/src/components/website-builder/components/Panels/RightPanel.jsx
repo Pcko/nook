@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
+import {useBuilder} from "../../hooks/UseBuilder";
 
 /**
  * RightPanel component
@@ -11,6 +12,7 @@ import AIAssistantPanel from "./AIAssistantPanel";
  */
 function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
+    const {selectedElementId} = useBuilder();
 
     return (
         <div className="h-full min-w-[200px] bg-ui-bg p-2">
@@ -28,7 +30,7 @@ function RightPanel() {
                     {/* Editor-Tab */}
                     <div
                         className={
-                            activeTab === "editor"
+                            (activeTab === "editor") && selectedElementId
                                 ? "h-full overflow-y-auto"
                                 : "hidden h-full"
                         }
