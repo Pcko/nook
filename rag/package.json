@@ -21,7 +21,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "groq-sdk": "^0.33.0"
+    "groq-sdk": "^0.37.0"
   },
   "type": "module",
   "devDependencies": {

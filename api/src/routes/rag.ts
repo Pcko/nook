@@ -1,5 +1,10 @@
 import express, { Request, Response } from 'express';
-import {RAGElementEditResponseBody, RAGQueryBody, RAGResponseBody} from "../types/requests/rag";
+import {
+    RAGElementEditRequestBody,
+    RAGElementEditResponseBody,
+    RAGQueryBody,
+    RAGResponseBody
+} from "../types/requests/rag";
 import type {
     UserChatCompletionMessageParam,
 } from "../types/requests/rag.d.ts";
@@ -56,7 +61,7 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
     }
 });
 
-router.post('/editElement', async (req: Request<{}, {}, UserChatCompletionMessageParam[]>, res: Response) => {
+router.post('/editElement', async (req: Request<{}, {}, RAGElementEditRequestBody>, res: Response) => {
     if(Buffer.byteLength(JSON.stringify(req.body)) > byteLimit) {
         return res.sendStatus(413);
     }

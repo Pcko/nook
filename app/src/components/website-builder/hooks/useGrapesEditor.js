@@ -1,11 +1,13 @@
 import grapesjs from "grapesjs";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import "grapesjs/dist/css/grapes.min.css";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 import ErrorHandler from "../../logging/ErrorHandler";
 import {loadCustomBlocks} from "../utils/grapesBlocks";
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
+import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
+import {registerButtonTestTrait} from "../utils/grapesAnchorButton";
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
@@ -17,6 +19,8 @@ import {replaceDefaultShortcuts} from "../utils/shortcuts";
 export function useGrapesEditor(config, page) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
+    const [isReady, setIsReady] = useState(false);
+
     const handleError = ErrorHandler({
         feature: "Website Builder",
         component: "useGrapesEditor",
@@ -31,15 +35,21 @@ export function useGrapesEditor(config, page) {
         });
 
         editorRef.current = editor;
+        editor.on('load', ()=>{
+            replaceDefaultShortcuts(editorRef);
+            loadCustomBlocks(editor);
 
-        replaceDefaultShortcuts(editorRef);
-        loadCustomBlocks(editor);
+            setIsReady(true);
+        });
+
+        registerButtonTestTrait(editor);
+        removeGlobalTitleTrait(editor);
 
         return () => {
             editorRef.current?.destroy();
             editorRef.current = null;
         };
-    }, []);
+    }, [config]);
 
     useEffect(() => {
         if (!editorRef.current || !page) return;
@@ -52,5 +62,5 @@ export function useGrapesEditor(config, page) {
         });
     }, [page, handleError]);
 
-    return {editorRef, containerRef};
+    return {editorRef, containerRef, isReady};
 }
