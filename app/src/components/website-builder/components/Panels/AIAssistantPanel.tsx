@@ -31,6 +31,8 @@ function AIAssistantPanel(): JSX.Element {
         selectedElementId,
         refreshEditor,
         syncWebsiteDataFromEditor,
+        aiBusy,
+        setAiBusy,
     } = useBuilder();
 
     useEffect(() => {
@@ -75,7 +77,7 @@ function AIAssistantPanel(): JSX.Element {
         setInternalMessages(updatedInternalMessages);
 
         setLoading(true);
-
+        setAiBusy(true);
         try {
             const body = {
                 messages: updatedInternalMessages,
@@ -133,6 +135,7 @@ function AIAssistantPanel(): JSX.Element {
             ]);
         } finally {
             setLoading(false);
+            setAiBusy(false);
             setInput("");
         }
     };
@@ -160,7 +163,7 @@ function AIAssistantPanel(): JSX.Element {
                                         AI Assistant
                                     </h5>
                                     <p className="m-0 text-small text-text-subtle">
-                                       Selected Component: {selectedElementId}
+                                        Selected Component: {selectedElementId}
                                     </p>
                                 </div>
                             </div>

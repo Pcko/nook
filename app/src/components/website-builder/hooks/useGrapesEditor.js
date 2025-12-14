@@ -40,7 +40,7 @@ export function useGrapesEditor(config, page) {
             loadCustomBlocks(editor);
 
             setIsReady(true);
-        })
+        });
 
         registerButtonTestTrait(editor);
         removeGlobalTitleTrait(editor);

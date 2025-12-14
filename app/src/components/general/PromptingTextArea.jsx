@@ -6,8 +6,8 @@ import {AIIcon} from "../dashboard/resources/DashboardIcons";
 /**
  * @param {boolean} loading - A Boolean that disables the submit button if true
  * @param {string | readonly string[] | number} prompt - The prompt the users writes
- * @param setPrompt - The Setter of the written prompt
- * @param placeholder - The placeholder of the input field
+ * @param {function} setPrompt - The Setter of the written prompt
+ * @param {string} placeholder - The placeholder of the input field
  * @param {React.MouseEventHandler<HTMLButtonElement>} handleSubmit - A function which is called upon submitting
  * @returns {React.JSX.Element}
  */
