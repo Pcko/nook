@@ -12,6 +12,11 @@ import {AIIcon} from "../dashboard/resources/DashboardIcons";
  * @returns {React.JSX.Element}
  */
 function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholder}) {
+    /**
+     * Colour of the AI-Button if it's disabled.
+     * @type {string}
+     */
+    const inactiveColour = "#CECECE";
 
     return (
         <>
@@ -56,11 +61,11 @@ function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholde
                     }
                 >
                     <AIIcon
-                        colorEnd={prompt.length === 0 ? "#CECECE" : undefined}
-                        colorMid={prompt.length === 0 ? "#CECECE" : undefined}
-                        colorStart={prompt.length === 0 ? "#CECECE" : undefined}
+                        colorEnd={prompt.length === 0 ? inactiveColour : undefined}
+                        colorMid={prompt.length === 0 ? inactiveColour : undefined}
+                        colorStart={prompt.length === 0 ? inactiveColour : undefined}
                         size={32}
-                        strokeColor={prompt.length === 0 ? "#CECECE" : undefined}
+                        strokeColor={prompt.length === 0 ? inactiveColour : undefined}
                     />
                 </motion.div>
             </motion.button>

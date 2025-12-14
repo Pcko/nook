@@ -8,7 +8,7 @@ function RightPanel() {
     const {selectedElementId, aiBusy} = useBuilder();
 
     const handleTabChange = (tab) => {
-        if (aiBusy && tab !== "assistant") return;
+        if (aiBusy) return;
         setActiveTab(tab);
     };
 
