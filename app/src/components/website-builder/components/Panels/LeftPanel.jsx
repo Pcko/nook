@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import {useBuilder} from "../../hooks/UseBuilder";
+import WebsiteSettings from "./WebsiteSettings";
 
 /**
  * LeftPanel component
@@ -27,11 +28,13 @@ function LeftPanel() {
                 ]}
             />
 
-            {/* Both exist at load; visibility only */}
-            <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"}/>
-            <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"}/>
-        </div>
-    );
+      {/* Both exist at load; visibility only */}
+      <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"} />
+      <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"} />
+
+      {activeTab === "config" && <WebsiteSettings/>}
+    </div>
+  );
 }
 
 export default LeftPanel;

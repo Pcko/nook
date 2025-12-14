@@ -3,6 +3,13 @@ import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
 
+/**
+ * RightPanel component
+ *
+ * Renders the right sidebar for the website builder.
+ * Tab "editor": Traits + Styles
+ * Tab "assistant": AI Assistant
+ */
 function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
     const {selectedElementId, aiBusy} = useBuilder();
@@ -12,6 +19,16 @@ function RightPanel() {
         setActiveTab(tab);
     };
 
+  return (
+    <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
+      <TabSelector
+        active={activeTab}
+        onChange={setActiveTab}
+        options={[
+          { value: "editor", label: "Editor" },
+          { value: "assistant", label: "AI Assistant" },
+        ]}
+      />
     return (
         <div className="h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">

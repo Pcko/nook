@@ -1,5 +1,5 @@
 // src/editor/shortcuts.ts
-import { handleUndo, handleRedo, toggleOutlines } from './grapesActions';
+import { handleUndo, handleRedo, toggleOutlines, togglePreview } from './grapesActions';
 
 /**
  * Replace default GrapesJS keyboard shortcuts with custom ones.
@@ -15,9 +15,12 @@ export function replaceDefaultShortcuts(editorRef) {
   km.remove('core:undo');
   km.remove('core:redo');
   km.remove('sw-visibility');
+  km.remove('core:preview');
+
 
   // Add your custom bindings
   km.add('my:undo', 'ctrl+z', () => handleUndo(editorRef));
   km.add('my:redo', 'ctrl+y', () => handleRedo(editorRef));
   km.add('my:toggle-outlines', 'alt+o', () => toggleOutlines(editorRef));
+  km.add('my:toggle-preview', 'alt+p', () => togglePreview(editorRef));
 }
