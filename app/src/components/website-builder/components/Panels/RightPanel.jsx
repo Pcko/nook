@@ -18,17 +18,7 @@ function RightPanel() {
         if (aiBusy) return;
         setActiveTab(tab);
     };
-
-  return (
-    <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto">
-      <TabSelector
-        active={activeTab}
-        onChange={setActiveTab}
-        options={[
-          { value: "editor", label: "Editor" },
-          { value: "assistant", label: "AI Assistant" },
-        ]}
-      />
+    
     return (
         <div className="h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
