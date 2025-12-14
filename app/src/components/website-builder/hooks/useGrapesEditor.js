@@ -49,7 +49,7 @@ export function useGrapesEditor(config, page) {
             editorRef.current?.destroy();
             editorRef.current = null;
         };
-    }, []);
+    }, [config]);
 
     useEffect(() => {
         if (!editorRef.current || !page) return;
