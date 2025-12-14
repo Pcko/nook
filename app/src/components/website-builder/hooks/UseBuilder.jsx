@@ -11,7 +11,7 @@ import React, {
  * @typedef {Object} BuilderContextValue
  * @property {MutableRefObject<Editor>} editorRef
  * @property {any} page
- * @property {(page: ) => void} setPage
+ * @property {(page: any) => void} setPage
  * @property {string|null} selectedElementId
  * @property {() => void} refreshEditor
  * @property {() => void} syncWebsiteDataFromEditor
