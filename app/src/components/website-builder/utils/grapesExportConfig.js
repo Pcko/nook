@@ -4,7 +4,7 @@ import pluginExport from "grapesjs-plugin-export";
 import faviconDark from "../../../assets/resources/favicon-dark.png";
 import faviconLight from "../../../assets/resources/favicon-light.png";
 
-import { getWebsiteExportSettings } from "./websiteExportSettings";
+import {getWebsiteExportSettings} from "./websiteExportSettings";
 
 /**
  * Convert a base64 string (without data URL prefix) into a binary string
@@ -13,12 +13,12 @@ import { getWebsiteExportSettings } from "./websiteExportSettings";
  * @returns {string} binary string
  */
 function base64ToBinary(base64) {
-  const raw = atob(base64);
-  let binary = "";
-  for (let i = 0; i < raw.length; i++) {
-    binary += String.fromCharCode(raw.charCodeAt(i));
-  }
-  return binary;
+    const raw = atob(base64);
+    let binary = "";
+    for (let i = 0; i < raw.length; i++) {
+        binary += String.fromCharCode(raw.charCodeAt(i));
+    }
+    return binary;
 }
 
 /**
@@ -27,14 +27,14 @@ function base64ToBinary(base64) {
  * @returns {string}
  */
 function arrayBufferToBinary(buffer) {
-  const bytes = new Uint8Array(buffer);
-  const chars = new Array(bytes.length);
+    const bytes = new Uint8Array(buffer);
+    const chars = new Array(bytes.length);
 
-  for (let i = 0; i < bytes.length; i++) {
-    chars[i] = String.fromCharCode(bytes[i]);
-  }
+    for (let i = 0; i < bytes.length; i++) {
+        chars[i] = String.fromCharCode(bytes[i]);
+    }
 
-  return chars.join("");
+    return chars.join("");
 }
 
 
@@ -44,9 +44,9 @@ function arrayBufferToBinary(buffer) {
  * @returns {Promise<string>}
  */
 async function urlToBinary(url) {
-  const res = await fetch(url);
-  const buffer = await res.arrayBuffer();
-  return arrayBufferToBinary(buffer);
+    const res = await fetch(url);
+    const buffer = await res.arrayBuffer();
+    return arrayBufferToBinary(buffer);
 }
 
 /**
@@ -55,14 +55,14 @@ async function urlToBinary(url) {
  * @returns {string} extension
  */
 function getExtFromDataUrl(dataUrl) {
-  const match = dataUrl.match(/^data:image\/([^;]+);/i);
-  if (!match) return "png";
+    const match = dataUrl.match(/^data:image\/([^;]+);/i);
+    if (!match) return "png";
 
-  const mimeExt = match[1].toLowerCase();
-  if (mimeExt === "svg+xml") return "svg";
-  if (mimeExt === "x-icon" || mimeExt === "vnd.microsoft.icon") return "ico";
+    const mimeExt = match[1].toLowerCase();
+    if (mimeExt === "svg+xml") return "svg";
+    if (mimeExt === "x-icon" || mimeExt === "vnd.microsoft.icon") return "ico";
 
-  return mimeExt;
+    return mimeExt;
 }
 
 /**
@@ -71,11 +71,11 @@ function getExtFromDataUrl(dataUrl) {
  * @returns {string}
  */
 function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
 /**
@@ -87,22 +87,22 @@ function escapeHtml(str) {
  * @returns {void}
  */
 function exportCanvasImages(editor, output) {
-  const imgs = editor.DomComponents.getWrapper().find("img");
+    const imgs = editor.DomComponents.getWrapper().find("img");
 
-  for (let i = 0; i < imgs.length; i++) {
-    const cmp = imgs[i];
-    const src = cmp.get("src");
+    for (let i = 0; i < imgs.length; i++) {
+        const cmp = imgs[i];
+        const src = cmp.get("src");
 
-    if (!src || !src.startsWith("data:image")) continue;
+        if (!src || !src.startsWith("data:image")) continue;
 
-    const ext = getExtFromDataUrl(src);
-    const filename = `image-${i}.${ext}`;
-    const base64 = src.split(",")[1];
+        const ext = getExtFromDataUrl(src);
+        const filename = `image-${i}.${ext}`;
+        const base64 = src.split(",")[1];
 
-    if (!base64) continue;
+        if (!base64) continue;
 
-    output[filename] = base64ToBinary(base64);
-  }
+        output[filename] = base64ToBinary(base64);
+    }
 }
 
 /**
@@ -114,29 +114,29 @@ function exportCanvasImages(editor, output) {
  * @returns {Promise<void>}
  */
 async function exportFavicons(settings, output) {
-  const { lightDataUrl, darkDataUrl } = settings;
+    const {lightDataUrl, darkDataUrl} = settings;
 
-  // Light favicon: prefer custom data URL, otherwise default white.png
-  if (lightDataUrl && lightDataUrl.startsWith("data:image")) {
-    const ext = getExtFromDataUrl(lightDataUrl);
-    const base64 = lightDataUrl.split(",")[1];
-    if (base64) {
-      output[`favicon-light.${ext}`] = base64ToBinary(base64);
+    // Light favicon: prefer custom data URL, otherwise default white.png
+    if (lightDataUrl && lightDataUrl.startsWith("data:image")) {
+        const ext = getExtFromDataUrl(lightDataUrl);
+        const base64 = lightDataUrl.split(",")[1];
+        if (base64) {
+            output[`favicon-light.${ext}`] = base64ToBinary(base64);
+        }
+    } else if (faviconLight) {
+        output["favicon-light.png"] = await urlToBinary(faviconLight);
     }
-  } else if (faviconLight) {
-    output["favicon-light.png"] = await urlToBinary(faviconLight);
-  }
 
-  // Dark favicon: prefer custom data URL, otherwise default black.png
-  if (darkDataUrl && darkDataUrl.startsWith("data:image")) {
-    const ext = getExtFromDataUrl(darkDataUrl);
-    const base64 = darkDataUrl.split(",")[1];
-    if (base64) {
-      output[`favicon-dark.${ext}`] = base64ToBinary(base64);
+    // Dark favicon: prefer custom data URL, otherwise default black.png
+    if (darkDataUrl && darkDataUrl.startsWith("data:image")) {
+        const ext = getExtFromDataUrl(darkDataUrl);
+        const base64 = darkDataUrl.split(",")[1];
+        if (base64) {
+            output[`favicon-dark.${ext}`] = base64ToBinary(base64);
+        }
+    } else if (faviconDark) {
+        output["favicon-dark.png"] = await urlToBinary(faviconDark);
     }
-  } else if (faviconDark) {
-    output["favicon-dark.png"] = await urlToBinary(faviconDark);
-  }
 }
 
 /**
@@ -144,53 +144,53 @@ async function exportFavicons(settings, output) {
  * @type {import('grapesjs-plugin-export').PluginOptions}
  */
 export const grapesjsExportConfig = {
-  filenamePfx: "website",
+    filenamePfx: "website",
 
-  root: {
-    /**
-     * Generate index.html and rewrite data-URL images to local file paths.
-     * @param {import('grapesjs').Editor} editor
-     * @returns {Promise<string>}
-     */
-    "index.html": async editor => {
-      let html = editor.getHtml();
-      const imgs = editor.DomComponents.getWrapper().find("img");
+    root: {
+        /**
+         * Generate index.html and rewrite data-URL images to local file paths.
+         * @param {import('grapesjs').Editor} editor
+         * @returns {Promise<string>}
+         */
+        "index.html": async editor => {
+            let html = editor.getHtml();
+            const imgs = editor.DomComponents.getWrapper().find("img");
 
-      imgs.forEach((cmp, i) => {
-        const src = cmp.get("src");
-        if (!src || !src.startsWith("data:image")) return;
+            imgs.forEach((cmp, i) => {
+                const src = cmp.get("src");
+                if (!src || !src.startsWith("data:image")) return;
 
-        const ext = getExtFromDataUrl(src);
-        const filename = `image-${i}.${ext}`;
+                const ext = getExtFromDataUrl(src);
+                const filename = `image-${i}.${ext}`;
 
-        html = html.replaceAll(src, `img/${filename}`);
-      });
+                html = html.replaceAll(src, `img/${filename}`);
+            });
 
-      const { title, description, language, lightDataUrl, darkDataUrl } =
-        getWebsiteExportSettings();
+            const {title, description, language, lightDataUrl, darkDataUrl} =
+                getWebsiteExportSettings();
 
-      const langAttr = language || "en";
+            const langAttr = language || "en";
 
-      /** @type {string[]} */
-      const headLines = [
-        `<meta charset="UTF-8" />`,
-        `<title>${escapeHtml(title)}</title>`,
-        `<meta name="description" content="${escapeHtml(description)}" />`,
-        `<link rel="stylesheet" href="css/style.css" />`,
-      ];
+            /** @type {string[]} */
+            const headLines = [
+                `<meta charset="UTF-8" />`,
+                `<title>${escapeHtml(title)}</title>`,
+                `<meta name="description" content="${escapeHtml(description)}" />`,
+                `<link rel="stylesheet" href="css/style.css" />`,
+            ];
 
-      // Always emit favicon links; fall back to PNG favicons if user hasn't set any.
-      const lightExt = lightDataUrl ? getExtFromDataUrl(lightDataUrl) : "png";
-      headLines.push(
-        `<link rel="icon" href="img/favicon-light.${lightExt}" media="(prefers-color-scheme: light)" />`
-      );
+            // Always emit favicon links; fall back to PNG favicons if user hasn't set any.
+            const lightExt = lightDataUrl ? getExtFromDataUrl(lightDataUrl) : "png";
+            headLines.push(
+                `<link rel="icon" href="img/favicon-light.${lightExt}" media="(prefers-color-scheme: light)" />`
+            );
 
-      const darkExt = darkDataUrl ? getExtFromDataUrl(darkDataUrl) : "png";
-      headLines.push(
-        `<link rel="icon" href="img/favicon-dark.${darkExt}" media="(prefers-color-scheme: dark)" />`
-      );
+            const darkExt = darkDataUrl ? getExtFromDataUrl(darkDataUrl) : "png";
+            headLines.push(
+                `<link rel="icon" href="img/favicon-dark.${darkExt}" media="(prefers-color-scheme: dark)" />`
+            );
 
-      return `
+            return `
         <!DOCTYPE html>
         <html lang="${langAttr}">
         <head>
@@ -200,39 +200,39 @@ export const grapesjsExportConfig = {
           ${html}
         </body>
         </html>`;
+        },
+
+
+        css: {
+            /**
+             * Export compiled CSS from the editor.
+             *
+             * @param {import('grapesjs').Editor} editor
+             * @returns {string} Compiled CSS string
+             */
+            "style.css": editor => editor.getCss(),
+        },
+
+        /**
+         * Export embedded images and favicons as a filename→binary string map.
+         *
+         * @param {import('grapesjs').Editor} editor
+         * @returns {Promise<Record<string, string>>}
+         */
+        img: async editor => {
+            /** @type {Record<string, string>} */
+            const output = {};
+
+            // Export inline <img> assets from the canvas
+            exportCanvasImages(editor, output);
+
+            // Export favicon assets (custom or defaults)
+            const settings = getWebsiteExportSettings();
+            await exportFavicons(settings, output);
+
+            return output;
+        },
     },
-
-
-    css: {
-      /**
-      * Export compiled CSS from the editor.
-      *
-      * @param {import('grapesjs').Editor} editor
-      * @returns {string} Compiled CSS string
-      */
-      "style.css": editor => editor.getCss(),
-    },
-
-    /**
-     * Export embedded images and favicons as a filename→binary string map.
-     *
-     * @param {import('grapesjs').Editor} editor
-     * @returns {Promise<Record<string, string>>}
-     */
-    img: async editor => {
-      /** @type {Record<string, string>} */
-      const output = {};
-
-      // Export inline <img> assets from the canvas
-      exportCanvasImages(editor, output);
-
-      // Export favicon assets (custom or defaults)
-      const settings = getWebsiteExportSettings();
-      await exportFavicons(settings, output);
-
-      return output;
-    },
-  },
 };
 
 export const grapesjsExportPlugin = pluginExport;

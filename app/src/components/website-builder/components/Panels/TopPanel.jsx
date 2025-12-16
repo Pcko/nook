@@ -10,10 +10,20 @@ import {
     AiOutlineEye,
 } from "react-icons/ai";
 import {Listbox, ListboxButton, ListboxOptions, ListboxOption} from "@headlessui/react";
-import {handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite, togglePreview} from "../../utils/grapesActions";
+import {
+    handleRedo,
+    handleUndo,
+    setDesktop,
+    setMobile,
+    setTablet,
+    toggleOutlines,
+    exportWebsite,
+    togglePreview
+} from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../logging/ErrorHandler";
 import {useMetaNotify} from "../../../logging/MetaNotifyHook";
+import DeployModal from "../../../deployment/DeployModal";
 
 /**
  * TopPanel component
@@ -60,6 +70,8 @@ function TopPanel({editorRef, page}) {
     }
 
     const [zoom, setZoom] = useState(100); // track active zoom (for highlighting)
+    const [deployOpen, setDeployOpen] = useState(false);
+
     const setCanvasZoom = (val) => {
         const editor = editorRef?.current;
         if (!editor) return;
@@ -79,61 +91,67 @@ function TopPanel({editorRef, page}) {
     };
 
     return (
-        <div
-            className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
-            {/* left group */}
-            <div className="flex items-center gap-2">
-                <ToolbarButton
-                    icon={<AiOutlineUndo size={18}/>}
-                    label="Str+Z"
-                    onClick={() => handleUndo(editorRef)}
-                />
-                <ToolbarButton
-                    icon={<AiOutlineRedo size={18}/>}
-                    label="Str+Y"
-                    onClick={() => handleRedo(editorRef)}
-                />
-                <ToolbarButton
-                    icon={<AiOutlineBorder size={18}/>}
-                    label="Alt+O"
-                    onClick={() => toggleOutlines(editorRef)}
-                />
-                <ToolbarButton
-                    icon={<AiOutlineEye size={18}/>}
-                    label="Alt+P"
-                    onClick={() => togglePreview(editorRef)}
-                />
-            </div>
+        <>
+            <div
+                className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+                {/* left group */}
+                <div className="flex items-center gap-2">
+                    <ToolbarButton
+                        icon={<AiOutlineUndo size={18}/>}
+                        label="Str+Z"
+                        onClick={() => handleUndo(editorRef)}
+                    />
+                    <ToolbarButton
+                        icon={<AiOutlineRedo size={18}/>}
+                        label="Str+Y"
+                        onClick={() => handleRedo(editorRef)}
+                    />
+                    <ToolbarButton
+                        icon={<AiOutlineBorder size={18}/>}
+                        label="Alt+O"
+                        onClick={() => toggleOutlines(editorRef)}
+                    />
+                    <ToolbarButton
+                        icon={<AiOutlineEye size={18}/>}
+                        label="Alt+P"
+                        onClick={() => togglePreview(editorRef)}
+                    />
+                </div>
 
-            {/* center group */}
-            <div className="flex items-center justify-center gap-2">
-                <ToolbarButton
-                    icon={<AiOutlineLaptop size={18}/>}
-                    onClick={() => setDesktop(editorRef)}
-                />
-                <ToolbarButton
-                    icon={<AiOutlineTablet size={18}/>}
-                    onClick={() => setTablet(editorRef)}
-                />
-                <ToolbarButton
-                    icon={<AiOutlineMobile size={18}/>}
-                    onClick={() => setMobile(editorRef)}
-                />
-                <ZoomListbox
-                    onChange={(val) => setCanvasZoom(val)}
-                    options={[25, 50, 75, 100]}
-                    value={zoom}
-                />
-            </div>
+                {/* center group */}
+                <div className="flex items-center justify-center gap-2">
+                    <ToolbarButton
+                        icon={<AiOutlineLaptop size={18}/>}
+                        onClick={() => setDesktop(editorRef)}
+                    />
+                    <ToolbarButton
+                        icon={<AiOutlineTablet size={18}/>}
+                        onClick={() => setTablet(editorRef)}
+                    />
+                    <ToolbarButton
+                        icon={<AiOutlineMobile size={18}/>}
+                        onClick={() => setMobile(editorRef)}
+                    />
+                    <ZoomListbox
+                        onChange={(val) => setCanvasZoom(val)}
+                        options={[25, 50, 75, 100]}
+                        value={zoom}
+                    />
+                </div>
 
-            {/* right group */}
-            <div className="flex items-center justify-end gap-2">
-                <TopActionButton label={"Save"} onClick={() => handleSave()}/>
-                <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)}/>
-                {/*<TopActionButton label={"Preview"}/>*/}
-                <TopActionButton label={"Publish"} primary={true}/>
+                {/* right group */}
+                <div className="flex items-center justify-end gap-2">
+                    <TopActionButton label={"Save"} onClick={() => handleSave()}/>
+                    <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)}/>
+                    {/*<TopActionButton label={"Preview"}/>*/}
+                    <TopActionButton label={"Publish"} primary={true} onClick={() => setDeployOpen(true)}/></div>
             </div>
-        </div>
+            <DeployModal
+                open={deployOpen}
+                onClose={() => setDeployOpen(false)}
+                page={page}
+                publicBaseUrl={"https://yourdomain.com"}
+            />        </>
     );
 }
 
