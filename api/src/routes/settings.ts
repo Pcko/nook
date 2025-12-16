@@ -3,7 +3,8 @@ import speakeasy from 'speakeasy';
 
 import { User } from '../util/internal.js';
 import IUser from '../types/IUser.js';
-import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
+import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody, VerifyEmailBody } from '../types/requests/settings.js';
+import { Verify } from 'crypto';
 
 const router = express.Router();
 
@@ -70,6 +71,44 @@ router.delete('/delete-account', async (req: Request<{}, {}, DeleteAccountBody>,
     return res.sendStatus(500);
   }
 });
+
+/**
+ * @route PATCH /api/settings/verifyEmail
+ * @summary Verifies the otp sent to a users email
+ * 
+ * @param {Request} req
+ *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
+ *      @property {string} req.body.otp - One-time-password
+ * 
+ * @returns 200
+ */
+router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: Response) => {
+  try {
+    const { userId } = req;
+    const { otp } = req.body;
+    if (!otp) {
+      return res.status(400).send({ error: 'otp-missing' });
+    }
+
+    const user = await User.findById(userId) as IUser;
+    const userSecret = user.twoFactorAuthSecret as string;
+
+    if (!speakeasy.totp.verify({
+      secret: userSecret, encoding: 'base32', token: otp
+    })) {
+      return res.status(403).send({ message: 'One time password is invalid!' })
+    }
+
+    user.emailVerified = true;
+    await user.save();
+
+    return res.sendStatus(200);
+  }
+  catch (err) {
+    console.error("❌ Email verification error: ", err);
+    return res.sendStatus(500);
+  }
+})
 
 /**
  * @route GET /api/settings/twoFactorAuth

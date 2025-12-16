@@ -44,6 +44,10 @@ const UserSchema = new Schema<IUser>({
     },
     twoFactorAuthSecret: {
         type: String,
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false,
     }
 },
     { timestamps: true }

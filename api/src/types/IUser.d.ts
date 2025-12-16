@@ -8,6 +8,7 @@ export default interface IUser extends Document {
     email: string;
     twoFactorAuthOn: boolean;
     twoFactorAuthSecret?: string;
+    emailVerified: boolean;
     tokenVersion: number;
     updateTokenVersion: () => Promise<void>;
 }
