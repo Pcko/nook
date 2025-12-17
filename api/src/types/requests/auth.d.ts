@@ -12,6 +12,11 @@ export interface RegisterBody {
     email: string;
 }
 
+export interface VerifyEmailBody {
+    username: string;
+    otp: string;
+}
+
 export interface TokenBody {
     token: string;
 }
