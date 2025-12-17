@@ -70,6 +70,7 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
 
         /* done as soon as frontend exists
         if (!process.env.DEVENV && !user.emailVerified) {
+            await sendEmailVerificationEmail(user);
             return res.status(403).send({ error: 'email-not-verified' })
         }
         */
@@ -217,33 +218,6 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
     }
     catch (err) {
         console.error("❌ Email verification error: ", err);
-        return res.sendStatus(500);
-    }
-})
-
-/**
- * @route GET /auth/sendEmailVerificationCode/:username
- * @summary Sends a new otp to the users email
- * 
- * @param {Request} req
- *      @property {string} req.params.username - Username
- * 
- * @returns 200
- */
-router.get('/sendEmailVerificationCode/:username', async (req: Request<SendVerifyEmailParams, {}, {}>, res: Response) => {
-    try {
-        const { username } = req.params;
-        if (!username) {
-            return res.status(400).json({ error: 'parameter-missing' });
-        }
-
-        const user = await User.findById(username) as IUser;
-
-        await sendEmailVerificationEmail(user);
-
-        return res.sendStatus(200);
-    } catch (err) {
-        console.error("❌ Send Email verification code error: ", err);
         return res.sendStatus(500);
     }
 })
