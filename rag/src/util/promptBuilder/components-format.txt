@@ -1,5 +1,5 @@
 {
-  "type": "text",              // Type of the component (optional, unless required)
+  "type": "text",
   "attributes": {
     // Component attributes (e.g., id for styling)
   },
