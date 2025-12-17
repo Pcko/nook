@@ -117,7 +117,7 @@ export async function sendOTPEmail(recipiant: string, subject: string, otp: stri
                                         <!-- Security note -->
                                         <div class="text">
                                             This code will expire in <strong>10 minutes</strong>.
-                                            If you didn't request this code, you can safely ignore this email.
+                                            If you did not request this code, you can safely ignore this email.
                                         </div>
 
                                         <!-- Footer -->

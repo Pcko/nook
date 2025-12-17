@@ -10,10 +10,9 @@ export interface RegisterBody {
     firstName: string;
     lastName: string;
     email: string;
-    otp?: string;
 }
 
-export interface VerifyEmailParams {
+export interface VerifyEmailBody {
     username: string;
     otp: string;
 }

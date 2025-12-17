@@ -4,7 +4,6 @@ import speakeasy from 'speakeasy';
 import { User } from '../util/internal.js';
 import IUser from '../types/IUser.js';
 import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
-import { Verify } from 'crypto';
 
 const router = express.Router();
 

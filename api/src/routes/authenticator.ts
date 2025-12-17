@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
 
@@ -17,7 +17,7 @@ import {
     RegisterBody,
     TokenBody,
     TokenContent,
-    VerifyEmailParams,
+    VerifyEmailBody,
     SendVerifyEmailParams,
 } from '../types/requests/auth.js';
 import IUser from '../types/IUser.js';
@@ -68,9 +68,11 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
             return res.status(400).send({ message: 'Username or password is invalid!' });
         }
 
+        /* done as soon as frontend exists
         if (!process.env.DEVENV && !user.emailVerified) {
             return res.status(403).send({ error: 'email-not-verified' })
         }
+        */
 
         //validate password
         const match = await bcrypt.compare(password, user.password);
@@ -134,7 +136,7 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
  */
 router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Response) => {
     try {
-        const { username, password, firstName, lastName, email, otp } = req.body;
+        const { username, password, firstName, lastName, email } = req.body;
 
         //make sure all parameters are valid
         const result =
@@ -171,7 +173,7 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 
         await sendEmailVerificationEmail(user);
 
-        return res.sendStatus(201);
+        return res.sendStatus(202);
     } catch (err) {
         console.error("❌ Registration error: ", err);
         return res.sendStatus(500);
@@ -179,20 +181,20 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 });
 
 /**
- * @route PATCH /auth/verifyEmail/:username/:otp
+ * @route PATCH /auth/verifyEmail
  * @summary Verifies the otp sent to a users email
  * 
  * @param {Request} req
- *      @property {string} req.params.username - Username
- *      @property {string} req.params.otp - One-time-password
+ *      @property {string} req.body.username - Username
+ *      @property {string} req.body.otp - One-time-password
  * 
  * @returns 200
  */
-router.patch('/verifyEmail/:username/:otp', async (req: Request<VerifyEmailParams, {}, {}>, res: Response) => {
+router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: Response) => {
     try {
-        const { username, otp } = req.params;
+        const { username, otp } = req.body;
         if (!username || !otp) {
-            return res.status(400).send({ error: 'parameter-missing' });
+            return res.status(400).json({ error: 'parameter-missing' });
         }
 
         const user = await User.findById(username) as IUser;
@@ -232,7 +234,7 @@ router.get('/sendEmailVerificationCode/:username', async (req: Request<SendVerif
     try {
         const { username } = req.params;
         if (!username) {
-            return res.status(400).send({ error: 'parameter-missing' });
+            return res.status(400).json({ error: 'parameter-missing' });
         }
 
         const user = await User.findById(username) as IUser;
@@ -289,7 +291,6 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
         return res.sendStatus(500);
     }
 });
-
 
 function createTokens(tokenContent: TokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15min' }); //valid for 15min after creation
