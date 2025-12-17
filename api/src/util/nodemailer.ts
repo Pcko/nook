@@ -21,8 +21,9 @@ export async function sendCustomEmail(recipiant: string, subject: string, option
 
 export async function sendOTPEmail(recipiant: string, subject: string, otp: string) {
     await sendCustomEmail(recipiant, subject, {
-        html: `<!DOCTYPE html>
-            <<html lang="en">
+        html: `
+            <!DOCTYPE html>
+            <html lang="en">
 
             <head>
                 <meta charset="UTF-8" />
@@ -107,8 +108,7 @@ export async function sendOTPEmail(recipiant: string, subject: string, otp: stri
 
                                         <!-- Message -->
                                         <div class="text">
-                                            Use the verification code below to complete your sign-in.
-                                            This code will expire in <strong>10 minutes</strong>.
+                                            Your verification code:
                                         </div>
 
                                         <!-- OTP -->
@@ -116,12 +116,13 @@ export async function sendOTPEmail(recipiant: string, subject: string, otp: stri
 
                                         <!-- Security note -->
                                         <div class="text">
+                                            This code will expire in <strong>10 minutes</strong>.
                                             If you didn't request this code, you can safely ignore this email.
                                         </div>
 
                                         <!-- Footer -->
                                         <div class="footer">
-                                            ${new Date(Date.now()).getFullYear} NOOK. All rights reserved.
+                                            ©${new Date(Date.now()).getFullYear()} NOOK. All rights reserved.
                                         </div>
                                     </td>
                                 </tr>
@@ -131,6 +132,6 @@ export async function sendOTPEmail(recipiant: string, subject: string, otp: stri
                 </table>
             </body>
 
-        </html>`, text: `Your one-time-password is: ${otp}`
+        </html>`, text: `Your one-time-password is: ${otp} \nThis code expires in 10 minutes`
     });
 }

@@ -4,7 +4,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
 
-import { sendCustomEmail, sendOTPEmail, User } from '../util/internal.js';
+import { sendOTPEmail, User } from '../util/internal.js';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
@@ -17,17 +17,18 @@ import {
     RegisterBody,
     TokenBody,
     TokenContent,
-    VerifyEmailBody,
+    VerifyEmailParams,
+    SendVerifyEmailParams,
 } from '../types/requests/auth.js';
 import IUser from '../types/IUser.js';
 
 const router = express.Router();
 
-const loginLimiter = rateLimit({
+const rateLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     max: 15,
     message: {
-        message: 'Too many login attempts. Please try again in 5 minutes.'
+        message: 'Too many attempts. Please try again in 5 minutes.'
     },
     standardHeaders: true,
     legacyHeaders: false,
@@ -45,7 +46,7 @@ const loginLimiter = rateLimit({
  * 
  * @returns 200 - JSON{user<UserObject>, accessToken<string>, refreshToken<string>}
  */
-router.post('/login', loginLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
+router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
     try {
         const { username, password, otp } = req.body;
 
@@ -158,7 +159,7 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
         const secret = speakeasy.generateSecret({ name: `NOOK: ${username}` });
 
         //create new user and insert new user into database
-        await User.create({
+        const user = await User.create({
             _id: username,
             username: username,
             password,
@@ -166,7 +167,9 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
             lastName: lastName,
             email: email,
             twoFactorAuthSecret: secret.base32,
-        })
+        });
+
+        await sendEmailVerificationEmail(user);
 
         return res.sendStatus(201);
     } catch (err) {
@@ -176,18 +179,18 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 });
 
 /**
- * @route PATCH /auth/verifyEmail
+ * @route PATCH /auth/verifyEmail/:username/:otp
  * @summary Verifies the otp sent to a users email
  * 
  * @param {Request} req
- *      @property {string} req.username - Username
- *      @property {string} req.body.otp - One-time-password
+ *      @property {string} req.params.username - Username
+ *      @property {string} req.params.otp - One-time-password
  * 
  * @returns 200
  */
-router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: Response) => {
+router.patch('/verifyEmail/:username/:otp', async (req: Request<VerifyEmailParams, {}, {}>, res: Response) => {
     try {
-        const { username, otp } = req.body;
+        const { username, otp } = req.params;
         if (!username || !otp) {
             return res.status(400).send({ error: 'parameter-missing' });
         }
@@ -196,7 +199,11 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
         const userSecret = user.twoFactorAuthSecret as string;
 
         if (!speakeasy.totp.verify({
-            secret: userSecret, encoding: 'base32', token: otp
+            secret: userSecret,
+            encoding: 'base32',
+            token: otp,
+            step: 600,
+            window: 1
         })) {
             return res.status(403).send({ message: 'One time password is invalid!' })
         }
@@ -208,6 +215,33 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
     }
     catch (err) {
         console.error("❌ Email verification error: ", err);
+        return res.sendStatus(500);
+    }
+})
+
+/**
+ * @route GET /auth/sendEmailVerificationCode/:username
+ * @summary Sends a new otp to the users email
+ * 
+ * @param {Request} req
+ *      @property {string} req.params.username - Username
+ * 
+ * @returns 200
+ */
+router.get('/sendEmailVerificationCode/:username', async (req: Request<SendVerifyEmailParams, {}, {}>, res: Response) => {
+    try {
+        const { username } = req.params;
+        if (!username) {
+            return res.status(400).send({ error: 'parameter-missing' });
+        }
+
+        const user = await User.findById(username) as IUser;
+
+        await sendEmailVerificationEmail(user);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        console.error("❌ Send Email verification code error: ", err);
         return res.sendStatus(500);
     }
 })
@@ -256,6 +290,7 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     }
 });
 
+
 function createTokens(tokenContent: TokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15min' }); //valid for 15min after creation
     const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '30d' }); //valid for 30 days after creation
@@ -263,10 +298,14 @@ function createTokens(tokenContent: TokenContent) {
     return { accessToken, refreshToken };
 }
 
-function sendEmailVerificationEmail(recipiant: string) {
+async function sendEmailVerificationEmail(user: IUser) {
+    var otp = speakeasy.totp({
+        secret: user.twoFactorAuthSecret!,
+        encoding: 'base32',
+        step: 600 // specified in seconds
+    });
 
-
-    await sendOTPEmail(recipiant, '')
+    await sendOTPEmail(user.email, 'Your email verification code!', otp);
 }
 
 export default router;

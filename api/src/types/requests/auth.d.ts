@@ -13,9 +13,13 @@ export interface RegisterBody {
     otp?: string;
 }
 
-export interface VerifyEmailBody {
+export interface VerifyEmailParams {
     username: string;
     otp: string;
+}
+
+export interface SendVerifyEmailParams {
+    username: string;
 }
 
 export interface TokenBody {
