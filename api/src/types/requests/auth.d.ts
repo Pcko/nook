@@ -17,10 +17,6 @@ export interface VerifyEmailBody {
     otp: string;
 }
 
-export interface SendVerifyEmailParams {
-    username: string;
-}
-
 export interface TokenBody {
     token: string;
 }

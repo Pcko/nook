@@ -18,7 +18,6 @@ import {
     TokenBody,
     TokenContent,
     VerifyEmailBody,
-    SendVerifyEmailParams,
 } from '../types/requests/auth.js';
 import IUser from '../types/IUser.js';
 
