@@ -28,10 +28,9 @@ function AIAssistantPanel(): JSX.Element {
 
     const {
         editorRef,
-        selectedElementId,
+        selectedElement,
         refreshEditor,
         syncWebsiteDataFromEditor,
-        aiBusy,
         setAiBusy,
     } = useBuilder();
 
@@ -44,7 +43,7 @@ function AIAssistantPanel(): JSX.Element {
             },
         ]);
         setInternalMessages([]);
-    }, [selectedElementId]);
+    }, [selectedElement]);
 
     const handleQuickPrompt = (prompt: string): void => setInput(prompt);
 
@@ -52,7 +51,7 @@ function AIAssistantPanel(): JSX.Element {
         const trimmed = input.trim();
         if (!trimmed) return;
 
-        if (!editorRef.current || !selectedElementId) {
+        if (!editorRef.current || !selectedElement) {
             setMessages((prev) => [
                 ...prev,
                 {
@@ -81,14 +80,14 @@ function AIAssistantPanel(): JSX.Element {
         try {
             const body = {
                 messages: updatedInternalMessages,
-                elementId: selectedElementId,
+                elementId: selectedElement.getId() || selectedElement.cid,
                 websiteData: JSON.stringify(editorRef.current.getProjectData()),
             };
 
             const res: EditElementResponse = await AIService.editElement(body);
 
             const editor = editorRef.current;
-            const cmp = editor.getWrapper().find(`#${selectedElementId}`)[0];
+            const cmp = editor.getWrapper().find(`#${selectedElement.getId() || selectedElement.cid}`)[0];
 
             if (cmp && res.component) {
                 cmp.replaceWith(res.component);
@@ -143,14 +142,14 @@ function AIAssistantPanel(): JSX.Element {
     return (
         <div className="flex h-full flex-col rounded-[10px] border-2 border-ui-border bg-ui-bg">
             <AnimatePresence mode="wait">
-                {selectedElementId ? (
+                {selectedElement ? (
                     <motion.div
                         key="assistant"
                         initial={{opacity: 0, y: 6}}
                         animate={{opacity: 1, y: 0}}
                         exit={{opacity: 0, y: -6}}
                         transition={{duration: 0.2}}
-                        className="flex h-full flex-col rounded-[10px] border-2 border-ui-border bg-ui-bg"
+                        className="flex h-full flex-col bg-ui-bg rounded-[10px]"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-4 py-3 border-b border-ui-border">
@@ -163,7 +162,7 @@ function AIAssistantPanel(): JSX.Element {
                                         AI Assistant
                                     </h5>
                                     <p className="m-0 text-small text-text-subtle">
-                                        Selected Component: {selectedElementId}
+                                        Selected Component: {selectedElement.getId() || selectedElement.cid}
                                     </p>
                                 </div>
                             </div>

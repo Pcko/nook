@@ -12,7 +12,7 @@ import {useBuilder} from "../../hooks/UseBuilder";
  */
 function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
-    const {selectedElementId, aiBusy} = useBuilder();
+    const {selectedElement, aiBusy} = useBuilder();
 
     const handleTabChange = (tab) => {
         if (aiBusy) return;
@@ -20,7 +20,7 @@ function RightPanel() {
     };
     
     return (
-        <div className="h-full min-w-[200px] bg-ui-bg p-2">
+        <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
                 <TabSelector
                     active={activeTab}
@@ -35,7 +35,7 @@ function RightPanel() {
                     {/* Editor-Tab */}
                     <div
                         className={
-                            activeTab === "editor" && selectedElementId
+                            activeTab === "editor" && selectedElement
                                 ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
                                 : "hidden h-full"
                         }
