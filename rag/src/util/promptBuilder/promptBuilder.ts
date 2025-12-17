@@ -35,9 +35,10 @@ export const promptBuilder = {
      * @async
      * @param {string} query - The main user query.
      * @param {boolean} [skipContext=false] - If true, skips fetching additional context from ChromaDB.
+     * @param {boolean} includeQuery - If true, appends the user's query at the end.
      * @returns {Promise<string>} A Promise that resolves to a fully constructed prompt string.
      */
-    async build(query: string, skipContext?: boolean): Promise<string> {
+    async build(query: string, skipContext?: boolean, includeQuery: boolean = true): Promise<string> {
         let contextString = "No additional context available.";
         if (!skipContext) {
             try {
@@ -48,9 +49,12 @@ export const promptBuilder = {
             }
         }
 
-        const prompt = promptTemplate
+        let prompt = promptTemplate
             .replace("{{context}}", contextString)
-            + `\r\n\r\nUSER PROMPT:\r\n${query}`;
+
+        if(includeQuery) {
+            prompt += `\r\n\r\nUSER PROMPT:\r\n${query}`;
+        }
 
         return prompt.trim();
     },

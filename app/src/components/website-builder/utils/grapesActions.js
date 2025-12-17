@@ -32,7 +32,6 @@ export const toggleOutlines = (editorRef) => {
   }
 };
 
-
 /**
  * Change editor to desktop.
  * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
@@ -57,4 +56,54 @@ export const setMobile  = (editorRef) => {editorRef?.current?.setDevice?.("Mobil
  */
 export const exportWebsite = (editorRef) => {
   editorRef?.current?.runCommand("gjs-export-zip");
+};
+
+
+/**
+ * Toggle preview mode in the GrapesJS editor.
+ * When entering preview, it hides the editor UI (sw-visibility),
+ * but remembers its previous state.
+ * When exiting preview, it restores the previous sw-visibility state.
+ *
+ * @param {object} editorRef - Ref object containing the GrapesJS editor instance.
+ */
+export const togglePreview = (editorRef) => {
+  const editor = editorRef?.current;
+  if (!editor) return;
+
+  const PREVIEW_CMD = "core:preview";
+  const VISIBILITY_CMD = "sw-visibility";
+  const PREVIEW_VIS_KEY = "__swVisibilityBeforePreview";
+
+  const isPreviewActive = editor.Commands.isActive(PREVIEW_CMD);
+
+  if (isPreviewActive) {
+    editor.stopCommand(PREVIEW_CMD);
+
+    // Restore previous sw-visibility state if we stored it
+    const wasVisibilityActive = editor[PREVIEW_VIS_KEY];
+
+    if (wasVisibilityActive === true) {
+      editor.runCommand(VISIBILITY_CMD);
+    } else if (wasVisibilityActive === false) {
+      editor.stopCommand(VISIBILITY_CMD);
+    }
+    // Clean up the stored state
+    delete editor[PREVIEW_VIS_KEY];
+
+    if (typeof document !== "undefined") {
+      document.body.classList.remove("gjs-preview-active");
+    }
+  } else {
+
+    editor[PREVIEW_VIS_KEY] = editor.Commands.isActive(VISIBILITY_CMD);
+
+    // Ensure UI is hidden in preview
+    editor.stopCommand(VISIBILITY_CMD);
+    editor.runCommand(PREVIEW_CMD);
+
+    if (typeof document !== "undefined") {
+      document.body.classList.add("gjs-preview-active");
+    }
+  }
 };

@@ -1,6 +1,8 @@
 import {RAGQueryBody} from "./interfaces/RAGQueryBody.ts";
 import {RAGResponseDTO} from "./interfaces/RAGResponseDTO.ts";
 import axios from "../components/auth/AxiosInstance";
+import RAGElementEditResponseDTO from "./interfaces/RAGElementEditResponseBody.ts";
+import {ChatObject} from "./interfaces/ChatMessage.ts";
 
 /**
  * Shared Axios configuration used for AI-related requests.
@@ -52,6 +54,41 @@ class AIService {
             axiosConfig
         );
         return response.data;
+    }
+
+    static async editElement(body: ChatObject): Promise<RAGElementEditResponseDTO> {
+        const websiteData = JSON.parse(body.websiteData);
+        let trimmedWebsiteData = body.websiteData;
+        let trimmedMessages = body.messages;
+        const replacedImages :{ base64: string, placeholder: string }[] = [];
+
+        for(let asset of websiteData.assets) {
+            if(asset.type == "image" && asset.src.startsWith("data:image/")) {
+                const hash = Array.from(new Uint8Array(
+                    await crypto.subtle.digest("SHA-256", new TextEncoder().encode(asset.src))))
+                    .map(b=> b.toString(16).padStart(2, "0"))
+                    .join("").slice(0, 8);
+
+                const placeholderName = `__${hash}-${asset.name}__`
+                trimmedWebsiteData = trimmedWebsiteData.replaceAll(asset.src, placeholderName);
+                replacedImages.push({base64: asset.src, placeholder: placeholderName});
+                for(let message of trimmedMessages) {
+                    message.content = message.content.replaceAll(asset.src, placeholderName);
+                }
+            }
+        }
+
+        body.websiteData = trimmedWebsiteData;
+        body.messages = trimmedMessages;
+
+        const response = await axios.post<RAGElementEditResponseDTO>("/api/generation/editElement", body, axiosConfig);
+
+        let dataString = JSON.stringify(response.data);
+        replacedImages.forEach((image) => {
+            dataString = dataString.replaceAll(image.placeholder, image.base64);
+        });
+
+        return JSON.parse(dataString);
     }
 }
 

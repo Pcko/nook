@@ -49,19 +49,19 @@ async function getGroqResponse(messages: ChatCompletionMessageParam[]): Promise<
             messages: messages,
             model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
             stream: false,
+            reasoning_format: 'parsed',
+            max_completion_tokens: 8192,
+            response_format: { "type": "json_object" },
         });
 
-        const data = response.choices[0]?.message?.content || '';
+        const content = response.choices[0]?.message?.content || "";
+        const reasoning = response.choices[0]?.message?.reasoning || "";
 
         const duration = process.hrtime(startingTime);
 
-        const thinkMatch = data.match(/<think>(.*?)<\/think>/s);
-        const think = (thinkMatch ? thinkMatch[1]?.trim() : '') || '';
-        const trimmedResponse = data.replace(/<think>.*?<\/think>/s, '').trim();
-
         return {
-            think: think,
-            response: trimmedResponse,
+            think: reasoning,
+            response: content,
             total_duration: duration[0]*1e9 + duration[1]
         }
     } catch (err) {

@@ -18,10 +18,13 @@ Style format (the updated style must follow this exact structure and must target
 
 Return a JSON object using this structure:
 {
-  styles: string,
-  component: string
+  styles: [],
+  component: Object,
+  text: string
 }
 
-- "styles" must be a JSON array of objects in the format { selectors: string, attributes: string }.
+- "styles" must be a JSON array of objects in the format provided by "Style format" of your updated styles.
+  Note that if you update the styles of a certain selector, our parser overwrites all preexisting styles with your new ones. Every component may only have one style selector.
 - "component" must contain the edited component as valid JSON.
+"text" is your way of communicating with the user. Tell the user about the changes you made, but don't make it too technical.
 - Do NOT add any text before or after this object.
