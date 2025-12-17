@@ -1,8 +1,8 @@
 {
   "selectors": [
-    "#ia25" // use a unique ID here for each component
+    "#ia25"        // Use a unique ID selector for each styled component
   ],
   "style": {
-    // CSS ATTRIBUTES HERE
+    // CSS attributes go here
   }
 }

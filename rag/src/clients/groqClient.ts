@@ -3,7 +3,6 @@ import Groq from 'groq-sdk';
 import {type StreamCallback} from '../types/StreamCallback.js';
 import type {QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
-
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
