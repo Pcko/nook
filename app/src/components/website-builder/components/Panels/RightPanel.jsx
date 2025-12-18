@@ -18,7 +18,7 @@ function RightPanel() {
         if (aiBusy) return;
         setActiveTab(tab);
     };
-    
+
     return (
         <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
@@ -37,23 +37,23 @@ function RightPanel() {
                         className={
                             activeTab === "editor" && selectedElement
                                 ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
-                                : "hidden h-full"
+                                : "h-full hidden"
                         }
                     >
                         <div className="mb-2">
                             <p className="font-semibold mb-1">Traits</p>
-                            <div className="traits-panel" />
+                            <div className="traits-panel"/>
                         </div>
 
                         <div className="mt-2">
                             <p className="font-semibold mb-1">Styles</p>
-                            <div className="right-panel" />
+                            <div className="styles-panel"/>
                         </div>
                     </div>
 
                     {/* Assistant-Tab */}
                     <div className={activeTab === "assistant" ? "h-full" : "hidden h-full"}>
-                        <AIAssistantPanel />
+                        <AIAssistantPanel/>
                     </div>
                 </div>
             </div>

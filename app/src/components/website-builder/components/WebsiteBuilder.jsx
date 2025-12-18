@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-sort-props */
-import React, {useEffect} from "react";
+import React from "react";
 
 import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
@@ -34,7 +34,7 @@ function WebsiteBuilder({page}) {
             panels: {defaults: []},
             blockManager: {appendTo: "#gjs-blocks"},
             layerManager: {appendTo: "#gjs-layers"},
-            styleManager: {appendTo: ".right-panel"},
+            styleManager: {appendTo: ".styles-panel"},
             traitManager: {appendTo: ".traits-panel"},
             deviceManager: {
                 devices: [
