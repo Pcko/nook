@@ -22,11 +22,11 @@ const requiredENV = [
     'EMAIL_PASS',
     'APP_URL',
     'RAG_URL',
-    'RAG_KEY'
+    'RAG_API_KEY'
 ];
 const missingENV = requiredENV.filter((name) => !process.env[name]);
 if (missingENV.length) {
-    console.error(`❌ Missing environment variables: ${missingENV.join(", ")}`);
+    console.error(`⚠️ Missing environment variables: ${missingENV.join(", ")}`);
 }
 
 //Server settings

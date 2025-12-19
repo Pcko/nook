@@ -9,7 +9,8 @@
     "build": "tsc",
     "prod": "node dist/server.js",
     "dev": "nodemon",
-    "typecheck": "npx tsc --noEmit"
+    "typecheck": "npx tsc --noEmit",
+    "one-time-pipe": "node one-time-pipeline.js"
   },
   "author": "",
   "license": "ISC",
