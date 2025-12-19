@@ -8,6 +8,7 @@ import {loadCustomBlocks} from "../utils/grapesBlocks";
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
 import {registerButtonTestTrait} from "../utils/grapesAnchorButton";
+import {ComponentService} from "../../../services/ComponentService";
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
@@ -35,7 +36,7 @@ export function useGrapesEditor(config, page) {
         });
 
         editorRef.current = editor;
-        editor.on('load', ()=>{
+        editor.on('load', () => {
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editor);
 
@@ -44,6 +45,10 @@ export function useGrapesEditor(config, page) {
 
         registerButtonTestTrait(editor);
         removeGlobalTitleTrait(editor);
+
+        editor.on('component:add', (cmp) => {
+            cmp.setId(cmp.cid)
+        });
 
         return () => {
             editorRef.current?.destroy();

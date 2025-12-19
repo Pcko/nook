@@ -50,7 +50,7 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
         /**
          * Handles GrapesJS component selection changes.
-         * @param {any} cmp GrapesJS component model
+         * @param {Component} cmp GrapesJS component model
          */
         const onSelect = (cmp) => {
             setSelectedElement(cmp || null);
@@ -65,7 +65,7 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
                 editor.select(null);
                 setSelectedElement(null);
             }
-        };
+        }
 
         addEventListener("keydown", eventHandler);
         editor.on("component:selected", onSelect);

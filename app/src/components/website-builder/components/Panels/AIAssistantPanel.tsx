@@ -80,14 +80,14 @@ function AIAssistantPanel(): JSX.Element {
         try {
             const body = {
                 messages: updatedInternalMessages,
-                elementId: selectedElement.getId() || selectedElement.cid,
+                elementId: selectedElement.getId(),
                 websiteData: JSON.stringify(editorRef.current.getProjectData()),
             };
 
             const res: EditElementResponse = await AIService.editElement(body);
 
             const editor = editorRef.current;
-            const cmp = editor.getWrapper().find(`#${selectedElement.getId() || selectedElement.cid}`)[0];
+            const cmp = editor.getWrapper().find(`#${selectedElement.getId()}`)[0];
 
             if (cmp && res.component) {
                 cmp.replaceWith(res.component);
@@ -162,7 +162,7 @@ function AIAssistantPanel(): JSX.Element {
                                         AI Assistant
                                     </h5>
                                     <p className="m-0 text-small text-text-subtle">
-                                        Selected Component: {selectedElement.getId() || selectedElement.cid}
+                                        Selected Component: {selectedElement.getId()}
                                     </p>
                                 </div>
                             </div>

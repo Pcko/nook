@@ -21,7 +21,9 @@ const LoggerContext = createContext<LoggerContextValue | null>(null);
 
 export const useLogger = (): LoggerContextValue => {
     const ctx = useContext(LoggerContext);
-    if (!ctx) throw new Error("useLogger must be used within a LoggerProvider");
+    if (!ctx) {
+        throw new Error("useLogger must be used within a LoggerProvider");
+    }
     return ctx;
 };
 
