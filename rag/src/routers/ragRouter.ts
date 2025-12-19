@@ -19,7 +19,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
         messages = [
             {
                 role: "system",
-                content: promptBuilder.getPromptTemplate()
+                content: await promptBuilder.build(queryRequest.query, queryRequest.skipContext, false)
             },
             {
                 role: "user",
@@ -58,9 +58,10 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     const messages = await promptBuilder.buildElementEditMessages(req.body);
     const queryResponseBody = await groqClient.getGroqResponse(messages);
 
-    const parts: { styles: string, component: string } = JSON.parse(queryResponseBody.response);
+    const parts: { styles: Object, component: Object, text: string } = JSON.parse(queryResponseBody.response);
     return res.status(200).send({
         think: queryResponseBody.think,
+        text: parts.text,
         styles: parts.styles,
         component: parts.component,
         total_duration: queryResponseBody.total_duration
