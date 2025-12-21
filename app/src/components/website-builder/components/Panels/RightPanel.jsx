@@ -20,7 +20,7 @@ function RightPanel() {
     };
     
     return (
-        <div className="h-full min-w-[200px] bg-ui-bg p-2">
+        <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
                 <TabSelector
                     active={activeTab}
@@ -47,7 +47,7 @@ function RightPanel() {
 
                         <div className="mt-2">
                             <p className="font-semibold mb-1">Styles</p>
-                            <div className="right-panel" />
+                            <div className="style-panel" />
                         </div>
                     </div>
 

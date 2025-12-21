@@ -34,7 +34,7 @@ function WebsiteBuilder({page}) {
             panels: {defaults: []},
             blockManager: {appendTo: "#gjs-blocks"},
             layerManager: {appendTo: "#gjs-layers"},
-            styleManager: {appendTo: ".right-panel"},
+            styleManager: {appendTo: ".style-panel"},
             traitManager: {appendTo: ".traits-panel"},
             deviceManager: {
                 devices: [
