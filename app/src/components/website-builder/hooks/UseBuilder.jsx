@@ -1,18 +1,11 @@
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState,} from "react";
 
 /**
  * @typedef {Object} BuilderContextValue
  * @property {MutableRefObject<Editor>} editorRef
  * @property {any} page
  * @property {(page: any) => void} setPage
- * @property {string|null} selectedElementId
+ * @property {Component|null} selectedElement
  * @property {() => void} refreshEditor
  * @property {() => void} syncWebsiteDataFromEditor
  * @property {boolean} aiBusy
@@ -27,12 +20,12 @@ const BuilderContext = createContext(null);
  *
  * Provides shared Website Builder state + actions via React Context:
  * - Stores the current GrapesJS project data (`page`)
- * - Tracks currently selected component id (`selectedElementId`)
+ * - Tracks currently selected component (`selectedElement`)
  * - Exposes helpers to refresh the editor and sync project data from GrapesJS
  * - Exposes a global lock flag (`aiBusy`) to disable editing while AI operations run
  *
  * Side effects:
- * - Subscribes to GrapesJS "component:selected" to keep `selectedElementId` in sync
+ * - Subscribes to GrapesJS "component:selected" to keep `selectedElement` in sync
  * - Adds an Escape key listener to clear selection
  * - Toggles GrapesJS preview mode while `aiBusy` is true (prevents editing interactions)
  *
@@ -45,7 +38,7 @@ const BuilderContext = createContext(null);
  */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
     const [page, setPage] = useState(initialPage.data);
-    const [selectedElementId, setSelectedElementId] = useState(null);
+    const [selectedElement, setSelectedElement] = useState(null);
 
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
     const [aiBusy, setAiBusy] = useState(false);
@@ -57,10 +50,10 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
         /**
          * Handles GrapesJS component selection changes.
-         * @param {any} cmp GrapesJS component model
+         * @param {Component} cmp GrapesJS component model
          */
         const onSelect = (cmp) => {
-            setSelectedElementId(cmp?.getId?.() || null);
+            setSelectedElement(cmp || null);
         };
 
         /**
@@ -70,9 +63,9 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const eventHandler = (event) => {
             if (event.key === "Escape") {
                 editor.select(null);
-                setSelectedElementId(null);
+                setSelectedElement(null);
             }
-        };
+        }
 
         addEventListener("keydown", eventHandler);
         editor.on("component:selected", onSelect);
@@ -87,7 +80,6 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const editor = editorRef.current;
         if (!editor) return;
 
-        // While busy: enable preview (reduces editor interaction). When done: restore.
         if (aiBusy) editor.runCommand("core:preview");
         else editor.stopCommand("core:preview");
     }, [aiBusy, editorRef]);
@@ -116,7 +108,7 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
             editorRef,
             page,
             setPage,
-            selectedElementId,
+            selectedElement,
             refreshEditor,
             syncWebsiteDataFromEditor,
             aiBusy,
@@ -125,7 +117,7 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         [
             editorRef,
             page,
-            selectedElementId,
+            selectedElement,
             refreshEditor,
             syncWebsiteDataFromEditor,
             aiBusy,
