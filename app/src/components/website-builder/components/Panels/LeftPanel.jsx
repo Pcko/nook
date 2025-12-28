@@ -25,6 +25,7 @@ function LeftPanel() {
                 options={[
                     {value: "layers", label: "Layers"},
                     {value: "blocks", label: "Blocks"},
+                    {value: "config", label: "Config"},
                 ]}
             />
 
