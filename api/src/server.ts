@@ -35,10 +35,6 @@ app.use('/api/generation', ragRouter);
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
-});
-
 if (process.env.DEVENV) {
     app.listen(PORT, () => {
         console.log('✅ Server deployed at: http://localhost:' + PORT);
