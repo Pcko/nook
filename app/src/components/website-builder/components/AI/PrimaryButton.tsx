@@ -1,4 +1,4 @@
-import {JSX} from "react";
+import React, {JSX} from "react";
 
 /**
  * PrimaryButton
@@ -18,14 +18,7 @@ function PrimaryButton(props: {
         <button
             type="button"
             onClick={onClick}
-            className={[
-                "inline-flex items-center gap-2",
-                "rounded-lg",
-                "bg-primary px-4 py-2 text-small font-semibold text-white",
-                "hover:opacity-95",
-                "focus:outline-none focus:ring-2 focus:ring-primary/40",
-                "transition",
-            ].join(" ")}
+            className={"inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-small font-semibold text-white hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary/40 transition"}
         >
             {icon ? <span className="h-4 w-4">{icon}</span> : null}
             <span className="leading-none">{label}</span>

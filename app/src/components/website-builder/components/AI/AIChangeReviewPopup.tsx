@@ -256,10 +256,7 @@ function AIChangeReviewPopup(props: AIChangeReviewModalProps): JSX.Element {
                 >
                     <motion.div
                         key="modal"
-                        className={[
-                            "w-full max-w-6xl overflow-hidden rounded-2xl",
-                            "border border-ui-border bg-ui-bg shadow-2xl",
-                        ].join(" ")}
+                        className={"w-full max-w-6xl overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-2xl"}
                         initial={{opacity: 0, y: 12, scale: 0.985}}
                         animate={{opacity: 1, y: 0, scale: 1}}
                         exit={{opacity: 0, y: 12, scale: 0.985}}
@@ -274,8 +271,8 @@ function AIChangeReviewPopup(props: AIChangeReviewModalProps): JSX.Element {
                                     </h3>
                                     <span
                                         className="rounded-full border border-ui-border bg-website-bg px-2 py-0.5 text-micro font-mono text-text-subtle">
-                    {enabledCount}/{changes.length} selected
-                  </span>
+                                        {enabledCount}/{changes.length} selected
+                                    </span>
                                 </div>
                                 <p className="m-0 mt-1 text-small text-text-subtle">
                                     Choose which changes to apply. The preview updates instantly.
