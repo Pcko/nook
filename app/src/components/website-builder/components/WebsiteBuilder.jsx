@@ -9,7 +9,7 @@ import TopPanel from "./Panels/TopPanel";
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";
-import AIAssistantOverlay from "./ai/AIAssistantOverlay";
+import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
 
 function WebsiteBuilder({page}) {
     const {editorRef, containerRef, isReady} = useGrapesEditor({

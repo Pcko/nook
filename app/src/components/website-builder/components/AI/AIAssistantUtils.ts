@@ -18,6 +18,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { AIChange } from "./types.ts";
+import {Editor} from "grapesjs";
 
 /**
  * Escapes an ID for safe usage in a CSS selector (e.g. `#<id>`).
@@ -39,17 +40,27 @@ function escapeCssId(id: string): string {
  * @returns True if traversal was stopped early (component found), otherwise false.
  */
 function walkComponents(root: any, cb: (cmp: any) => boolean): boolean {
-    if (!root) return false;
-    if (cb(root)) return true;
+    if (!root) {
+        return false;
+    }
+    if (cb(root)){
+        return true;
+    }
 
     const children = typeof root.components === "function" ? root.components() : null;
-    if (!children) return false;
+    if (!children) {
+        return false;
+    }
 
     if (typeof children.forEach === "function") {
         let found = false;
         children.forEach((c: any) => {
-            if (found) return;
-            if (walkComponents(c, cb)) found = true;
+            if (found){
+                return;
+            }
+            if (walkComponents(c, cb)) {
+                found = true;
+            }
         });
         return found;
     }
@@ -71,12 +82,16 @@ function walkComponents(root: any, cb: (cmp: any) => boolean): boolean {
  */
 function findComponentByAnyId(editor: any, targetId: string): any | null {
     const wrapper = editor?.getWrapper?.();
-    if (!wrapper || !targetId) return null;
+    if (!wrapper || !targetId) {
+        return null;
+    }
 
     // 1) Try CSS selector lookup by HTML id
     const css = `#${escapeCssId(targetId)}`;
     const byCss = wrapper?.find?.(css)?.[0];
-    if (byCss) return byCss;
+    if (byCss){
+        return byCss;
+    }
 
     // 2) Fallback: traverse models (covers cases where getId() != HTML id)
     let found: any = null;
@@ -119,7 +134,9 @@ export function findAIChangeTarget(editor: any, targetId: string): any | null {
  * @returns Kebab-case property name.
  */
 function toKebabCase(prop: string): string {
-    if (prop.includes("-")) return prop;
+    if (prop.includes("-")){
+        return prop;
+    }
     return prop.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
 }
 
@@ -130,7 +147,7 @@ function toKebabCase(prop: string): string {
  * @param style - Style object.
  * @returns CSS declaration string (e.g. `font-size:16px;padding:10px;`).
  */
-function styleObjToCss(style: Record<string, unknown>): string {
+function styleObjToCss(style: Record<string, any>): string {
     return Object.entries(style || {})
         .filter(([k, v]) => k && v !== undefined && v !== null && v !== "")
         .map(([k, v]) => `${toKebabCase(String(k))}:${String(v)};`)
@@ -149,22 +166,20 @@ function styleObjToCss(style: Record<string, unknown>): string {
  * @param selector - CSS selector (e.g. ".btn.primary", "#hero h1").
  * @param style - Style object (JS-style keys are supported).
  */
-function applyCssRule(editor: any, selector: string, style: Record<string, unknown>): void {
+function applyCssRule(editor: Editor, selector: string, style: Record<string, any>): void {
     if (!editor || !selector) return;
 
     const cc = editor.CssComposer;
 
     try {
-        // Preferred (newer) API
+        // Preferred API
         if (cc?.setRule) {
             cc.setRule(selector, style);
             return;
         }
-
-        // Common alternative API shape
+        // Common alternative API
         if (cc?.getRule && cc?.add) {
-            let rule = cc.getRule(selector);
-            if (!rule) rule = cc.add(selector);
+            let rule = cc.getRule(selector) ?? cc.add(selector);
             if (rule?.setStyle) rule.setStyle(style);
             return;
         }
@@ -299,7 +314,7 @@ export function applyAIChange(editor: any, change: AIChange): void {
             at: typeof index === "number" ? index : undefined,
         });
 
-        const addedArr = Array.isArray(added) ? added : added ? [added] : [];
+        const addedArr = Array.isArray(added) ? added : (added ? [added] : []);
 
         // Keep the original root id stable (pin first root node to targetId)
         const newCmp = addedArr[0];

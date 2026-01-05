@@ -1,7 +1,9 @@
-export interface AIChangeReviewModalProps {
+import {Component, ProjectData} from "grapesjs";
+
+export interface AIChangeReviewPopupProps {
     open: boolean;
     title?: string;
-    baseProjectData: any;
+    baseProjectData: ProjectData;
     focusTargetId?: string | null;
     changes: AIChange[];
     onChange: (changes: AIChange[]) => void;
@@ -17,7 +19,7 @@ export interface AIStyleChange {
     enabled: boolean;
     label: string;
     selectors: string[];
-    style: Record<string, unknown>;
+    style: Record<string, Object>;
 }
 
 export interface AIComponentChange {
@@ -26,7 +28,7 @@ export interface AIComponentChange {
     enabled: boolean;
     label: string;
     targetId: string;
-    component: any;
+    component: Component;
 }
 
 export type AIChange = AIStyleChange | AIComponentChange;

@@ -11,17 +11,6 @@ import AIChangeReviewPopup from "../AI/AIChangeReviewPopup.tsx";
 import {applyAIChanges, buildAIChanges} from "../AI/AIAssistantUtils.ts";
 import {AIChange} from "../AI/types.ts";
 
-interface EditElementStyle {
-    selectors: string[];
-    style: Record<string, unknown>;
-}
-
-interface EditElementResponse {
-    component?: any;
-    styles: EditElementStyle[];
-    text?: string;
-}
-
 function AIAssistantPanel(): JSX.Element {
     const [input, setInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
@@ -59,8 +48,6 @@ function AIAssistantPanel(): JSX.Element {
     const handleSend = async (): Promise<void> => {
         const trimmed = input.trim();
         if (!trimmed) return;
-
-        // Avoid concurrent AI sessions while a change-review is still open.
         if (reviewOpen) return;
 
         if (!editorRef.current || !selectedElement) {
@@ -98,7 +85,7 @@ function AIAssistantPanel(): JSX.Element {
                 websiteData: JSON.stringify(editorRef.current.getProjectData()),
             };
 
-            const res: EditElementResponse = await AIService.editElement(body);
+            const res = await AIService.editElement(body);
 
             // Do not apply immediately; prepare a review modal.
             const editor = editorRef.current;
