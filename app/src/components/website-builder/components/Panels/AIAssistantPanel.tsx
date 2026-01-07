@@ -7,17 +7,9 @@ import PromptingTextArea from "../../../general/PromptingTextArea";
 import {useBuilder} from "../../hooks/UseBuilder";
 import SelectElementPlaceholder from "../../../general/SelectElementPlaceholder";
 import {ChatMessage} from "../../../../services/interfaces/ChatMessage";
-
-interface EditElementStyle {
-    selectors: string[];
-    style: Record<string, unknown>;
-}
-
-interface EditElementResponse {
-    component?: any;
-    styles: EditElementStyle[];
-    text?: string;
-}
+import AIChangeReviewPopup from "../AI/AIChangeReviewPopup.tsx";
+import {applyAIChanges, buildAIChanges} from "../AI/AIAssistantUtils.ts";
+import {AIChange} from "../AI/types.ts";
 
 function AIAssistantPanel(): JSX.Element {
     const [input, setInput] = useState<string>("");
@@ -25,6 +17,12 @@ function AIAssistantPanel(): JSX.Element {
 
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [internalMessages, setInternalMessages] = useState<ChatMessage[]>([]);
+
+    const [reviewOpen, setReviewOpen] = useState<boolean>(false);
+    const [pendingProjectData, setPendingProjectData] = useState<any>(null);
+    const [pendingChanges, setPendingChanges] = useState<AIChange[]>([]);
+    const [pendingAssistantText, setPendingAssistantText] = useState<string>("");
+    const [pendingTargetId, setPendingTargetId] = useState<string | null>(null);
 
     const {
         editorRef,
@@ -50,6 +48,7 @@ function AIAssistantPanel(): JSX.Element {
     const handleSend = async (): Promise<void> => {
         const trimmed = input.trim();
         if (!trimmed) return;
+        if (reviewOpen) return;
 
         if (!editorRef.current || !selectedElement) {
             setMessages((prev) => [
@@ -77,6 +76,8 @@ function AIAssistantPanel(): JSX.Element {
 
         setLoading(true);
         setAiBusy(true);
+
+        let openedReview = false;
         try {
             const body = {
                 messages: updatedInternalMessages,
@@ -84,32 +85,26 @@ function AIAssistantPanel(): JSX.Element {
                 websiteData: JSON.stringify(editorRef.current.getProjectData()),
             };
 
-            const res: EditElementResponse = await AIService.editElement(body);
+            const res = await AIService.editElement(body);
 
+            // Do not apply immediately; prepare a review modal.
             const editor = editorRef.current;
-            const cmp = editor.getWrapper().find(`#${selectedElement.getId()}`)[0];
+            const baseProjectData = editor.getProjectData();
+            const targetId = selectedElement.getId();
+            const changes = buildAIChanges(res, targetId);
 
-            if (cmp && res.component) {
-                cmp.replaceWith(res.component);
-                res.styles.forEach((style) => {
-                    style.selectors.forEach((selector) => {
-                        const componentsToStyle = editor.getWrapper().find(selector);
-
-                        componentsToStyle.forEach((componentToStyle: any) => {
-                            componentToStyle.setStyle(style.style);
-                        });
-                    });
-                });
-            }
-
-            refreshEditor();
-            syncWebsiteDataFromEditor();
+            setPendingProjectData(baseProjectData);
+            setPendingChanges(changes);
+            setPendingAssistantText(res.text || "I prepared changes for review.");
+            setPendingTargetId(targetId);
+            setReviewOpen(true);
+            openedReview = true;
 
             setMessages((prev) => [
                 ...prev,
                 {
                     role: "assistant",
-                    content: res.text || "Updated the selected element.",
+                    content: (res.text || "I prepared changes for review.") + " (Review & apply/reject in the popup)",
                 },
             ]);
 
@@ -132,15 +127,70 @@ function AIAssistantPanel(): JSX.Element {
                     content: "Something went wrong while editing the element.",
                 },
             ]);
-        } finally {
-            setLoading(false);
             setAiBusy(false);
+        } finally {
+            if (!openedReview) {
+                setAiBusy(false);
+            }
+            setLoading(false);
             setInput("");
         }
     };
 
+    const handleApplySelected = (): void => {
+        const editor = editorRef.current;
+        if (!editor) return;
+
+        applyAIChanges(editor, pendingChanges);
+
+        // Re-select the (replaced) component root by its stable id
+        if (pendingTargetId) {
+            const cmp = editor.getWrapper().find(`#${pendingTargetId}`)?.[0];
+            if (cmp) editor.select(cmp);
+        }
+
+        refreshEditor();
+        syncWebsiteDataFromEditor();
+
+        setReviewOpen(false);
+        setAiBusy(false);
+        setPendingTargetId(null);
+
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "assistant",
+                content: `Applied ${pendingChanges.filter((c) => c.enabled).length} changes.`,
+            },
+        ]);
+    };
+
+    const handleRejectAll = (): void => {
+        setReviewOpen(false);
+        setAiBusy(false);
+        setPendingTargetId(null);
+
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "assistant",
+                content: "Changes rejected.",
+            },
+        ]);
+    };
+
     return (
         <div className="flex h-full flex-col rounded-[10px] border-2 border-ui-border bg-ui-bg">
+            <AIChangeReviewPopup
+                open={reviewOpen}
+                title="AI Assistant – Review changes"
+                baseProjectData={pendingProjectData}
+                focusTargetId={pendingTargetId}
+                changes={pendingChanges}
+                onChange={setPendingChanges}
+                onApply={handleApplySelected}
+                onReject={handleRejectAll}
+            />
             <AnimatePresence mode="wait">
                 {selectedElement ? (
                     <motion.div
