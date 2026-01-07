@@ -1,3 +1,7 @@
+import {Editor} from "grapesjs";
+import Page from "./interfaces/Page.ts";
+import PageService from "./PageService.ts";
+
 /**
  * WebsiteBuilderService
  *
@@ -14,11 +18,6 @@
  * await WebsiteBuilderService.loadPageState(editor, currentPage);
  * ```
  */
-
-import {Editor} from "grapesjs";
-import Page from "./interfaces/Page.ts";
-import PageService from "./PageService.ts";
-
 class WebsiteBuilderService {
     /**
      * Save the current GrapesJS project state.

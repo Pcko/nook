@@ -57,8 +57,11 @@ export function useGrapesEditor(config, page) {
             const base = `gjs-${cmp.cid}`;
             const uniqueId = generateUniqueHtmlId(editor, base);
 
-            if (cmp.addAttributes) cmp.addAttributes({ id: uniqueId });
-            else if (cmp.setAttributes) cmp.setAttributes({ ...attrs, id: uniqueId });
+            if (cmp.addAttributes) {
+                cmp.addAttributes({id: uniqueId});
+            } else if (cmp.setAttributes) {
+                cmp.setAttributes({...attrs, id: uniqueId});
+            }
         });
 
 
