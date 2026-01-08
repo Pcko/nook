@@ -1,26 +1,8 @@
 import React, { useMemo, useState } from "react";
 
-import {
-  AiOutlineBorder,
-  AiOutlineLaptop,
-  AiOutlineMobile,
-  AiOutlineRedo,
-  AiOutlineTablet,
-  AiOutlineUndo,
-  AiOutlineEye,
-  AiOutlinePlus,
-} from "react-icons/ai";
+import { AiOutlineBorder, AiOutlineLaptop, AiOutlineMobile, AiOutlineRedo, AiOutlineTablet, AiOutlineUndo, AiOutlineEye, AiOutlinePlus } from "react-icons/ai";
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
-import {
-  handleRedo,
-  handleUndo,
-  setDesktop,
-  setMobile,
-  setTablet,
-  toggleOutlines,
-  exportWebsite,
-  togglePreview,
-} from "../../utils/grapesActions";
+import { handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutlines, exportWebsite, togglePreview } from "../../utils/grapesActions";
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../logging/ErrorHandler";
 import { useMetaNotify } from "../../../logging/MetaNotifyHook";
@@ -30,11 +12,11 @@ import { useMetaNotify } from "../../../logging/MetaNotifyHook";
  */
 function TopPanel({ editorRef, page }) {
   const baseMeta = useMemo(
-    () => ({
-      feature: "builder",
-      component: "TopPanel",
-    }),
-    []
+      () => ({
+        feature: "builder",
+        component: "TopPanel",
+      }),
+      []
   );
 
   const { notify } = useMetaNotify(baseMeta);
@@ -42,20 +24,20 @@ function TopPanel({ editorRef, page }) {
 
   function handleSave() {
     WebsiteBuilderService.savePageState(editorRef.current, page)
-      .then(() => {
-        notify(
-          "info",
-          "Page was saved successfully.",
-          { stage: "page-save", pageName: page.name },
-          "submit"
-        );
-      })
-      .catch((err) => {
-        handleError(err, {
-          fallbackMessage: "Failed to save the page.",
-          meta: { stage: "page-save", pageName: page?.name ?? null },
+        .then(() => {
+            notify(
+              "info",
+              "Page was saved successfully.",
+              { stage: "page-save", pageName: page.name },
+              "submit"
+          );
+        })
+        .catch((err) => {
+          handleError(err, {
+            fallbackMessage: "Failed to save the page.",
+            meta: { stage: "page-save", pageName: page?.name ?? null },
+          });
         });
-      });
   }
 
   const [zoom, setZoom] = useState(100);
@@ -135,73 +117,72 @@ function TopPanel({ editorRef, page }) {
   };
 
   return (
-    <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
-      {/* left group */}
-      <div className="flex items-center gap-2">
-        <ToolbarButton icon={<AiOutlineUndo size={18} />} label="Str+Z" onClick={() => handleUndo(editorRef)} />
-        <ToolbarButton icon={<AiOutlineRedo size={18} />} label="Str+Y" onClick={() => handleRedo(editorRef)} />
-        <ToolbarButton icon={<AiOutlineBorder size={18} />} label="Alt+O" onClick={() => toggleOutlines(editorRef)} />
-        <ToolbarButton icon={<AiOutlineEye size={18} />} label="Alt+P" onClick={() => togglePreview(editorRef)} />
+      <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+        {/* left group */}
+        <div className="flex items-center gap-2">
+          <ToolbarButton icon={<AiOutlineUndo size={18} />} label="Str+Z" onClick={() => handleUndo(editorRef)} />
+          <ToolbarButton icon={<AiOutlineRedo size={18} />} label="Str+Y" onClick={() => handleRedo(editorRef)} />
+          <ToolbarButton icon={<AiOutlineBorder size={18} />} label="Alt+O" onClick={() => toggleOutlines(editorRef)} />
+          <ToolbarButton icon={<AiOutlineEye size={18} />} label="Alt+P" onClick={() => togglePreview(editorRef)} />
+        </div>
+
+        {/* center group */}
+        <div className="flex items-center justify-center gap-2">
+          <ToolbarButton icon={<AiOutlinePlus size={18} />} onClick={handlePlus} />
+
+            {showCustomViewport && (
+              <CustomViewportInput
+                  value={customViewport}
+                  onChange={setCustomViewport}
+                  onApply={applyCustomViewport}
+              />
+          )}
+
+          <ToolbarButton icon={<AiOutlineLaptop size={18} />} onClick={handleDesktop} />
+          <ToolbarButton icon={<AiOutlineTablet size={18} />} onClick={handleTablet} />
+          <ToolbarButton icon={<AiOutlineMobile size={18} />} onClick={handleMobile} />
+
+          <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom} />
+        </div>
+
+        {/* right group */}
+        <div className="flex items-center justify-end gap-2">
+          <TopActionButton label={"Save"} onClick={() => handleSave()} />
+          <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)} />
+          <TopActionButton label={"Publish"} primary={true} />
+        </div>
       </div>
-
-      {/* center group */}
-      <div className="flex items-center justify-center gap-2">
-        {/* "+" is LEFT of the desktop/tablet/mobile buttons */}
-        <ToolbarButton icon={<AiOutlinePlus size={18} />} onClick={handlePlus} />
-
-        {showCustomViewport && (
-          <CustomViewportInput
-            value={customViewport}
-            onChange={setCustomViewport}
-            onApply={applyCustomViewport}
-          />
-        )}
-
-        <ToolbarButton icon={<AiOutlineLaptop size={18} />} onClick={handleDesktop} />
-        <ToolbarButton icon={<AiOutlineTablet size={18} />} onClick={handleTablet} />
-        <ToolbarButton icon={<AiOutlineMobile size={18} />} onClick={handleMobile} />
-
-        <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom} />
-      </div>
-
-      {/* right group */}
-      <div className="flex items-center justify-end gap-2">
-        <TopActionButton label={"Save"} onClick={() => handleSave()} />
-        <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)} />
-        <TopActionButton label={"Publish"} primary={true} />
-      </div>
-    </div>
   );
 }
 
 function CustomViewportInput({ value, onChange, onApply }) {
   return (
-    <div
-      className={[
-        "flex items-center rounded border border-ui-border transition",
-        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-        "py-1 px-2 gap-1.5 text-tiny",
-      ].join(" ")}
-      title="Custom viewport width in px (e.g. 950)"
-    >
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") onApply();
-        }}
-        inputMode="numeric"
-        placeholder="950"
-        className={["w-[4.2rem] bg-transparent outline-none", "font-mono text-micro text-text"].join(" ")}
-      />
-      <button
-        type="button"
-        onClick={onApply}
-        className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none border border-ui-border"
+      <div
+          className={[
+            "flex items-center rounded border border-ui-border transition",
+            "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+            "py-1 px-2 gap-1.5 text-tiny",
+          ].join(" ")}
+          title="Custom viewport width in px (e.g. 950)"
       >
-        px
-      </button>
-    </div>
+        <input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onApply();
+            }}
+            inputMode="numeric"
+            placeholder="950"
+            className={["w-[4.2rem] bg-transparent outline-none", "font-mono text-micro text-text"].join(" ")}
+        />
+        <button
+            type="button"
+            onClick={onApply}
+            className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none border border-ui-border"
+        >
+          px
+        </button>
+      </div>
   );
 }
 
@@ -209,86 +190,86 @@ function ToolbarButton({ icon, label, onClick }) {
   const hasLabel = !!label;
 
   return (
-    <button
-      aria-label={label || "toolbar button"}
-      className={[
-        "flex items-center rounded border border-ui-border transition",
-        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-        "py-1",
-        hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5",
-      ].join(" ")}
-      onClick={onClick}
-      title={label || undefined}
-    >
+      <button
+          aria-label={label || "toolbar button"}
+          className={[
+            "flex items-center rounded border border-ui-border transition",
+            "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+            "py-1",
+            hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5",
+          ].join(" ")}
+          onClick={onClick}
+          title={label || undefined}
+      >
       <span className="flex items-center justify-center bg-ui-default text-text rounded-full w-6 h-6 border border-ui-border">
         {icon}
       </span>
-      {hasLabel && (
-        <span className="bg-ui-bg-selected text-text px-1.5 py-0.5 rounded font-mono text-micro tracking-tight">
+        {hasLabel && (
+            <span className="bg-ui-bg-selected text-text px-1.5 py-0.5 rounded font-mono text-micro tracking-tight">
           {label}
         </span>
-      )}
-    </button>
+        )}
+      </button>
   );
 }
 
 function TopActionButton({ label, primary = false, onClick }) {
   return (
-    <button className={["btn-wb", primary ? "btn-wb--primary" : ""].join(" ")} onClick={onClick}>
-      <span className="py-0.5 font-mono">{label}</span>
-    </button>
+      <button className={["btn-wb", primary ? "btn-wb--primary" : ""].join(" ")} onClick={onClick}>
+        <span className="py-0.5 font-mono">{label}</span>
+      </button>
   );
 }
 
 function ZoomListbox({ value, onChange, options }) {
   return (
-    <Listbox value={value} onChange={onChange}>
-      <div className="relative">
-        <ListboxButton
-          className={[
-            "flex items-center rounded border border-ui-border transition",
-            "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-            "py-1 px-2 gap-1.5 text-tiny",
-            "focus:outline-none",
-          ].join(" ")}
-        >
+      <Listbox value={value} onChange={onChange}>
+        <div className="relative">
+          <ListboxButton
+              className={[
+                "flex items-center rounded border border-ui-border transition",
+                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+                "py-1 px-2 gap-1.5 text-tiny",
+                "focus:outline-none",
+              ].join(" ")}
+          >
           <span className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none">
             {value}%
           </span>
-          <span
-            aria-hidden
-            className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
-          />
-        </ListboxButton>
+            <span
+                aria-hidden
+                className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
+            />
+          </ListboxButton>
 
-        <ListboxOptions
-          className={[
-            "absolute right-0 z-10 mt-0.5",
-            "bg-ui-bg border border-ui-border rounded-[5px]",
-            "shadow-lg overflow-hidden",
-            "py-1",
-            "focus:outline-none",
-            "min-w-[3.7rem]",
-          ].join(" ")}
-        >
-          {options.map((opt) => (
-            <ListboxOption key={opt} value={opt}>
-              {({ active, selected }) => (
-                <div
-                  className={[
-                    "w-full text-left px-2 py-1 text-tiny transition-colors",
-                    active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
-                    selected ? "font-semibold text-text" : "font-normal",
-                  ].join(" ")}
-                >
-                  {opt}%
-                </div>
-              )}
-            </ListboxOption>
-          ))}
-        </ListboxOptions>
-      </div>
-    </Listbox>
+          <ListboxOptions
+              className={[
+                "absolute right-0 z-10 mt-0.5",
+                "bg-ui-bg border border-ui-border rounded-[5px]",
+                "shadow-lg overflow-hidden",
+                "py-1",
+                "focus:outline-none",
+                "min-w-[3.7rem]",
+              ].join(" ")}
+          >
+            {options.map((opt) => (
+                <ListboxOption key={opt} value={opt}>
+                  {({ active, selected }) => (
+                      <div
+                          className={[
+                            "w-full text-left px-2 py-1 text-tiny transition-colors",
+                            active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
+                            selected ? "font-semibold text-text" : "font-normal",
+                          ].join(" ")}
+                      >
+                        {opt}%
+                      </div>
+                  )}
+                </ListboxOption>
+            ))}
+          </ListboxOptions>
+        </div>
+      </Listbox>
   );
 }
 
