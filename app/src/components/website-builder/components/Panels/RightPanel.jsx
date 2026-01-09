@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
+import HistoryPanel from "./HistoryPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
 
 /**
@@ -27,33 +28,39 @@ function RightPanel() {
                     onChange={handleTabChange}
                     options={[
                         {value: "editor", label: "Editor"},
-                        {value: "assistant", label: "AI Assistant"},
+                        {value: "assistant", label: "Assistant"},
+                        {value: "history", label: "History"},
                     ]}
                 />
 
                 <div className="mt-2 flex-1 min-h-0">
                     {/* Editor-Tab */}
                     <div
-                        className={
-                            activeTab === "editor" && selectedElementId
-                                ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
-                                : "hidden h-full"
-                        }
+                            className={
+                                activeTab === "editor" && selectedElementId
+                                        ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
+                                        : "hidden h-full"
+                            }
                     >
                         <div className="mb-2">
                             <p className="font-semibold mb-1">Traits</p>
-                            <div className="traits-panel" />
+                            <div className="traits-panel"/>
                         </div>
 
                         <div className="mt-2">
                             <p className="font-semibold mb-1">Styles</p>
-                            <div className="style-panel" />
+                            <div className="style-panel"/>
                         </div>
                     </div>
 
                     {/* Assistant-Tab */}
                     <div className={activeTab === "assistant" ? "h-full" : "hidden h-full"}>
-                        <AIAssistantPanel />
+                        <AIAssistantPanel/>
+                    </div>
+
+                    {/* History-Tab */}
+                    <div className={activeTab === "history" ? "h-full" : "hidden h-full"}>
+                        <HistoryPanel/>
                     </div>
                 </div>
             </div>
