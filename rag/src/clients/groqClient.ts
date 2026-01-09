@@ -51,7 +51,6 @@ async function getGroqResponse(messages: ChatCompletionMessageParam[]): Promise<
             stream: false,
             reasoning_format: 'parsed',
             max_completion_tokens: 8192,
-            response_format: { "type": "json_object" },
         });
 
         const content = response.choices[0]?.message?.content || "";
