@@ -5,13 +5,13 @@ import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam
  *
  * @interface QueryRequestBody
  * @property {string} query - The text prompt to send to the LLM.
- * @property {boolean} [useLocalLLM=false] - If true, the query will be processed using a local LLM instead of a Groq.
+ * @property {string} [provider] - The inference provider used for the query.
  * @property {boolean} [skipContext=false] - If true, the LLM will skip ChromaDB context when generating the response.
  * @property {boolean} [stream=false] - If true, the response may be streamed in chunks rather than returned all at once.
  */
 export interface QueryRequestBody {
     query: string;
-    useLocalLLM?: boolean;
+    provider?: 'groq' | 'ollama';
     skipContext?: boolean;
     stream?: boolean;
 }
@@ -36,11 +36,13 @@ export interface QueryResponseBody {
  * @param {ChatCompletionMessageParam[]} messages - Message history from the user/assistant.
  * @param {string} elementId - The ID of the element to be edited.
  * @param {string} websiteData - The website data to include in the prompt.
+ * @param {string} provider - The inference provider used for the query.
  */
 export interface ElementEditRequestBody {
     messages: ChatCompletionMessageParam[];
     elementId: string;
     websiteData: string;
+    provider?: 'groq' | 'ollama';
 }
 
 /**
