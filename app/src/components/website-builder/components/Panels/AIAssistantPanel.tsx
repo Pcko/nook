@@ -29,6 +29,8 @@ function AIAssistantPanel(): JSX.Element {
         selectedElement,
         refreshEditor,
         syncWebsiteDataFromEditor,
+        captureHistory,
+        aiBusy,
         setAiBusy,
     } = useBuilder();
 
@@ -93,6 +95,10 @@ function AIAssistantPanel(): JSX.Element {
             const targetId = selectedElement.getId();
             const changes = buildAIChanges(res, targetId);
 
+            refreshEditor();
+            syncWebsiteDataFromEditor();
+            const shortPrompt = trimmed.length > 48 ? trimmed.slice(0, 48) + "…" : trimmed;
+            captureHistory?.(`AI: ${shortPrompt}`);
             setPendingProjectData(baseProjectData);
             setPendingChanges(changes);
             setPendingAssistantText(res.text || "I prepared changes for review.");
@@ -104,7 +110,7 @@ function AIAssistantPanel(): JSX.Element {
                 ...prev,
                 {
                     role: "assistant",
-                    content: (res.text || "I prepared changes for review.") + " (Review & apply/reject in the popup)",
+                    content: res.text || "Updated the selected element.",
                 },
             ]);
 

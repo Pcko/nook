@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
+import HistoryPanel from "./HistoryPanel";
 
 /**
  * RightPanel component
@@ -27,18 +28,19 @@ function RightPanel() {
                     onChange={handleTabChange}
                     options={[
                         {value: "editor", label: "Editor"},
-                        {value: "assistant", label: "AI Assistant"},
+                        {value: "assistant", label: "Assistant"},
+                        {value: "history", label: "History"},
                     ]}
                 />
 
                 <div className="mt-2 flex-1 min-h-0">
                     {/* Editor-Tab */}
                     <div
-                        className={
-                            activeTab === "editor" && selectedElement
-                                ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
-                                : "h-full hidden"
-                        }
+                            className={
+                                activeTab === "editor" && selectedElement
+                                        ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
+                                        : "hidden h-full"
+                            }
                     >
                         <div className="mb-2">
                             <p className="font-semibold mb-1">Traits</p>
@@ -54,6 +56,11 @@ function RightPanel() {
                     {/* Assistant-Tab */}
                     <div className={activeTab === "assistant" ? "h-full" : "hidden h-full"}>
                         <AIAssistantPanel/>
+                    </div>
+
+                    {/* History-Tab */}
+                    <div className={activeTab === "history" ? "h-full" : "hidden h-full"}>
+                        <HistoryPanel/>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,12 @@
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState,} from "react";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+import {useBuilderHistory} from "../utils/useBuilderHistory";
 
 /**
  * @typedef {Object} BuilderContextValue
@@ -8,6 +16,10 @@ import React, {createContext, useCallback, useContext, useEffect, useMemo, useSt
  * @property {Component|null} selectedElement
  * @property {() => void} refreshEditor
  * @property {() => void} syncWebsiteDataFromEditor
+ * @property {Array<{id: string, ts: number, reason: string, data: any}>} history
+ * @property {number} historyIndex
+ * @property {(index: number) => void} goToHistory
+ * @property {(reason?: string) => void} captureHistory
  * @property {boolean} aiBusy
  * @property {(busy: boolean) => void} setAiBusy
  */
@@ -42,6 +54,12 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
     const [aiBusy, setAiBusy] = useState(false);
+
+    const {history, historyIndex, goToHistory, captureHistory} = useBuilderHistory({
+        editorRef,
+        editorReady,
+        setPage,
+    });
 
     useEffect(() => {
         if (!editorReady) return;
@@ -104,24 +122,32 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
     /** @type {BuilderContextValue} */
     const value = useMemo(
-        () => ({
-            editorRef,
-            page,
-            setPage,
-            selectedElement,
-            refreshEditor,
-            syncWebsiteDataFromEditor,
-            aiBusy,
-            setAiBusy,
-        }),
-        [
-            editorRef,
-            page,
-            selectedElement,
-            refreshEditor,
-            syncWebsiteDataFromEditor,
-            aiBusy,
-        ]
+            () => ({
+                editorRef,
+                page,
+                setPage,
+                selectedElement,
+                refreshEditor,
+                syncWebsiteDataFromEditor,
+                history,
+                historyIndex,
+                goToHistory,
+                captureHistory,
+                aiBusy,
+                setAiBusy,
+            }),
+            [
+                editorRef,
+                page,
+                selectedElement,
+                refreshEditor,
+                syncWebsiteDataFromEditor,
+                aiBusy,
+                history,
+                historyIndex,
+                goToHistory,
+                captureHistory,
+            ]
     );
 
     return <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>;
