@@ -9,6 +9,7 @@ import type {PageMeta} from "./PageMeta.ts";
  * @property updatedAt - Timestamp of the last update.
  * @property deploymentStatus - Current publishing/deployment status.
  * @property data - The GrapesJS project data for this page.
+ * @property {PageMeta} [pageMeta] - page metadata for ai interaction
  */
 interface Page {
     name: string;
@@ -16,7 +17,6 @@ interface Page {
     updatedAt: string;
     deploymentStatus: string;
     data: ProjectData | null;
-    /** Optional per-page AI guidance metadata (may be null if not set). */
     pageMeta: PageMeta | null;
 }
 
