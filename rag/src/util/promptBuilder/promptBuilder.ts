@@ -14,11 +14,7 @@ const componentRules = readFileSync( path.resolve(__dirname, "component-rules.tx
 const componentsTemplate = readFileSync( path.resolve(__dirname, "components-format.txt"), "utf-8");
 const stylesTemplate = readFileSync( path.resolve(__dirname, "styles-format.txt"), "utf-8");
 
-const promptTemplate = readFileSync( path.resolve(__dirname, "prompt.txt"), "utf-8")
-    .replace("{{component-rules}}", componentRules)
-    .replace("{{grapes-format}}", grapesTemplate)
-    .replace("{{components-format}}", componentsTemplate)
-    .replace("{{styles-format}}", stylesTemplate);
+const promptTemplate = readFileSync( path.resolve(__dirname, "prompt.txt"), "utf-8");
 
 const elementEditPrompt = readFileSync( path.resolve(__dirname, "elementEdit-prompt.txt"), "utf-8")
     .replace("{{component-rules}}", componentRules)

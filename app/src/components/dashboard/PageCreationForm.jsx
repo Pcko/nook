@@ -9,6 +9,7 @@ import PagePromptingStep from "./page-creation-components/PagePromptingStep";
 import PageService from "../../services/PageService";
 import AIService from "../../services/AIService";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
+import grapesjs from "grapesjs";
 
 /**
  * All steps of the AI-Page-Creation process.
@@ -178,7 +179,15 @@ function PageCreationForm({closeForm, setPages}) {
             });
 
             try {
-                const parsedResponse = JSON.parse(response);
+                const generatedPageContainer = document.createElement("div");
+                generatedPageContainer.innerHTML = response;
+
+                const editor = grapesjs.init({
+                    fromElement: true,
+                    container: generatedPageContainer}
+                );
+
+                const parsedResponse = editor.getProjectData();
 
                 updateFormData({loadingStep: formData.loadingStep + 1});
                 generatedPages.push({

@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
-import HistoryPanel from "./HistoryPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
 
 /**
@@ -13,13 +12,13 @@ import {useBuilder} from "../../hooks/UseBuilder";
  */
 function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
-    const {selectedElementId, aiBusy} = useBuilder();
+    const {selectedElement, aiBusy} = useBuilder();
 
     const handleTabChange = (tab) => {
         if (aiBusy) return;
         setActiveTab(tab);
     };
-    
+
     return (
         <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
@@ -49,7 +48,7 @@ function RightPanel() {
 
                         <div className="mt-2">
                             <p className="font-semibold mb-1">Styles</p>
-                            <div className="style-panel"/>
+                            <div className="styles-panel"/>
                         </div>
                     </div>
 

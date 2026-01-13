@@ -8,6 +8,7 @@ import {loadCustomBlocks} from "../utils/grapesBlocks";
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
 import {registerButtonTestTrait} from "../utils/grapesAnchorButton";
+import {generateUniqueHtmlId} from "../utils/idGenerationUtil";
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.
@@ -35,7 +36,7 @@ export function useGrapesEditor(config, page) {
         });
 
         editorRef.current = editor;
-        editor.on('load', ()=>{
+        editor.on('load', () => {
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editor);
 
@@ -44,6 +45,25 @@ export function useGrapesEditor(config, page) {
 
         registerButtonTestTrait(editor);
         removeGlobalTitleTrait(editor);
+
+        // Ensure every component has an id, but do NOT overwrite an existing one.
+        editor.on("component:add", (cmp) => {
+            const editor = editorRef.current;
+            if (!editor) return;
+
+            const attrs = cmp.getAttributes?.() || cmp.get?.("attributes") || {};
+            if (attrs.id) return;
+
+            const base = `gjs-${cmp.cid}`;
+            const uniqueId = generateUniqueHtmlId(editor, base);
+
+            if (cmp.addAttributes) {
+                cmp.addAttributes({id: uniqueId});
+            } else if (cmp.setAttributes) {
+                cmp.setAttributes({...attrs, id: uniqueId});
+            }
+        });
+
 
         return () => {
             editorRef.current?.destroy();
