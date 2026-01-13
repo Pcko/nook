@@ -11,7 +11,7 @@
 /**
  * Page-level metadata.
  */
-export interface PageMeta {
+interface PageMeta {
     /**
      * Tracks whether the Meta Wizard was already shown/closed for this page.
      * If true, the wizard will not auto-open again.
