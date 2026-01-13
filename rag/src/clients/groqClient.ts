@@ -52,7 +52,7 @@ export default class GroqClient extends LlmClient {
                 messages: messages,
                 model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
                 stream: false,
-                reasoning_format: 'parsed',
+                reasoning_format: ['openai/gpt-oss-120b', 'qwen/qwen3-32b'].includes(process.env.GROQ_LLM_MODEL || '') ? 'parsed' : null,
                 max_completion_tokens: 8192,
             });
 
