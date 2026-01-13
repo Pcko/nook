@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import TabSelector from "./TabSelector";
 import AIAssistantPanel from "./AIAssistantPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
+import HistoryPanel from "./HistoryPanel";
 
 /**
  * RightPanel component
@@ -36,7 +37,7 @@ function RightPanel() {
                     {/* Editor-Tab */}
                     <div
                             className={
-                                activeTab === "editor" && selectedElementId
+                                activeTab === "editor" && selectedElement
                                         ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
                                         : "hidden h-full"
                             }
