@@ -28,9 +28,10 @@ const STEPS = {
  * @param {Object} props
  * @param {Function} props.closeForm - Function to close the creation modal.
  * @param {Function} props.setPages - Setter to update pages.
+ * @param {Object} props.fallbackFormData - If the page creation failed the data can be restored through this param
  * @returns {JSX.Element|null}
  */
-function PageCreationForm({closeForm, setPages}) {
+function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
     /**
      * @typedef {Object} FormData
      * @property {string} pageName - The name of the new page.
@@ -43,7 +44,7 @@ function PageCreationForm({closeForm, setPages}) {
      */
 
     /** @type {[FormData, Function]} */
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(fallbackFormData || {
         pageName: "",
         aiPrompt: "",
         aiPages: [],
@@ -120,7 +121,9 @@ function PageCreationForm({closeForm, setPages}) {
      * Moves user into AI prompt mode.
      */
     const handleAiButtonClick = () => {
-        if (!formData.pageName || formData.pageName.length < 2) {
+        const result = isInvalidStringForURL(formData.pageName);
+
+        if (result || formData.pageName.length < 2) {
             return notify("error", "Enter a valid page name first.", {
                 step: "choose", pageName: formData.pageName
             }, "validation");
@@ -237,6 +240,7 @@ function PageCreationForm({closeForm, setPages}) {
                     step: "ai-save", pageName: formData.pageName
                 }
             });
+            sessionStorage.setItem(`artifact`, JSON.stringify({timestamp: Date.now(), ...formData}));
         } finally {
             updateFormData({loading: false});
         }

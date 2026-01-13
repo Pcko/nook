@@ -10,6 +10,7 @@ import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";
 import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
+import MetaWizardOverlay from "../../meta-wizard/MetaWizardOverlay.tsx";
 
 function WebsiteBuilder({page}) {
     const {editorRef, containerRef, isReady} = useGrapesEditor({
@@ -50,9 +51,10 @@ function WebsiteBuilder({page}) {
                         editor={<div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
                             {
                                 editorRef.loaded && (
-                                    <div className="absolute inset-0 flex items-center justify-center z-50 bg-white">
+                                    <div className="absolute inset-0 flex items-center justify-center z-50 bg-website-bg">
                                         <LoadingBubble/>
-                                    </div>)}
+                                    </div>)
+                            }
 
                             {/* GrapesJS canvas */}
                             <div className="h-full bg-white" ref={containerRef}/>
@@ -64,6 +66,8 @@ function WebsiteBuilder({page}) {
                     />
                 </div>
             </div>
+            {/* Meta-Wizard Overlay that opens only once*/}
+            <MetaWizardOverlay/>
         </BuilderProvider>
     );
 }

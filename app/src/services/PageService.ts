@@ -1,6 +1,7 @@
 import axios from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import PageDTO from "./interfaces/PageDTO.ts";
+import type {PageMeta} from "./interfaces/PageMeta.ts";
 
 class PageService {
     /**
@@ -10,7 +11,25 @@ class PageService {
      * @private
      */
     private static parsePage(requestPage: PageDTO): Page {
-        return {...requestPage, data: requestPage.data === null ? null : JSON.parse(requestPage.data)};
+        const data = requestPage.data === null ? null : JSON.parse(requestPage.data);
+
+        // pageMeta is optional (backend may not support it yet)
+        let pageMeta: PageMeta | null = null;
+        if (typeof requestPage.pageMeta === "string") {
+            try {
+                pageMeta = JSON.parse(requestPage.pageMeta);
+            } catch {
+                pageMeta = null;
+            }
+        } else if (requestPage.pageMeta && typeof requestPage.pageMeta === "object") {
+            pageMeta = requestPage.pageMeta as unknown as PageMeta;
+        }
+
+        return {
+            ...requestPage,
+            data,
+            pageMeta,
+        };
     }
 
     /**

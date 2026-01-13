@@ -23,4 +23,6 @@ export interface ChatObject {
     elementId: string;
     websiteData: string;
     messages: ChatMessage[];
+    /** Optional per-page meta used to steer the assistant (backend may ignore). */
+    pageMeta?: unknown;
 }

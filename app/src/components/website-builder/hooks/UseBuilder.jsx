@@ -9,6 +9,39 @@ import React, {
 import {useBuilderHistory} from "../utils/useBuilderHistory";
 
 /**
+ * @typedef {PageMeta} PageMeta
+ */
+
+/**
+ * Safe JSON parse helper used for LocalStorage values.
+ *
+ * @param {string|null} value - Raw JSON string.
+ * @returns {any|null} Parsed value or null.
+ */
+function safeParseJson(value) {
+    if (!value) return null;
+    try {
+        return JSON.parse(value);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Loads the stored meta for a page (if any).
+ *
+ * @param {string|null|undefined} pageName - Page identifier used for the storage key.
+ * @param {any} fallback - Fallback meta (e.g. from API).
+ * @returns {PageMeta|null} Meta or null.
+ */
+function readPageMetaFromStorage(pageName, fallback) {
+    if (!pageName) return fallback ?? null;
+    const raw = localStorage.getItem(`pageMeta_${pageName}`);
+    const parsed = safeParseJson(raw);
+    return parsed ?? fallback ?? null;
+}
+
+/**
  * @typedef {Object} BuilderContextValue
  * @property {MutableRefObject<Editor>} editorRef
  * @property {any} page
@@ -16,6 +49,11 @@ import {useBuilderHistory} from "../utils/useBuilderHistory";
  * @property {Component|null} selectedElement
  * @property {() => void} refreshEditor
  * @property {() => void} syncWebsiteDataFromEditor
+ * @property {PageMeta|null} pageMeta
+ * @property {(meta: PageMeta|null) => void} setPageMeta
+ * @property {boolean} isMetaWizardOpen
+ * @property {() => void} openMetaWizard
+ * @property {() => void} closeMetaWizard
  * @property {Array<{id: string, ts: number, reason: string, data: any}>} history
  * @property {number} historyIndex
  * @property {(index: number) => void} goToHistory
@@ -43,13 +81,48 @@ const BuilderContext = createContext(null);
  *
  * @param {Object} props
  * @param {MutableRefObject<Editor>} props.editorRef GrapesJS editor ref
- * @param {{data: any}} props.initialPage Initial project data wrapper
+ * @param {Page} props.initialPage Initial project data wrapper
  * @param {boolean} props.editorReady Indicates GrapesJS is initialized
  * @param {import("react").ReactNode} props.children Children rendered within the provider
  * @returns {JSX.Element}
  */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
     const [page, setPage] = useState(initialPage.data);
+    const pageName = initialPage?.name ?? null;
+    //local persisting can be removed later
+    const [pageMeta, setPageMetaState] = useState(() => readPageMetaFromStorage(pageName, initialPage.pageMeta));
+
+    /**
+     * Controls the visibility of the meta wizard overlay.
+     * Auto-opens if the wizard has not been seen for this page.
+     */
+    const [isMetaWizardOpen, setIsMetaWizardOpen] = useState(() => {
+        const initialMeta = readPageMetaFromStorage(pageName, initialPage.pageMeta);
+        return !initialMeta?.wizardSeen;
+    });
+
+    /**
+     * Persists PageMeta to LocalStorage and updates state.
+     *
+     * @param {PageMeta|null} next - Next meta value.
+     */
+    const setPageMeta = useCallback(
+        (next) => {
+            setPageMetaState(next);
+            if (!pageName) return;
+            const key = `pageMeta_${pageName}`;
+            try {
+                if (next === null || next === undefined) localStorage.removeItem(key);
+                else localStorage.setItem(key, JSON.stringify(next));
+            } catch {
+                // ignore
+            }
+        },
+        [pageName]
+    );
+
+    const openMetaWizard = useCallback(() => setIsMetaWizardOpen(true), []);
+    const closeMetaWizard = useCallback(() => setIsMetaWizardOpen(false), []);
     const [selectedElement, setSelectedElement] = useState(null);
 
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
@@ -122,32 +195,41 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
     /** @type {BuilderContextValue} */
     const value = useMemo(
-            () => ({
-                editorRef,
-                page,
-                setPage,
-                selectedElement,
-                refreshEditor,
-                syncWebsiteDataFromEditor,
-                history,
-                historyIndex,
-                goToHistory,
-                captureHistory,
-                aiBusy,
-                setAiBusy,
-            }),
-            [
-                editorRef,
-                page,
-                selectedElement,
-                refreshEditor,
-                syncWebsiteDataFromEditor,
-                aiBusy,
-                history,
-                historyIndex,
-                goToHistory,
-                captureHistory,
-            ]
+        () => ({
+            editorRef,
+            page,
+            setPage,
+            selectedElement,
+            refreshEditor,
+            syncWebsiteDataFromEditor,
+            history,
+            historyIndex,
+            goToHistory,
+            captureHistory,
+            aiBusy,
+            setAiBusy,
+            pageMeta,
+            setPageMeta,
+            isMetaWizardOpen,
+            openMetaWizard,
+            closeMetaWizard,
+        }),
+        [
+            editorRef,
+            page,
+            selectedElement,
+            refreshEditor,
+            syncWebsiteDataFromEditor,
+            aiBusy,
+            history,
+            historyIndex,
+            goToHistory,
+            captureHistory,
+            pageMeta,
+            isMetaWizardOpen,
+            openMetaWizard,
+            closeMetaWizard,
+        ]
     );
 
     return <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>;

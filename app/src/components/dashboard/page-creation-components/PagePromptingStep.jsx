@@ -74,7 +74,7 @@ function PagePromptingStep({
     return (
         <motion.div
             animate={{opacity: 1, y: 0, scale: 1}}
-            className="page-creation-window max-w-3xl p-4 md:p-5 rounded-[8px] mx-auto bg-website-bg border border-ui-border shadow-sm"
+            className="page-creation-window"
             exit={{opacity: 0, y: 8, scale: 0.98}}
             initial={{opacity: 0, y: 8, scale: 0.98}}
             transition={{duration: 0.2, ease: "easeOut"}}

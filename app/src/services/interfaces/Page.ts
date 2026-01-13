@@ -1,4 +1,5 @@
 import {ProjectData} from "grapesjs";
+import type {PageMeta} from "./PageMeta.ts";
 
 /**
  * Represents a website page managed by the WebsiteBuilder.
@@ -15,6 +16,8 @@ interface Page {
     updatedAt: string;
     deploymentStatus: string;
     data: ProjectData | null;
+    /** Optional per-page AI guidance metadata (may be null if not set). */
+    pageMeta: PageMeta | null;
 }
 
 export default Page;

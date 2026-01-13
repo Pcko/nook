@@ -9,7 +9,7 @@ import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIc
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
-import {useNavigate} from "react-router-dom";
+import {Meta, useNavigate} from "react-router-dom";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 /**
@@ -145,6 +145,24 @@ function PageHub() {
             });
         }
     };
+
+    /**
+     *  Handles leftover Pages that
+     * @returns {undefined|Object}
+     */
+    const handleFragment = () => {
+        if (!localStorage.getItem("fragment")) {
+            return undefined;
+        }
+
+        try {
+            return JSON.parse(localStorage.getItem("fragment"));
+        } catch (err) {
+            return undefined;
+        }
+    }
+
+    const fallbackFormData = handleFragment();
 
     return (
         <div className="w-full h-full flex flex-col pt-3 px-20">
@@ -307,6 +325,7 @@ function PageHub() {
                         pages={pages}
                         setPages={setPages}
                         closeForm={() => setPageCreationFormActive(false)}
+                        fallbackFormData={fallbackFormData}
                     />
                 </CenteredWindowWithBackgroundBlur>)}
 
