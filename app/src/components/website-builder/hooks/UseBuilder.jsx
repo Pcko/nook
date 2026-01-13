@@ -6,7 +6,7 @@ import React, {
     useMemo,
     useState,
 } from "react";
-import {useBuilderHistory} from "../utils/useBuilderHistory"; // NEW:
+import {useBuilderHistory} from "../utils/useBuilderHistory";
 
 /**
  * @typedef {Object} BuilderContextValue
@@ -55,7 +55,6 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
     const [aiBusy, setAiBusy] = useState(false);
 
-    // NEW:
     const {history, historyIndex, goToHistory, captureHistory} = useBuilderHistory({
         editorRef,
         editorReady,

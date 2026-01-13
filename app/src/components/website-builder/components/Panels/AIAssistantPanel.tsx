@@ -106,7 +106,6 @@ function AIAssistantPanel(): JSX.Element {
 
             refreshEditor();
             syncWebsiteDataFromEditor();
-            // Store a short, human-friendly reason (keeps history meaningful)
             const shortPrompt = trimmed.length > 48 ? trimmed.slice(0, 48) + "…" : trimmed;
             captureHistory?.(`AI: ${shortPrompt}`);
 

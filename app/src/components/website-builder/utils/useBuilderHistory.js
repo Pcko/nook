@@ -18,7 +18,6 @@ import {useCallback, useEffect, useRef, useState} from "react";
  * }}
  */
 export function useBuilderHistory({editorRef, editorReady, setPage}) {
-    // --- lightweight snapshot history (view + restore) ---
     const MAX_HISTORY = 50;
     const [historyState, setHistoryState] = useState({items: [], index: -1});
     const historyStateRef = useRef(historyState);
