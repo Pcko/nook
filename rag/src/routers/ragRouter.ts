@@ -1,19 +1,19 @@
 import {type Request, type Response, Router} from "express";
 
-import localLLMClient from "../clients/ollamaClient.js";
+import localLLMClient from "../clients/openAiClient.js";
 import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
 import type {ElementEditRequestBody, ElementEditResponseBody, QueryRequestBody, QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 import type LlmClient from "../clients/llmClient.js";
-import OllamaClient from "../clients/ollamaClient.js";
+import OpenAiClient from "../clients/openAiClient.js";
 import GroqClient from "../clients/groqClient.js";
 
 const ragRouter = Router();
 
 const clients = {
     'groq': new GroqClient(),
-    'ollama': new OllamaClient(),
+    'local': new OpenAiClient(`http://localhost:${process.env.LLM_API_PORT || '11434'}/v1/chat/completions`),
 };
 const defaultClient = 'groq'
 

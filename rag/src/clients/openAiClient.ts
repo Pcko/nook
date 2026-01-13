@@ -3,14 +3,22 @@ import type {QueryResponseBody} from "../dto/rag.js";
 import LlmClient from "./llmClient.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
-const port = process.env.LLM_API_PORT || '11434';
-
-export default class OllamaClient extends LlmClient {
-
-    private readonly apiRoute = `http://localhost:${port}/v1/chat/completions`;
+export default class OpenAiClient extends LlmClient {
 
     /**
-     * Sends a chat completion request for a local LLM (served by ollama).
+     * The route to an OpenAI-v1-API-compliant chat completion endpoint without key authentication.
+     *
+     * @private apiRoute
+     */
+    private readonly apiRoute;
+
+    constructor(apiRoute: string) {
+        super();
+        this.apiRoute = apiRoute
+    }
+
+    /**
+     * Sends a chat completion request to an OpenAI-v1-API-compliant chat completion endpoint.
      *
      * @function getResponse
      * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM chat completion.
@@ -36,9 +44,7 @@ export default class OllamaClient extends LlmClient {
             }
 
             const json = await response.json();
-            const choices: [] = json.choices;
 
-            // @ts-ignore
             const data = json.choices[0].message.content;
             const thinkMatch = data.match(/<think>(.*?)<\/think>/s);
             const think = thinkMatch ? thinkMatch[1].trim() : "";
@@ -56,7 +62,7 @@ export default class OllamaClient extends LlmClient {
     }
 
     /**
-     * A streamed chat completion request for a local LLM (served by ollama).
+     * A streamed chat completion request for an OpenAI-v1-API-compliant chat completion endpoint.
      *
      * @function streamResponse
      * @param {ChatCompletionMessageParam[]} messages - The prompt for the LLM.
@@ -79,11 +85,11 @@ export default class OllamaClient extends LlmClient {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Ollama API error: ${errorText}`);
+                throw new Error(`OpenaAi API error: ${errorText}`);
             }
 
             if (!response.body) {
-                throw new Error("Ollama did not respond with a stream");
+                throw new Error("OpenAi API did not respond with a stream");
             }
 
             const reader = response.body.getReader();

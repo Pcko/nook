@@ -11,7 +11,7 @@ import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam
  */
 export interface QueryRequestBody {
     query: string;
-    provider?: 'groq' | 'ollama';
+    provider?: 'groq' | 'local';
     skipContext?: boolean;
     stream?: boolean;
 }
@@ -42,7 +42,7 @@ export interface ElementEditRequestBody {
     messages: ChatCompletionMessageParam[];
     elementId: string;
     websiteData: string;
-    provider?: 'groq' | 'ollama';
+    provider?: 'groq' | 'local';
 }
 
 /**
