@@ -20,14 +20,14 @@ export interface ChromaDBAddDocumentsRequestBody {
  * The request to be sent to Chroma
  *
  * @interface ChromaDBQuery
- * @property {string} query - The text query to search for.
+ * @property {string[]} queries - The text queries to search for.
  * @property {Where} [where] - Optional filter criteria for the query.
  * For structure, see https://docs.trychroma.com/docs/querying-collections/metadata-filtering.
  * @property {number} [nResults] - Optional number of results to return (defaults to `defaultNResults`).
  * @property {number} [distanceCutoff] - Optional filter critera for similarity (0 to 1; 0 is equal and >0.5 is unrelated)
  */
 export interface ChromaDBQuery {
-    query: string;
+    queries: string[];
     where?: Where;
     nResults?: number;
     distanceCutoff?: number;
