@@ -13,7 +13,7 @@ const rewritePrompt = readFileSync(path.resolve(__dirname, "rewrite-query.txt"),
  * Query Rewriter for vector database requests.
  *
  * @param {string} query - The original query to be rewritten.
- * @param {string} llmClient - The LLM client to use for the prompt.
+ * @param {LlmClient} llmClient - The LLM client to use for the prompt.
  *
  * @returns {Promise<string[]>} - The queries to be used for the vector database request.
  */
@@ -31,9 +31,9 @@ export default async function rewriteQuery (query: string, llmClient: LlmClient)
 
     const { response } = await llmClient.getResponse(messages);
     const queries = response.trim()
-        .split('\n')
+        .split(/\r?\n/)
         .filter(line => line.startsWith("- "))
-        .map(line => line.substring(2));
+        .map(line => line.substring(2).trim());
 
     return queries;
 }
