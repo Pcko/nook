@@ -3,73 +3,78 @@ import Groq from 'groq-sdk';
 import {type StreamCallback} from '../types/StreamCallback.js';
 import type {QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
+import LlmClient from "./llmClient.js";
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
 /**
- * A streamed chat completion request for a Groq LLM.
+ * Client for Groq-SDK LLM requests
  *
- * @function streamGroqResponse
- * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
- * @param {StreamCallback} onData - A callback to handle the streaming response.
- * @returns {Promise<void>} A Promise that resolves when the stream is completed.
+ * @class
  */
-async function streamGroqResponse(messages: ChatCompletionMessageParam[], onData: StreamCallback): Promise<void> {
-    try {
-        const stream = await groq.chat.completions.create({
-            messages: messages,
-            model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
-            stream: true,
-        });
+export default class GroqClient extends LlmClient {
 
-        for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-                onData(content);
+    /**
+     * A streamed chat completion request for a Groq LLM.
+     *
+     * @function streamResponse
+     * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
+     * @param {StreamCallback} onData - A callback to handle the streaming response.
+     * @returns {Promise<void>} A Promise that resolves when the stream is completed.
+     */
+    async streamResponse(messages: ChatCompletionMessageParam[], onData: StreamCallback): Promise<void> {
+        try {
+            const stream = await groq.chat.completions.create({
+                messages: messages,
+                model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
+                stream: true,
+            });
+
+            for await (const chunk of stream) {
+                const content = chunk.choices[0]?.delta?.content;
+                if (content) {
+                    onData(content);
+                }
             }
+        } catch (err) {
+            console.error('Streaming error from Groq:', err);
+            throw err;
         }
-    } catch (err) {
-        console.error('Streaming error from Groq:', err);
-        throw err;
     }
-}
 
-/**
- * Sends a chat completion request for a Groq LLM.
- *
- * @function getGroqResponse
- * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
- * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
- */
-async function getGroqResponse(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
-    try{
-        const startingTime = process.hrtime();
-        const response = await groq.chat.completions.create({
-            messages: messages,
-            model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
-            stream: false,
-            reasoning_format: 'parsed',
-            max_completion_tokens: 8192,
-        });
+    /**
+     * Sends a chat completion request for a Groq LLM.
+     *
+     * @function getResponse
+     * @param {ChatCompletionMessageParam[]} messages - The messages for the LLM (history + new user prompt).
+     * @returns {Promise<QueryResponseBody>} A Promise that resolves to the LLM response.
+     */
+    async getResponse(messages: ChatCompletionMessageParam[]): Promise<QueryResponseBody> {
+        try{
+            const startingTime = process.hrtime();
+            const response = await groq.chat.completions.create({
+                messages: messages,
+                model: process.env.GROQ_LLM_MODEL || 'qwen/qwen3-32b',
+                stream: false,
+                reasoning_format: ['openai/gpt-oss-120b', 'qwen/qwen3-32b'].includes(process.env.GROQ_LLM_MODEL || '') ? 'parsed' : null,
+                max_completion_tokens: 8192,
+            });
 
-        const content = response.choices[0]?.message?.content || "";
-        const reasoning = response.choices[0]?.message?.reasoning || "";
+            const content = response.choices[0]?.message?.content || "";
+            const reasoning = response.choices[0]?.message?.reasoning || "";
 
-        const duration = process.hrtime(startingTime);
+            const duration = process.hrtime(startingTime);
 
-        return {
-            think: reasoning,
-            response: content,
-            total_duration: duration[0]*1e9 + duration[1]
+            return {
+                think: reasoning,
+                response: content,
+                total_duration: duration[0]*1e9 + duration[1]
+            }
+        } catch (err) {
+            console.error('Response Error from Groq: ', err);
+            throw err;
         }
-    } catch (err) {
-        console.error('Response Error from Groq: ', err);
-        throw err;
     }
-}
 
-export default {
-    streamGroqResponse,
-    getGroqResponse
-};
+}

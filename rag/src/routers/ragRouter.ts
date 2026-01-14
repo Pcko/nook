@@ -1,32 +1,37 @@
 import {type Request, type Response, Router} from "express";
 
-import localLLMClient from "../clients/localLLMClient.js";
+import localLLMClient from "../clients/openAiClient.js";
 import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
 import type {ElementEditRequestBody, ElementEditResponseBody, QueryRequestBody, QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
+import type LlmClient from "../clients/llmClient.js";
+import OpenAiClient from "../clients/openAiClient.js";
+import GroqClient from "../clients/groqClient.js";
 
 const ragRouter = Router();
+
+const clients = {
+    'groq': new GroqClient(),
+    'local': new OpenAiClient(`http://localhost:${process.env.LLM_API_PORT || '11434'}/v1/chat/completions`),
+};
+const defaultClient = 'groq'
 
 ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Response<QueryResponseBody | { error: string }>) => {
     const queryRequest = req.body;
 
-    let messages: ChatCompletionMessageParam[] = [];
-    let prompt: string = "";
-    if(queryRequest.useLocalLLM) {
-        prompt = await promptBuilder.build(queryRequest.query, queryRequest.skipContext);
-    } else {
-        messages = [
-            {
-                role: "system",
-                content: await promptBuilder.build(queryRequest.query, queryRequest.skipContext, false)
-            },
-            {
-                role: "user",
-                content: queryRequest.query
-            }
-        ]
-    }
+    const llmClient: LlmClient = clients[queryRequest.provider || defaultClient];
+
+    const messages: ChatCompletionMessageParam[] =  [
+        {
+            role: "system",
+            content: await promptBuilder.build(queryRequest.query, queryRequest.skipContext, false)
+        },
+        {
+            role: "user",
+            content: queryRequest.query
+        }
+    ];
 
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
@@ -37,26 +42,22 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
             res.write(chunk);
         }
 
-        if(queryRequest.useLocalLLM) {
-            await localLLMClient.streamLLMResponse(prompt, callback);
-        } else {
-            await groqClient.streamGroqResponse(messages, callback);
-        }
+        await llmClient.streamResponse(messages, callback);
 
         return res.end();
     } else {
-        let queryResponse = await (queryRequest.useLocalLLM ?
-            localLLMClient.getLLMResponse(prompt) :
-            groqClient.getGroqResponse(messages)
-        );
+        const queryResponse = await llmClient.getResponse(messages);
 
         return res.status(200).send(queryResponse);
     }
 });
 
 ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
-    const messages = await promptBuilder.buildElementEditMessages(req.body);
-    const queryResponseBody = await groqClient.getGroqResponse(messages);
+    const requestBody: ElementEditRequestBody = req.body;
+    const messages = await promptBuilder.buildElementEditMessages(requestBody);
+
+    const llmClient: LlmClient = clients[requestBody.provider || defaultClient];
+    const queryResponseBody = await llmClient.getResponse(messages);
 
     const parts: { styles: Object, component: Object, text: string } = JSON.parse(queryResponseBody.response);
     return res.status(200).send({
