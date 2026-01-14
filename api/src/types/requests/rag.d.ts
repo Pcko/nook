@@ -1,7 +1,7 @@
 export interface RAGQueryBody {
     query: string;
+    provider: string;
     skipContext?: boolean;
-    useLocalLLM?: boolean;
     stream?: boolean;
 }
 
