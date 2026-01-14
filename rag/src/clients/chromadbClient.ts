@@ -1,4 +1,4 @@
-import { ChromaClient } from "chromadb";
+import {ChromaClient, type Metadata} from "chromadb";
 import { OllamaEmbeddingFunction } from '@chroma-core/ollama';
 
 import type {
@@ -37,16 +37,32 @@ const collection = await client.getOrCreateCollection({
  */
 async function getChromaDBQueryResponse(request: ChromaDBQuery): Promise<ChromaDBQueryResultItem[]> {
     const queryResult = await collection.query({
-        queryTexts: [request.query],
+        queryTexts: request.queries,
         nResults: request.nResults || defaultNResults,
         include: ["documents", "metadatas", "distances"],
         ...(request.where ? { where: request.where } : {})
     });
 
-    const distances = queryResult.distances?.[0] || [];
-    const documents = queryResult.documents?.[0] || [];
-    const metadatas = queryResult.metadatas?.[0] || [];
-    const ids = queryResult.ids?.[0] || [];
+    const idsSet: Set<string> = new Set<string>();
+    const documents: string[] = [];
+    const metadatas: Metadata[] = [];
+    const distances: number[] = [];
+
+    let idsIndex = 0;
+    for(const ids of queryResult.ids) {
+        let i = 0;
+        for(const id of ids) {
+            if(!idsSet.has(id)) {
+                idsSet.add(id);
+                documents.push(queryResult.documents?.[idsIndex]?.[i] || "");
+                metadatas.push(queryResult.metadatas?.[idsIndex]?.[i] || {});
+                distances.push(queryResult.distances?.[idsIndex]?.[i] || 1);
+            }
+            i++;
+        }
+        idsIndex++;
+    }
+    const ids = [...idsSet];
 
     const filtered = distances
         .map((dist, i) => ({

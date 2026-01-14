@@ -25,7 +25,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
     const messages: ChatCompletionMessageParam[] =  [
         {
             role: "system",
-            content: await promptBuilder.build(queryRequest.query, queryRequest.skipContext, false)
+            content: await promptBuilder.build(queryRequest.query, llmClient, queryRequest.skipContext, false)
         },
         {
             role: "user",
