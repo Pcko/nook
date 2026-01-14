@@ -2,11 +2,12 @@ import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam
 import type {QueryResponseBody} from "../dto/rag.js";
 import type {StreamCallback} from "../types/StreamCallback.js";
 
-/*
-    Abstract LLM Client
-
-
-*/
+/**
+ * An abstract class for LLM API calls
+ *
+ * @abstract
+ * @class
+ */
 export default abstract class LlmClient {
 
     /**

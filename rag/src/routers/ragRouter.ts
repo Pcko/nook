@@ -46,7 +46,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
         return res.end();
     } else {
-        let queryResponse = await llmClient.getResponse(messages);
+        const queryResponse = await llmClient.getResponse(messages);
 
         return res.status(200).send(queryResponse);
     }

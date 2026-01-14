@@ -3,6 +3,11 @@ import type {QueryResponseBody} from "../dto/rag.js";
 import LlmClient from "./llmClient.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
+/**
+ * Client for OpenAI-v1-API-style LLM requests
+ *
+ * @class
+ */
 export default class OpenAiClient extends LlmClient {
 
     /**

@@ -8,6 +8,11 @@ const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
+/**
+ * Client for Groq-SDK LLM requests
+ *
+ * @class
+ */
 export default class GroqClient extends LlmClient {
 
     /**
