@@ -18,6 +18,7 @@ import {useMetaNotify} from "../logging/MetaNotifyHook";
 import {useBuilder} from "../website-builder/hooks/UseBuilder";
 import {grapesjsExportConfig} from "../website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../website-builder/utils/websiteExportSettings";
+import PublishingService from "../../services/PublishingService";
 
 function classNames(...xs) {
     return xs.filter(Boolean).join(" ");
@@ -33,35 +34,6 @@ function slugify(input) {
             .replace(/^-+|-+$/g, "")
             .slice(0, 80) || "page"
     );
-}
-
-async function buildStaticBundle(editor) {
-    const htmlFn = grapesjsExportConfig?.root?.["index.html"];
-    const cssFn = grapesjsExportConfig?.root?.css?.["style.css"];
-    const imgFn = grapesjsExportConfig?.root?.img;
-
-    if (!htmlFn || !cssFn || !imgFn) {
-        throw new Error("Export configuration is missing required handlers.");
-    }
-
-    const [html, css, imgBinaryMap] = await Promise.all([
-        htmlFn(editor),
-        Promise.resolve(cssFn(editor)),
-        imgFn(editor),
-    ]);
-
-    const assets = Object.entries(imgBinaryMap || {}).map(([filename, binary]) => ({
-        path: `img/${filename}`,
-        base64: btoa(binary),
-    }));
-
-    return {
-        html,
-        css,
-        assets,
-        projectData: editor.getProjectData(),
-        exportSettings: getWebsiteExportSettings(),
-    };
 }
 
 const DESTINATIONS = [
@@ -88,15 +60,7 @@ const DESTINATIONS = [
     },
 ];
 
-export default function DeployModal({
-                                        open,
-                                        onClose,
-                                        page,
-                                        // optional: show a “Go to Settings” button if you wire it from LeftPanel/TopPanel
-                                        onOpenSettings,
-                                        // optional: shown as URL preview; e.g. https://yourdomain.com
-                                        publicBaseUrl,
-                                    }) {
+export default function DeployModal({open, onClose, page, onOpenSettings, publicBaseUrl}) {
     const baseMeta = useMemo(() => ({feature: "builder", component: "DeployModal"}), []);
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
@@ -108,11 +72,6 @@ export default function DeployModal({
 
     const [destination, setDestination] = useState("live"); // live | preview | download
     const [slug, setSlug] = useState(defaultSlug);
-
-    // Advanced (hidden by default)
-    const [endpoint, setEndpoint] = useState("/api/deploy");
-    const [replaceExisting, setReplaceExisting] = useState(true);
-    const [includeProjectData, setIncludeProjectData] = useState(true);
 
     const [busy, setBusy] = useState(false);
     const [resultUrl, setResultUrl] = useState("");
@@ -162,37 +121,26 @@ export default function DeployModal({
 
             notify("info", "Publishing…", {stage: "deploy", mode: "api", env}, "deploy");
 
-            const bundle = await buildStaticBundle(editor);
+            const {html} = await PublishingService.buildStaticBundle(editor);
+            const res = await PublishingService.publish(page, html);
 
-            const payload = {
-                page: {id: page?.id ?? null, name: page?.name ?? null},
-                slug,
-                environment: env,
-                overwrite: replaceExisting,
-                bundle: {
-                    html: bundle.html,
-                    css: bundle.css,
-                    assets: bundle.assets,
-                    exportSettings: bundle.exportSettings,
-                    projectData: includeProjectData ? bundle.projectData : undefined,
-                },
-            };
+            const authorId = res?.data?.author;
+            const pageName = res?.data?.name || page.name;
+            const maybeUrl = `/pages/${authorId}/${pageName}`;
 
-            const res = await axiosInstance.post(endpoint, payload);
-            const maybeUrl = res?.data?.url || res?.data?.publicUrl || res?.data?.deployUrl || "";
-
+            window.open(maybeUrl, "_blank", "noopener,noreferrer");
             setResultUrl(maybeUrl);
 
             notify(
                 "info",
                 "Publish complete.",
-                {stage: "deploy", mode: "api", env, endpoint, slug, returnedUrl: maybeUrl || null},
+                {stage: "deploy", mode: "api", env, slug, returnedUrl: maybeUrl || null},
                 "deploy"
             );
         } catch (err) {
             handleError(err, {
                 fallbackMessage: "Publishing failed.",
-                meta: {stage: "deploy", mode: "api", endpoint, slug},
+                meta: {stage: "deploy", mode: "api", slug},
             });
         } finally {
             setBusy(false);
@@ -212,13 +160,19 @@ export default function DeployModal({
     return (
         <Transition show={open} as={Fragment}>
             <Dialog as="div" className="relative z-[60]" onClose={onClose}>
-                <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100" leaveTo="opacity-0">
-                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+                <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0"
+                                  enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100"
+                                  leaveTo="opacity-0">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm"/>
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4">
-                        <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0 translate-y-2 scale-95" enterTo="opacity-100 translate-y-0 scale-100" leave="ease-in duration-150" leaveFrom="opacity-100 translate-y-0 scale-100" leaveTo="opacity-0 translate-y-2 scale-95">
+                        <Transition.Child as={Fragment} enter="ease-out duration-200"
+                                          enterFrom="opacity-0 translate-y-2 scale-95"
+                                          enterTo="opacity-100 translate-y-0 scale-100" leave="ease-in duration-150"
+                                          leaveFrom="opacity-100 translate-y-0 scale-100"
+                                          leaveTo="opacity-0 translate-y-2 scale-95">
                             <Dialog.Panel className="w-full max-w-2xl">
                                 <motion.div
                                     initial={{opacity: 0, y: 10, scale: 0.98}}
@@ -249,8 +203,9 @@ export default function DeployModal({
                                                 </button>
                                             ) : null}
 
-                                            <button onClick={onClose} className="hover:text-primary transition-colors" aria-label="Close" disabled={busy} type="button">
-                                                <XMarkIcon className="h-5 w-5" />
+                                            <button onClick={onClose} className="hover:text-primary transition-colors"
+                                                    aria-label="Close" disabled={busy} type="button">
+                                                <XMarkIcon className="h-5 w-5"/>
                                             </button>
                                         </div>
                                     </div>
@@ -261,16 +216,18 @@ export default function DeployModal({
                                             Check your site info (from the left panel)
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            <SummaryRow label="Site title" value={settings?.title || ""} />
-                                            <SummaryRow label="Language" value={settings?.language || ""} />
-                                            <SummaryRow label="Favicons" value={settings?.lightDataUrl || settings?.darkDataUrl ? "Custom" : "Default"} />
-                                            <SummaryRow label="Description" value={settings?.description || ""} wide />
+                                            <SummaryRow label="Site title" value={settings?.title || ""}/>
+                                            <SummaryRow label="Language" value={settings?.language || ""}/>
+                                            <SummaryRow label="Favicons"
+                                                        value={settings?.lightDataUrl || settings?.darkDataUrl ? "Custom" : "Default"}/>
+                                            <SummaryRow label="Description" value={settings?.description || ""} wide/>
                                         </div>
                                     </div>
 
                                     {/* Step 2: destination cards */}
                                     <div className="mt-3">
-                                        <div className="text-small font-semibold text-text mb-2">Where should it go?</div>
+                                        <div className="text-small font-semibold text-text mb-2">Where should it go?
+                                        </div>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                             {DESTINATIONS.map((d) => (
                                                 <DestinationCard
@@ -291,7 +248,8 @@ export default function DeployModal({
                                             <div className="text-small font-semibold text-text mb-2">Page address</div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 <div className="sm:col-span-1">
-                                                    <label className="text-small text-text-subtle">Web address name</label>
+                                                    <label className="text-small text-text-subtle">Web address
+                                                        name</label>
                                                     <input
                                                         className="mt-1 w-full h-[44px] px-3 pt-1 border-2 border-ui-border rounded-[6px] bg-website-bg text-small text-text placeholder-text-subtle
                                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
@@ -304,8 +262,9 @@ export default function DeployModal({
 
                                                 <div className="sm:col-span-1">
                                                     <label className="text-small text-text-subtle">Preview</label>
-                                                    <div className="mt-1 h-[44px] rounded-[6px] border border-ui-border bg-website-bg px-3 flex items-center gap-2">
-                                                        <LinkIcon className="h-4 w-4 text-text-subtle" />
+                                                    <div
+                                                        className="mt-1 h-[44px] rounded-[6px] border border-ui-border bg-website-bg px-3 flex items-center gap-2">
+                                                        <LinkIcon className="h-4 w-4 text-text-subtle"/>
                                                         <div className="text-small text-text-subtle truncate">
                                                             {urlPreview || "Will be shown after publishing"}
                                                         </div>
@@ -325,54 +284,6 @@ export default function DeployModal({
                                         </div>
                                     )}
 
-                                    {/* Advanced (hidden) */}
-                                    <div className="mt-3">
-                                        <Disclosure>
-                                            {({open: advOpen}) => (
-                                                <div className="rounded-[8px] border-2 border-ui-border bg-ui-bg">
-                                                    <Disclosure.Button className="w-full px-3 py-3 flex items-center justify-between text-left">
-                                                        <div className="text-small font-semibold text-text">Advanced</div>
-                                                        <ChevronDownIcon className={classNames("h-5 w-5 text-text-subtle transition-transform", advOpen ? "rotate-180" : "")} />
-                                                    </Disclosure.Button>
-                                                    <Disclosure.Panel className="px-3 pb-3">
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                            <div>
-                                                                <div className="text-small font-medium text-text">Replace existing version</div>
-                                                                <div className="mt-1">
-                                                                    <Toggle checked={replaceExisting} onChange={setReplaceExisting} />
-                                                                </div>
-                                                                <div className="mt-1 text-tiny text-text-subtle">If off, publishing can fail if it already exists.</div>
-                                                            </div>
-
-                                                            <div>
-                                                                <div className="text-small font-medium text-text">Include editor data</div>
-                                                                <div className="mt-1">
-                                                                    <Toggle checked={includeProjectData} onChange={setIncludeProjectData} />
-                                                                </div>
-                                                                <div className="mt-1 text-tiny text-text-subtle">Useful for re-importing later.</div>
-                                                            </div>
-
-                                                            <div className="sm:col-span-2">
-                                                                <div className="text-small font-medium text-text">Deploy endpoint</div>
-                                                                <input
-                                                                    className={classNames(
-                                                                        "mt-1 w-full h-[44px] px-3 pt-1 border-2 border-ui-border rounded-[6px] bg-website-bg text-small text-text placeholder-text-subtle",
-                                                                        "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors",
-                                                                        destination === "download" ? "opacity-60 cursor-not-allowed" : ""
-                                                                    )}
-                                                                    value={endpoint}
-                                                                    onChange={(e) => setEndpoint(e.target.value)}
-                                                                    placeholder="/api/deploy"
-                                                                    disabled={destination === "download"}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </Disclosure.Panel>
-                                                </div>
-                                            )}
-                                        </Disclosure>
-                                    </div>
-
                                     {/* Result */}
                                     <AnimatePresence>
                                         {resultUrl ? (
@@ -384,12 +295,13 @@ export default function DeployModal({
                                                 className="mt-3 rounded-[8px] border-2 border-ui-border bg-ui-bg p-3"
                                             >
                                                 <div className="flex items-start gap-2">
-                                                    <CheckCircleIcon className="h-5 w-5 text-primary mt-[2px]" />
+                                                    <CheckCircleIcon className="h-5 w-5 text-primary mt-[2px]"/>
                                                     <div className="min-w-0 flex-1">
                                                         <div className="text-small font-semibold text-text">Done</div>
                                                         <div className="mt-1 flex items-center gap-2 min-w-0">
-                                                            <LinkIcon className="h-4 w-4 text-text-subtle" />
-                                                            <div className="text-small text-text break-all font-mono">{resultUrl}</div>
+                                                            <LinkIcon className="h-4 w-4 text-text-subtle"/>
+                                                            <div
+                                                                className="text-small text-text break-all font-mono">{resultUrl}</div>
                                                         </div>
                                                     </div>
 
@@ -474,7 +386,7 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
         >
             <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Icon className="h-6 w-6 text-primary" />
+                    <Icon className="h-6 w-6 text-primary"/>
                 </div>
                 <div className="min-w-0">
                     <div className="text-small font-semibold text-text">{title}</div>
@@ -483,7 +395,8 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
             </div>
 
             {active ? (
-                <div className="mt-3 inline-flex rounded-[999px] border border-primary/40 bg-primary/5 px-2 pt-[3px] pb-[2px] text-tiny font-semibold text-primary">
+                <div
+                    className="mt-3 inline-flex rounded-[999px] border border-primary/40 bg-primary/5 px-2 pt-[3px] pb-[2px] text-tiny font-semibold text-primary">
                     Selected
                 </div>
             ) : null}
@@ -493,29 +406,10 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
 
 function SummaryRow({label, value, wide = false}) {
     return (
-        <div className={classNames("rounded-[6px] border border-ui-border bg-website-bg p-2", wide ? "sm:col-span-2" : "")}>
+        <div
+            className={classNames("rounded-[6px] border border-ui-border bg-website-bg p-2", wide ? "sm:col-span-2" : "")}>
             <div className="text-tiny text-text-subtle">{label}</div>
             <div className="text-small text-text break-words">{value || "—"}</div>
         </div>
-    );
-}
-
-function Toggle({checked, onChange}) {
-    return (
-        <Switch
-            checked={checked}
-            onChange={onChange}
-            className={classNames(
-                "relative inline-flex h-6 w-11 items-center rounded-full border transition-colors cursor-pointer",
-                checked ? "bg-primary/20 border-primary/40" : "bg-ui-bg border-ui-border"
-            )}
-        >
-      <span
-          className={classNames(
-              "inline-block h-5 w-5 transform rounded-full bg-website-bg border border-ui-border transition-transform",
-              checked ? "translate-x-5" : "translate-x-1"
-          )}
-      />
-        </Switch>
     );
 }

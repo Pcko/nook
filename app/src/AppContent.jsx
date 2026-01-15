@@ -11,6 +11,7 @@ import Register from "./components/auth/Registration";
 import {MotionConfig,} from "framer-motion";
 import NotificationOverlay from "./components/general/NotificationOverlay";
 import {useAnimation} from "./components/context/AnimationContext";
+import PublishedPageView from "./components/deployment/PublishedPageView";
 
 function AppContent() {
     const {animationEnabled} = useAnimation();
@@ -30,6 +31,7 @@ function AppContent() {
                                 <Route path="/settings" element={<Settings/>}/>
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/editor/:pageName" element={<EditorHub/>}/>
+                                <Route path="/pages/:authorId/:pageName" element={<PublishedPageView />} />
                             </Route>
                         </Routes>
                     </main>

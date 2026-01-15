@@ -150,8 +150,9 @@ function TopPanel({editorRef, page}) {
                 open={deployOpen}
                 onClose={() => setDeployOpen(false)}
                 page={page}
-                publicBaseUrl={"https://yourdomain.com"}
-            />        </>
+                publicBaseUrl={"nook-app-psi.vercel.app"}
+            />
+        </>
     );
 }
 
