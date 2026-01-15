@@ -15,13 +15,13 @@ const router = express.Router();
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {string} req.body.pageName - Page name
  *      @property {string} [req.body.folderName] - Optional folder name
- * 
+ *
  * @returns 200 - JSON{pageDetails<IPage>}
  */
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
         const { userId } = req;
-        const { pageName, folderName } = req.body;
+        const { pageName, folderName, metadata } = req.body;
 
         //make sure the pageName is valid
         if (isInvalidStringForURL(pageName)) {
@@ -44,7 +44,8 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         const pageData = {
             name: updatedPageName,
             author: userId,
-            folderName: folderName || 'GENERAL'
+            folderName: folderName || 'GENERAL',
+            metadata: metadata || {},
         };
 
         const pageDetails = await Page.create(pageData) as IPage;
@@ -122,7 +123,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
     try {
         const { userId } = req;
         const { pageName } = req.params;
-        const { newPageName, newFolderName, pageContent } = req.body;
+        const { newPageName, newFolderName, pageContent, metadata } = req.body;
 
         const page = await Page.findOne({ name: pageName, author: userId }) as IPage;
         if (!page) {
@@ -162,6 +163,10 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         //Update Folder
         if (newFolderName) {
             page.folderName = newFolderName;
+        }
+
+        if(metadata) {
+            page.metadata = metadata;
         }
 
         await page.save();

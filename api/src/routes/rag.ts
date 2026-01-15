@@ -5,9 +5,8 @@ import {
     RAGQueryBody,
     RAGResponseBody
 } from "../types/requests/rag";
-import type {
-    UserChatCompletionMessageParam,
-} from "../types/requests/rag.d.ts";
+import {Page} from "../database/models/page-schema.js";
+import IPage from "../types/IPage.js";
 
 const router = express.Router();
 
@@ -20,15 +19,22 @@ const charLimit = 500;
 const byteLimit = 1e5;
 
 router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) => {
+    const { userId } = req;
+
     if(req.body.query.length > charLimit) {
         return res.sendStatus(413);
     }
 
     try {
+        const metadata = (await Page.findOne({ name: req.body.pageName, author: userId }).lean<IPage>())?.metadata || {};
+
         const response = await fetch(`${process.env.RAG_URL}/generation/query`, {
             method: 'POST',
             headers: ragHeaders,
-            body: JSON.stringify(req.body)
+            body: JSON.stringify({
+                ...req.body,
+                meta: metadata
+            })
         });
 
         if (!response.ok || !response.body) {
@@ -62,15 +68,22 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
 });
 
 router.post('/editElement', async (req: Request<{}, {}, RAGElementEditRequestBody>, res: Response) => {
+    const { userId } = req;
+
     if(Buffer.byteLength(JSON.stringify(req.body)) > byteLimit) {
         return res.sendStatus(413);
     }
 
     try {
+        const metadata = (await Page.findOne({ name: req.body.pageName, author: userId }).lean<IPage>())?.metadata || {};
+
         const response = await fetch(`${process.env.RAG_URL}/generation/editElement`, {
             method: 'POST',
             headers: ragHeaders,
-            body: JSON.stringify(req.body)
+            body: JSON.stringify({
+                ...req.body,
+                meta: metadata
+            })
         });
 
         if (!response.ok || !response.body) {

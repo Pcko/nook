@@ -47,7 +47,7 @@ app.use(express.static(clientPath));
 app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
-app.use('/api/generation', ragRouter);
+app.use('/api/generation', authenticateToken, ragRouter);
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
