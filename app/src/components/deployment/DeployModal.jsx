@@ -130,7 +130,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
-            const url = `${import.meta.env.VITE_API_URL}/api/published/${authorId}/${pageName}`;
+            const url = `${publicBaseUrl}/api/published/${authorId}/${pageName}`;
 
             setResultUrl(url);
             setPendingUrl(url);

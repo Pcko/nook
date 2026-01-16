@@ -44,12 +44,6 @@ import {
  */
 function TopPanel({editorRef, page}) {
     /**
-     * Public base URL for the preview link shown in DeployModal.
-     * Note: this should be a full base URL or domain; DeployModal appends `/${slug}/`.
-     */
-    const PUBLIC_BASE_URL = "nook-app-psi.vercel.app";
-
-    /**
      * Logging/notifications context.
      */
     const baseMeta = useMemo(
@@ -237,7 +231,7 @@ function TopPanel({editorRef, page}) {
                 onClose={() => setDeployOpen(false)}
                 open={deployOpen}
                 page={page}
-                publicBaseUrl={PUBLIC_BASE_URL}
+                publicBaseUrl={import.meta.env.VITE_API_URL}
             />
         </div>
     );
