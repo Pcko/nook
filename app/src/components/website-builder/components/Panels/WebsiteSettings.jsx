@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
 import faviconDark from "../../../../assets/resources/favicon-dark.png";
 import faviconLight from "../../../../assets/resources/favicon-light.png";

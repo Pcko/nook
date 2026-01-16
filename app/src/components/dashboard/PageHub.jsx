@@ -9,7 +9,7 @@ import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIc
 import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
-import {Meta, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 
 /**
@@ -151,12 +151,12 @@ function PageHub() {
      * @returns {undefined|Object}
      */
     const handleFragment = () => {
-        if (!localStorage.getItem("fragment")) {
+        if (!sessionStorage.getItem("artifact")) {
             return undefined;
         }
 
         try {
-            return JSON.parse(localStorage.getItem("fragment"));
+            return JSON.parse(sessionStorage.getItem("artifact"));
         } catch (err) {
             return undefined;
         }

@@ -1,5 +1,5 @@
 import {Document} from 'mongoose';
-import {PageMetadata} from "./requests/pages";
+import {PageMetadata} from "./requests/pageMeta";
 
 export default interface IPage extends Document {
     name: string;

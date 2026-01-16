@@ -31,7 +31,7 @@ Additional context (suggestions from vector database, optional):
 {{context}}
 
 User-Created Metadata:
-{{userMetadata}}
+{{user-metadata}}
 
 TASK:
 Based on the user description and the additional context, generate a static single-page website as a single HTML file using inline-css.

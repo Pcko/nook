@@ -14,7 +14,11 @@ function BrandingForm(props: { value: PageMeta; onChange: (next: PageMeta) => vo
     const { value, onChange } = props;
     const v = value || {};
 
-    const setField = (k: string, val: string) => onChange({ ...v, [k]: val });
+    const setField = <K extends keyof PageMeta>(k: K, val: PageMeta[K]) => {
+        onChange({...v, [k]: val});
+    };
+
+    const keywordsValue = Array.isArray(v.keywords) ? v.keywords.join(", ") : "";
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -53,8 +57,14 @@ function BrandingForm(props: { value: PageMeta; onChange: (next: PageMeta) => vo
             <Field label="Keywords" hint="Comma separated">
                 <input
                     className="w-full rounded-[10px] border border-ui-border bg-ui-bg px-3 py-2 text-small text-text"
-                    value={v.keywords || ""}
-                    onChange={(e) => setField("keywords", e.target.value)}
+                    value={keywordsValue}
+                    onChange={(e) => {
+                        const next = e.target.value
+                            .split(",")
+                            .map((item) => item.trim())
+                            .filter(Boolean);
+                        setField("keywords", next.length ? next : undefined);
+                    }}
                     placeholder="e.g. coffee, breakfast, local"
                 />
             </Field>

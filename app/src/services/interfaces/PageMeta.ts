@@ -42,7 +42,7 @@ export interface PageMeta {
     /** Tone of voice (free-form to keep UX flexible). */
     tone?: string;
     /** Keywords describing brand or style. */
-    keywords?: string;
+    keywords?: string[];
 
     /** Services / offering summary. */
     services?: string;
