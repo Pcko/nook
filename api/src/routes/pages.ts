@@ -15,8 +15,8 @@ const router = express.Router();
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {string} req.body.pageName - Page name
  *      @property {string} [req.body.folderName] - Optional folder name
- *
- * @returns 200 - JSON{pageDetails<IPage>}
+ * 
+ * @returns 201 - JSON{pageDetails<IPage>}
  */
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
@@ -25,7 +25,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         //make sure the pageName is valid
         if (isInvalidStringForURL(pageName)) {
-            return res.sendStatus(400).json({ error: 'invalid_pageName' });
+            return res.status(400).json({ error: 'invalid_pageName' });
         }
 
         let updatedPageName = pageName;
@@ -50,7 +50,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         const pageDetails = await Page.create(pageData) as IPage;
 
-        return res.status(200).json(pageDetails);
+        return res.status(201).json(pageDetails);
     } catch (err) {
         console.error('❌ Create page error: ', err);
         return res.sendStatus(500);
@@ -135,7 +135,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         if (newPageName) {
             //make sure the pageName is valid
             if (isInvalidStringForURL(newPageName)) {
-                return res.sendStatus(400).json({ error: 'invalid_pageName' });
+                return res.status(400).json({ error: 'invalid_pageName' });
             }
 
             updatedPageName = newPageName;

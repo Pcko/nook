@@ -29,13 +29,13 @@ function LeftPanel() {
                 ]}
             />
 
-      {/* Both exist at load; visibility only */}
-      <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"} />
-      <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"} />
+            {/* Both exist at load; visibility only */}
+            <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"}/>
+            <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"}/>
 
-      {activeTab === "config" && <WebsiteSettings/>}
-    </div>
-  );
+            {activeTab === "config" && <WebsiteSettings/>}
+        </div>
+    );
 }
 
 export default LeftPanel;
