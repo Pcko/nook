@@ -1,3 +1,5 @@
+import {PageMeta} from "./PageMeta.ts";
+
 /**
  * Represents a single message in a chat completion request.
  *
@@ -20,9 +22,9 @@ export interface ChatMessage {
  * @property {string} websiteData - The whole state of the page a stringified ProjectData object
  */
 export interface ChatObject {
+    /** Page name for metadata extraction on the backend. */
+    pageName: string;
     elementId: string;
     websiteData: string;
     messages: ChatMessage[];
-    /** Optional per-page meta used to steer the assistant (backend may ignore). */
-    pageMeta?: unknown;
 }

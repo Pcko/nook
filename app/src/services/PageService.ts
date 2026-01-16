@@ -12,7 +12,16 @@ class PageService {
      */
     private static parsePage(requestPage: PageDTO): Page {
         const data = !requestPage.data ? null : JSON.parse(requestPage.data);
-        const pageMeta = !requestPage.pageMeta ? null : JSON.parse(requestPage.pageMeta);
+        // Backend field is `metadata` (object). Older frontend code used `pageMeta` (JSON string).
+        // Support both shapes to stay compatible.
+        const rawMeta = (requestPage as any).metadata ?? requestPage.pageMeta ?? null;
+        let pageMeta: PageMeta | null = null;
+        try {
+            if (typeof rawMeta === "string") pageMeta = JSON.parse(rawMeta);
+            else if (rawMeta && typeof rawMeta === "object") pageMeta = rawMeta;
+        } catch {
+            pageMeta = null;
+        }
 
         return {
             ...requestPage,
@@ -46,8 +55,8 @@ class PageService {
      * @param pageName - The name of the page to create
      * @returns The newly created Page object
      */
-    static async createPage(pageName: string): Promise<Page> {
-        const response = await axios.post<PageDTO>("/api/pages", {pageName});
+    static async createPage(pageName: string, metadata: PageMeta = {} as PageMeta): Promise<Page> {
+        const response = await axios.post<PageDTO>("/api/pages", {pageName, metadata});
         return this.parsePage(response.data);
     }
 
@@ -58,10 +67,15 @@ class PageService {
      * @returns The updated Page object
      */
     static async updatePage(page: Page, newPageName?: string): Promise<{ newPageName: string }> {
-        const payload = {
+        const payload: any = {
             newPageName,
             pageContent: JSON.stringify(page.data),
         };
+
+        // Only send metadata if present to avoid wiping it accidentally.
+        if (page.pageMeta !== undefined && page.pageMeta !== null) {
+            payload.metadata = page.pageMeta;
+        }
 
         const response = await axios.patch(`/api/pages/${page.name}`, payload);
         return response.data;

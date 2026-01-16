@@ -5,11 +5,13 @@ import {isInvalidStringForURL} from "../general/FormChecks";
 
 import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
 import PagePromptingStep from "./page-creation-components/PagePromptingStep";
+import PageCreationMetaStep from "./page-creation-components/PageCreationMetaStep";
 
 import PageService from "../../services/PageService";
 import AIService from "../../services/AIService";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 import grapesjs from "grapesjs";
+import {useMetaWizardState} from "../meta-wizard/useMetaWizard";
 
 /**
  * All steps of the AI-Page-Creation process.
@@ -17,168 +19,194 @@ import grapesjs from "grapesjs";
  * @enum {string}
  */
 const STEPS = {
-    CHOOSE: "choose", AI_CHAT: "ai-chat", AI_PREVIEW: "ai-preview"
+    CHOOSE: "choose",
+    META: "meta",
+    AI_CHAT: "ai-chat",
+    AI_PREVIEW: "ai-preview",
 };
 
 /**
  * PageCreationForm component handles multistep creation of pages,
  * including the choice between manual page-editing or ai-generation.
- *
- * @component
- * @param {Object} props
- * @param {Function} props.closeForm - Function to close the creation modal.
- * @param {Function} props.setPages - Setter to update pages.
- * @param {Object} props.fallbackFormData - If the page creation failed the data can be restored through this param
- * @returns {JSX.Element|null}
  */
 function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
     /**
      * @typedef {Object} FormData
-     * @property {string} pageName - The name of the new page.
-     * @property {string} aiPrompt - The prompt for generating AI pages.
-     * @property {Array<Object>} aiPages - List of generated AI page candidates.
-     * @property {boolean} loading - Loading state for AI generation or saving.
-     * @property {number} loadingStep - Current index in AI generation progress.
-     * @property {string} currentStep - Current UI step key from STEPS.
-     * @property {boolean} submitted - Prevents double creation of pages.
+     * @property {string} pageName
+     * @property {string} aiPrompt
+     * @property {Array<Object>} aiPages
+     * @property {boolean} loading
+     * @property {number} loadingStep
+     * @property {string} currentStep
+     * @property {boolean} submitted
+     * @property {Object|null} pageMeta
+     * @property {Object|null} createdPage
      */
 
-    /** @type {[FormData, Function]} */
-    const [formData, setFormData] = useState(fallbackFormData || {
-        pageName: "",
-        aiPrompt: "",
-        aiPages: [],
-        loading: false,
-        loadingStep: 0,
-        currentStep: STEPS.CHOOSE,
-        submitted: false
+    const [formData, setFormData] = useState(() => {
+        const fb = fallbackFormData || {};
+        return {
+            pageName: fb.pageName || "",
+            aiPrompt: fb.aiPrompt || "",
+            aiPages: fb.aiPages || [],
+            loading: false,
+            loadingStep: 0,
+            currentStep: fb.currentStep || STEPS.CHOOSE,
+            submitted: false,
+            createdPage: fb.createdPage || null,
+        };
     });
 
+    const metaWizard = useMetaWizardState((fallbackFormData && fallbackFormData.pageMeta) || {});
+    const [metaFlow, setMetaFlow] = useState({mode: null, returnStep: STEPS.CHOOSE});
     const navigate = useNavigate();
 
-    const baseMeta = useMemo(() => ({
-        feature: "pages", component: "PageCreationForm"
-    }), []);
+    const baseMeta = useMemo(
+        () => ({
+            feature: "pages",
+            component: "PageCreationForm",
+        }),
+        []
+    );
 
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
     const GENERATED_PAGE_AMOUNT = 2;
 
-    /**
-     * Update form state.
-     * @param {Partial<FormData>} updates
-     */
     const updateFormData = (updates) => {
         setFormData((prev) => ({...prev, ...updates}));
     };
 
-    /**
-     * Submit handler for manual page creation.
-     *
-     * @param {"self"|"external"} cause - Determines whether to open the editor or just create silently.
-     * @returns {Promise<void>}
-     */
-    const handleFormSubmit = async (cause) => {
+    const ensurePageCreated = async () => {
+        if (formData.createdPage) return formData.createdPage;
+
         const result = isInvalidStringForURL(formData.pageName);
         if (result) {
-            return notify("error", result, {
-                step: "manual-submit", pageName: formData.pageName
-            }, "validation");
+            notify(
+                "error",
+                result,
+                {step: formData.currentStep, pageName: formData.pageName},
+                "validation"
+            );
+            return null;
         }
 
-        if (formData.submitted) {
-            return;
+        const created = await PageService.createPage(formData.pageName, metaWizard.meta || {});
+
+        // Backend may rename on duplicates; keep using its name.
+        updateFormData({pageName: created.name, createdPage: created});
+
+        setPages((prev) => ({...prev, [created.name]: created}));
+        return created;
+    };
+
+    const handleFormSubmit = async (cause, metaOverride = undefined) => {
+        const result = isInvalidStringForURL(formData.pageName);
+        if (result) {
+            return notify(
+                "error",
+                result,
+                {step: "manual-submit", pageName: formData.pageName},
+                "validation"
+            );
         }
+
+        if (formData.submitted) return;
         updateFormData({submitted: true});
 
         try {
-            const pageSkeleton = {name: formData.pageName};
-            setPages((prev) => ({...prev, [pageSkeleton.name]: pageSkeleton}));
+            const metaToUse = metaOverride ?? metaWizard.meta ?? {};
+            const created = await PageService.createPage(formData.pageName, metaToUse);
+
+            const completePage = {
+                ...created,
+                pageMeta: created.pageMeta ?? metaToUse ?? null,
+            };
+
+            setPages((prev) => ({...prev, [completePage.name]: completePage}));
+
+            notify(
+                "info",
+                "Page created.",
+                {step: "manual-submit", pageName: completePage.name, cause: "self"},
+                "submit"
+            );
 
             if (cause === "self") {
-                const newPage = await PageService.createPage(formData.pageName);
-
-                notify("info", "Page created.", {
-                    step: "manual-submit", pageName: formData.pageName, cause: "self"
-                }, "submit");
-
-                navigate(`/editor/${formData.pageName}`, {state: {page: newPage}});
+                navigate(`/editor/${encodeURIComponent(completePage.name)}`, {
+                    state: {page: completePage},
+                });
             } else {
                 closeForm();
             }
         } catch (err) {
             updateFormData({submitted: false});
             handleError(err, {
-                fallbackMessage: "Page creation failed.", meta: {
-                    step: "manual-submit", pageName: formData.pageName
-                }
+                fallbackMessage: "Page creation failed.",
+                meta: {step: "manual-submit", pageName: formData.pageName},
             });
         }
     };
 
-    /**
-     * Moves user into AI prompt mode.
-     */
-    const handleAiButtonClick = () => {
+    const startAiFlow = () => {
         const result = isInvalidStringForURL(formData.pageName);
-
         if (result || formData.pageName.length < 2) {
-            return notify("error", "Enter a valid page name first.", {
-                step: "choose", pageName: formData.pageName
-            }, "validation");
+            return notify(
+                "error",
+                "Enter a valid page name first.",
+                {step: "choose", pageName: formData.pageName},
+                "validation"
+            );
         }
 
-        updateFormData({
-            aiPrompt: "", currentStep: STEPS.AI_CHAT
-        });
+        setMetaFlow({mode: "ai", returnStep: STEPS.CHOOSE});
+        updateFormData({aiPrompt: "", aiPages: [], currentStep: STEPS.META});
     };
 
-    /**
-     * Sends AI prompt to backend and loads generated pages.
-     * @returns {Promise<void>}
-     */
-    const handleAiPromptSubmit = async () => {
-        if (!formData.aiPrompt.trim()) {
-            return notify("error", "Enter a prompt.", {
-                step: "ai-chat", pageName: formData.pageName
-            }, "validation");
+    const startManualFlow = () => {
+        const result = isInvalidStringForURL(formData.pageName);
+        if (result || formData.pageName.length < 2) {
+            return notify(
+                "error",
+                "Enter a valid page name first.",
+                {step: "choose", pageName: formData.pageName},
+                "validation"
+            );
         }
 
-        updateFormData({loading: true, loadingStep: 0});
-
-        try {
-            const generatedPages = await generateAIPages();
-
-            updateFormData({
-                aiPages: generatedPages,
-                loadingStep: GENERATED_PAGE_AMOUNT,
-                currentStep: STEPS.AI_PREVIEW,
-                loading: false
-            });
-        } catch (err) {
-            handleError(err, {
-                fallbackMessage: "AI-Prompting failed.", meta: {
-                    step: "ai-generate", pageName: formData.pageName
-                }
-            });
-            updateFormData({loading: false});
-        }
+        setMetaFlow({mode: "manual", returnStep: STEPS.CHOOSE});
+        updateFormData({aiPrompt: "", aiPages: [], currentStep: STEPS.META});
     };
 
-    /**
-     * Generates multiple pages via AI.
-     * Retries invalid JSON responses automatically.
-     *
-     * @returns {Promise<Array<{name: string, data: any}>>}
-     */
-    const generateAIPages = async () => {
+    const handleMetaStepClose = async (reason, incoming) => {
+        const nextMeta = metaWizard.applyClose(reason, incoming || {});
+
+        if (reason === "dismiss") {
+            updateFormData({currentStep: metaFlow.returnStep || STEPS.CHOOSE});
+            setMetaFlow({mode: null, returnStep: STEPS.CHOOSE});
+            return;
+        }
+
+        // On skip/complete, proceed with the selected flow.
+        if (metaFlow.mode === "ai") {
+            updateFormData({currentStep: STEPS.AI_CHAT});
+        } else if (metaFlow.mode === "manual") {
+            await handleFormSubmit("self", nextMeta);
+        } else {
+            updateFormData({currentStep: metaFlow.returnStep || STEPS.CHOOSE});
+        }
+
+        setMetaFlow({mode: null, returnStep: STEPS.CHOOSE});
+    };
+
+    const generateAIPages = async (pageNameForMeta) => {
         const generatedPages = [];
-        let failCount = 1;
 
         for (let i = 0; i < GENERATED_PAGE_AMOUNT; i++) {
             const {response} = await AIService.getGeneratedPage({
-                query: formData.aiPrompt
+                query: formData.aiPrompt,
+                pageName: pageNameForMeta,
             });
 
             try {
@@ -187,17 +215,13 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
 
                 const editor = grapesjs.init({
                     fromElement: true,
-                    container: generatedPageContainer}
-                );
+                    container: generatedPageContainer,
+                });
 
                 const parsedResponse = editor.getProjectData();
-
-                updateFormData({loadingStep: formData.loadingStep + 1});
-                generatedPages.push({
-                    name: formData.pageName, data: parsedResponse
-                });
+                setFormData((prev) => ({...prev, loadingStep: prev.loadingStep + 1}));
+                generatedPages.push({name: pageNameForMeta, data: parsedResponse});
             } catch (err) {
-                failCount++;
                 i--;
             }
         }
@@ -205,62 +229,115 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         return generatedPages;
     };
 
-    /**
-     * Saves an AI-generated page and navigates to the editor.
-     *
-     * @param {{name: string, data: any}} selectedPage
-     * @returns {Promise<void>}
-     */
+    const handleAiPromptSubmit = async () => {
+        if (!formData.aiPrompt.trim()) {
+            return notify(
+                "error",
+                "Enter a prompt.",
+                {step: "ai-chat", pageName: formData.pageName},
+                "validation"
+            );
+        }
+
+        updateFormData({loading: true, loadingStep: 0});
+
+        try {
+            // Create page first (stores metadata in DB), then generate using pageName.
+            const created = await ensurePageCreated();
+            if (!created) {
+                updateFormData({loading: false});
+                return;
+            }
+
+            const generatedPages = await generateAIPages(created.name);
+
+            updateFormData({
+                aiPages: generatedPages,
+                loadingStep: GENERATED_PAGE_AMOUNT,
+                currentStep: STEPS.AI_PREVIEW,
+                loading: false,
+            });
+        } catch (err) {
+            handleError(err, {
+                fallbackMessage: "AI-Prompting failed.",
+                meta: {step: "ai-generate", pageName: formData.pageName},
+            });
+            updateFormData({loading: false});
+        }
+    };
+
     const handleSelectAiPage = async (selectedPage) => {
         if (formData.submitted || formData.loading) return;
-
         updateFormData({submitted: true, loading: true});
 
         try {
-            const page = await PageService.createPage(formData.pageName);
-            const completePage = {...page, data: selectedPage.data};
+            const created = await ensurePageCreated();
+            if (!created) {
+                updateFormData({submitted: false, loading: false});
+                return;
+            }
+
+            const completePage = {
+                ...created,
+                data: selectedPage.data,
+                pageMeta: created.pageMeta ?? metaWizard.meta ?? null,
+            };
 
             setPages((prev) => ({...prev, [completePage.name]: completePage}));
 
-            notify("info", "Page created via AI.", {
-                step: "ai-preview", pageName: completePage.name
-            }, "submit");
+            notify(
+                "info",
+                "Page created via AI.",
+                {step: "ai-preview", pageName: completePage.name},
+                "submit"
+            );
 
             await PageService.updatePage(completePage);
 
-            navigate(`/editor/${completePage.name}`, {
-                state: {page: completePage}
+            navigate(`/editor/${encodeURIComponent(completePage.name)}`, {
+                state: {page: completePage},
             });
 
             closeForm();
         } catch (err) {
             updateFormData({submitted: false});
             handleError(err, {
-                fallbackMessage: "AI-Page selection failed.", meta: {
-                    step: "ai-save", pageName: formData.pageName
-                }
+                fallbackMessage: "AI-Page selection failed.",
+                meta: {step: "ai-save", pageName: formData.pageName},
             });
-            sessionStorage.setItem(`artifact`, JSON.stringify({timestamp: Date.now(), ...formData}));
+            sessionStorage.setItem(
+                `artifact`,
+                JSON.stringify({timestamp: Date.now(), ...formData, pageMeta: metaWizard.meta})
+            );
         } finally {
             updateFormData({loading: false});
         }
     };
 
-    /**
-     * Decides which step component should be rendered.
-     *
-     * @returns {JSX.Element|null}
-     */
     const renderStep = () => {
         switch (formData.currentStep) {
             case STEPS.CHOOSE:
                 return (
                     <PageCreationChooseStep
                         closeForm={closeForm}
-                        handleAiButtonClick={handleAiButtonClick}
-                        handleFormSubmit={handleFormSubmit}
                         pageName={formData.pageName}
                         setPageName={(name) => updateFormData({pageName: name})}
+                        onChooseManual={startManualFlow}
+                        onChooseAi={startAiFlow}
+                    />
+                );
+
+            case STEPS.META:
+                return (
+                    <PageCreationMetaStep
+                        closeForm={closeForm}
+                        onBack={() => {
+                            updateFormData({currentStep: metaFlow.returnStep || STEPS.CHOOSE});
+                            setMetaFlow({mode: null, returnStep: STEPS.CHOOSE});
+                        }}
+                        onWizardClose={handleMetaStepClose}
+                        initialValue={metaWizard.meta}
+                        stepLabel={"Step 1 of 3"}
                     />
                 );
 
@@ -283,7 +360,9 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         }
     };
 
-    return renderStep();
+    return (
+        <>{renderStep()}</>
+    );
 }
 
 export default PageCreationForm;

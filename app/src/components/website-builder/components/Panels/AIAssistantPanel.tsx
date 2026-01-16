@@ -30,7 +30,7 @@ function AIAssistantPanel(): JSX.Element {
         refreshEditor,
         syncWebsiteDataFromEditor,
         captureHistory,
-        pageMeta,
+        pageName,
         aiBusy,
         setAiBusy,
     } = useBuilder();
@@ -86,7 +86,7 @@ function AIAssistantPanel(): JSX.Element {
                 messages: updatedInternalMessages,
                 elementId: selectedElement.getId(),
                 websiteData: JSON.stringify(editorRef.current.getProjectData()),
-                pageMeta: pageMeta || null,
+                pageName: pageName || "",
             };
 
             const res = await AIService.editElement(body);

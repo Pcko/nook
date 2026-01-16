@@ -5,7 +5,6 @@ import {SparklesIcon, ArrowRightIcon, XMarkIcon} from "@heroicons/react/24/outli
 import BaseFormular from "./BaseFormular";
 import BrandingForm from "./BrandingForm.tsx";
 import TargetForm from "./TargetForm.tsx";
-import {useBuilder} from "../website-builder/hooks/UseBuilder";
 import type {PageMeta} from "../../services/interfaces/PageMeta.ts";
 
 /** Wizard step identifiers used by {@link MetaWizard}. */
@@ -45,11 +44,13 @@ export interface MetaWizardProps {
  *
  * All fields are optional.
  *
+ * Persistence is intentionally handled by the parent via callbacks (onClose/onComplete/onSkip)
+ * so this wizard can be used both before and after a page exists.
+ *
  * @param {MetaWizardProps} props - Component props.
  * @returns {JSX.Element} Rendered wizard.
  */
 function MetaWizard({onComplete, onSkip, onClose, initialValue}: MetaWizardProps): JSX.Element {
-    const {setPageMeta} = useBuilder();
     const [step, setStep] = useState<WizardStep>("welcome");
     const [meta, setMeta] = useState<PageMeta>(initialValue || {});
 
@@ -86,7 +87,6 @@ function MetaWizard({onComplete, onSkip, onClose, initialValue}: MetaWizardProps
             skipped: true,
         };
 
-        setPageMeta(next);
         onSkip?.(next);
         onClose?.("skip", next);
     };
@@ -98,7 +98,6 @@ function MetaWizard({onComplete, onSkip, onClose, initialValue}: MetaWizardProps
             skipped: false,
         };
 
-        setPageMeta(next);
         onComplete?.(next);
         onClose?.("complete", next);
     };

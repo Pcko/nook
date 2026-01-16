@@ -11,7 +11,7 @@
 /**
  * Page-level metadata.
  */
-interface PageMeta {
+export interface PageMeta {
     /**
      * Tracks whether the Meta Wizard was already shown/closed for this page.
      * If true, the wizard will not auto-open again.
@@ -67,5 +67,3 @@ interface PageMeta {
     audienceRegion?: string;
     audienceNotes?: string;
 }
-
-export default PageMeta;

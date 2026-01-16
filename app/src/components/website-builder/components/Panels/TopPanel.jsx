@@ -6,13 +6,12 @@ import { handleRedo, handleUndo, setDesktop, setMobile, setTablet, toggleOutline
 import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../logging/ErrorHandler";
 import { useMetaNotify } from "../../../logging/MetaNotifyHook";
-import {useBuilder} from "../../hooks/UseBuilder";
+// MetaWizard is configured before page creation; no wizard UI inside builder.
 
 /**
  * TopPanel component
  */
 function TopPanel({ editorRef, page }) {
-  const {openMetaWizard} = useBuilder();
   const baseMeta = useMemo(
       () => ({
         feature: "builder",
@@ -151,7 +150,6 @@ function TopPanel({ editorRef, page }) {
         <div className="flex items-center justify-end gap-2">
           <TopActionButton label={"Save"} onClick={() => handleSave()} />
           <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)} />
-          <TopActionButton label={"Page setup"} onClick={openMetaWizard} />
           <TopActionButton label={"Publish"} primary={true} />
         </div>
       </div>
