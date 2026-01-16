@@ -69,7 +69,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
     const settings = getWebsiteExportSettings();
     const defaultSlug = useMemo(() => slugify(page?.name || "page"), [page?.name]);
-
     const [destination, setDestination] = useState("live"); // live | preview | download
     const [slug, setSlug] = useState(defaultSlug);
 
@@ -94,7 +93,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     const urlPreview = useMemo(() => {
         if (!publicBaseUrl) return "";
         const base = String(publicBaseUrl).replace(/\/+$/, "");
-        return `${base}/${slug}/`;
+        return `${base}/../${slug}/`;
     }, [publicBaseUrl, slug]);
 
     async function downloadZip() {
@@ -387,7 +386,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+                        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm"/>
                     </Transition.Child>
 
                     <div className="fixed inset-0 overflow-y-auto">
@@ -401,10 +400,12 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                 leaveFrom="opacity-100 translate-y-0 scale-100"
                                 leaveTo="opacity-0 translate-y-1 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-sm rounded-[8px] bg-website-bg border border-ui-border shadow-sm p-4">
+                                <Dialog.Panel
+                                    className="w-full max-w-sm rounded-[8px] bg-website-bg border border-ui-border shadow-sm p-4">
                                     <div className="flex items-start gap-3">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                                            <LinkIcon className="h-5 w-5 text-primary" />
+                                        <div
+                                            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                                            <LinkIcon className="h-5 w-5 text-primary"/>
                                         </div>
 
                                         <div className="min-w-0 flex-1">
@@ -422,7 +423,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                             onClick={closeOpenPrompt}
                                             aria-label="Close"
                                         >
-                                            <XMarkIcon className="h-5 w-5" />
+                                            <XMarkIcon className="h-5 w-5"/>
                                         </button>
                                     </div>
 
