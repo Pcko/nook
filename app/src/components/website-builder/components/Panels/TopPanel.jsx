@@ -1,5 +1,5 @@
+import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import React, {useMemo, useState} from "react";
-
 import {
     AiOutlineBorder,
     AiOutlineEye,
@@ -9,7 +9,11 @@ import {
     AiOutlineTablet,
     AiOutlineUndo
 } from "react-icons/ai";
-import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
+
+import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
+import DeployModal from "../../../deployment/DeployModal";
+import useErrorHandler from "../../../logging/ErrorHandler";
+import {useMetaNotify} from "../../../logging/MetaNotifyHook";
 import {
     exportWebsite,
     handleRedo,
@@ -20,14 +24,8 @@ import {
     toggleOutlines,
     togglePreview
 } from "../../utils/grapesActions";
-import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
-import useErrorHandler from "../../../logging/ErrorHandler";
-import {useMetaNotify} from "../../../logging/MetaNotifyHook";
-import DeployModal from "../../../deployment/DeployModal";
 
-/**
- * TopPanel component
- */
+
 function TopPanel({editorRef, page}) {
     const baseMeta = useMemo(
         () => ({
@@ -40,6 +38,9 @@ function TopPanel({editorRef, page}) {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+     *
+     */
     function handleSave() {
         WebsiteBuilderService.savePageState(editorRef.current, page)
             .then(() => {
@@ -64,6 +65,10 @@ function TopPanel({editorRef, page}) {
     const [showCustomViewport, setShowCustomViewport] = useState(false);
     const [lastAppliedCustomWidth, setLastAppliedCustomWidth] = useState(null); // number (e.g. 950) once applied
 
+    /**
+     *
+     * @param val
+     */
     const setCanvasZoom = (val) => {
         const editor = editorRef?.current;
         if (!editor) return;
@@ -80,6 +85,10 @@ function TopPanel({editorRef, page}) {
         frameEl.style.height = `${newHeight}px`;
     };
 
+    /**
+     *
+     * @param width
+     */
     const ensureAndSetCustomDevice = (width) => {
         const editor = editorRef?.current;
         if (!editor) return;
@@ -97,6 +106,9 @@ function TopPanel({editorRef, page}) {
         editor.setDevice(id);
     };
 
+    /**
+     *
+     */
     const applyCustomViewport = () => {
         const raw = String(customViewport).trim();
         const width = parseInt(raw, 10);
@@ -107,22 +119,35 @@ function TopPanel({editorRef, page}) {
     };
 
     // Device buttons should hide custom input (as requested)
+    /**
+     *
+     */
     const handleDesktop = () => {
         setShowCustomViewport(false);
         setDesktop(editorRef);
     };
+
+    /**
+     *
+     */
     const handleTablet = () => {
         setShowCustomViewport(false);
         setTablet(editorRef);
     };
+
+    /**
+     *
+     */
     const handleMobile = () => {
         setShowCustomViewport(false);
         setMobile(editorRef);
     };
 
-    // "+" behavior:
-    // - Show the input
-    // - If user has already applied a width before, immediately switch to that custom device again
+    /**
+     * "+" behavior:
+     * Show the input
+     * If user has already applied a width before, immediately switch to that custom device again
+     */
     const handlePlus = () => {
         setShowCustomViewport(true);
 
@@ -134,12 +159,14 @@ function TopPanel({editorRef, page}) {
     };
 
     return (
-        <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+        <div
+            className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
             {/* left group */}
             <div className="flex items-center gap-2">
                 <ToolbarButton icon={<AiOutlineUndo size={18}/>} label="Str+Z" onClick={() => handleUndo(editorRef)}/>
                 <ToolbarButton icon={<AiOutlineRedo size={18}/>} label="Str+Y" onClick={() => handleRedo(editorRef)}/>
-                <ToolbarButton icon={<AiOutlineBorder size={18}/>} label="Alt+O"
+                <ToolbarButton icon={<AiOutlineBorder size={18}/>}
+                               label="Alt+O"
                                onClick={() => toggleOutlines(editorRef)}/>
                 <ToolbarButton icon={<AiOutlineEye size={18}/>} label="Alt+P" onClick={() => togglePreview(editorRef)}/>
             </div>
@@ -150,9 +177,9 @@ function TopPanel({editorRef, page}) {
 
                 {showCustomViewport && (
                     <CustomViewportInput
-                        value={customViewport}
-                        onChange={setCustomViewport}
                         onApply={applyCustomViewport}
+                        onChange={setCustomViewport}
+                        value={customViewport}
                     />
                 )}
 
@@ -168,43 +195,50 @@ function TopPanel({editorRef, page}) {
                 <TopActionButton label={"Save"} onClick={() => handleSave()}/>
                 <TopActionButton label={"Export"} onClick={() => exportWebsite(editorRef)}/>
                 {/*<TopActionButton label={"Preview"}/>*/}
-                <TopActionButton label={"Publish"} primary={true} onClick={() => setDeployOpen(true)}/>
+                <TopActionButton label={"Publish"} onClick={() => setDeployOpen(true)} primary={true}/>
             </div>
 
             <DeployModal
-                open={deployOpen}
                 onClose={() => setDeployOpen(false)}
+                open={deployOpen}
                 page={page}
                 publicBaseUrl={"nook-app-psi.vercel.app"}
             />
-            <div/>
-            );
-            }
+        </div>
+    );
+}
 
-            function CustomViewportInput({value, onChange, onApply}) {
-            return (
-            <div
+/**
+ *
+ * @param root0
+ * @param root0.value
+ * @param root0.onChange
+ * @param root0.onApply
+ */
+function CustomViewportInput({value, onChange, onApply}) {
+    return (
+        <div
             className={[
-            "flex items-center rounded border border-ui-border transition",
-            "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-            "py-1 px-2 gap-1.5 text-tiny",
+                "flex items-center rounded border border-ui-border transition",
+                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
+                "py-1 px-2 gap-1.5 text-tiny",
             ].join(" ")}
             title="Custom viewport width in px (e.g. 950)"
         >
             <input
-                value={value}
+                className={["w-[4.2rem] bg-transparent outline-none", "font-mono text-micro text-text"].join(" ")}
+                inputMode="numeric"
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter") onApply();
                 }}
-                inputMode="numeric"
                 placeholder="950"
-                className={["w-[4.2rem] bg-transparent outline-none", "font-mono text-micro text-text"].join(" ")}
+                value={value}
             />
             <button
-                type="button"
-                onClick={onApply}
                 className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none border border-ui-border"
+                onClick={onApply}
+                type="button"
             >
                 px
             </button>
@@ -212,8 +246,15 @@ function TopPanel({editorRef, page}) {
     );
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.icon
+ * @param root0.label
+ * @param root0.onClick
+ */
 function ToolbarButton({icon, label, onClick}) {
-    const hasLabel = !!label;
+    const hasLabel = !label;
 
     return (
         <button
@@ -240,9 +281,16 @@ function ToolbarButton({icon, label, onClick}) {
     );
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.label
+ * @param root0.primary
+ * @param root0.onClick
+ */
 function TopActionButton({
-    label, primary = false, onClick
-}) {
+                             label, primary = false, onClick
+                         }) {
     return (
         <button className={["btn-wb", primary ? "btn-wb--primary" : ""].join(" ")} onClick={onClick}>
             <span className="py-0.5 font-mono">{label}</span>
@@ -250,11 +298,16 @@ function TopActionButton({
     );
 }
 
-function ZoomListbox({
-    value, onChange, options
-}) {
+/**
+ *
+ * @param root0
+ * @param root0.value
+ * @param root0.onChange
+ * @param root0.options
+ */
+function ZoomListbox({value, onChange, options}) {
     return (
-        <Listbox value={value} onChange={onChange}>
+        <Listbox onChange={onChange} value={value}>
             <div className="relative">
                 <ListboxButton
                     className={[
@@ -264,10 +317,10 @@ function ZoomListbox({
                         "focus:outline-none",
                     ].join(" ")}
                 >
-          <span
-              className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none">
-            {value}%
-          </span>
+                    <span
+                        className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none">
+                        {value}%
+                    </span>
                     <span
                         aria-hidden
                         className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
