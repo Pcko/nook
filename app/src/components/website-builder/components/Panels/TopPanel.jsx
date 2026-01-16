@@ -4,7 +4,7 @@ import {
     AiOutlineBorder,
     AiOutlineEye,
     AiOutlineLaptop,
-    AiOutlineMobile,
+    AiOutlineMobile, AiOutlinePlus,
     AiOutlineRedo,
     AiOutlineTablet,
     AiOutlineUndo

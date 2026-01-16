@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import axiosInstance from "../auth/AxiosInstance";
+import PublishingService from "../../services/PublishingService.ts";
 
 function PublishedPageView() {
     const {authorId, pageName} = useParams();
@@ -13,10 +13,7 @@ function PublishedPageView() {
         (async () => {
             try {
                 setErr("");
-                const res = await axiosInstance.get(`/api/published/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`, {
-                    responseType: "text",
-                    transformResponse: (r) => r, // keep raw string
-                });
+                const res = await PublishingService.open(authorId, pageName);
                 if (!mounted) return;
                 setHtml(res.data);
             } catch (e) {

@@ -1,4 +1,5 @@
 import axios from "../components/auth/AxiosInstance";
+import axiosInstance from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import {grapesjsExportConfig} from "../components/website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../components/website-builder/utils/websiteExportSettings";
@@ -17,6 +18,13 @@ class PublishingService {
             {page: html},
             axiosConfig
         );
+    }
+
+    static open(authorId: string, pageName: string) {
+       return axiosInstance.get(`/api/published/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`, {
+            responseType: "text",
+            transformResponse: (r) => r, // keep raw string
+        })
     }
 
     static async buildStaticBundle(editor) {
