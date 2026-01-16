@@ -24,12 +24,14 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
         const {userId} = req;
         const {pageName} = req.params;
         const {page} = req.body;
-        //make sure the pageName is valid
+
         if (isInvalidStringForURL(pageName)) {
             return res.status(400).json({error: 'invalid_pageName'});
         }
 
-        const pageDocument = await Page.findOne({name: pageName, author: userId}).lean<IPage>();
+        const filter = {name: pageName, author: userId};
+        const pageDocument = await Page.findOne(filter).lean<IPage>();
+
         if (!pageDocument) {
             return res.status(404).json({error: 'page_missing'});
         }
@@ -40,7 +42,6 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
             author: userId,
         }
 
-        const filter = {name: pageName, author: userId};
 
         const pageDetails = await PublishedPage.exists(filter) ?
             await PublishedPage.findOneAndUpdate(filter, publishedPage)

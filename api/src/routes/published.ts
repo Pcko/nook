@@ -17,10 +17,6 @@ router.get("/:authorId/:pageName", async (req: Request, res: Response) => {
     try {
         const { authorId, pageName } = req.params;
 
-        if (isInvalidStringForURL(authorId) || isInvalidStringForURL(pageName)) {
-            return res.status(400).json({ error: "invalid_params" });
-        }
-
         const published = await PublishedPage.findOne({
             author: authorId,
             name: pageName,
