@@ -284,10 +284,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div className="mt-2 text-small text-text-subtle">
-                                                “Publish (Live)” updates the public page. “Preview link” is for testing.
-                                            </div>
                                         </div>
                                     ) : (
                                         <div className="mt-3 rounded-[8px] border-2 border-ui-border bg-ui-bg p-3">
