@@ -8,13 +8,24 @@ import {
     computeStats,
     getPreviousRange,
     getRange,
-    normalizeReferrer,
     startOfDay,
     toISODate,
     buildTopList,
 } from "../util/stats.js";
 
 const router = express.Router();
+
+async function findPage(userId: string, pageId: string) {
+    if (mongoose.isValidObjectId(pageId)) {
+        const byId = await Page.findOne({ _id: pageId, author: userId }).lean();
+        if (byId) return byId;
+    }
+    return Page.findOne({ author: userId, name: pageId }).lean();
+}
+
+function buildPageFilter(pageName: string, pageId?: unknown) {
+    return pageId ? { $or: [{ pageId }, { pageName }] } : { pageName };
+}
 
 router.get("/pages/:pageId", async (req: Request, res: Response) => {
     try {
@@ -27,32 +38,37 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
         const { dateFrom, dateTo, rangeDays } = getRange(req.query);
         const previousRange = getPreviousRange(dateFrom, rangeDays);
 
-        let page = await Page.findOne({ author: userId, name: pageId }).lean();
-        if (!page && mongoose.isValidObjectId(pageId)) {
-            page = await Page.findOne({ _id: pageId, author: userId }).lean();
-        }
-
+        const page = await findPage(userId!, pageId);
         if (!page) {
             return res.status(404).json({ error: "page_not_found" });
         }
 
         const pageName = page.name;
+        const pageFilter = buildPageFilter(pageName, page._id);
 
-        const events = await PageView.find({
-            author: userId,
-            pageName,
-            day: { $gte: dateFrom, $lte: dateTo },
-        })
-            .select("day visitorHash viewedAt referrer")
-            .lean();
-
-        const previousEvents = await PageView.find({
-            author: userId,
-            pageName,
-            day: { $gte: previousRange.dateFrom, $lte: previousRange.dateTo },
-        })
-            .select("day visitorHash viewedAt")
-            .lean();
+        const [events, previousEvents, authorEvents, publishedPage] = await Promise.all([
+            PageView.find({
+                author: userId,
+                day: { $gte: dateFrom, $lte: dateTo },
+                ...pageFilter,
+            })
+                .select("day visitorHash viewedAt referrer")
+                .lean(),
+            PageView.find({
+                author: userId,
+                day: { $gte: previousRange.dateFrom, $lte: previousRange.dateTo },
+                ...pageFilter,
+            })
+                .select("day visitorHash viewedAt")
+                .lean(),
+            PageView.find({
+                author: userId,
+                day: { $gte: dateFrom, $lte: dateTo },
+            })
+                .select("pageName")
+                .lean(),
+            PublishedPage.findOne({ author: userId, name: pageName }).lean<IPublishedPage>(),
+        ]);
 
         const computed = computeStats(events, dateFrom, rangeDays, segment);
         const previousComputed = computeStats(previousEvents, previousRange.dateFrom, rangeDays, segment);
@@ -66,20 +82,7 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
             ),
         };
 
-        const referrerCounts = new Map<string, number>();
-        for (const event of computed.filteredEvents) {
-            const name = normalizeReferrer(event.referrer);
-            referrerCounts.set(name, (referrerCounts.get(name) || 0) + 1);
-        }
-
-        const topReferrers = buildTopList(referrerCounts, 5, "name", "visits");
-
-        const authorEvents = await PageView.find({
-            author: userId,
-            day: { $gte: dateFrom, $lte: dateTo },
-        })
-            .select("pageName")
-            .lean();
+        const topReferrers = buildTopList(computed.referrerCounts, 5, "name", "visits");
 
         const pageCounts = new Map<string, number>();
         for (const event of authorEvents) {
@@ -89,17 +92,15 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
 
         const topPages = buildTopList(pageCounts, 5, "path", "views");
 
-        const publishedPage = await PublishedPage.findOne({ author: userId, name: pageName }).lean<IPublishedPage>();
         let deployments: any[] = [];
-        
         if (publishedPage) {
             const deploymentDate = toISODate(
                 startOfDay(new Date(publishedPage.updatedAt ?? publishedPage.createdAt ?? Date.now()))
             );
             const viewsSinceDeploy = await PageView.countDocuments({
                 author: userId,
-                pageName,
                 day: { $gte: deploymentDate },
+                ...pageFilter,
             });
 
             deployments = [

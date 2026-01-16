@@ -80,11 +80,19 @@ function calculateChange(current: number, previous: number) {
 
 function normalizeReferrer(ref?: string) {
     if (!ref) return "Direct";
+    const trimmed = ref.trim();
+    if (!trimmed) return "Direct";
+    if (trimmed.toLowerCase() === "direct") return "Direct";
     try {
-        const host = new URL(ref).hostname.replace(/^www\./, "");
+        const host = new URL(trimmed).hostname.replace(/^www\./, "");
         return host || "Direct";
     } catch {
-        return "Direct";
+        try {
+            const host = new URL(`https://${trimmed}`).hostname.replace(/^www\./, "");
+            return host || "Direct";
+        } catch {
+            return "Direct";
+        }
     }
 }
 
@@ -99,13 +107,12 @@ function buildDateList(dateFrom: string, rangeDays: number) {
 
 function computeStats(events: PageViewEvent[], dateFrom: string, rangeDays: number, segment: string) {
     const dayList = buildDateList(dateFrom, rangeDays);
-    const perDayViews = new Map<string, number>();
-    const perDayUnique = new Map<string, Set<string>>();
-
-    dayList.forEach((day) => {
-        perDayViews.set(day, 0);
-        perDayUnique.set(day, new Set());
+    const dayIndex = new Map<string, number>();
+    const series = dayList.map((day, index) => {
+        dayIndex.set(day, index);
+        return { date: day, views: 0, unique: 0 };
     });
+    const perDayUnique = dayList.map(() => new Set<string>());
 
     const visitorStats = new Map<string, { firstViewedAt: Date }>();
 
@@ -119,7 +126,7 @@ function computeStats(events: PageViewEvent[], dateFrom: string, rangeDays: numb
     }
 
     const uniqueVisitors = new Set<string>();
-    const filteredEvents: PageViewEvent[] = [];
+    const referrerCounts = new Map<string, number>();
 
     for (const event of events) {
         const visitorKey = event.visitorHash || `anon-${event._id}`;
@@ -133,18 +140,20 @@ function computeStats(events: PageViewEvent[], dateFrom: string, rangeDays: numb
 
         if (!include) continue;
 
-        filteredEvents.push(event);
+        const index = dayIndex.get(event.day);
+        if (index === undefined) continue;
 
-        perDayViews.set(event.day, (perDayViews.get(event.day) || 0) + 1);
-        perDayUnique.get(event.day)?.add(visitorKey);
+        series[index].views += 1;
+        perDayUnique[index].add(visitorKey);
         uniqueVisitors.add(visitorKey);
+
+        const referrerName = normalizeReferrer(event.referrer);
+        referrerCounts.set(referrerName, (referrerCounts.get(referrerName) || 0) + 1);
     }
 
-    const series = dayList.map((day) => ({
-        date: day,
-        views: perDayViews.get(day) || 0,
-        unique: perDayUnique.get(day)?.size || 0,
-    }));
+    for (let i = 0; i < series.length; i += 1) {
+        series[i].unique = perDayUnique[i].size;
+    }
 
     const totalViews = series.reduce((sum, row) => sum + row.views, 0);
 
@@ -155,7 +164,7 @@ function computeStats(events: PageViewEvent[], dateFrom: string, rangeDays: numb
             avgDailyViews: rangeDays ? Math.round(totalViews / rangeDays) : 0,
         },
         series,
-        filteredEvents,
+        referrerCounts,
     };
 }
 

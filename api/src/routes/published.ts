@@ -27,11 +27,11 @@ function getVisitorHash(req: Request) {
     return crypto.createHash("sha256").update(`${ip}|${userAgent}`).digest("hex");
 }
 
-function normalizeReferrer(req: Request) {
+function getReferrerUrl(req: Request) {
     const ref = String(req.headers.referer || req.headers.referrer || "");
     if (!ref) return "";
     try {
-        return new URL(ref).hostname.replace(/^www\./, "");
+        return new URL(ref).toString();
     } catch {
         return "";
     }
@@ -68,7 +68,7 @@ router.get("/:authorId/:pageName", async (req: Request, res: Response) => {
             day: toISODate(startOfDay(viewedAt)),
             viewedAt,
             visitorHash: getVisitorHash(req),
-            referrer: normalizeReferrer(req),
+            referrer: getReferrerUrl(req),
             userAgent: String(req.headers["user-agent"] || ""),
         }).catch((err) => {
             console.error("❌ Page view logging error:", err);
