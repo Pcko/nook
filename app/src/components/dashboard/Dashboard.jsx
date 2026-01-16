@@ -8,11 +8,12 @@ import UserIcon from "../general/UserIcon";
 import SidebarItem from "./SidebarItem";
 import AuthService from "../../services/AuthService";
 import {
-    ArrowUpTrayIcon, CodeBracketIcon, FolderOpenIcon, PaintBrushIcon, ShieldCheckIcon, UserCircleIcon
+    ArrowUpTrayIcon, CodeBracketIcon, FolderOpenIcon, PaintBrushIcon, ShieldCheckIcon, UserCircleIcon, ChartBarIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
 import {LogVisualizer} from "../logging/LoggerDevTools";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
+import StatsHub from "./StatsHub";
 
 function Dashboard() {
     const [activeTab, setActiveTab] = useState("pages");
@@ -57,9 +58,15 @@ function Dashboard() {
             case "securitySettings":
                 return <Settings activeTab="security"/>;
             case "logging":
-                return (<div className="h-full">
-                    <LogVisualizer/>
-                </div>);
+                return (
+                    <div className="h-full">
+                        <LogVisualizer/>
+                    </div>
+                );
+            case "stats":
+                return (
+                    <StatsHub userId={user.username}/>
+                );
             default:
                 return <LoadingBubble className="mt-[200px]"/>;
         }
@@ -104,6 +111,12 @@ function Dashboard() {
                             icon={ShieldCheckIcon}
                             active={activeTab === "securitySettings"}
                             onClick={() => setActiveTab("securitySettings")}
+                        />
+                        <SidebarItem
+                            label="Statistics"
+                            icon={ChartBarIcon}
+                            active={activeTab === "stats"}
+                            onClick={() => setActiveTab("stats")}
                         />
 
                         {import.meta.env.VITE_ENV?.toLowerCase() === "dev" && (<>

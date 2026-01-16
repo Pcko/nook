@@ -13,6 +13,7 @@ import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 import publishingRouter from './routes/publishing.js';
 import publishedRouter from './routes/published.js'
+import statsRouter from './routes/stats.js';
 
 //ENV variable check
 const requiredENV = [
@@ -52,6 +53,7 @@ app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', ragRouter);
 app.use('/api/publishPage', authenticateToken, publishingRouter)
 app.use('/api/published', publishedRouter)
+app.use('/api/stats', authenticateToken, statsRouter)
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
