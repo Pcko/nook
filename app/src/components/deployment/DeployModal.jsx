@@ -126,7 +126,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
-            const maybeUrl = `/pages/${authorId}/${pageName}`;
+            const maybeUrl = `${import.meta.env.VITE_API_URL}/api/published/${authorId}/${pageName}`;
 
             window.open(maybeUrl, "_blank", "noopener,noreferrer");
             setResultUrl(maybeUrl);

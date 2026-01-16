@@ -5,8 +5,15 @@ import IPublishedPage from "../types/IPublishedPage.js";
 
 const router = express.Router();
 
-/** * @route GET /api/publishPage/:username/:pageName * @summary Returns a published page (html) for rendering in the frontend * * @param {Request<{ username: string; pageName: string }, {}, {}>} req * @property {string} req.params.username - Author username * @property {string} req.params.pageName - Published page name * * @returns 200 - JSON{ name, author, html } * @returns 404 - JSON{ error: 'published_page_not_found' } */
-router.get("/published/:authorId/:pageName", async (req: Request, res: Response) => {
+/**
+ * @route GET /api/publishPage/:username/:pageName
+ * @summary Returns a published page (html) for rendering in the frontend
+ * @param {Request<{ username: string; pageName: string }, {}, {}>} req
+ * @property {string} req.params.username - Author username
+ * @property {string} req.params.pageName - Published page name
+ * @returns 200 - JSON{ name, author, html } * @returns 404 - JSON{ error: 'published_page_not_found' }
+*/
+router.get("/:authorId/:pageName", async (req: Request, res: Response) => {
     try {
         const { authorId, pageName } = req.params;
 

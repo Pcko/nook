@@ -40,7 +40,12 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
             author: userId,
         }
 
-        const pageDetails = await PublishedPage.create(publishedPage) as IPublishedPage
+        const filter = {name: pageName, author: userId};
+
+        const pageDetails = await PublishedPage.exists(filter) ?
+            await PublishedPage.findOneAndUpdate(filter, publishedPage)
+            : await PublishedPage.create(publishedPage) as IPublishedPage;
+
         return res.status(201).json(pageDetails);
     } catch (err) {
         console.error('❌ Publish page error: ', err);
