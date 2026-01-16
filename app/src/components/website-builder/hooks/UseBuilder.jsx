@@ -6,15 +6,20 @@ import React, {
     useMemo,
     useState,
 } from "react";
+import {useBuilderHistory} from "../utils/useBuilderHistory";
 
 /**
  * @typedef {Object} BuilderContextValue
  * @property {MutableRefObject<Editor>} editorRef
  * @property {any} page
  * @property {(page: any) => void} setPage
- * @property {string|null} selectedElementId
+ * @property {Component|null} selectedElement
  * @property {() => void} refreshEditor
  * @property {() => void} syncWebsiteDataFromEditor
+ * @property {Array<{id: string, ts: number, reason: string, data: any}>} history
+ * @property {number} historyIndex
+ * @property {(index: number) => void} goToHistory
+ * @property {(reason?: string) => void} captureHistory
  * @property {boolean} aiBusy
  * @property {(busy: boolean) => void} setAiBusy
  */
@@ -27,12 +32,12 @@ const BuilderContext = createContext(null);
  *
  * Provides shared Website Builder state + actions via React Context:
  * - Stores the current GrapesJS project data (`page`)
- * - Tracks currently selected component id (`selectedElementId`)
+ * - Tracks currently selected component (`selectedElement`)
  * - Exposes helpers to refresh the editor and sync project data from GrapesJS
  * - Exposes a global lock flag (`aiBusy`) to disable editing while AI operations run
  *
  * Side effects:
- * - Subscribes to GrapesJS "component:selected" to keep `selectedElementId` in sync
+ * - Subscribes to GrapesJS "component:selected" to keep `selectedElement` in sync
  * - Adds an Escape key listener to clear selection
  * - Toggles GrapesJS preview mode while `aiBusy` is true (prevents editing interactions)
  *
@@ -45,10 +50,16 @@ const BuilderContext = createContext(null);
  */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
     const [page, setPage] = useState(initialPage.data);
-    const [selectedElementId, setSelectedElementId] = useState(null);
+    const [selectedElement, setSelectedElement] = useState(null);
 
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
     const [aiBusy, setAiBusy] = useState(false);
+
+    const {history, historyIndex, goToHistory, captureHistory} = useBuilderHistory({
+        editorRef,
+        editorReady,
+        setPage,
+    });
 
     useEffect(() => {
         if (!editorReady) return;
@@ -57,10 +68,10 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
         /**
          * Handles GrapesJS component selection changes.
-         * @param {any} cmp GrapesJS component model
+         * @param {Component} cmp GrapesJS component model
          */
         const onSelect = (cmp) => {
-            setSelectedElementId(cmp?.getId?.() || null);
+            setSelectedElement(cmp || null);
         };
 
         /**
@@ -70,9 +81,9 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const eventHandler = (event) => {
             if (event.key === "Escape") {
                 editor.select(null);
-                setSelectedElementId(null);
+                setSelectedElement(null);
             }
-        };
+        }
 
         addEventListener("keydown", eventHandler);
         editor.on("component:selected", onSelect);
@@ -87,7 +98,6 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const editor = editorRef.current;
         if (!editor) return;
 
-        // While busy: enable preview (reduces editor interaction). When done: restore.
         if (aiBusy) editor.runCommand("core:preview");
         else editor.stopCommand("core:preview");
     }, [aiBusy, editorRef]);
@@ -112,24 +122,32 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
     /** @type {BuilderContextValue} */
     const value = useMemo(
-        () => ({
-            editorRef,
-            page,
-            setPage,
-            selectedElementId,
-            refreshEditor,
-            syncWebsiteDataFromEditor,
-            aiBusy,
-            setAiBusy,
-        }),
-        [
-            editorRef,
-            page,
-            selectedElementId,
-            refreshEditor,
-            syncWebsiteDataFromEditor,
-            aiBusy,
-        ]
+            () => ({
+                editorRef,
+                page,
+                setPage,
+                selectedElement,
+                refreshEditor,
+                syncWebsiteDataFromEditor,
+                history,
+                historyIndex,
+                goToHistory,
+                captureHistory,
+                aiBusy,
+                setAiBusy,
+            }),
+            [
+                editorRef,
+                page,
+                selectedElement,
+                refreshEditor,
+                syncWebsiteDataFromEditor,
+                aiBusy,
+                history,
+                historyIndex,
+                goToHistory,
+                captureHistory,
+            ]
     );
 
     return <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>;

@@ -70,12 +70,12 @@
 }
 
 .gjs-traits-c{
-  background-color: white !important;
+  background-color: var(--ui-default) !important;
   color: var(--text);
 }
 
 .gjs-field-text, .gjs-field-select{
-  background-color: white;
+  background-color: var(--ui-default);
   border: 2px solid var(--ui-border);
   border-radius: 5px;
 }
@@ -94,4 +94,58 @@ body.gjs-preview-active .right-panel {
 
 .gjs-off-prv {
   display: none !important;
+}
+
+.gjs-sm-properties{
+  background-color: var(--ui-default) !important;
+}
+
+
+.gjs-sm-label{
+  color: var(--text) !important;
+}
+
+.gjs-fields{
+  color: var(--text) !important;
+
+  .gjs-sm-field input, .gjs-clm-field input, .gjs-clm-select input, .gjs-sm-field select, .gjs-clm-field select, .gjs-clm-select select {
+    color: var(--text) !important;
+  }
+
+  .gjs-field{
+    background-color: var(--ui-default) !important;
+    border: 2px solid var(--ui-border) !important;
+    border-radius: 5px !important;
+  }
+}
+
+.gjs-sm-field.gjs-sm-composite, .gjs-sm-composite.gjs-clm-field, .gjs-sm-composite.gjs-clm-select{
+  border: 2px solid var(--ui-border) !important;
+}
+
+.gjs-sm-sector{
+  border-bottom: none !important;
+}
+
+:root {
+  /* Core */
+  --gjs-primary-color: var(--ui-default);
+  --gjs-secondary-color: var(--ui-border);
+  --gjs-tertiary-color: var(--ui-border);
+  --gjs-quaternary-color: var(--ui-subtle);
+  --gjs-main-dark-color: var(--ui-bg-selected);
+
+  /* Backgrounds */
+  --gjs-main-color: var(--ui-bg);
+  --gjs-secondary-color: var(--ui-bg-selected);
+
+  /* Text */
+  --gjs-font-color: var(--text);
+  --gjs-font-color-inverse: var(--text-on-primary);
+  --gjs-soft-color: var(--text-subtle);
+
+  /* States */
+  --gjs-color-blue: var(--primary);
+  --gjs-color-green: var(--success);
+  --gjs-color-red: var(--dangerous);
 }

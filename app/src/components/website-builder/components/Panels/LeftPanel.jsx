@@ -16,7 +16,7 @@ function LeftPanel() {
     return (
         <div
             className={
-                "h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto " +
+                "left-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto " +
                 (aiBusy ? "pointer-events-none opacity-60" : "")
             }>
             <TabSelector
@@ -25,7 +25,7 @@ function LeftPanel() {
                 options={[
                     {value: "layers", label: "Layers"},
                     {value: "blocks", label: "Blocks"},
-                    {value: "settings", label: "Settings"}
+                    {value: "config", label: "Config"},
                 ]}
             />
 

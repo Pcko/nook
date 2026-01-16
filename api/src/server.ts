@@ -13,9 +13,24 @@ import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 import publishingRouter from './routes/publishing.js';
 
-if (!process.env.APP_URL || !process.env.RAG_URL) {
-    console.error('Cors environment missing!')
+//ENV variable check
+const requiredENV = [
+    'MONGODB_URI',
+    'DB_NAME',
+    'ACCESS_TOKEN_SECRET',
+    'REFRESH_TOKEN_SECRET',
+    'EMAIL_USER',
+    'EMAIL_PASS',
+    'APP_URL',
+    'RAG_URL',
+    'RAG_KEY'
+];
+const missingENV = requiredENV.filter((name) => !process.env[name]);
+if (missingENV.length) {
+    console.error(`❌ Missing environment variables: ${missingENV.join(", ")}`);
 }
+
+//Server settings
 const allowedOrigins: string[] = [process.env.APP_URL, process.env.RAG_URL] as string[];
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +44,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));
 app.use(express.static(clientPath));
 
+//Routes
 app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);

@@ -4,11 +4,25 @@ import React from "react";
 import {AIIcon} from "../dashboard/resources/DashboardIcons";
 
 /**
- * @param {boolean} loading - A Boolean that disables the submit button if true
- * @param {string | readonly string[] | number} prompt - The prompt the users writes
- * @param {function} setPrompt - The Setter of the written prompt
- * @param {string} placeholder - The placeholder of the input field
- * @param {React.MouseEventHandler<HTMLButtonElement>} handleSubmit - A function which is called upon submitting
+ * PromptingTextArea
+ *
+ * Controlled textarea with an attached submit button (AI icon).
+ * - Enter submits (unless Shift+Enter).
+ * - Shift+Enter inserts a newline.
+ * - Disabled while `loading` is true or when the prompt is empty/whitespace.
+ *
+ * @component
+ * @param {Object} props
+ * @param {boolean} props.loading
+ *   When true, disables the textarea and submit button and applies a disabled style.
+ * @param {string} props.prompt
+ *   Current prompt value (controlled).
+ * @param {(value: string) => void} props.setPrompt
+ *   Setter for updating the prompt (e.g., from `useState`).
+ * @param {() => void} props.handleSubmit
+ *   Called when submitting via button click or Enter key (without Shift).
+ * @param {string} props.placeholder
+ *   Placeholder text for the textarea.
  * @returns {React.JSX.Element}
  */
 function PromptingTextArea({loading, prompt, setPrompt, handleSubmit, placeholder}) {

@@ -1,7 +1,18 @@
-- Every component must have EITHER a "type" OR "tagName" attribute set.
-  - in "type", you may use one of these: "text", "div", "Box", "link", "button", "image"
-  - in "tagName", you may use one of these: "u", "i", "b"
-- Text must be represented as a "textnode" inside of a "text" element
-- "u", "i", "b" are all wrappers of "textnode", they must be children of "text"
-- Every visually relevant element should have an entry in "styles" referencing its id using "#id".
-- For images, set a reasonable public placeholder URL (stock content) if none is provided.
+- Each component must define EITHER a "type" OR a "tagName".
+- Allowed values for "type": "text", "textnode", "div", "Box", "link", "button", "image".
+- Allowed values for "tagName": "u", "i", "b".
+
+- Text content must always be represented as a "textnode" inside a component of type "text".
+- The "content" field is ONLY for plain human-readable text on "textnode" elements.
+- NEVER put objects, arrays, JSON, or placeholders like [object Object] into "content".
+
+- Container components (e.g. type "div" or "Box") should normally NOT use the "content" field.
+- They should place all visual children inside the "components" array.
+
+- Image components (type "image") must NOT contain nested components or text content.
+- Use only attributes like "src", "alt", "id", etc.
+
+- Every visually relevant component MUST have a corresponding entry in the "styles" array.
+- This style entry must reference the component by its id using "#id".
+
+- For image components, if the user does not provide a URL, you must assign a reasonable public placeholder image.

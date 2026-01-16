@@ -5,6 +5,8 @@ import { fileURLToPath } from "url";
 import chromaClient from "../../clients/chromadbClient.js";
 import type ChatCompletionMessageParam from "../../types/ChatCompletionMessageParam.js"
 import type {ElementEditRequestBody} from "../../dto/rag.js";
+import rewriteQuery from "./queryRewriter.js";
+import type LlmClient from "../../clients/llmClient.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,11 +16,7 @@ const componentRules = readFileSync( path.resolve(__dirname, "component-rules.tx
 const componentsTemplate = readFileSync( path.resolve(__dirname, "components-format.txt"), "utf-8");
 const stylesTemplate = readFileSync( path.resolve(__dirname, "styles-format.txt"), "utf-8");
 
-const promptTemplate = readFileSync( path.resolve(__dirname, "prompt.txt"), "utf-8")
-    .replace("{{component-rules}}", componentRules)
-    .replace("{{grapes-format}}", grapesTemplate)
-    .replace("{{components-format}}", componentsTemplate)
-    .replace("{{styles-format}}", stylesTemplate);
+const promptTemplate = readFileSync( path.resolve(__dirname, "prompt.txt"), "utf-8");
 
 const elementEditPrompt = readFileSync( path.resolve(__dirname, "elementEdit-prompt.txt"), "utf-8")
     .replace("{{component-rules}}", componentRules)
@@ -34,15 +32,17 @@ export const promptBuilder = {
      *
      * @async
      * @param {string} query - The main user query.
+     * @param {LlmClient} llmClient - The LLM client to be used to rewrite the query.
      * @param {boolean} [skipContext=false] - If true, skips fetching additional context from ChromaDB.
      * @param {boolean} includeQuery - If true, appends the user's query at the end.
      * @returns {Promise<string>} A Promise that resolves to a fully constructed prompt string.
      */
-    async build(query: string, skipContext?: boolean, includeQuery: boolean = true): Promise<string> {
+    async build(query: string, llmClient: LlmClient, skipContext?: boolean, includeQuery: boolean = true): Promise<string> {
         let contextString = "No additional context available.";
         if (!skipContext) {
             try {
-                const chromaResponse = await chromaClient.query({ query });
+                const queries = await rewriteQuery(query, llmClient);
+                const chromaResponse = await chromaClient.query({ queries });
                 contextString = JSON.stringify(chromaResponse);
             } catch (err) {
                 console.error("[promptBuilder] Chroma Error:", err);
