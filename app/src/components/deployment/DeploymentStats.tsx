@@ -35,6 +35,9 @@ function formatPct(n) {
     return `${sign}${v.toFixed(1)}%`;
 }
 
+const PRIMARY_COLOR = "var(--primary)";
+const PRIMARY_SOFT = "var(--primary-hover)";
+
 function startOfDay(d) {
     const x = new Date(d);
     x.setHours(0, 0, 0, 0);
@@ -102,56 +105,26 @@ export default function DeploymentStats({
     const dateTo = useMemo(() => toISODate(startOfDay(new Date())), []);
     const dateFrom = useMemo(() => toISODate(startOfDay(daysAgo(rangeDays - 1))), [rangeDays]);
 
-    // Fallback mock data so component is usable immediately
+    // Fallback empty data when no API is provided
     async function defaultFetch() {
-        // generate simple trend data
         const series = Array.from({ length: rangeDays }, (_, idx) => {
             const d = new Date();
             d.setDate(d.getDate() - (rangeDays - 1 - idx));
-            const views = Math.max(0, Math.round(120 + 60 * Math.sin(idx / 3) + Math.random() * 35));
-            const unique = Math.max(0, Math.round(80 + 35 * Math.sin(idx / 4) + Math.random() * 25));
-            return { date: toISODate(d), views, unique };
+            return { date: toISODate(d), views: 0, unique: 0 };
         });
-
-        const sumViews = series.reduce((a, b) => a + b.views, 0);
-        const sumUnique = series.reduce((a, b) => a + b.unique, 0);
 
         return {
             summary: {
-                views: sumViews,
-                uniqueVisitors: sumUnique,
-                avgDailyViews: Math.round(sumViews / rangeDays),
-                changePctViews: 7.8,
-                changePctUnique: 4.1,
+                views: 0,
+                uniqueVisitors: 0,
+                avgDailyViews: 0,
+                changePctViews: null,
+                changePctUnique: null,
             },
             series,
-            topReferrers: [
-                { name: "Google", visits: 420 },
-                { name: "Direct", visits: 310 },
-                { name: "Instagram", visits: 190 },
-                { name: "LinkedIn", visits: 120 },
-            ],
-            topPages: [
-                { path: "/", views: 620 },
-                { path: "/pricing", views: 410 },
-                { path: "/contact", views: 180 },
-            ],
-            deployments: [
-                {
-                    id: "dpl_1",
-                    name: "Live deployment",
-                    createdAt: toISODate(daysAgo(6)),
-                    note: "Hero section update",
-                    viewsSinceDeploy: 540,
-                },
-                {
-                    id: "dpl_0",
-                    name: "Previous deployment",
-                    createdAt: toISODate(daysAgo(20)),
-                    note: "New testimonials",
-                    viewsSinceDeploy: 1320,
-                },
-            ],
+            topReferrers: [],
+            topPages: [],
+            deployments: [],
         };
     }
 
@@ -320,6 +293,16 @@ export default function DeploymentStats({
                     <div className="h-[260px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={series} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor={PRIMARY_COLOR} stopOpacity={0.35} />
+                                        <stop offset="95%" stopColor={PRIMARY_COLOR} stopOpacity={0.05} />
+                                    </linearGradient>
+                                    <linearGradient id="uniqueGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor={PRIMARY_SOFT} stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor={PRIMARY_SOFT} stopOpacity={0.05} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis
                                     dataKey="date"
@@ -334,8 +317,22 @@ export default function DeploymentStats({
                                     ]}
                                     labelFormatter={(label) => `Date: ${label}`}
                                 />
-                                <Area type="monotone" dataKey="views" fillOpacity={0.2} strokeWidth={2} />
-                                <Area type="monotone" dataKey="unique" fillOpacity={0.2} strokeWidth={2} />
+                                <Area
+                                    type="monotone"
+                                    dataKey="views"
+                                    stroke={PRIMARY_COLOR}
+                                    fill="url(#viewsGradient)"
+                                    fillOpacity={1}
+                                    strokeWidth={2}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="unique"
+                                    stroke={PRIMARY_SOFT}
+                                    fill="url(#uniqueGradient)"
+                                    fillOpacity={1}
+                                    strokeWidth={2}
+                                />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
