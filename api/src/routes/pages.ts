@@ -16,7 +16,7 @@ const router = express.Router();
  *      @property {string} req.body.pageName - Page name
  *      @property {string} [req.body.folderName] - Optional folder name
  * 
- * @returns 200 - JSON{pageDetails<IPage>}
+ * @returns 201 - JSON{pageDetails<IPage>}
  */
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
@@ -49,7 +49,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         const pageDetails = await Page.create(pageData) as IPage;
 
-        return res.status(200).json(pageDetails);
+        return res.status(201).json(pageDetails);
     } catch (err) {
         console.error('❌ Create page error: ', err);
         return res.sendStatus(500);

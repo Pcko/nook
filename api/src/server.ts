@@ -1,16 +1,17 @@
-import express, { Request, Response } from 'express';
+import express, {Request, Response} from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import cors from 'cors';
 
 import 'dotenv/config';
 import './database/connection.js'; //<-- database connection script
-
 import authenticateToken from './routes/auth-token.js';
 import authRouter from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
+import publishingRouter from './routes/publishing.js';
+import publishedRouter from './routes/published.js'
 
 //ENV variable check
 const requiredENV = [
@@ -39,8 +40,8 @@ const clientPath = path.join(__dirname, '..', 'app', 'dist');
 const app = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
-app.use(express.json({ limit: '16mb' }));
+app.use(cors({origin: allowedOrigins, credentials: true}));
+app.use(express.json({limit: '16mb'}));
 app.use(express.static(clientPath));
 
 //Routes
@@ -48,12 +49,10 @@ app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', ragRouter);
+app.use('/api/publishPage', authenticateToken, publishingRouter)
+app.use('/api/published', publishedRouter)
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
-
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
-});
 
 if (process.env.DEVENV) {
     app.listen(PORT, () => {
