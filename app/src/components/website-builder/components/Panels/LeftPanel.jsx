@@ -34,7 +34,6 @@ function LeftPanel() {
             <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"}/>
 
             {activeTab === "config" && <WebsiteSettings/>}
-            {activeTab === "settings" && <WebsiteSettings/>}
         </div>
     );
 }

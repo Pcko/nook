@@ -118,7 +118,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
         if (!editor) return;
 
         setBusy(true);
-        setAiBusy(true);
         setResultUrl("");
 
         try {
