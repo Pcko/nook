@@ -226,7 +226,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                         </div>
                                     </div>
 
-                                    {/* Step 1: quick summary */}
                                     <div className="rounded-[8px] border-2 border-ui-border bg-ui-bg p-3">
                                         <div className="text-small font-semibold text-text mb-2">
                                             Check your site info (from the left panel)
@@ -240,7 +239,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                         </div>
                                     </div>
 
-                                    {/* Step 2: destination cards */}
                                     <div className="mt-3">
                                         <div className="text-small font-semibold text-text mb-2">Where should it go?
                                         </div>
@@ -258,7 +256,6 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                         </div>
                                     </div>
 
-                                    {/* Step 3: address (simple) */}
                                     {destination !== "download" ? (
                                         <div className="mt-3 rounded-[8px] border-2 border-ui-border bg-ui-bg p-3">
                                             <div className="text-small font-semibold text-text mb-2">Page address</div>

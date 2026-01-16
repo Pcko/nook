@@ -253,8 +253,8 @@ function CustomViewportInput({value, onChange, onApply}) {
  * @param root0.label
  * @param root0.onClick
  */
-function ToolbarButton({icon, label, onClick}) {
-    const hasLabel = !label;
+function ToolbarButton({ icon, label, onClick }) {
+    const hasLabel = !!label;
 
     return (
         <button
@@ -268,8 +268,7 @@ function ToolbarButton({icon, label, onClick}) {
             onClick={onClick}
             title={label || undefined}
         >
-      <span
-          className="flex items-center justify-center bg-ui-default text-text rounded-full w-6 h-6 border border-ui-border">
+      <span className="flex items-center justify-center bg-ui-default text-text rounded-full w-6 h-6 border border-ui-border">
         {icon}
       </span>
             {hasLabel && (
