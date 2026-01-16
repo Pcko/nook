@@ -8,6 +8,10 @@ const PageSchema = new Schema<IPage>(
             required: true,
             maxLength: 50,
         },
+        metadata: {
+            type: Object,
+            default: {}
+        },
         data: {
             type: String,
             default: null,

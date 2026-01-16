@@ -1,4 +1,5 @@
 export interface RAGQueryBody {
+    pageName: string;
     query: string;
     provider: string;
     skipContext?: boolean;
@@ -12,21 +13,23 @@ export interface RAGResponseBody {
 }
 
 /**
- *
  * @interface RAGElementEditRequestBody
+ *
+ * @param {string} pageName - The name of the page edit.
  * @param {ChatCompletionMessageParam[]} messages - Message history from the user/assistant.
  * @param {string} elementId - The ID of the element to be edited.
  * @param {string} websiteData - The website data to include in the prompt.
  */
 export interface RAGElementEditRequestBody {
+    pageName: string;
     messages: UserChatCompletionMessageParam[];
     elementId: string;
     websiteData: string;
 }
 
 /**
- *
  * @interface RAGElementEditResponseBody
+ *
  * @param {string} think - Reasoning of reasoning LLMs. (only qwen3 or gpt currently support this)
  * @param {Object} component - The element data that was edited.
  * @param {Object} styles - The website styles data that was edited.

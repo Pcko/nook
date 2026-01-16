@@ -146,6 +146,24 @@ function PageHub() {
         }
     };
 
+    /**
+     *  Handles leftover Pages that
+     * @returns {undefined|Object}
+     */
+    const handleFragment = () => {
+        if (!sessionStorage.getItem("artifact")) {
+            return undefined;
+        }
+
+        try {
+            return JSON.parse(sessionStorage.getItem("artifact"));
+        } catch (err) {
+            return undefined;
+        }
+    }
+
+    const fallbackFormData = handleFragment();
+
     return (
         <div className="w-full h-full flex flex-col pt-3 px-20">
             <div>
@@ -307,6 +325,7 @@ function PageHub() {
                         pages={pages}
                         setPages={setPages}
                         closeForm={() => setPageCreationFormActive(false)}
+                        fallbackFormData={fallbackFormData}
                     />
                 </CenteredWindowWithBackgroundBlur>)}
 

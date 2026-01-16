@@ -21,11 +21,11 @@ const router = express.Router();
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
         const { userId } = req;
-        const { pageName, folderName } = req.body;
+        const { pageName, folderName, metadata } = req.body;
 
         //make sure the pageName is valid
         if (isInvalidStringForURL(pageName)) {
-            return res.sendStatus(400).json({ error: 'invalid_pageName' });
+            return res.status(400).json({ error: 'invalid_pageName' });
         }
 
         let updatedPageName = pageName;
@@ -44,7 +44,8 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
         const pageData = {
             name: updatedPageName,
             author: userId,
-            folderName: folderName || 'GENERAL'
+            folderName: folderName || 'GENERAL',
+            metadata: metadata || {},
         };
 
         const pageDetails = await Page.create(pageData) as IPage;
@@ -122,7 +123,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
     try {
         const { userId } = req;
         const { pageName } = req.params;
-        const { newPageName, newFolderName, pageContent } = req.body;
+        const { newPageName, newFolderName, pageContent, metadata } = req.body;
 
         const page = await Page.findOne({ name: pageName, author: userId }) as IPage;
         if (!page) {
@@ -134,7 +135,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         if (newPageName) {
             //make sure the pageName is valid
             if (isInvalidStringForURL(newPageName)) {
-                return res.sendStatus(400).json({ error: 'invalid_pageName' });
+                return res.status(400).json({ error: 'invalid_pageName' });
             }
 
             updatedPageName = newPageName;
@@ -162,6 +163,10 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         //Update Folder
         if (newFolderName) {
             page.folderName = newFolderName;
+        }
+
+        if(metadata) {
+            page.metadata = metadata;
         }
 
         await page.save();

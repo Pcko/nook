@@ -1,4 +1,5 @@
 import {ProjectData} from "grapesjs";
+import type {PageMeta} from "./PageMeta.ts";
 
 /**
  * Represents a website page managed by the WebsiteBuilder.
@@ -8,6 +9,7 @@ import {ProjectData} from "grapesjs";
  * @property updatedAt - Timestamp of the last update.
  * @property deploymentStatus - Current publishing/deployment status.
  * @property data - The GrapesJS project data for this page.
+ * @property {PageMeta} [pageMeta] - page metadata for ai interaction
  */
 interface Page {
     name: string;
@@ -15,6 +17,7 @@ interface Page {
     updatedAt: string;
     deploymentStatus: string;
     data: ProjectData | null;
+    pageMeta: PageMeta | null;
 }
 
 export default Page;

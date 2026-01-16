@@ -1,7 +1,5 @@
 import {type Request, type Response, Router} from "express";
 
-import localLLMClient from "../clients/openAiClient.js";
-import groqClient from "../clients/groqClient.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
 import type {ElementEditRequestBody, ElementEditResponseBody, QueryRequestBody, QueryResponseBody} from "../dto/rag.js";
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
@@ -22,16 +20,7 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
     const llmClient: LlmClient = clients[queryRequest.provider || defaultClient];
 
-    const messages: ChatCompletionMessageParam[] =  [
-        {
-            role: "system",
-            content: await promptBuilder.build(queryRequest.query, llmClient, queryRequest.skipContext, false)
-        },
-        {
-            role: "user",
-            content: queryRequest.query
-        }
-    ];
+    const messages: ChatCompletionMessageParam[] = await promptBuilder.build(queryRequest, llmClient);
 
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
@@ -54,9 +43,9 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
 ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBody>, res: Response<ElementEditResponseBody>)=> {
     const requestBody: ElementEditRequestBody = req.body;
-    const messages = await promptBuilder.buildElementEditMessages(requestBody);
 
     const llmClient: LlmClient = clients[requestBody.provider || defaultClient];
+    const messages = await promptBuilder.buildElementEditMessages(requestBody, llmClient);
     const queryResponseBody = await llmClient.getResponse(messages);
 
     const parts: { styles: Object, component: Object, text: string } = JSON.parse(queryResponseBody.response);

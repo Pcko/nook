@@ -195,8 +195,16 @@ h1 {
     @apply w-[700px] h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded-[5px] bg-ui-bg mb-3;
 }
 
+.standard-modal{
+    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[750px] max-w-[90%] max-w-xl mx-auto p-4 md:p-5 rounded-[8px] bg-website-bg border border-ui-border shadow-sm;
+}
+
 .page-creation-window{
-    @apply bg-website-bg border-2 border-ui-border rounded-[5px] p-6 mx-auto w-[750px] max-w-[90%];
+    @apply standard-modal;
+}
+
+.base-formular-window{
+    @apply standard-modal;
 }
 
 /* Hide scrollbar but keep scrolling (Chrome, Edge, Safari) */

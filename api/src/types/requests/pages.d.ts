@@ -1,6 +1,9 @@
+import { PageMetadata } from "./pageMeta";
+
 export interface CreatePageBody {
     pageName: string;
     folderName?: string;
+    metadata?: PageMetadata;
 }
 
 export interface PageNameParam {
@@ -11,4 +14,5 @@ export interface UpdatePageBody {
     newPageName?: string;
     newFolderName?: string;
     pageContent?: string;
+    metadata?: PageMetadata;
 }

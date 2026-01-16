@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import 'dotenv/config';
 import './database/connection.js'; //<-- database connection script
+
 import authenticateToken from './routes/auth-token.js';
 import authRouter from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
 import settingsRouter from './routes/settings.js';
