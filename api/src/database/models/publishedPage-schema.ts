@@ -1,8 +1,15 @@
 import mongoose, { Schema } from 'mongoose';
 import IPublishedPage from '../../types/IPublishedPage.js';
+import { PageView } from './pageView-schema.js';
 
 const PublishedPageSchema = new Schema<IPublishedPage>(
     {
+        pageId: {
+            type: Schema.Types.ObjectId,
+            ref: "Page",
+            required: true,
+            index: true,
+        },
         name: {
             type: String,
             required: true,
@@ -10,7 +17,7 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
         },
         html: {
             type: String,
-            default: null,
+            required: true,
         },
         author: {
             type: String,
@@ -24,6 +31,35 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
     }
 );
 
-PublishedPageSchema.index({ name: 1, author: 1 }, { unique: true });
+async function handlePublishedPageDeletion(publishedPage: IPublishedPage | null) {
+    if (!publishedPage) return;
+
+    await PageView.deleteMany({ publishedPageId: publishedPage._id });
+}
+
+// findOneAndDelete (also covers findByIdAndDelete)
+PublishedPageSchema.pre('findOneAndDelete', async function (next) {
+    const publishedPage = await this.model.findOne(this.getFilter());
+    await handlePublishedPageDeletion(publishedPage);
+    next();
+});
+
+// deleteOne (query middleware)
+PublishedPageSchema.pre('deleteOne', { document: false, query: true }, async function (next) {
+    const publishedPage = await this.model.findOne(this.getFilter());
+    await handlePublishedPageDeletion(publishedPage);
+    next();
+});
+
+// deleteMany (bulk deletion)
+PublishedPageSchema.pre('deleteMany', async function (next) {
+    const publishedPages = await this.model.find(this.getFilter());
+    for (const publishedPage of publishedPages) {
+        await handlePublishedPageDeletion(publishedPage);
+    }
+    next();
+});
+
+PublishedPageSchema.index({ pageId: 1, author: 1 }, { unique: true });
 
 export const PublishedPage = mongoose.model<IPublishedPage>('PublishedPage', PublishedPageSchema);

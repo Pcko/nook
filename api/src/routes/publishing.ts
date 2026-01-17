@@ -1,6 +1,5 @@
 import express, {Request, Response} from 'express';
 
-import {isInvalidStringForURL} from "../util/FormChecks.js";
 import {PublishPageBody, PublishPageParams} from '../types/requests/publishing.js';
 import {PublishedPage, Page} from '../util/internal.js';
 import IPublishedPage from '../types/IPublishedPage.js';
@@ -25,26 +24,23 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
         const {pageName} = req.params;
         const {page} = req.body;
 
-        if (isInvalidStringForURL(pageName)) {
-            return res.status(400).json({error: 'invalid_pageName'});
-        }
-
-        const filter = {name: pageName, author: userId};
-        const pageDocument = await Page.findOne(filter).lean<IPage>();
+        const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
 
         if (!pageDocument) {
             return res.status(404).json({error: 'page_missing'});
         }
 
         const publishedPage = {
-            name: pageName,
+            pageId: pageDocument._id,
+            name: pageDocument.name,
             html: page,
             author: userId,
         }
 
+        const existingPublished = await PublishedPage.findOne({ pageId: pageDocument._id, author: userId }).lean<IPublishedPage>();
 
-        const pageDetails = await PublishedPage.exists(filter) ?
-            await PublishedPage.findOneAndUpdate(filter, publishedPage)
+        const pageDetails = existingPublished
+            ? await PublishedPage.findByIdAndUpdate(existingPublished._id, publishedPage, { new: true }) as IPublishedPage
             : await PublishedPage.create(publishedPage) as IPublishedPage;
 
         return res.status(201).json(pageDetails);
@@ -69,8 +65,12 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         const userId = req.userId;
         const {pageName} = req.params;
 
-        const deletedPage = await PublishedPage.findOneAndDelete({name: pageName, author: userId});
+        const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
+        if (!pageDocument) {
+            return res.status(404).json({ error: 'page_not_found' })
+        }
 
+        const deletedPage = await PublishedPage.findOneAndDelete({ pageId: pageDocument._id, author: pageDocument.author });
         if (!deletedPage) {
             return res.status(404).json({error: 'published_page_not_found'})
         }

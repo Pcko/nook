@@ -12,7 +12,8 @@ import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 import publishingRouter from './routes/publishing.js';
-import publishedRouter from './routes/published.js'
+import publishedPageRouter from './routes/publishedPage.js'
+import statsRouter from './routes/stats.js';
 
 //ENV variable check
 const requiredENV = [
@@ -24,11 +25,11 @@ const requiredENV = [
     'EMAIL_PASS',
     'APP_URL',
     'RAG_URL',
-    'RAG_KEY'
+    'RAG_API_KEY'
 ];
 const missingENV = requiredENV.filter((name) => !process.env[name]);
 if (missingENV.length) {
-    console.error(`❌ Missing environment variables: ${missingENV.join(", ")}`);
+    console.error(`⚠️ Missing environment variables: ${missingENV.join(", ")}`);
 }
 
 //Server settings
@@ -51,7 +52,8 @@ app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', ragRouter);
 app.use('/api/publishPage', authenticateToken, publishingRouter)
-app.use('/api/published', publishedRouter)
+app.use('/api/published', publishedPageRouter)
+app.use('/api/stats', authenticateToken, statsRouter)
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 

@@ -27,17 +27,18 @@ class SettingsService {
     }
 
     static async deleteAccount(user : User) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-
-        return await axios({
+        const response = await axios({
             'method': 'delete',
             'url': '/api/settings/delete-account',
             'data': {
                 'username': user.username
             }
         });
+
+        if (response.status === 200) {
+            localStorage.clear();
+            sessionStorage.clear();
+        }
     }
 }
 
