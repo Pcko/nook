@@ -1,23 +1,25 @@
 import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam.js";
 
 /**
- * Represents the request body for generating a Website using an LLM.
+ * Represents the request body for generating a website using an LLM.
  *
  * @interface QueryRequestBody
  * @property {string} query - The text prompt to send to the LLM.
- * @property {boolean} [useLocalLLM=false] - If true, the query will be processed using a local LLM instead of a Groq.
+ * @property {string} [provider] - The inference provider used for the query.
  * @property {boolean} [skipContext=false] - If true, the LLM will skip ChromaDB context when generating the response.
  * @property {boolean} [stream=false] - If true, the response may be streamed in chunks rather than returned all at once.
+ * @property {WebsiteMetadata} [meta] - Optional page-level metadata used for AI generation for branding/content consistency.
  */
 export interface QueryRequestBody {
     query: string;
-    useLocalLLM?: boolean;
+    provider?: 'groq' | 'local';
     skipContext?: boolean;
     stream?: boolean;
+    meta?: WebsiteMetadata;
 }
 
 /**
- * Represents the response from an LLM generation query.
+ * Represents the response from a website generation query.
  *
  * @interface QueryResponseBody
  * @property {string} think - The LLM's internal reasoning or thought process for the query.
@@ -36,16 +38,21 @@ export interface QueryResponseBody {
  * @param {ChatCompletionMessageParam[]} messages - Message history from the user/assistant.
  * @param {string} elementId - The ID of the element to be edited.
  * @param {string} websiteData - The website data to include in the prompt.
+ * @param {string} provider - The inference provider used for the query.
+ * @param {WebsiteMetadata} meta - Page-level metadata for the website editing query for branding/content consistency.
  */
 export interface ElementEditRequestBody {
     messages: ChatCompletionMessageParam[];
     elementId: string;
     websiteData: string;
+    provider?: 'groq' | 'local';
+    meta?: WebsiteMetadata;
 }
 
 /**
+ * Represents the response from a website editing query.
  *
- * @interface ElementEditRequestBody
+ * @interface ElementEditResponseBody
  * @param {string} think - Reasoning of reasoning LLMs. (only qwen3 or gpt currently support this)
  * @param {Object} component - The element data that was edited.
  * @param {Object} styles - The website styles data that was edited.
@@ -57,4 +64,47 @@ export interface ElementEditResponseBody {
     component: Object;
     styles: Object;
     total_duration: number;
+}
+
+/**
+ * Contains additional information about the website.
+ *
+ * @interface WebsiteMetadata
+ *
+ * @param {string} language - The website's language.
+ * @param {string} industry - The industry the website will be used in.
+ * @param {string} websiteGoal - What the user wants to achieve using this website.
+ * @param {string} brandName - The brand name of the user or the website.
+ * @param {string} tagline - A short brand tagline/slogan.
+ * @param {string} tone - The tone the user wants the website to follow.
+ * @param {string[]} keywords - Website topic keywords.
+ * @param {string} services - A summary of what the website should offer.
+ * @param {string} ctaText - The website's call-to-action text.
+ * @param {string} email - The email of the user or the website.
+ * @param {string} phone - The phone number of the user or the website.
+ * @param {string} location - A place where the user or the website is located.
+ * @param {string} dos - A description of what the website must contain.
+ * @param {string} donts - A description of what the website must not contain.
+ * @param {string} audienceType - The type of users the website is intended for.
+ * @param {string} audienceRegion - The region the website is intended for.
+ * @param {string} audienceNotes - Additional notes about the website's target audience.
+ */
+export interface WebsiteMetadata {
+    language?: string;
+    industry?: string;
+    websiteGoal?: string;
+    brandName?: string;
+    tagline?: string;
+    tone?: string;
+    keywords?: string[];
+    services?: string;
+    ctaText?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+    dos?: string;
+    donts?: string;
+    audienceType?: string;
+    audienceRegion?: string;
+    audienceNotes?: string;
 }

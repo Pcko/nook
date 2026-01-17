@@ -4,7 +4,9 @@ import { fileURLToPath } from "url";
 
 import chromaClient from "../../clients/chromadbClient.js";
 import type ChatCompletionMessageParam from "../../types/ChatCompletionMessageParam.js"
-import type {ElementEditRequestBody} from "../../dto/rag.js";
+import type {ElementEditRequestBody, QueryRequestBody, WebsiteMetadata} from "../../dto/rag.js";
+import rewriteQuery from "./queryRewriter.js";
+import type LlmClient from "../../clients/llmClient.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,17 +31,19 @@ export const promptBuilder = {
      * Builds a text prompt for a given query, optionally including context from ChromaDB.
      *
      * @async
-     * @param {string} query - The main user query.
-     * @param {boolean} [skipContext=false] - If true, skips fetching additional context from ChromaDB.
-     * @param {boolean} includeQuery - If true, appends the user's query at the end.
-     * @returns {Promise<string>} A Promise that resolves to a fully constructed prompt string.
+     * @param {QueryRequestBody} queryRequest - The user's queryRequest object.
+     * @param {LlmClient} llmClient - The LLM client to be used to rewrite the query.
+     * @returns {Promise<ChatCompletionMessageParam[]>} A Promise that resolves to a fully constructed chat completion message list.
      */
-    async build(query: string, skipContext?: boolean, includeQuery: boolean = true): Promise<string> {
+    async build(queryRequest: QueryRequestBody, llmClient: LlmClient): Promise<ChatCompletionMessageParam[]> {
+        let fullQuery = queryRequest.meta?
+            `${queryRequest.query}\nAdditional Info:\n${constructPageMeta(queryRequest.meta)}`
+            : queryRequest.query;
+
         let contextString = "No additional context available.";
-        if (!skipContext) {
+        if (!queryRequest.skipContext) {
             try {
-                const chromaResponse = await chromaClient.query({ query });
-                contextString = JSON.stringify(chromaResponse);
+                contextString = await getWebsiteContext(fullQuery, llmClient);
             } catch (err) {
                 console.error("[promptBuilder] Chroma Error:", err);
             }
@@ -47,12 +51,18 @@ export const promptBuilder = {
 
         let prompt = promptTemplate
             .replace("{{context}}", contextString)
+            .replace("{{user-metadata}}", queryRequest.meta ? constructPageMeta(queryRequest.meta) : "No metadata available.");
 
-        if(includeQuery) {
-            prompt += `\r\n\r\nUSER PROMPT:\r\n${query}`;
-        }
-
-        return prompt.trim();
+        return [
+            {
+                role: "system",
+                content: prompt
+            },
+            {
+                role: "user",
+                content: fullQuery
+            }
+        ];
     },
 
     /**
@@ -69,18 +79,30 @@ export const promptBuilder = {
      *
      * @async
      * @param {ElementEditRequestBody} elementEditRequestBody - The data needed to construct the edit messages.
+     * @param {LlmClient} llmClient - The LLM client to be used to rewrite the query.
      * @returns {Promise<ChatCompletionMessageParam[]>} A Promise that resolves
      * to an array of messages ready for a chat completion API call.
      */
-    async buildElementEditMessages(elementEditRequestBody: ElementEditRequestBody): Promise<ChatCompletionMessageParam[]> {
+    async buildElementEditMessages(elementEditRequestBody: ElementEditRequestBody, llmClient: LlmClient): Promise<ChatCompletionMessageParam[]> {
         return [
             {
                 role: "system",
                 content: elementEditPrompt
                     .replace("{{componentId}}", elementEditRequestBody.elementId)
-                    .replace("{{website-data}}", elementEditRequestBody.websiteData),
+                    .replace("{{website-data}}", elementEditRequestBody.websiteData)
+                    .replace("{{user-metadata}}", elementEditRequestBody.meta ? constructPageMeta(elementEditRequestBody.meta) : "No metadata available."),
             },
             ...elementEditRequestBody.messages
         ];
     }
 };
+
+async function getWebsiteContext(query: string, llmClient: LlmClient): Promise<string> {
+    const queries = await rewriteQuery(query, llmClient);
+    const chromaResponse = await chromaClient.query({ queries });
+    return JSON.stringify(chromaResponse);
+}
+
+function constructPageMeta(metadata: WebsiteMetadata) {
+    return Object.entries(metadata).map(([key, value]) => `${key}: ${value}`).join("\n");
+}

@@ -30,6 +30,9 @@ Image usage guidelines:
 Additional context (suggestions from vector database, optional):
 {{context}}
 
+User-Created Metadata:
+{{user-metadata}}
+
 TASK:
 Based on the user description and the additional context, generate a static single-page website as a single HTML file using inline-css.
 DO NOT add any text outside the <html></html> tag.

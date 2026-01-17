@@ -5,6 +5,8 @@
 //---models---
 export * from '../database/models/page-schema.js';
 export * from '../database/models/user-schema.js';
+export * from '../database/models/publishedPage-schema.js';
+export * from '../database/models/pageView-schema.js';
 
 //---modules---
 export * from './nodemailer.js';

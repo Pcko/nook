@@ -11,6 +11,7 @@ import {useBuilderHistory} from "../utils/useBuilderHistory";
 /**
  * @typedef {Object} BuilderContextValue
  * @property {MutableRefObject<Editor>} editorRef
+ * @property {string|null} pageName
  * @property {any} page
  * @property {(page: any) => void} setPage
  * @property {Component|null} selectedElement
@@ -22,6 +23,8 @@ import {useBuilderHistory} from "../utils/useBuilderHistory";
  * @property {(reason?: string) => void} captureHistory
  * @property {boolean} aiBusy
  * @property {(busy: boolean) => void} setAiBusy
+ * @property {any|null} pageMeta
+ * @property {(meta: any|null) => void} setPageMeta
  */
 
 /** @type {import("react").Context<BuilderContextValue|null>} */
@@ -30,30 +33,20 @@ const BuilderContext = createContext(null);
 /**
  * BuilderProvider
  *
- * Provides shared Website Builder state + actions via React Context:
- * - Stores the current GrapesJS project data (`page`)
- * - Tracks currently selected component (`selectedElement`)
- * - Exposes helpers to refresh the editor and sync project data from GrapesJS
- * - Exposes a global lock flag (`aiBusy`) to disable editing while AI operations run
- *
- * Side effects:
- * - Subscribes to GrapesJS "component:selected" to keep `selectedElement` in sync
- * - Adds an Escape key listener to clear selection
- * - Toggles GrapesJS preview mode while `aiBusy` is true (prevents editing interactions)
- *
- * @param {Object} props
- * @param {MutableRefObject<Editor>} props.editorRef GrapesJS editor ref
- * @param {{data: any}} props.initialPage Initial project data wrapper
- * @param {boolean} props.editorReady Indicates GrapesJS is initialized
- * @param {import("react").ReactNode} props.children Children rendered within the provider
- * @returns {JSX.Element}
+ * WebsiteBuilder runtime state. Metadata is sourced from the page (DB) and held
+ * in memory only (no localStorage, no wizard UI in the builder).
  */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
-    const [page, setPage] = useState(initialPage.data);
+    const pageName = initialPage?.name ?? null;
+
+    const [page, setPage] = useState(initialPage?.data ?? null);
     const [selectedElement, setSelectedElement] = useState(null);
 
     /** Global lock used to disable builder interactions while AI edits are in-flight. */
     const [aiBusy, setAiBusy] = useState(false);
+
+    /** Page metadata coming from the DB (via initialPage). No local persistence here. */
+    const [pageMeta, setPageMeta] = useState(initialPage?.pageMeta ?? null);
 
     const {history, historyIndex, goToHistory, captureHistory} = useBuilderHistory({
         editorRef,
@@ -66,24 +59,14 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const editor = editorRef.current;
         if (!editor) return;
 
-        /**
-         * Handles GrapesJS component selection changes.
-         * @param {Component} cmp GrapesJS component model
-         */
-        const onSelect = (cmp) => {
-            setSelectedElement(cmp || null);
-        };
+        const onSelect = (cmp) => setSelectedElement(cmp || null);
 
-        /**
-         * Handles global key events (Escape clears selection).
-         * @param {KeyboardEvent} event
-         */
         const eventHandler = (event) => {
             if (event.key === "Escape") {
                 editor.select(null);
                 setSelectedElement(null);
             }
-        }
+        };
 
         addEventListener("keydown", eventHandler);
         editor.on("component:selected", onSelect);
@@ -102,18 +85,10 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         else editor.stopCommand("core:preview");
     }, [aiBusy, editorRef]);
 
-    /**
-     * Requests a GrapesJS refresh (useful after programmatic DOM/model updates).
-     * Memoized to keep stable references for consumers.
-     */
     const refreshEditor = useCallback(() => {
         editorRef.current?.refresh?.();
     }, [editorRef]);
 
-    /**
-     * Reads project data from GrapesJS and stores it in `page`.
-     * Memoized to keep stable references for consumers.
-     */
     const syncWebsiteDataFromEditor = useCallback(() => {
         const editor = editorRef.current;
         if (!editor) return;
@@ -122,32 +97,37 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
 
     /** @type {BuilderContextValue} */
     const value = useMemo(
-            () => ({
-                editorRef,
-                page,
-                setPage,
-                selectedElement,
-                refreshEditor,
-                syncWebsiteDataFromEditor,
-                history,
-                historyIndex,
-                goToHistory,
-                captureHistory,
-                aiBusy,
-                setAiBusy,
-            }),
-            [
-                editorRef,
-                page,
-                selectedElement,
-                refreshEditor,
-                syncWebsiteDataFromEditor,
-                aiBusy,
-                history,
-                historyIndex,
-                goToHistory,
-                captureHistory,
-            ]
+        () => ({
+            editorRef,
+            pageName,
+            page,
+            setPage,
+            selectedElement,
+            refreshEditor,
+            syncWebsiteDataFromEditor,
+            history,
+            historyIndex,
+            goToHistory,
+            captureHistory,
+            aiBusy,
+            setAiBusy,
+            pageMeta,
+            setPageMeta,
+        }),
+        [
+            editorRef,
+            pageName,
+            page,
+            selectedElement,
+            refreshEditor,
+            syncWebsiteDataFromEditor,
+            history,
+            historyIndex,
+            goToHistory,
+            captureHistory,
+            aiBusy,
+            pageMeta,
+        ]
     );
 
     return <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>;
@@ -157,9 +137,6 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
  * useBuilder
  *
  * Hook to access builder context. Must be used within {@link BuilderProvider}.
- *
- * @returns {BuilderContextValue}
- * @throws {Error} If used outside {@link BuilderProvider}
  */
 export function useBuilder() {
     const ctx = useContext(BuilderContext);

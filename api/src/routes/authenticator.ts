@@ -33,7 +33,6 @@ const rateLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-
 /**
  * @route POST /auth/login
  * @summary Handles user login

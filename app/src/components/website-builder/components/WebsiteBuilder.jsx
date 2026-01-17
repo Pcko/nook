@@ -45,8 +45,6 @@ function WebsiteBuilder({page}) {
                 <TopPanel editorRef={editorRef} page={page}/>
                 <div className="flex-1 overflow-hidden">
                     <ResizablePanelsLayout
-                        onLayout={handleLayout}
-                        left={<LeftPanel/>}
                         editor={<div className="relative h-full min-w-0 border border-gray-300 overflow-hidden">
                             {
                                 editorRef.loaded && (
@@ -60,6 +58,8 @@ function WebsiteBuilder({page}) {
                             {/*AI overlay */}
                             <AIAssistantOverlay/>
                         </div>}
+                        left={<LeftPanel/>}
+                        onLayout={handleLayout}
                         right={<RightPanel/>}
                     />
                 </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import {motion} from "framer-motion";
-import {AIPageCreationIcon, EditorPageCreationIcon,} from "../resources/DashboardIcons";
+import {AIPageCreationIcon, EditorPageCreationIcon} from "../resources/DashboardIcons";
 import FormTopBar from "./FormTopBar";
 import {CreationOption} from "./CreationOption";
 
@@ -14,36 +14,33 @@ import {CreationOption} from "./CreationOption";
  * @param {Function} props.closeForm - Callback to close the form modal.
  * @param {string} props.pageName - Current value of the page name input.
  * @param {Function} props.setPageName - Setter for updating the page name.
- * @param {Function} props.handleFormSubmit - Handler for manual page creation. Receives `"self"`.
- * @param {Function} props.handleAiButtonClick - Handler for AI-based page creation.
+ * @param {Function} props.onChooseManual - Starts the manual creation flow (opens the optional meta step first).
+ * @param {Function} props.onChooseAi - Starts the AI creation flow (opens the optional meta step first).
  * @returns {JSX.Element}
  */
 function PageCreationChooseStep({
-                                    closeForm,
-                                    pageName,
-                                    setPageName,
-                                    handleFormSubmit,
-                                    handleAiButtonClick,
-                                }) {
+    closeForm,
+    pageName,
+    setPageName,
+    onChooseManual,
+    onChooseAi,
+}) {
     const maxNameLength = 50;
 
     return (
         <motion.div
             animate={{opacity: 1, y: 0, scale: 1}}
-            className="page-creation-window max-w-xl mx-auto p-4 md:p-5 rounded-[8px] bg-website-bg border border-ui-border shadow-sm"
+            className="page-creation-window"
             exit={{opacity: 0, y: 8, scale: 0.98}}
             initial={{opacity: 0, y: 8, scale: 0.98}}
             transition={{duration: 0.2, ease: "easeOut"}}
         >
             <FormTopBar onClick={closeForm} title="Create a new page"/>
 
-            <form
-                className="mt-3"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    handleFormSubmit("self");
-                }}
-            >
+            <form className="mt-3" onSubmit={(e) => {
+                e.preventDefault();
+                onChooseManual();
+            }}>
                 <p className="text-text-subtle mb-4 text-small">
                     Enter a name for your new page below. This will be used for the URL and navigation.
                 </p>
@@ -69,23 +66,25 @@ function PageCreationChooseStep({
                     value={pageName}
                 />
 
-                <p className="text-small text-text-subtle mt-1 mb-6">
-                    {pageName.length}/{maxNameLength}
-                </p>
+                <div className="flex items-center justify-between mt-1 mb-6 gap-3">
+                    <p className="text-small text-text-subtle">
+                        {pageName.length}/{maxNameLength}
+                    </p>
+                </div>
 
                 <div className="flex flex-col gap-3 md:flex-row md:gap-4 select-none">
                     <CreationOption
                         actionText="Start building →"
                         description="Take full control of the design process. Start from a blank canvas."
                         icon={<EditorPageCreationIcon className="w-14 h-14"/>}
-                        onClick={() => handleFormSubmit("self")}
+                        onClick={onChooseManual}
                         title="Create a page yourself"
                     />
                     <CreationOption
                         actionText="Generate with AI →"
                         description="Describe your page and let AI build it for you."
                         icon={<AIPageCreationIcon className="w-14 h-14"/>}
-                        onClick={handleAiButtonClick}
+                        onClick={onChooseAi}
                         title="Create a page using AI"
                     />
                 </div>

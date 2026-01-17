@@ -16,6 +16,12 @@ export interface RAGQueryBody {
     query: string;
 
     /**
+     * Name of the page whose metadata should be used for generation.
+     * The backend can use this to load stored metadata from the DB.
+     */
+    pageName: string;
+
+    /**
      * If true, skip retrieval of external context (documents, knowledge base, etc.)
      * and let the LLM answer from its own prior / default context only.
      * If omitted or false, the backend is expected to run retrieval as normal.

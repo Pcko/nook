@@ -28,3 +28,6 @@ Return a JSON object using this structure:
 - "component" must contain the edited component as valid JSON.
 "text" is your way of communicating with the user. Tell the user about the changes you made, but don't make it too technical.
 - Do NOT add any text before or after this object.
+
+User-provided metadata:
+{{user-metadata}}
