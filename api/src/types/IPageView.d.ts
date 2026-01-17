@@ -2,7 +2,7 @@ import { Document } from "mongoose";
 
 export default interface IPageView extends Document {
     pageName: string;
-    publishedPageId: string;
+    publishedPageId: Schema.Types.ObjectId;
     author: string;
     day: string;
     viewedAt: Date;

@@ -198,23 +198,6 @@ router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Res
             return res.status(404).send({ message: 'Page not found!' });
         }
 
-        const publishedPages = await PublishedPage.find({ author: userId, pageId: page._id })
-            .select("_id")
-            .lean();
-        const publishedPageIds = publishedPages.map((publishedPage) => publishedPage._id);
-
-        const deleteFilters: Record<string, any>[] = [{ pageName }];
-        if (publishedPageIds.length) {
-            deleteFilters.push({ publishedPageId: { $in: publishedPageIds } });
-        }
-
-        await PageView.deleteMany({
-            author: userId,
-            $or: deleteFilters,
-        });
-
-        await PublishedPage.deleteMany({ author: userId, pageId: page._id });
-
         return res.sendStatus(202);
     } catch (err) {
         console.error('❌ Delete page error: ', err);

@@ -27,7 +27,7 @@ const PageViewSchema = new Schema<IPageView>(
         },
         viewedAt: {
             type: Date,
-            default: Date.now,
+            default: Date.now(),
         },
         visitorHash: {
             type: String,
@@ -48,9 +48,5 @@ const PageViewSchema = new Schema<IPageView>(
         minimize: false,
     }
 );
-
-PageViewSchema.index({ author: 1, pageName: 1, day: 1 });
-PageViewSchema.index({ author: 1, day: 1 });
-PageViewSchema.index({ publishedPageId: 1, day: 1 });
 
 export const PageView = mongoose.model<IPageView>("PageView", PageViewSchema);
