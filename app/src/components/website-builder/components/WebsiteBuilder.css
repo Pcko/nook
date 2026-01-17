@@ -149,3 +149,219 @@ body.gjs-preview-active .right-panel {
   --gjs-color-green: var(--success);
   --gjs-color-red: var(--dangerous);
 }
+
+
+
+
+
+
+
+
+
+
+/* Scope everything to the modal so it won't affect the editor UI elsewhere */
+.gjs-mdl-container {
+  --gjs-radius: 12px;
+  --gjs-gap: 12px;
+  --gjs-control-h: 44px;
+}
+
+/* GrapesJS theme helpers (many components rely on these) */
+.gjs-mdl-container .gjs-one-bg {
+  background-color: var(--ui-bg) !important;
+}
+.gjs-mdl-container .gjs-two-color {
+  color: var(--text) !important;
+}
+.gjs-mdl-container .gjs-four-color {
+  color: var(--text-subtle) !important;
+}
+
+/* Backdrop */
+.gjs-mdl-container .gjs-mdl-collector {
+  background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Modal shell */
+.gjs-mdl-container .gjs-mdl-dialog {
+  background: var(--ui-bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: var(--gjs-radius) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35) !important;
+  overflow: hidden !important;
+}
+
+/* Header */
+.gjs-mdl-container .gjs-mdl-header {
+  background: var(--ui-default) !important;
+  border-bottom: 1px solid var(--ui-border) !important;
+  padding: 14px 16px !important;
+}
+.gjs-mdl-container .gjs-mdl-title {
+  font-weight: 700 !important;
+  color: var(--text) !important;
+}
+.gjs-mdl-container .gjs-mdl-btn-close {
+  color: var(--text-subtle) !important;
+  border-radius: 10px !important;
+  padding: 6px 10px !important;
+}
+.gjs-mdl-container .gjs-mdl-btn-close:hover {
+  background: var(--ui-bg-selected) !important;
+  color: var(--text) !important;
+  cursor: pointer !important;
+}
+
+/* Content padding */
+.gjs-mdl-container .gjs-mdl-content {
+  background: var(--ui-bg) !important;
+  padding: 16px !important;
+}
+
+/* Asset manager main wrapper */
+.gjs-mdl-container .gjs-asset-manager {
+  background: var(--ui-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Remove the “sloppy” outer dashed frame that GrapesJS applies */
+.gjs-mdl-container .gjs-am-file-uploader {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Make the form itself the dropzone card */
+.gjs-mdl-container .gjs-am-file-uploader form {
+  background: var(--website-bg) !important;
+  border: 2px dashed var(--ui-border) !important;
+  border-radius: var(--gjs-radius) !important;
+  padding: 24px !important;
+
+  /* center the call-to-action nicely */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 360px !important;
+  position: relative !important;
+}
+
+/* The label: no extra box, just text */
+.gjs-mdl-container #gjs-am-title {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: var(--text-subtle) !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  text-align: center !important;
+}
+
+/* Hover state */
+.gjs-mdl-container .gjs-am-file-uploader form:hover {
+  border-color: var(--ui-border-selected) !important;
+  background: var(--ui-bg-selected) !important;
+}
+.gjs-mdl-container .gjs-am-file-uploader form:hover #gjs-am-title {
+  color: var(--text) !important;
+}
+
+.gjs-mdl-container .gjs-am-assets-cont {
+  background: transparent !important;
+  padding-left: 16px !important; /* a bit of breathing room vs left panel */
+}
+
+/* Header area (URL input + button) */
+.gjs-mdl-container .gjs-am-assets-header {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 0 var(--gjs-gap) 0 !important;
+}
+
+/* Make the add-asset form a clean flex row */
+.gjs-mdl-container .gjs-am-add-asset {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+  margin: 0 !important;
+}
+
+.gjs-mdl-container .gjs-am-add-field {
+  flex: 1 1 auto !important;
+}
+
+.gjs-mdl-container .gjs-am-add-asset input {
+  width: 100% !important;
+  height: var(--gjs-control-h) !important;
+  background: var(--website-bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 10px !important;
+  padding: 0 12px !important;
+}
+
+.gjs-mdl-container .gjs-am-add-asset input::placeholder {
+  color: var(--text-subtle) !important;
+}
+
+.gjs-mdl-container .gjs-am-add-asset input:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+}
+
+/* Primary button (prevent wrapping + match input height) */
+.gjs-mdl-container .gjs-btn-prim {
+  height: var(--gjs-control-h) !important;
+  padding: 0 16px !important;
+  border-radius: 10px !important;
+  background: var(--primary) !important;
+  color: var(--text-on-primary) !important;
+  border: 1px solid var(--ui-border-selected) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+.gjs-mdl-container .gjs-btn-prim:hover {
+  background: var(--primary-hover) !important;
+  cursor: pointer !important;
+}
+
+/* Assets list container */
+.gjs-mdl-container .gjs-am-assets {
+  background: transparent !important;
+  padding-top: var(--gjs-gap) !important;
+  border-top: 1px solid var(--ui-border) !important;
+}
+
+/* Asset cards */
+.gjs-mdl-container .gjs-am-asset {
+  background: var(--website-bg) !important;
+  border: 1px solid var(--ui-border) !important;
+  border-radius: 12px !important;
+  padding: 10px !important;
+  margin-bottom: 10px !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.gjs-mdl-container .gjs-am-asset:hover {
+  background: var(--ui-bg-selected) !important;
+  border-color: var(--ui-border-selected) !important;
+}
+
+/* Selected state (covers different GrapesJS builds) */
+.gjs-mdl-container .gjs-am-asset--selected,
+.gjs-mdl-container .gjs-am-asset.gjs-am-asset-selected {
+  border-color: var(--primary) !important;
+}
+
+/* Asset meta text */
+.gjs-mdl-container .gjs-am-name,
+.gjs-mdl-container .gjs-am-meta,
+.gjs-mdl-container .gjs-am-preview-title {
+  color: var(--text) !important;
+}
+.gjs-mdl-container .gjs-am-meta {
+  color: var(--text-subtle) !important;
+}
+

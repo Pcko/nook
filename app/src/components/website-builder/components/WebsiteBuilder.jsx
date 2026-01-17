@@ -2,10 +2,10 @@ import React from "react";
 
 import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
-import ResizablePanelsLayout from "./ResizablePanelsLayout";
-import LeftPanel from "./Panels/LeftPanel";
-import RightPanel from "./Panels/RightPanel";
-import TopPanel from "./Panels/TopPanel";
+import ResizablePanelsLayout from "./layout/ResizablePanelsLayout";
+import LeftPanel from "./layout/LeftPanel";
+import RightPanel from "./layout/RightPanel";
+import TopPanel from "./layout/top-panel/TopPanel";
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";

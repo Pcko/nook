@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import TabSelector from "./TabSelector";
+import TabSelector from "../TabSelector";
 import {useBuilder} from "../../hooks/UseBuilder";
-import WebsiteSettings from "./WebsiteSettings";
+import ConfigPanel from "../panels/config-panel/ConfigPanel";
 
 /**
  * LeftPanel component
@@ -33,7 +33,7 @@ function LeftPanel() {
       <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"} />
       <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"} />
 
-      {activeTab === "config" && <WebsiteSettings/>}
+      {activeTab === "config" && <ConfigPanel/>}
     </div>
   );
 }
