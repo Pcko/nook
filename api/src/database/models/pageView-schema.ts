@@ -13,6 +13,11 @@ const PageViewSchema = new Schema<IPageView>(
             ref: "Page",
             required: false,
         },
+        publishedPageId: {
+            type: Schema.Types.ObjectId,
+            ref: "PublishedPage",
+            required: false,
+        },
         author: {
             type: String,
             ref: "User",

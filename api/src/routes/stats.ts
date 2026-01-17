@@ -11,20 +11,13 @@ import {
     startOfDay,
     toISODate,
     buildTopList,
-} from "../util/stats.js";
+} from "../util/statsComputer.js";
 
 const router = express.Router();
 
 async function findPage(userId: string, pageId: string) {
-    if (mongoose.isValidObjectId(pageId)) {
-        const byId = await Page.findOne({ _id: pageId, author: userId }).lean();
-        if (byId) return byId;
-    }
-    return Page.findOne({ author: userId, name: pageId }).lean();
-}
-
-function buildPageFilter(pageName: string, pageId?: unknown) {
-    return pageId ? { $or: [{ pageId }, { pageName }] } : { pageName };
+    if (!mongoose.isValidObjectId(pageId)) return null;
+    return Page.findOne({ _id: pageId, author: userId }).lean();
 }
 
 router.get("/pages/:pageId", async (req: Request, res: Response) => {
@@ -32,19 +25,23 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
         const { userId } = req;
         const { pageId } = req.params;
 
+        if (!userId) {
+            return res.sendStatus(401);
+        }
+
         const segmentRaw = String(req.query.segment || "all");
         const segment = VALID_SEGMENTS.has(segmentRaw) ? segmentRaw : "all";
 
         const { dateFrom, dateTo, rangeDays } = getRange(req.query);
         const previousRange = getPreviousRange(dateFrom, rangeDays);
 
-        const page = await findPage(userId!, pageId);
+        const page = await findPage(userId, pageId);
         if (!page) {
             return res.status(404).json({ error: "page_not_found" });
         }
 
         const pageName = page.name;
-        const pageFilter = buildPageFilter(pageName, page._id);
+        const pageFilter = { pageId: page._id };
 
         const [events, previousEvents, authorEvents, publishedPage] = await Promise.all([
             PageView.find({

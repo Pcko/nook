@@ -1,3 +1,12 @@
+import {
+    addDays as addDaysFn,
+    differenceInCalendarDays,
+    format,
+    isValid,
+    parseISO,
+    startOfDay as startOfDayFn,
+} from "date-fns";
+
 type PageViewEvent = {
     day: string;
     visitorHash?: string;
@@ -11,30 +20,22 @@ const DEFAULT_RANGE_DAYS = 14;
 const VALID_SEGMENTS = new Set(["all", "new", "returning"]);
 
 function startOfDay(date: Date) {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d;
+    return startOfDayFn(date);
 }
 
 function toISODate(date: Date) {
-    const d = new Date(date);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    return format(date, "yyyy-MM-dd");
 }
 
 function addDays(date: Date, days: number) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + days);
-    return d;
+    return addDaysFn(date, days);
 }
 
-function parseDate(value?: string) {
+function validateDateString(value?: string) {
     if (!value) return null;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-    const d = new Date(`${value}T00:00:00`);
-    if (Number.isNaN(d.getTime())) return null;
+    const d = parseISO(value);
+    if (!isValid(d)) return null;
     return value;
 }
 
@@ -42,13 +43,13 @@ function getRange(query: { rangeDays?: unknown; dateFrom?: unknown; dateTo?: unk
     const rangeDaysRaw = Number(query.rangeDays ?? DEFAULT_RANGE_DAYS);
     const rangeDays = Number.isFinite(rangeDaysRaw) && rangeDaysRaw > 0 ? rangeDaysRaw : DEFAULT_RANGE_DAYS;
 
-    const rawFrom = parseDate(query.dateFrom as string | undefined);
-    const rawTo = parseDate(query.dateTo as string | undefined);
+    const rawFrom = validateDateString(query.dateFrom as string | undefined);
+    const rawTo = validateDateString(query.dateTo as string | undefined);
 
     if (rawFrom && rawTo) {
-        const fromDate = startOfDay(new Date(`${rawFrom}T00:00:00`));
-        const toDate = startOfDay(new Date(`${rawTo}T00:00:00`));
-        const diffDays = Math.round((toDate.getTime() - fromDate.getTime()) / 86400000) + 1;
+        const fromDate = startOfDay(parseISO(rawFrom));
+        const toDate = startOfDay(parseISO(rawTo));
+        const diffDays = differenceInCalendarDays(toDate, fromDate) + 1;
         return {
             dateFrom: rawFrom,
             dateTo: rawTo,
@@ -64,7 +65,7 @@ function getRange(query: { rangeDays?: unknown; dateFrom?: unknown; dateTo?: unk
 }
 
 function getPreviousRange(dateFrom: string, rangeDays: number) {
-    const from = startOfDay(new Date(`${dateFrom}T00:00:00`));
+    const from = startOfDay(parseISO(dateFrom));
     const prevTo = addDays(from, -1);
     const prevFrom = addDays(prevTo, -(rangeDays - 1));
     return {
@@ -181,7 +182,7 @@ export {
     startOfDay,
     toISODate,
     addDays,
-    parseDate,
+    validateDateString,
     getRange,
     getPreviousRange,
     calculateChange,
