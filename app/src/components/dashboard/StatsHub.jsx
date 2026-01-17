@@ -11,7 +11,7 @@ import {
 import DeploymentStats from "../deployment/DeploymentStats";
 import PageService from "../../services/PageService";
 import StatsService from "../../services/StatsService";
-import LoadingCircleSpinner from "../general/LoadingCircleSpinner";
+import { LoadingBubble } from "../general/LoadingScreen";
 
 function classNames(...xs) {
     return xs.filter(Boolean).join(" ");
@@ -80,7 +80,16 @@ export default function StatsHub() {
         });
     }, [pages, pageQuery]);
 
-    if (loading) return <LoadingCircleSpinner />;
+    
+        return (
+            <LoadingBubble
+                className="w-full rounded-[8px] bg-website-bg"
+                compact
+                title="Loading analytics"
+                subtitle="Fetching your pages and stats."
+            />
+        );
+    
 
     return (
         <div className="rounded-[8px] bg-website-bg border border-ui-border shadow-sm p-4 md:p-5">
