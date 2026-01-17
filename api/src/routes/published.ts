@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { PublishedPage } from "../database/models/publishedPage-schema.js";
-import { Page, PageView } from "../util/internal.js";
+import { PageView } from "../util/internal.js";
 import IPublishedPage from "../types/IPublishedPage.js";
 import { getReferrerUrl, getVisitorHash } from "../util/pageView.js";
 import { startOfDay, toISODate } from "../util/statsComputer.js";
@@ -28,12 +28,10 @@ router.get("/:authorId/:pageName", async (req: Request, res: Response) => {
             return res.status(404).json({ error: "published_page_not_found" });
         }
 
-        const page = await Page.findOne({ author: authorId, name: pageName }).lean();
         const viewedAt = new Date();
 
         PageView.create({
             pageName,
-            pageId: page?._id,
             publishedPageId: published._id,
             author: authorId,
             day: toISODate(startOfDay(viewedAt)),

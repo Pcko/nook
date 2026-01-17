@@ -8,15 +8,11 @@ const PageViewSchema = new Schema<IPageView>(
             required: true,
             index: true,
         },
-        pageId: {
-            type: Schema.Types.ObjectId,
-            ref: "Page",
-            required: false,
-        },
         publishedPageId: {
             type: Schema.Types.ObjectId,
             ref: "PublishedPage",
-            required: false,
+            required: true,
+            index: true,
         },
         author: {
             type: String,
@@ -55,5 +51,6 @@ const PageViewSchema = new Schema<IPageView>(
 
 PageViewSchema.index({ author: 1, pageName: 1, day: 1 });
 PageViewSchema.index({ author: 1, day: 1 });
+PageViewSchema.index({ publishedPageId: 1, day: 1 });
 
 export const PageView = mongoose.model<IPageView>("PageView", PageViewSchema);

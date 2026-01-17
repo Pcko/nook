@@ -29,22 +29,27 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
             return res.status(400).json({error: 'invalid_pageName'});
         }
 
-        const filter = {name: pageName, author: userId};
-        const pageDocument = await Page.findOne(filter).lean<IPage>();
+        const pageFilter = {name: pageName, author: userId};
+        const pageDocument = await Page.findOne(pageFilter).lean<IPage>();
 
         if (!pageDocument) {
             return res.status(404).json({error: 'page_missing'});
         }
 
         const publishedPage = {
-            name: pageName,
+            pageId: pageDocument._id,
+            name: pageDocument.name,
             html: page,
             author: userId,
         }
 
+        const existingPublished = await PublishedPage.findOne({
+            author: userId,
+            $or: [{ pageId: pageDocument._id }, { name: pageDocument.name }],
+        }).lean<IPublishedPage>();
 
-        const pageDetails = await PublishedPage.exists(filter) ?
-            await PublishedPage.findOneAndUpdate(filter, publishedPage)
+        const pageDetails = existingPublished
+            ? await PublishedPage.findByIdAndUpdate(existingPublished._id, publishedPage, { new: true })
             : await PublishedPage.create(publishedPage) as IPublishedPage;
 
         return res.status(201).json(pageDetails);
@@ -69,7 +74,11 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         const userId = req.userId;
         const {pageName} = req.params;
 
-        const deletedPage = await PublishedPage.findOneAndDelete({name: pageName, author: userId});
+        const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
+        const deleteFilter = pageDocument
+            ? { pageId: pageDocument._id, author: userId }
+            : { name: pageName, author: userId };
+        const deletedPage = await PublishedPage.findOneAndDelete(deleteFilter);
 
         if (!deletedPage) {
             return res.status(404).json({error: 'published_page_not_found'})

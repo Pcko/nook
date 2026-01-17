@@ -40,31 +40,34 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
             return res.status(404).json({ error: "page_not_found" });
         }
 
-        const pageName = page.name;
-        const pageFilter = { pageId: page._id };
+        const publishedPage = await PublishedPage.findOne({ author: userId, pageId: page._id }).lean<IPublishedPage>();
+        const pageViewFilter = publishedPage ? { publishedPageId: publishedPage._id } : null;
 
-        const [events, previousEvents, authorEvents, publishedPage] = await Promise.all([
-            PageView.find({
-                author: userId,
-                day: { $gte: dateFrom, $lte: dateTo },
-                ...pageFilter,
-            })
-                .select("day visitorHash viewedAt referrer")
-                .lean(),
-            PageView.find({
-                author: userId,
-                day: { $gte: previousRange.dateFrom, $lte: previousRange.dateTo },
-                ...pageFilter,
-            })
-                .select("day visitorHash viewedAt")
-                .lean(),
+        const [events, previousEvents, authorEvents] = await Promise.all([
+            publishedPage
+                ? PageView.find({
+                      author: userId,
+                      day: { $gte: dateFrom, $lte: dateTo },
+                      ...pageViewFilter!,
+                  })
+                      .select("day visitorHash viewedAt referrer")
+                      .lean()
+                : Promise.resolve([] as any[]),
+            publishedPage
+                ? PageView.find({
+                      author: userId,
+                      day: { $gte: previousRange.dateFrom, $lte: previousRange.dateTo },
+                      ...pageViewFilter!,
+                  })
+                      .select("day visitorHash viewedAt")
+                      .lean()
+                : Promise.resolve([] as any[]),
             PageView.find({
                 author: userId,
                 day: { $gte: dateFrom, $lte: dateTo },
             })
                 .select("pageName")
                 .lean(),
-            PublishedPage.findOne({ author: userId, name: pageName }).lean<IPublishedPage>(),
         ]);
 
         const computed = computeStats(events, dateFrom, rangeDays, segment);
@@ -97,7 +100,7 @@ router.get("/pages/:pageId", async (req: Request, res: Response) => {
             const viewsSinceDeploy = await PageView.countDocuments({
                 author: userId,
                 day: { $gte: deploymentDate },
-                ...pageFilter,
+                publishedPageId: publishedPage._id,
             });
 
             deployments = [

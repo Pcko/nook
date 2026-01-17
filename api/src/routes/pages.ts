@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 
 import { isInvalidStringForURL } from "../util/FormChecks.js";
-import { Page, PageView } from '../util/internal.js';
+import { Page, PageView, PublishedPage } from '../util/internal.js';
 import IPage from '../types/IPage.js';
 import { CreatePageBody, PageNameParam, UpdatePageBody } from '../types/requests/pages.js';
 
@@ -198,10 +198,22 @@ router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Res
             return res.status(404).send({ message: 'Page not found!' });
         }
 
+        const publishedPages = await PublishedPage.find({ author: userId, pageId: page._id })
+            .select("_id")
+            .lean();
+        const publishedPageIds = publishedPages.map((publishedPage) => publishedPage._id);
+
+        const deleteFilters: Record<string, any>[] = [{ pageName }];
+        if (publishedPageIds.length) {
+            deleteFilters.push({ publishedPageId: { $in: publishedPageIds } });
+        }
+
         await PageView.deleteMany({
             author: userId,
-            $or: [{ pageId: page._id }, { pageName }],
+            $or: deleteFilters,
         });
+
+        await PublishedPage.deleteMany({ author: userId, pageId: page._id });
 
         return res.sendStatus(202);
     } catch (err) {

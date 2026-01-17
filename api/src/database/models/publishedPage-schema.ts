@@ -3,6 +3,12 @@ import IPublishedPage from '../../types/IPublishedPage.js';
 
 const PublishedPageSchema = new Schema<IPublishedPage>(
     {
+        pageId: {
+            type: Schema.Types.ObjectId,
+            ref: "Page",
+            required: true,
+            index: true,
+        },
         name: {
             type: String,
             required: true,
@@ -24,6 +30,6 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
     }
 );
 
-PublishedPageSchema.index({ name: 1, author: 1 }, { unique: true });
+PublishedPageSchema.index({ pageId: 1, author: 1 }, { unique: true });
 
 export const PublishedPage = mongoose.model<IPublishedPage>('PublishedPage', PublishedPageSchema);
