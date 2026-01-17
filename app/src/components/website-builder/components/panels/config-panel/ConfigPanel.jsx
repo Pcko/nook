@@ -7,7 +7,7 @@ import frameLight from "../../../../../assets/resources/frame-light.png";
 import {useWebsiteExportSettings} from "../../../utils/websiteExportSettings";
 
 import FaviconPreviewThemes from "./FaviconPreviewThemes";
-import {useBuilder} from "../../hooks/UseBuilder";
+import {useBuilder} from "../../../hooks/UseBuilder";
 
 
 const LANGUAGES = [
