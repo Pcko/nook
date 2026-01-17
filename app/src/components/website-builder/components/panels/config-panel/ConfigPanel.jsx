@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 
-import faviconDark from "../../../../assets/resources/favicon-dark.png";
-import faviconLight from "../../../../assets/resources/favicon-light.png";
-import frameDark from "../../../../assets/resources/frame-dark.png";
-import frameLight from "../../../../assets/resources/frame-light.png";
-import {useWebsiteExportSettings} from "../../utils/websiteExportSettings";
+import faviconDark from "../../../../../assets/resources/favicon-dark.png";
+import faviconLight from "../../../../../assets/resources/favicon-light.png";
+import frameDark from "../../../../../assets/resources/frame-dark.png";
+import frameLight from "../../../../../assets/resources/frame-light.png";
+import {useWebsiteExportSettings} from "../../../utils/websiteExportSettings";
 
 import FaviconPreviewThemes from "./FaviconPreviewThemes";
-import {useBuilder} from "../../hooks/UseBuilder";
+import {useBuilder} from "../../../hooks/UseBuilder";
 
 
 const LANGUAGES = [
@@ -27,11 +27,11 @@ const ELLIPSIS = "…";
  *
  * @returns {JSX.Element} Website settings form and preview.
  */
-export default function WebsiteSettings() {
+export default function ConfigPanel() {
     const {pageMeta} = useBuilder();
 
     const [title, setTitle] = useState("");
-    const [language, setLanguage] = useState( pageMeta?.language ?? "en");
+    const [language, setLanguage] = useState(pageMeta?.language ?? "en");
     const [description, setDescription] = useState("");
     const [favicons, setFavicons] = useState({
         lightDataUrl: "",

@@ -14,7 +14,7 @@ let currentSettings = {
 
 /**
  * React hook to keep export settings in sync with the UI.
- * Call this from React components (e.g., WebsiteSettings).
+ * Call this from React components (e.g., ConfigPanel).
  *
  * @param {WebsiteExportSettings} settings - Latest values coming from the UI.
  * @returns {void}
