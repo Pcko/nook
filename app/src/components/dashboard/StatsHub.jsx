@@ -80,7 +80,7 @@ export default function StatsHub() {
         });
     }, [pages, pageQuery]);
 
-    
+    if (loading) {
         return (
             <LoadingBubble
                 className="w-full rounded-[8px] bg-website-bg"
@@ -89,7 +89,7 @@ export default function StatsHub() {
                 subtitle="Fetching your pages and stats."
             />
         );
-    
+    }
 
     return (
         <div className="rounded-[8px] bg-website-bg border border-ui-border shadow-sm p-4 md:p-5">
