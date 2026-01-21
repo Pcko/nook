@@ -12,10 +12,10 @@ import {
     AiOutlineUndo,
 } from "react-icons/ai";
 
-import WebsiteBuilderService from "../../../../services/WebsiteBuilderService";
-import DeployModal from "../../../deployment/DeployModal";
-import useErrorHandler from "../../../logging/ErrorHandler";
-import {useMetaNotify} from "../../../logging/MetaNotifyHook";
+import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
+import DeployModal from "../../../../deployment/DeployModal";
+import useErrorHandler from "../../../../logging/ErrorHandler";
+import {useMetaNotify} from "../../../../logging/MetaNotifyHook";
 import {
     exportWebsite,
     handleRedo,
@@ -25,7 +25,10 @@ import {
     setTablet,
     toggleOutlines,
     togglePreview,
-} from "../../utils/grapesActions";
+} from "../../../utils/grapesActions";
+import ToolbarButton from './ToolbarButton';
+import ZoomListbox from './ZoomListbox';
+import TopActionButton from './TopActionButton';
 
 /**
  * TopPanel
@@ -234,170 +237,6 @@ function TopPanel({editorRef, page}) {
                 publicBaseUrl={import.meta.env.VITE_API_URL}
             />
         </div>
-    );
-}
-
-/**
- * CustomViewportInput
- * Small input + "px" apply button used to set a custom device width.
- *
- * Props:
- * @param {string} value - Current input text
- * @param {(value: string) => void} onChange - Updates input state
- * @param {() => void} onApply - Applies current width to GrapesJS DeviceManager
- */
-function CustomViewportInput({value, onChange, onApply}) {
-    return (
-        <div
-            className={[
-                "flex items-center rounded border border-ui-border transition",
-                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-                "py-1 px-2 gap-1.5 text-tiny",
-            ].join(" ")}
-            title="Custom viewport width in px (e.g. 950)"
-        >
-            <input
-                className={["w-[4.2rem] bg-transparent outline-none", "font-mono text-micro text-text"].join(" ")}
-                inputMode="numeric"
-                onChange={(e) => onChange(e.target.value)}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") onApply();
-                }}
-                placeholder="950"
-                value={value}
-            />
-            <button
-                className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none border border-ui-border"
-                onClick={onApply}
-                type="button"
-            >
-                px
-            </button>
-        </div>
-    );
-}
-
-/**
- * ToolbarButton
- * Small icon button optionally showing a keyboard hint label.
- *
- * Props:
- * @param {React.ReactNode} icon - Icon element
- * @param {string=} label - Optional keyboard shortcut label (displayed as a pill)
- * @param {() => void} onClick - Click handler
- */
-function ToolbarButton({icon, label, onClick}) {
-    /**
-     * Double-negation coerces label to boolean:
-     * - true if label is a non-empty string
-     * - false if label is "", null, undefined, etc.
-     */
-    const hasLabel = !!label;
-
-    return (
-        <button
-            aria-label={label || "toolbar button"}
-            className={[
-                "flex items-center rounded border border-ui-border transition",
-                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-                "py-1",
-                hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5",
-            ].join(" ")}
-            onClick={onClick}
-            title={label || undefined}
-            type="button"
-        >
-      <span
-          className="flex items-center justify-center bg-ui-default text-text rounded-full w-6 h-6 border border-ui-border">
-        {icon}
-      </span>
-
-            {hasLabel ? (
-                <span className="bg-ui-bg-selected text-text px-1.5 py-0.5 rounded font-mono text-micro tracking-tight">
-          {label}
-        </span>
-            ) : null}
-        </button>
-    );
-}
-
-/**
- * TopActionButton
- * Primary/secondary action button (Save/Export/Publish).
- *
- * Props:
- * @param {string} label
- * @param {boolean=} primary - If true, uses primary styling
- * @param {() => void} onClick
- */
-function TopActionButton({label, primary = false, onClick}) {
-    return (
-        <button className={["btn-wb", primary ? "btn-wb--primary" : ""].join(" ")} onClick={onClick} type="button">
-            <span className="py-0.5 font-mono">{label}</span>
-        </button>
-    );
-}
-
-/**
- * ZoomListbox
- * HeadlessUI Listbox for selecting a zoom percentage.
- *
- * Props:
- * @param {number} value - Current zoom (e.g. 100)
- * @param {(val: number) => void} onChange - Called with selected option
- * @param {number[]} options - List of zoom values
- */
-function ZoomListbox({value, onChange, options}) {
-    return (
-        <Listbox onChange={onChange} value={value}>
-            <div className="relative">
-                <ListboxButton
-                    className={[
-                        "flex items-center rounded border border-ui-border transition",
-                        "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-                        "py-1 px-2 gap-1.5 text-tiny",
-                        "focus:outline-none",
-                    ].join(" ")}
-                >
-          <span
-              className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none">
-            {value}%
-          </span>
-
-                    <span
-                        aria-hidden
-                        className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
-                    />
-                </ListboxButton>
-
-                <ListboxOptions
-                    className={[
-                        "absolute right-0 z-10 mt-0.5",
-                        "bg-ui-bg border border-ui-border rounded-[5px]",
-                        "shadow-lg overflow-hidden",
-                        "py-1",
-                        "focus:outline-none",
-                        "min-w-[3.7rem]",
-                    ].join(" ")}
-                >
-                    {options.map((opt) => (
-                        <ListboxOption key={opt} value={opt}>
-                            {({active, selected}) => (
-                                <div
-                                    className={[
-                                        "w-full text-left px-2 py-1 text-tiny transition-colors",
-                                        active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
-                                        selected ? "font-semibold text-text" : "font-normal",
-                                    ].join(" ")}
-                                >
-                                    {opt}%
-                                </div>
-                            )}
-                        </ListboxOption>
-                    ))}
-                </ListboxOptions>
-            </div>
-        </Listbox>
     );
 }
 

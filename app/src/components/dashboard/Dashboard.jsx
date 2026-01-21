@@ -8,14 +8,7 @@ import UserIcon from "../general/UserIcon";
 import SidebarItem from "./SidebarItem";
 import AuthService from "../../services/AuthService";
 import {
-    ArrowUpTrayIcon,
-    BookOpenIcon,
-    CodeBracketIcon,
-    FolderOpenIcon,
-    PaintBrushIcon,
-    ShieldCheckIcon,
-    UserCircleIcon,
-    ChartBarIcon, GlobeAltIcon,
+    ArrowUpTrayIcon, CodeBracketIcon, FolderOpenIcon, PaintBrushIcon, ShieldCheckIcon, UserCircleIcon, ChartBarIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
 import {LogVisualizer} from "../logging/LoggerDevTools";
@@ -23,6 +16,7 @@ import {useMetaNotify} from "../logging/MetaNotifyHook";
 import StatsHub from "./StatsHub";
 import UserGuide from "./UserGuide";
 import PageExplorer from "./PageExplorer";
+import UserGuide from "./UserGuide";
 
 function Dashboard() {
     const [activeTab, setActiveTab] = useState("pages");

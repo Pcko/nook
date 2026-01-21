@@ -4,6 +4,7 @@ import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
 import PromptingTextArea from "../../general/PromptingTextArea";
+import { LoadingBubble } from "../../general/LoadingScreen";
 
 /**
  * PagePromptingStep
@@ -106,11 +107,12 @@ function PagePromptingStep({
                         </div>
 
                         {loading && !hasPages && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                {[0, 1].map((i) => (
-                                    <SkeletonPreviewCard key={i}/>
-                                ))}
-                            </div>
+                              <LoadingBubble
+                                            className="w-full rounded-[8px] bg-website-bg"
+                                            compact
+                                            title="Loading pages"
+                                            subtitle="Generating your pages..."
+                                        />
                         )}
 
                         {hasPages && (

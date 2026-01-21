@@ -1,18 +1,15 @@
 import React from "react";
 
-import {useGrapesEditor} from "../hooks/useGrapesEditor";
 import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
-
-import LeftPanel from "./Panels/LeftPanel";
-import RightPanel from "./Panels/RightPanel";
-import TopPanel from "./Panels/TopPanel";
-
+import {useGrapesEditor} from "../hooks/useGrapesEditor";
+import ResizablePanelsLayout from "./layout/ResizablePanelsLayout";
+import LeftPanel from "./layout/LeftPanel";
+import RightPanel from "./layout/RightPanel";
+import TopPanel from "./layout/top-panel/TopPanel";
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";
-
 import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
-import ResizablePanelsLayout from "./ResizablePanelsLayout";
 
 function WebsiteBuilder({page}) {
     const {editorRef, containerRef, isReady} = useGrapesEditor({
@@ -36,16 +33,13 @@ function WebsiteBuilder({page}) {
         },
     }, page);
 
-    /**
-     *
-     */
     const handleLayout = () => editorRef.current?.refresh?.();
 
     return (
         <BuilderProvider
-            editorReady={isReady}
             editorRef={editorRef}
             initialPage={page}
+            editorReady={isReady}
         >
             <div className="flex flex-col h-screen w-screen">
                 <TopPanel editorRef={editorRef} page={page}/>
