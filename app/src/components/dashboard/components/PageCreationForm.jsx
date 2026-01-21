@@ -1,17 +1,17 @@
 import React, {useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import useErrorHandler from "../logging/ErrorHandler";
-import {isInvalidStringForURL} from "../general/FormChecks";
+import useErrorHandler from "../../logging/ErrorHandler";
+import {isInvalidStringForURL} from "../../general/FormChecks";
 
-import PageCreationChooseStep from "./page-creation-components/PageCreationChooseStep";
-import PagePromptingStep from "./page-creation-components/PagePromptingStep";
-import PageCreationMetaStep from "./page-creation-components/PageCreationMetaStep";
+import PageCreationChooseStep from "./page-creation/PageCreationChooseStep";
+import PagePromptingStep from "./page-creation/PagePromptingStep";
+import PageCreationMetaStep from "./page-creation/PageCreationMetaStep";
 
-import PageService from "../../services/PageService";
-import AIService from "../../services/AIService";
-import {useMetaNotify} from "../logging/MetaNotifyHook";
+import PageService from "../../../services/PageService";
+import AIService from "../../../services/AIService";
+import {useMetaNotify} from "../../logging/MetaNotifyHook";
 import grapesjs from "grapesjs";
-import {useMetaWizardState} from "../meta-wizard/useMetaWizard";
+import {useMetaWizardState} from "../../meta-wizard/useMetaWizard";
 
 /**
  * All steps of the AI-Page-Creation process.

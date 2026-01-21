@@ -1,6 +1,6 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import React from 'react';
-import Dashboard from "./components/dashboard/Dashboard"
+import Dashboard from "./components/dashboard/components/Dashboard"
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRedirect from "./components/general/AuthRedirect";

@@ -8,10 +8,10 @@ import {
     ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-import DeploymentStats from "../deployment/DeploymentStats";
-import PageService from "../../services/PageService";
-import StatsService from "../../services/StatsService";
-import { LoadingBubble } from "../general/LoadingScreen";
+import DeploymentStats from "../../deployment/DeploymentStats";
+import PageService from "../../../services/PageService";
+import StatsService from "../../../services/StatsService";
+import { LoadingBubble } from "../../general/LoadingScreen";
 
 function classNames(...xs) {
     return xs.filter(Boolean).join(" ");

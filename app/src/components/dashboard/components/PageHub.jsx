@@ -3,15 +3,15 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import useErrorHandler from "../logging/ErrorHandler";
-import PageService from "../../services/PageService";
-import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";
-import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
+import useErrorHandler from "../../logging/ErrorHandler";
+import PageService from "../../../services/PageService";
+import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "../resources/DashboardIcons";
+import CenteredWindowWithBackgroundBlur from "../../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import {useNavigate} from "react-router-dom";
-import {useMetaNotify} from "../logging/MetaNotifyHook";
-import SortMenu from "./SortMenu";
+import {useMetaNotify} from "../../logging/MetaNotifyHook";
+import SortMenu from "./ui/SortMenu";
 
 /**
  * All Options that the user can sort by

@@ -1,12 +1,12 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import grapesjs from "grapesjs";
-import PageService from "../../services/PageService.ts";
-import PublishedPage from "../../services/interfaces/PublishedPage.ts";
-import {LoadingBubble} from "../general/LoadingScreen";
-import Preview from "../general/Preview.tsx";
-import useErrorHandler from "../logging/ErrorHandler.ts";
+import PageService from "../../../services/PageService.ts";
+import PublishedPage from "../../../services/interfaces/PublishedPage.ts";
+import {LoadingBubble} from "../../general/LoadingScreen";
+import Preview from "../../general/Preview.tsx";
+import useErrorHandler from "../../logging/ErrorHandler.ts";
 import {ArrowPathIcon, MagnifyingGlassIcon} from "@heroicons/react/24/outline";
-import SortMenu from "./SortMenu";
+import SortMenu from "./ui/SortMenu";
 
 type SortKey = "updatedAt" | "createdAt" | "name";
 

@@ -2,7 +2,7 @@ import React from "react";
 import {motion} from "framer-motion";
 
 import FormTopBar from "./FormTopBar";
-import MetaWizard from "../../meta-wizard/MetaWizard";
+import MetaWizard from "../../../meta-wizard/MetaWizard";
 
 /**
  * PageCreationMetaStep

@@ -1,10 +1,10 @@
 import React from "react";
 import {motion, AnimatePresence} from "framer-motion";
-import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
+import LoadingCircleSpinner from "../../../general/LoadingCircleSpinner";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import PromptingTextArea from "../../general/PromptingTextArea";
-import { LoadingBubble } from "../../general/LoadingScreen";
+import PromptingTextArea from "../../../general/PromptingTextArea";
+import { LoadingBubble } from "../../../general/LoadingScreen";
 
 /**
  * PagePromptingStep
