@@ -8,12 +8,21 @@ import UserIcon from "../general/UserIcon";
 import SidebarItem from "./SidebarItem";
 import AuthService from "../../services/AuthService";
 import {
-    ArrowUpTrayIcon, CodeBracketIcon, FolderOpenIcon, PaintBrushIcon, ShieldCheckIcon, UserCircleIcon, ChartBarIcon
+    ArrowUpTrayIcon,
+    BookOpenIcon,
+    CodeBracketIcon,
+    FolderOpenIcon,
+    PaintBrushIcon,
+    ShieldCheckIcon,
+    UserCircleIcon,
+    ChartBarIcon, GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
 import {LogVisualizer} from "../logging/LoggerDevTools";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 import StatsHub from "./StatsHub";
+import UserGuide from "./UserGuide";
+import PageExplorer from "./PageExplorer";
 
 function Dashboard() {
     const [activeTab, setActiveTab] = useState("pages");
@@ -51,6 +60,8 @@ function Dashboard() {
         switch (activeTab) {
             case "pages":
                 return <PageHub/>;
+            case "explorer":
+                return <PageExplorer/>;
             case "accountSettings":
                 return <Settings activeTab="account"/>;
             case "appearanceSettings":
@@ -67,6 +78,8 @@ function Dashboard() {
                 return (
                     <StatsHub userId={user.username}/>
                 );
+            case "userGuide":
+                return <UserGuide/>;
             default:
                 return <LoadingBubble className="mt-[200px]"/>;
         }
@@ -93,6 +106,12 @@ function Dashboard() {
                             active={activeTab === "pages"}
                             onClick={() => setActiveTab("pages")}
                         />
+                        <SidebarItem
+                            label="Explorer"
+                            icon={GlobeAltIcon}
+                            active={activeTab=== "explorer"}
+                            onClick={() => setActiveTab("explorer")}
+                        />
                         <h6 className="!text-text">Settings</h6>
                         <SidebarItem
                             label="Account"
@@ -117,6 +136,13 @@ function Dashboard() {
                             icon={ChartBarIcon}
                             active={activeTab === "stats"}
                             onClick={() => setActiveTab("stats")}
+                        />
+                        <h6 className="!text-text">Help</h6>
+                        <SidebarItem
+                            label="User Guide"
+                            icon={BookOpenIcon}
+                            active={activeTab === "userGuide"}
+                            onClick={() => setActiveTab("userGuide")}
                         />
 
                         {import.meta.env.VITE_ENV?.toLowerCase() === "dev" && (<>

@@ -5,7 +5,7 @@
  */
 
 import React, {JSX, useEffect, useMemo, useRef, useState} from "react";
-import grapesjs from "grapesjs";
+import grapesjs, {Editor} from "grapesjs";
 import {AnimatePresence, motion} from "framer-motion";
 import {CheckIcon, XMarkIcon} from "@heroicons/react/24/solid";
 
@@ -14,6 +14,8 @@ import {AIChangeReviewPopupProps} from "./types.ts";
 import ControlButton from "./ControlButton.tsx";
 import PrimaryButton from "./PrimaryButton.tsx";
 import DangerButton from "./DangerButton.tsx";
+
+const PREVIEW_SCALE = 0.3;
 
 /**
  * Builds a minimal HTML document string used as an iframe `srcDoc`.
@@ -34,7 +36,7 @@ function buildSrcDoc(html: string, css: string): string {
       body { background: #fff; }
     </style>
   </head>
-  <body>
+  <body class="scale-50">
     ${html || ""}
   </body>
 </html>`;
@@ -119,7 +121,7 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
         if (!hiddenContainerRef.current) return;
         if (previewEditorRef.current) return;
 
-        const editor = grapesjs.init({
+        const editor : Editor= grapesjs.init({
             container: hiddenContainerRef.current,
             height: "0px",
             width: "0px",
@@ -340,12 +342,21 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
                                                 updates with selection
                                             </div>
                                         </div>
-                                        <iframe
-                                            title="AI Preview"
-                                            className="h-[74vh] w-full bg-white"
-                                            sandbox="allow-same-origin"
-                                            srcDoc={previewDoc}
-                                        />
+                                        <div className="w-full h-56 overflow-hidden rounded-lg border bg-gray-50">
+                                            <iframe
+                                                title={`preview-${k}`}
+                                                srcDoc={buildSrcDoc(k.html,k.css)}
+                                                sandbox=""
+                                                style={{
+                                                    width: `${100 / PREVIEW_SCALE}%`,
+                                                    height: `${100 / PREVIEW_SCALE}%`,
+                                                    transform: `scale(${PREVIEW_SCALE})`,
+                                                    transformOrigin: "top left",
+                                                    border: "0",
+                                                    display: "block",
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
