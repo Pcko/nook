@@ -6,5 +6,5 @@
     "ignore": [
         "src/**/*.test.ts"
     ],
-    "exec": "node --no-warnings --loader ts-node/esm src/server.ts"
+    "exec": "node --no-warnings --loader ts-node/esm"
 }

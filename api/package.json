@@ -8,8 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "prod": "node dist/server.js",
-    "dev": "nodemon",
-    "typecheck": "npx tsc --noEmit"
+    "dev": "nodemon src/server.ts",
+    "typecheck": "npx tsc --noEmit",
+    "publisherDev": "nodemon src/publisher.ts",
+    "publisherProd": "node dist/publisher.js"
   },
   "author": "",
   "license": "ISC",
