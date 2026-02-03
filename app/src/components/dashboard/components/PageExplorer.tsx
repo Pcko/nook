@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import grapesjs from "grapesjs";
 import PageService from "../../../services/PageService.ts";
 import PublishedPage from "../../../services/interfaces/PublishedPage.ts";
-import {LoadingBubble} from "../../general/LoadingScreen";
+import { LoadingBubble } from "../../general/LoadingScreen";
 import Preview from "../../general/Preview.tsx";
 import useErrorHandler from "../../logging/ErrorHandler.ts";
-import {ArrowPathIcon, MagnifyingGlassIcon} from "@heroicons/react/24/outline";
+import { ArrowPathIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SortMenu from "./ui/SortMenu";
 
 type SortKey = "updatedAt" | "createdAt" | "name";
@@ -34,7 +34,7 @@ const sortByOptions: SortOption[] = [
     }
 ];
 
-const PUBLIC_BASE_URL = (import.meta as any).env?.VITE_PUBLISH_URL;
+const PUBLIC_BASE_URL = (import.meta as any).env.VITE_PUBLISH_URL;
 const PREVIEW_CONCURRENCY = 4;
 
 function toDate(input?: Date | string): Date | undefined {
@@ -47,7 +47,7 @@ function toDate(input?: Date | string): Date | undefined {
 function getPublicUrl(p: PublishedPage) {
     const safeAuthor = encodeURIComponent(p.author ?? "");
     const safeName = encodeURIComponent(p.name ?? "");
-    return `${PUBLIC_BASE_URL}/api/published/${safeAuthor}/${safeName}`;
+    return `${PUBLIC_BASE_URL}/${safeAuthor}/${safeName}`;
 }
 
 function pageKey(p: PublishedPage) {
@@ -62,7 +62,7 @@ async function mapLimit<T, R>(
     const results: R[] = [];
     let i = 0;
 
-    const workers = Array.from({length: Math.max(1, limit)}, async () => {
+    const workers = Array.from({ length: Math.max(1, limit) }, async () => {
         while (i < items.length) {
             const idx = i++;
             results[idx] = await fn(items[idx]);
@@ -87,7 +87,7 @@ export default function PageExplorer() {
 
     const sandboxRef = useRef<HTMLDivElement | null>(null);
 
-    const handleError = useErrorHandler({feature: "PageExplorer", component: "PageExplorer"});
+    const handleError = useErrorHandler({ feature: "PageExplorer", component: "PageExplorer" });
 
     const initPages = async () => {
         setLoading(true);
@@ -153,7 +153,7 @@ export default function PageExplorer() {
                 try {
                     if (p.html) {
                         const doc = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>html,body{margin:0;padding:0;}</style></head><body>${p.html}</body></html>`;
-                        if (!cancelled) setHtmlByKey((prev) => ({...prev, [k]: doc}));
+                        if (!cancelled) setHtmlByKey((prev) => ({ ...prev, [k]: doc }));
                         return;
                     }
 
@@ -180,7 +180,7 @@ export default function PageExplorer() {
                     editor.destroy();
                     host.remove();
 
-                    if (!cancelled) setHtmlByKey((prev) => ({...prev, [k]: doc}));
+                    if (!cancelled) setHtmlByKey((prev) => ({ ...prev, [k]: doc }));
                 } catch (e: any) {
                     if (!cancelled) {
                         setHtmlErrorByKey((prev) => ({
@@ -208,7 +208,7 @@ export default function PageExplorer() {
 
     return (
         <div className="w-full h-full flex flex-col gap-6 pt-6 px-6 md:px-10 lg:px-16">
-            <div ref={sandboxRef} style={{display: "none"}}/>
+            <div ref={sandboxRef} style={{ display: "none" }} />
 
             <div className="rounded-2xl border border-ui-border bg-ui-bg px-5 py-4 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -226,7 +226,7 @@ export default function PageExplorer() {
                             disabled={loading}
                             type="button"
                         >
-                            <ArrowPathIcon className="h-4 w-4"/>
+                            <ArrowPathIcon className="h-4 w-4" />
                             Refresh
                         </button>
                     </div>
@@ -236,7 +236,7 @@ export default function PageExplorer() {
                     <div className="flex-1">
                         <div className="relative">
                             <MagnifyingGlassIcon
-                                className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle"/>
+                                className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
                             <input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -264,7 +264,7 @@ export default function PageExplorer() {
 
             <div>
                 {loading ? (
-                    <LoadingBubble/>
+                    <LoadingBubble />
                 ) : pages.length === 0 ? (
                     <div className="p-6 rounded-xl border border-ui-border bg-ui-bg text-text-subtle">
                         No published pages found.
