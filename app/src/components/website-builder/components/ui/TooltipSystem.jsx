@@ -1,18 +1,5 @@
 import React, { useEffect, useRef } from "react";
 
-/**
- * TooltipSystem
- *
- * - One tooltip "host" for the whole app (mount once).
- * - Works via event delegation for ANY element that has `data-wb-tooltip="..."`.
- * - Supports optional:
- *    - data-wb-tooltip-delay="600" (ms)
- *    - data-wb-tooltip-placement="bottom" | "top"
- *
- * Also exports:
- *  - InfoTip: small "i" icon that shows a tooltip.
- */
-
 const STYLE_ID = "wb-tooltip-styles";
 
 function ensureStyles() {
