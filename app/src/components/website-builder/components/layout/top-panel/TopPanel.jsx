@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-sort-props */
-import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import React, {useMemo, useState} from "react";
 import {
     AiOutlineBorder,

@@ -1,8 +1,9 @@
-import React, {useMemo, useState} from "react";
+﻿import React, {useMemo, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import {useLogger} from "../context/LoggerContext";
 import {LogLevel} from "./types/logLevel";
 import {LogEntry} from "./types/logEntry";
+import DateTimeService from "../../services/DateTimeService";
 
 const ALL_LEVELS: LogLevel[] = ["debug", "info", "warn", "error", "fatal"];
 
@@ -23,12 +24,6 @@ const levelBadgeClasses = (level?: LogLevel): string => {
     }
 };
 
-const formatTimestamp = (ts?: string): string => {
-    if (!ts) return "";
-    const d = new Date(ts);
-    if (Number.isNaN(d.getTime())) return ts;
-    return d.toLocaleString();
-};
 
 export function LogVisualizer(): React.JSX.Element {
     const [searchTerm, setSearchTerm] = useState("");
@@ -105,10 +100,10 @@ export function LogVisualizer(): React.JSX.Element {
                         Logging &amp; Crash Analysis
                     </p>
                     <p className="text-[11px] text-text-subtle m-0">
-                        {combinedLogs.length} Entries · filterable after Level, Text und Context
+                        {combinedLogs.length} Entries Â· filterable after Level, Text und Context
                     </p>
                     <p className="text-[11px] text-text-subtle m-0">
-                        {inMemoryLogs.length} in Memory · {persistedLogs.length} persisted
+                        {inMemoryLogs.length} in Memory Â· {persistedLogs.length} persisted
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -141,7 +136,7 @@ export function LogVisualizer(): React.JSX.Element {
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Search in message, route, user, meta …"
+                        placeholder="Search in message, route, user, meta â€¦"
                         className="w-full text-xs px-3 py-1.5 rounded-[6px] border border-ui-border
                                    bg-website-bg text-text placeholder:text-text-subtle
                                    focus:outline-none focus:ring-1 focus:ring-primary"
@@ -213,7 +208,7 @@ export function LogVisualizer(): React.JSX.Element {
                                                 {log.level || "unknown"}
                                             </span>
                                             <span className="text-[11px] text-text-subtle">
-                                                {formatTimestamp(log.timestamp)}
+                                                {DateTimeService.formatTimestamp(log.timestamp)}
                                             </span>
                                         </div>
 

@@ -1,14 +1,8 @@
-import React, {useMemo} from "react";
+﻿import React, {useMemo} from "react";
+import DateTimeService from "../../../../services/DateTimeService";
 
 import {useBuilder} from "../../hooks/UseBuilder";
 
-function formatTime(ts) {
-    try {
-        return new Date(ts).toLocaleTimeString();
-    } catch (e) {
-        return "";
-    }
-}
 
 /**
  * HistoryPanel
@@ -57,7 +51,7 @@ function HistoryPanel() {
                                         ? "bg-ui-bg-selected text-text"
                                         : "bg-ui-bg text-text-subtle hover:bg-ui-button-hover")
                                 }
-                                title={formatTime(it.ts)}
+                                title={DateTimeService.formatTime(it.ts)}
                             >
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={"text-tiny font-semibold " + (isActive ? "text-text" : "text-text-subtle")}
@@ -66,7 +60,7 @@ function HistoryPanel() {
                                     </span>
 
                                     <span className="text-micro font-mono bg-ui-bg-selected text-text px-1.5 py-0.5 rounded">
-                                        {formatTime(it.ts)}
+                                        {DateTimeService.formatTime(it.ts)}
                                     </span>
                                 </div>
                             </button>
@@ -78,3 +72,4 @@ function HistoryPanel() {
 }
 
 export default HistoryPanel;
+

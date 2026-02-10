@@ -1,5 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
-import grapesjs from "grapesjs";
+import React, {useEffect, useMemo, useState} from "react";
 import PageService from "../../../services/PageService.ts";
 import PublishedPage from "../../../services/interfaces/PublishedPage.ts";
 import {LoadingBubble} from "../../general/LoadingScreen";
@@ -7,6 +6,14 @@ import Preview from "../../general/Preview.tsx";
 import useErrorHandler from "../../logging/ErrorHandler.ts";
 import {ArrowPathIcon, MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import SortMenu from "./ui/SortMenu";
+import {
+    buildPreviewDocument,
+    getPublicUrl,
+    mapLimit,
+    pageKey,
+    PREVIEW_CONCURRENCY,
+    toDate,
+} from "./utils/pageExplorerUtils.ts";
 
 type SortKey = "updatedAt" | "createdAt" | "name";
 
@@ -34,45 +41,6 @@ const sortByOptions: SortOption[] = [
     }
 ];
 
-const PUBLIC_BASE_URL = (import.meta as any).env?.VITE_PUBLISH_URL;
-const PREVIEW_CONCURRENCY = 4;
-
-function toDate(input?: Date | string): Date | undefined {
-    if (!input) return undefined;
-    if (input instanceof Date) return input;
-    const d = new Date(input);
-    return Number.isNaN(d.getTime()) ? undefined : d;
-}
-
-function getPublicUrl(p: PublishedPage) {
-    const safeAuthor = encodeURIComponent(p.author ?? "");
-    const safeName = encodeURIComponent(p.name ?? "");
-    return `${PUBLIC_BASE_URL}/api/published/${safeAuthor}/${safeName}`;
-}
-
-function pageKey(p: PublishedPage) {
-    return `${p.author ?? "unknown"}::${p.name ?? "unknown"}::v1`;
-}
-
-async function mapLimit<T, R>(
-    items: T[],
-    limit: number,
-    fn: (item: T) => Promise<R>
-): Promise<R[]> {
-    const results: R[] = [];
-    let i = 0;
-
-    const workers = Array.from({length: Math.max(1, limit)}, async () => {
-        while (i < items.length) {
-            const idx = i++;
-            results[idx] = await fn(items[idx]);
-        }
-    });
-
-    await Promise.all(workers);
-    return results;
-}
-
 export default function PageExplorer() {
     const [internalPages, setInternalPages] = useState<PublishedPage[]>([]);
     const [loading, setLoading] = useState(true);
@@ -84,8 +52,6 @@ export default function PageExplorer() {
     const [htmlByKey, setHtmlByKey] = useState<Record<string, string>>({});
     const [htmlErrorByKey, setHtmlErrorByKey] = useState<Record<string, string>>({});
     const [htmlLoadingKeys, setHtmlLoadingKeys] = useState<Set<string>>(new Set());
-
-    const sandboxRef = useRef<HTMLDivElement | null>(null);
 
     const handleError = useErrorHandler({feature: "PageExplorer", component: "PageExplorer"});
 
@@ -131,13 +97,11 @@ export default function PageExplorer() {
         let cancelled = false;
 
         const run = async () => {
-            if (!sandboxRef.current) return;
-
             const needs = pages.filter((p) => {
                 const k = pageKey(p);
                 if (htmlByKey[k]) return false;
-                if (p.html) return true;
-                return Boolean(p.page?.data);
+                if (htmlErrorByKey[k]) return false;
+                return Boolean(p.html);
             });
 
             if (needs.length === 0) return;
@@ -151,34 +115,17 @@ export default function PageExplorer() {
             await mapLimit(needs, PREVIEW_CONCURRENCY, async (p) => {
                 const k = pageKey(p);
                 try {
-                    if (p.html) {
-                        const doc = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>html,body{margin:0;padding:0;}</style></head><body>${p.html}</body></html>`;
-                        if (!cancelled) setHtmlByKey((prev) => ({...prev, [k]: doc}));
+                    if (!p.html) {
+                        if (!cancelled) {
+                            setHtmlErrorByKey((prev) => ({
+                                ...prev,
+                                [k]: "No HTML available for preview",
+                            }));
+                        }
                         return;
                     }
 
-                    if (!p.page?.data) throw new Error("Missing page data");
-
-                    const host = document.createElement("div");
-                    host.style.display = "none";
-                    sandboxRef.current!.appendChild(host);
-
-                    const editor = grapesjs.init({
-                        container: host,
-                        height: "0px",
-                        width: "0px",
-                        storageManager: false,
-                    });
-
-                    editor.loadProjectData(p.page.data as any);
-
-                    const html = editor.getHtml();
-                    const css = editor.getCss();
-
-                    const doc = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><style>html,body{margin:0;padding:0;}</style><style>${css ?? ""}</style></head><body>${html ?? ""}</body></html>`;
-
-                    editor.destroy();
-                    host.remove();
+                    const doc = buildPreviewDocument(p.html);
 
                     if (!cancelled) setHtmlByKey((prev) => ({...prev, [k]: doc}));
                 } catch (e: any) {
@@ -204,12 +151,10 @@ export default function PageExplorer() {
         return () => {
             cancelled = true;
         };
-    }, [pages, htmlByKey]);
+    }, [pages, htmlByKey, htmlErrorByKey]);
 
     return (
         <div className="w-full h-full flex flex-col gap-6 pt-6 px-6 md:px-10 lg:px-16">
-            <div ref={sandboxRef} style={{display: "none"}}/>
-
             <div className="rounded-2xl border border-ui-border bg-ui-bg px-5 py-4 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-1">
@@ -288,7 +233,7 @@ export default function PageExplorer() {
                                         iframeDoc={iframeDoc}
                                         isHtmlLoading={isHtmlLoading}
                                         iframeErr={iframeErr}
-                                        onClick={() => open(publicUrl)}
+                                        onClick={() => window.open(publicUrl, "_blank", "noopener,noreferrer")}
                                     />
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
@@ -296,7 +241,7 @@ export default function PageExplorer() {
                                             <div className="text-sm text-text-subtle truncate">by {p.author}</div>
                                         </div>
                                         <button
-                                            onClick={() => open(publicUrl)}
+                                            onClick={() => window.open(publicUrl, "_blank", "noopener,noreferrer")}
                                             className="text-xs px-2.5 py-1.5 rounded-md border border-ui-border bg-website-bg text-text-subtle hover:text-text"
                                             type="button"
                                         >

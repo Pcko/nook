@@ -1,12 +1,11 @@
-import Page from "./Page.ts";
-
 interface PublishedPage {
-    page: Page
+    _id?: string;
+    pageId?: string;
     name: string;
-    html: string;
+    html?: string;
     author: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }
 
 export default PublishedPage;

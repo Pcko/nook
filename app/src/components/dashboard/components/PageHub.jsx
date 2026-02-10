@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useMemo, useState} from "react";
+﻿import React, {Fragment, useEffect, useMemo, useState} from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 
 import PageCreationForm from "./PageCreationForm";
@@ -12,6 +12,7 @@ import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import {useNavigate} from "react-router-dom";
 import {useMetaNotify} from "../../logging/MetaNotifyHook";
 import SortMenu from "./ui/SortMenu";
+import DateTimeService from "../../../services/DateTimeService";
 
 /**
  * All Options that the user can sort by
@@ -265,10 +266,10 @@ function PageHub() {
 
                                     <div
                                         className="p-4 align-middle border-ui-border border border-t-0 flex items-center">
-                                        {new Date(details.createdAt).toLocaleString(navigator.language, dateFormat)}
+                                        {DateTimeService.formatDateTime(details.createdAt, navigator.language, dateFormat)}
                                     </div>
                                     <div className="p-4 border-ui-border border border-t-0 flex items-center">
-                                        {new Date(details.updatedAt).toLocaleString(navigator.language, dateFormat)}
+                                        {DateTimeService.formatDateTime(details.updatedAt, navigator.language, dateFormat)}
                                     </div>
                                     <div
                                         className={`p-4 border-ui-border border border-t-0 flex items-center ${index === filtered.length - 1 ? "rounded-br-[5px]" : ""}`}
@@ -306,3 +307,4 @@ function PageHub() {
 }
 
 export default PageHub;
+
