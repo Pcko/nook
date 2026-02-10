@@ -10,6 +10,7 @@ import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";
 import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
+import {TooltipHost} from "./ui/TooltipSystem";
 
 function WebsiteBuilder({page}) {
     const {editorRef, containerRef, isReady} = useGrapesEditor({
@@ -42,6 +43,7 @@ function WebsiteBuilder({page}) {
             editorReady={isReady}
         >
             <div className="flex flex-col h-screen w-screen">
+                <TooltipHost/>
                 <TopPanel editorRef={editorRef} page={page}/>
                 <div className="flex-1 overflow-hidden">
                     <ResizablePanelsLayout

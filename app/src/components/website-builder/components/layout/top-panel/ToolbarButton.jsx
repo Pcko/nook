@@ -1,11 +1,11 @@
 import React from "react";
 
-function ToolbarButton({ icon, label, onClick }) {
+function ToolbarButton({ icon, label, tooltip, tooltipDelay = 650, tooltipPlacement = "bottom", onClick }) {
     const hasLabel = !!label;
 
     return (
             <button
-                    aria-label={label || "toolbar button"}
+                    aria-label={label || tooltip || "toolbar button"}
                     className={[
                         "flex items-center rounded border border-ui-border transition",
                         "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
@@ -13,7 +13,13 @@ function ToolbarButton({ icon, label, onClick }) {
                         hasLabel ? "gap-1.5 px-2 text-tiny" : "px-1.5",
                     ].join(" ")}
                     onClick={onClick}
-                    title={label || undefined}
+                    {...(tooltip
+                        ? {
+                            "data-wb-tooltip": tooltip,
+                            "data-wb-tooltip-delay": String(tooltipDelay),
+                            "data-wb-tooltip-placement": tooltipPlacement,
+                        }
+                        : {})}
             >
       <span className="flex items-center justify-center bg-ui-default text-text rounded-full w-6 h-6 border border-ui-border">
         {icon}
