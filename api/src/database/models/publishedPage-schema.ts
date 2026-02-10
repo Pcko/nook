@@ -60,6 +60,6 @@ PublishedPageSchema.pre('deleteMany', async function (next) {
     next();
 });
 
-PublishedPageSchema.index({ pageId: 1, author: 1 }, { unique: true });
+PublishedPageSchema.index({ name: 1, author: 1 }, { unique: true });
 
 export const PublishedPage = mongoose.model<IPublishedPage>('PublishedPage', PublishedPageSchema);

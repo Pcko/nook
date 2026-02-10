@@ -1,5 +1,14 @@
 import React from "react";
-import {BookOpenIcon, CheckCircleIcon} from "@heroicons/react/24/outline";
+import {
+    ArrowUpCircleIcon,
+    BookOpenIcon,
+    ChartBarIcon,
+    CheckCircleIcon,
+    CodeBracketIcon,
+    FolderOpenIcon,
+    PencilSquareIcon,
+    SparklesIcon,
+} from "@heroicons/react/24/outline";
 
 const GOOD_EXAMPLES = [
     "I need a website for my small coffee shop in Vienna.",
@@ -34,6 +43,39 @@ const BEST_PRACTICES = [
     "Avoid technical instructions.",
 ];
 
+const FEATURE_CARDS = [
+    {
+        title: "Prompt-to-site AI",
+        description: "Describe the business, and NOOK generates structure, copy, and visuals.",
+        icon: SparklesIcon,
+    },
+    {
+        title: "Ai Assistant",
+        description: "Remake or redesign sections or elements of the Page",
+        icon: CodeBracketIcon,
+    },
+    {
+        title: "Page Explorer",
+        description: "Discover new Pages and share Ideas.",
+        icon: FolderOpenIcon,
+    },
+    {
+        title: "Visual Editor",
+        description: "Refine text and sections without touching code.",
+        icon: PencilSquareIcon,
+    },
+    {
+        title: "Page Publishing",
+        description: "Publish pages to the public and share them on the web",
+        icon: ArrowUpCircleIcon,
+    },
+    {
+        title: "Usage analytics",
+        description: "Track activity and trends to understand momentum.",
+        icon: ChartBarIcon,
+    },
+];
+
 const PROMPT_TEMPLATE = [
     "We are a [business type] in [location].",
     "We offer [services/products] for [audience].",
@@ -52,7 +94,8 @@ function UserGuide() {
             <header className="rounded-[12px] border border-ui-border bg-website-bg p-6">
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                     <div className="max-w-2xl">
-                        <div className="inline-flex items-center gap-2 rounded-[999px] border border-ui-border bg-ui-bg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
+                        <div
+                            className="inline-flex items-center gap-2 rounded-[999px] border border-ui-border bg-ui-bg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
                             <BookOpenIcon className="h-4 w-4"/>
                             User Guide
                         </div>
@@ -87,16 +130,59 @@ function UserGuide() {
                 </div>
             </header>
 
+            <section className="rounded-[12px] border border-ui-border bg-website-bg p-5">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
+                            Features
+                        </p>
+                        <h3 className="mt-2 text-lg font-semibold text-text">
+                            Core product highlights
+                        </h3>
+                        <p className="mt-2 text-sm text-text-subtle">
+                            Compact overview for the interim presentation.
+                        </p>
+                    </div>
+                </div>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {FEATURE_CARDS.map((feature) => {
+                        const Icon = feature.icon;
+                        return (
+                            <div
+                                key={feature.title}
+                                className="flex items-start gap-3 rounded-[10px] border border-ui-border bg-ui-bg p-4"
+                            >
+                                <span
+                                    className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-ui-border bg-website-bg text-primary">
+                                    <Icon className="h-5 w-5"/>
+                                </span>
+                                <div>
+                                    <p className="text-sm font-semibold text-text">
+                                        {feature.title}
+                                    </p>
+                                    <p className="mt-1 text-xs text-text-subtle">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
             <section className="grid gap-6 lg:grid-cols-2">
                 <div className="rounded-[12px] border border-ui-border bg-website-bg p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
                         1. Describe your business or idea
                     </p>
                     <p className="mt-3 text-base text-text">
-                        Briefly explain who you are and what you do. Write naturally, like you are explaining it to another person.
+                        Briefly explain who you are and what you do. Write naturally, like you are explaining it to
+                        another person.
                     </p>
-                    <div className="mt-4 rounded-[8px] border border-ui-border bg-ui-bg px-3 py-2 text-sm text-text-subtle">
-                        Example: "I run a specialty coffee shop. We focus on high-quality espresso, homemade pastries, and a cozy atmosphere."
+                    <div
+                        className="mt-4 rounded-[8px] border border-ui-border bg-ui-bg px-3 py-2 text-sm text-text-subtle">
+                        Example: "I run a specialty coffee shop. We focus on high-quality espresso, homemade pastries,
+                        and a cozy atmosphere."
                     </div>
                     <p className="mt-3 text-sm text-text-subtle">
                         This helps the AI choose the right structure, matching images, and suitable tone.
@@ -107,7 +193,8 @@ function UserGuide() {
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
                         2. Use this prompt template
                     </p>
-                    <div className="mt-4 whitespace-pre-line rounded-[8px] border border-ui-border bg-ui-bg px-3 py-3 text-sm text-text-subtle">
+                    <div
+                        className="mt-4 whitespace-pre-line rounded-[8px] border border-ui-border bg-ui-bg px-3 py-3 text-sm text-text-subtle">
                         {PROMPT_TEMPLATE}
                     </div>
                     <p className="mt-3 text-sm text-text-subtle">
@@ -121,7 +208,8 @@ function UserGuide() {
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">
                         Example prompt
                     </p>
-                    <div className="mt-4 whitespace-pre-line rounded-[8px] border border-ui-border bg-ui-bg px-3 py-3 text-sm text-text-subtle">
+                    <div
+                        className="mt-4 whitespace-pre-line rounded-[8px] border border-ui-border bg-ui-bg px-3 py-3 text-sm text-text-subtle">
                         {EXAMPLE_PROMPT}
                     </div>
                     <p className="mt-3 text-sm text-text-subtle">
@@ -206,10 +294,12 @@ function UserGuide() {
                             ))}
                         </ul>
                     </div>
-                    <div className="rounded-[10px] border border-ui-border bg-ui-bg px-4 py-3 text-sm text-text-subtle lg:max-w-[320px]">
+                    <div
+                        className="rounded-[10px] border border-ui-border bg-ui-bg px-4 py-3 text-sm text-text-subtle lg:max-w-[320px]">
                         <p className="font-semibold text-text">Final tip</p>
                         <p className="mt-2">
-                            If you can explain your idea in 2-5 sentences, you are doing it right. The AI is designed to do the rest.
+                            If you can explain your idea in 2-5 sentences, you are doing it right. The AI is designed to
+                            do the rest.
                         </p>
                     </div>
                 </div>

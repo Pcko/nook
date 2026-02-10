@@ -1,16 +1,18 @@
-import React, {Fragment, useEffect, useMemo, useState} from "react";
+﻿import React, {Fragment, useEffect, useMemo, useState} from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import useErrorHandler from "../logging/ErrorHandler";
-import PageService from "../../services/PageService";
-import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "./resources/DashboardIcons";
-import CenteredWindowWithBackgroundBlur from "../general/CenteredWindowWithBackgroundBlur";
+import useErrorHandler from "../../logging/ErrorHandler";
+import PageService from "../../../services/PageService";
+import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "../resources/DashboardIcons";
+import CenteredWindowWithBackgroundBlur from "../../general/CenteredWindowWithBackgroundBlur";
 import {BsThreeDots} from "react-icons/bs";
 import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
 import {useNavigate} from "react-router-dom";
-import {useMetaNotify} from "../logging/MetaNotifyHook";
+import {useMetaNotify} from "../../logging/MetaNotifyHook";
+import SortMenu from "./ui/SortMenu";
+import DateTimeService from "../../../services/DateTimeService";
 
 /**
  * All Options that the user can sort by
@@ -51,24 +53,6 @@ const deploymentPriority = {
 const dateFormat = {
     year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false
 };
-
-function convertOptionToHTML(option) {
-    return (
-        <div className="flex text-text-subtle">
-            <svg
-                className="size-5 my-auto mx-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path strokeLinecap="round" strokeLinejoin="round" d={option.svg}/>
-            </svg>
-            <div className="my-auto">{option.option}</div>
-        </div>
-    );
-}
 
 function PageHub() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -182,30 +166,11 @@ function PageHub() {
 
                     {/* Sorting + New Page */}
                     <div className="flex ml-auto space-x-4">
-                        <Listbox value={sortByOption} onChange={setSortByOption}>
-                            <div className="relative">
-                                <ListboxButton
-                                    className="flex items-center justify-center w-[180px] h-[42px] pr-3 border-2 border-ui-border rounded-[5px] bg-ui-bg hover:bg-ui-bg-selected transition-colors text-text">
-                                    {convertOptionToHTML(sortByOption)}
-                                </ListboxButton>
-
-                                <ListboxOptions
-                                    className="absolute z-10 mt-1 w-[180px] bg-ui-bg border-2 border-ui-border rounded-[5px] shadow-lg overflow-hidden text-text-subtle">
-                                    <h6 className="px-3 py-2 text-sm font-semibold text-text hover:cursor-default">
-                                        Sort
-                                    </h6>
-                                    <div className="divide-y divide-ui-border">
-                                        {sortByOptions.map((option) => (<ListboxOption key={option.id} value={option}>
-                                            {({active, selected}) => (<button
-                                                className={`w-full text-left px-3 py-2 text-sm transition-colors rounded ${active ? "bg-ui-bg-selected" : ""} ${selected ? "font-medium" : "font-normal"}`}
-                                            >
-                                                {convertOptionToHTML(option)}
-                                            </button>)}
-                                        </ListboxOption>))}
-                                    </div>
-                                </ListboxOptions>
-                            </div>
-                        </Listbox>
+                        <SortMenu
+                            value={sortByOption}
+                            onChange={setSortByOption}
+                            options={sortByOptions}
+                        />
 
                         <button
                             type="button"
@@ -301,10 +266,10 @@ function PageHub() {
 
                                     <div
                                         className="p-4 align-middle border-ui-border border border-t-0 flex items-center">
-                                        {new Date(details.createdAt).toLocaleString(navigator.language, dateFormat)}
+                                        {DateTimeService.formatDateTime(details.createdAt, navigator.language, dateFormat)}
                                     </div>
                                     <div className="p-4 border-ui-border border border-t-0 flex items-center">
-                                        {new Date(details.updatedAt).toLocaleString(navigator.language, dateFormat)}
+                                        {DateTimeService.formatDateTime(details.updatedAt, navigator.language, dateFormat)}
                                     </div>
                                     <div
                                         className={`p-4 border-ui-border border border-t-0 flex items-center ${index === filtered.length - 1 ? "rounded-br-[5px]" : ""}`}
@@ -342,3 +307,4 @@ function PageHub() {
 }
 
 export default PageHub;
+

@@ -20,10 +20,6 @@ import {grapesjsExportConfig} from "../website-builder/utils/grapesExportConfig"
 import {getWebsiteExportSettings} from "../website-builder/utils/websiteExportSettings";
 import PublishingService from "../../services/PublishingService";
 
-function classNames(...xs) {
-    return xs.filter(Boolean).join(" ");
-}
-
 function slugify(input) {
     return (
         String(input || "")
@@ -355,12 +351,11 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
                                             <button
                                                 type="button"
-                                                className={classNames(
-                                                    "rounded-[6px] px-4 pt-2 pb-[9px] text-small font-semibold transition-colors",
+                                                className={`rounded-[6px] px-4 pt-2 pb-[9px] text-small font-semibold transition-colors ${
                                                     canRun
                                                         ? "bg-primary text-white hover:opacity-95"
                                                         : "bg-ui-bg-selected text-text-subtle opacity-60 cursor-not-allowed"
-                                                )}
+                                                }`}
                                                 onClick={handlePrimary}
                                                 disabled={!canRun}
                                             >
@@ -461,10 +456,9 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
             whileHover={{y: -2}}
             whileTap={{scale: 0.98}}
             onClick={onClick}
-            className={classNames(
-                "p-4 border-2 rounded-[6px] cursor-pointer bg-website-bg transition-colors",
+            className={`p-4 border-2 rounded-[6px] cursor-pointer bg-website-bg transition-colors ${
                 active ? "border-primary shadow-sm" : "border-ui-border hover:border-primary hover:shadow-md"
-            )}
+            }`}
             role="button"
             tabIndex={0}
         >
@@ -491,7 +485,7 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
 function SummaryRow({label, value, wide = false}) {
     return (
         <div
-            className={classNames("rounded-[6px] border border-ui-border bg-website-bg p-2", wide ? "sm:col-span-2" : "")}>
+            className={`rounded-[6px] border border-ui-border bg-website-bg p-2 ${wide ? "sm:col-span-2" : ""}`}>
             <div className="text-tiny text-text-subtle">{label}</div>
             <div className="text-small text-text break-words">{value || "—"}</div>
         </div>

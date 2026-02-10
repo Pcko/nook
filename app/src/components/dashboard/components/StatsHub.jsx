@@ -8,14 +8,10 @@ import {
     ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-import DeploymentStats from "../deployment/DeploymentStats";
-import PageService from "../../services/PageService";
-import StatsService from "../../services/StatsService";
-import { LoadingBubble } from "../general/LoadingScreen";
-
-function classNames(...xs) {
-    return xs.filter(Boolean).join(" ");
-}
+import DeploymentStats from "../../deployment/DeploymentStats";
+import PageService from "../../../services/PageService";
+import StatsService from "../../../services/StatsService";
+import { LoadingBubble } from "../../general/LoadingScreen";
 
 export default function StatsHub() {
     const [pagePickerOpen, setPagePickerOpen] = useState(false);
@@ -207,10 +203,9 @@ export default function StatsHub() {
                                                             setSelectedPageId(pid);
                                                             setPagePickerOpen(false);
                                                         }}
-                                                        className={classNames(
-                                                            "w-full text-left px-3 py-3 border-b border-ui-border transition-colors",
+                                                        className={`w-full text-left px-3 py-3 border-b border-ui-border transition-colors ${
                                                             active ? "bg-ui-bg-selected" : "hover:bg-website-bg"
-                                                        )}
+                                                        }`}
                                                     >
                                                         <div className="text-small font-semibold text-text truncate">
                                                             {name}

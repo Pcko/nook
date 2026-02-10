@@ -37,11 +37,11 @@ router.post('/:pageName', async (req: Request<PublishPageParams, {}, PublishPage
             author: userId,
         }
 
-        const existingPublished = await PublishedPage.findOne({ pageId: pageDocument._id, author: userId }).lean<IPublishedPage>();
-
-        const pageDetails = existingPublished
-            ? await PublishedPage.findByIdAndUpdate(existingPublished._id, publishedPage, { new: true }) as IPublishedPage
-            : await PublishedPage.create(publishedPage) as IPublishedPage;
+        const pageDetails = await PublishedPage.findOneAndUpdate(
+            { name: pageDocument.name, author: userId },
+            publishedPage,
+            { new: true, upsert: true, setDefaultsOnInsert: true }
+        ) as IPublishedPage;
 
         return res.status(201).json(pageDetails);
     } catch (err) {

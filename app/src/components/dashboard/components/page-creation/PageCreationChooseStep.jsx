@@ -1,6 +1,6 @@
 import React from "react";
 import {motion} from "framer-motion";
-import {AIPageCreationIcon, EditorPageCreationIcon} from "../resources/DashboardIcons";
+import {AIPageCreationIcon, EditorPageCreationIcon} from "../../resources/DashboardIcons";
 import FormTopBar from "./FormTopBar";
 import {CreationOption} from "./CreationOption";
 

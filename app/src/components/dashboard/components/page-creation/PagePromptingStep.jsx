@@ -1,10 +1,10 @@
 import React from "react";
 import {motion, AnimatePresence} from "framer-motion";
-import LoadingCircleSpinner from "../../general/LoadingCircleSpinner";
+import LoadingCircleSpinner from "../../../general/LoadingCircleSpinner";
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import PromptingTextArea from "../../general/PromptingTextArea";
-import { LoadingBubble } from "../../general/LoadingScreen";
+import PromptingTextArea from "../../../general/PromptingTextArea";
+import { LoadingBubble } from "../../../general/LoadingScreen";
 
 /**
  * PagePromptingStep
@@ -122,7 +122,6 @@ function PagePromptingStep({
                                         className="rounded-[6px] border border-ui-border bg-ui-bg overflow-hidden cursor-pointer"
                                         key={i}
                                         layout
-                                        onClick={() => handleSelectAiPage(page)}
                                         transition={{type: "spring", stiffness: 220, damping: 20}}
                                         whileHover={{y: -4, boxShadow: "0 10px 24px rgba(0,0,0,0.12)"}}
                                     >

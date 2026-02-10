@@ -2,6 +2,7 @@ import axios from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import PageDTO from "./interfaces/PageDTO.ts";
 import type {PageMeta} from "./interfaces/PageMeta.ts";
+import PublishedPage from "./interfaces/PublishedPage.ts";
 
 class PageService {
     /**
@@ -87,6 +88,11 @@ class PageService {
      */
     static async deletePage(pageName: string): Promise<void> {
         await axios.delete(`/api/pages/${pageName}`);
+    }
+
+    static async getPublishedPages(): Promise<PublishedPage[]> {
+        const response = await axios.get<PublishedPage[]>("/api/published");
+        return response.data;
     }
 }
 

@@ -19,10 +19,6 @@ import {
     UsersIcon,
 } from "@heroicons/react/24/outline";
 
-function classNames(...xs) {
-    return xs.filter(Boolean).join(" ");
-}
-
 function formatNumber(n) {
     if (n == null || Number.isNaN(Number(n))) return "—";
     return new Intl.NumberFormat().format(Number(n));
@@ -201,7 +197,7 @@ export default function DeploymentStats({
                 </div>
             ) : null}
 
-            <div className={classNames(isEmbedded ? "" : "mt-3")}>
+            <div className={isEmbedded ? "" : "mt-3"}>
                 <div className="flex flex-wrap items-center gap-2 text-tiny text-text-subtle">
                     <span className="inline-flex items-center gap-1">
                         <CalendarDaysIcon className="h-4 w-4" />
@@ -250,14 +246,12 @@ export default function DeploymentStats({
                             type="button"
                             onClick={load}
                             disabled={loading}
-                            className={classNames(
-                                "rounded-[6px] border-2 border-ui-border bg-website-bg px-3 pt-1 pb-[6px] text-small",
-                                "text-text-subtle hover:border-primary hover:text-primary transition-colors",
+                            className={`rounded-[6px] border-2 border-ui-border bg-website-bg px-3 pt-1 pb-[6px] text-small text-text-subtle hover:border-primary hover:text-primary transition-colors ${
                                 loading ? "opacity-60 cursor-not-allowed" : ""
-                            )}
+                            }`}
                         >
                             <span className="inline-flex items-center gap-2">
-                                <ArrowPathIcon className={classNames("h-4 w-4", loading ? "animate-spin" : "")} />
+                                <ArrowPathIcon className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
                                 Refresh
                             </span>
                         </button>
@@ -428,10 +422,9 @@ function PillGroup({ label, value, onChange, options }) {
                             key={o.value}
                             type="button"
                             onClick={() => onChange(o.value)}
-                            className={classNames(
-                                "px-3 pt-[3px] pb-[2px] text-small rounded-[999px] transition-colors",
+                            className={`px-3 pt-[3px] pb-[2px] text-small rounded-[999px] transition-colors ${
                                 active ? "bg-ui-bg-selected text-text font-semibold" : "text-text-subtle hover:text-primary"
-                            )}
+                            }`}
                         >
                             {o.label}
                         </button>
@@ -460,14 +453,13 @@ function KpiCard({ label, value, delta, Icon }) {
 
             <div className="mt-2">
         <span
-            className={classNames(
-                "inline-flex rounded-[999px] border px-2 pt-[3px] pb-[2px] text-tiny font-semibold",
+            className={`inline-flex rounded-[999px] border px-2 pt-[3px] pb-[2px] text-tiny font-semibold ${
                 deltaPositive
                     ? "border-primary/40 bg-primary/5 text-primary"
                     : deltaNegative
                         ? "border-ui-border bg-website-bg text-text"
                         : "border-ui-border bg-website-bg text-text-subtle"
-            )}
+            }`}
         >
           {delta} vs. previous
         </span>
