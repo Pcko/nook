@@ -224,13 +224,6 @@ function AIAssistantPanel(): JSX.Element {
                                     </p>
                                 </div>
                             </div>
-
-                            <span
-                                className="rounded-[999px] border border-primary/40 bg-primary/5 px-2 pt-[3px] pb-[2px]
-                               text-small font-semibold uppercase tracking-[0.14em] text-primary"
-                            >
-                                Beta
-                            </span>
                         </div>
 
                         {/* Conversation + Quick Actions */}
