@@ -21,6 +21,15 @@ import ToolbarButton from "./ToolbarButton";
 import TopActionButton from "./TopActionButton";
 import ZoomListbox from "./ZoomListbox";
 import { InfoTip } from "../../ui/TooltipSystem";
+import {
+    exportWebsite,
+    handleRedo,
+    handleUndo,
+    setDesktop,
+    setMobile,
+    setTablet,
+    toggleOutlines, togglePreview
+} from "../../../utils/grapesActions";
 
 /**
  * TopPanel
