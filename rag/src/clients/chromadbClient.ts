@@ -7,8 +7,8 @@ import type {
     ChromaDBQueryResultItem
 } from "../dto/chroma.js";
 
-const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "15");
-const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF || "0.5");
+const defaultNResults = parseInt(process.env.CHROMADB_N_RESULTS || "7");
+const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF || "0.4");
 
 const embedder = new OllamaEmbeddingFunction({
     url: 'http://localhost:11434',

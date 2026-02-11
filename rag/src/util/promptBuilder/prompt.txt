@@ -27,7 +27,7 @@ Image usage guidelines:
 - Each image should clearly support the content of its section.
 - Do not generate empty or broken images; always use a valid public placeholder image URL if no concrete image is available.
 
-Additional context (suggestions from vector database, optional):
+Information from similar Websites (each of these is an instruction used for a different website, you may use some of them as inspiration, but do not assume they are exactly what the user wants.):
 {{context}}
 
 User-Created Metadata:
