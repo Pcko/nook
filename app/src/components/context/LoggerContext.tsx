@@ -24,7 +24,7 @@ const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
     error: 40,
     fatal: 50,
 };
-const VALID_LOG_LEVELS: LogLevel[] = ["debug", "info", "warn", "error", "fatal"];
+const VALID_LOG_LEVELS: LogLevel[] = Object.keys(LOG_LEVEL_WEIGHT);
 
 const parseSentryMinLevel = (): LogLevel => {
     const raw = (import.meta as any).env?.VITE_SENTRY_MIN_LEVEL;
@@ -33,6 +33,7 @@ const parseSentryMinLevel = (): LogLevel => {
 const SENTRY_MIN_LEVEL = parseSentryMinLevel();
 
 const shouldForwardToSentry = (level: LogLevel): boolean => {
+    console.log(VALID_LOG_LEVELS)
     return LOG_LEVEL_WEIGHT[level] >= LOG_LEVEL_WEIGHT[SENTRY_MIN_LEVEL];
 };
 
