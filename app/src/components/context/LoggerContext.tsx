@@ -8,6 +8,7 @@ import React, {
     useRef,
     useState,
 } from "react";
+import * as Sentry from "@sentry/react";
 import { LoggerContextValue } from "../logging/types/loggerContextValue";
 import { LogEntry } from "../logging/types/logEntry";
 import { LogLevel } from "../logging/types/logLevel";
@@ -16,6 +17,92 @@ const MAX_LOGS = 1500;        // in-memory
 const MAX_PERSISTED = 200;    // localStorage
 const STORAGE_KEY = "app_logs";
 const FLUSH_DELAY_MS = 2000;
+const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
+    debug: 10,
+    info: 20,
+    warn: 30,
+    error: 40,
+    fatal: 50,
+};
+const VALID_LOG_LEVELS: LogLevel[] = Object.keys(LOG_LEVEL_WEIGHT);
+
+const parseSentryMinLevel = (): LogLevel => {
+    const raw = (import.meta as any).env?.VITE_SENTRY_MIN_LEVEL;
+    return VALID_LOG_LEVELS.includes(raw) ? raw : "warn";
+};
+const SENTRY_MIN_LEVEL = parseSentryMinLevel();
+
+const shouldForwardToSentry = (level: LogLevel): boolean => {
+    console.log(VALID_LOG_LEVELS)
+    return LOG_LEVEL_WEIGHT[level] >= LOG_LEVEL_WEIGHT[SENTRY_MIN_LEVEL];
+};
+
+const toSentryLevel = (
+    level: LogLevel
+): "debug" | "info" | "warning" | "error" | "fatal" => {
+    switch (level) {
+        case "warn":
+            return "warning";
+        case "error":
+            return "error";
+        case "fatal":
+            return "fatal";
+        case "debug":
+            return "debug";
+        default:
+            return "info";
+    }
+};
+
+const forwardEntryToSentry = (entry: LogEntry, originalMeta: unknown): void => {
+    const sentryLevel = toSentryLevel(entry.level);
+
+    Sentry.addBreadcrumb({
+        category: "app.log",
+        message: entry.message,
+        level: sentryLevel,
+        data: {
+            id: entry.id,
+            level: entry.level,
+            route: entry.route ?? undefined,
+            sessionId: entry.sessionId,
+            timestamp: entry.timestamp,
+            userId: entry.userId ?? undefined,
+        },
+    });
+
+    if (!shouldForwardToSentry(entry.level)) return;
+
+    Sentry.withScope((scope) => {
+        scope.setLevel(sentryLevel);
+        scope.setTag("log_source", "frontend_logger");
+        scope.setTag("log_level", entry.level);
+        scope.setTag("session_id", entry.sessionId);
+        if (entry.route) scope.setTag("route", entry.route);
+        if (entry.userId) scope.setUser({ id: entry.userId });
+
+        scope.setContext("app_log", {
+            id: entry.id,
+            level: entry.level,
+            route: entry.route,
+            sessionId: entry.sessionId,
+            timestamp: entry.timestamp,
+            meta: entry.meta,
+        });
+
+        if (originalMeta instanceof Error) {
+            Sentry.captureException(originalMeta);
+            return;
+        }
+
+        if (entry.level === "error" || entry.level === "fatal") {
+            Sentry.captureException(new Error(entry.message));
+            return;
+        }
+
+        Sentry.captureMessage(entry.message);
+    });
+};
 
 const LoggerContext = createContext<LoggerContextValue | null>(null);
 
@@ -162,6 +249,13 @@ export const LoggerProvider: React.FC<LoggerProviderProps> = ({ children, getUse
             if ((import.meta as any).env?.VITE_ENV === "dev") {
                 const consoleFn = (console as any)[level] || console.log.bind(console);
                 consoleFn(`[${level}] ${message}`, entry.meta);
+            }
+            try {
+                forwardEntryToSentry(entry, meta);
+            } catch (sentryErr) {
+                if ((import.meta as any).env?.DEV) {
+                    console.error("Sentry forward failed:", sentryErr);
+                }
             }
 
             pendingRef.current.push(entry);
