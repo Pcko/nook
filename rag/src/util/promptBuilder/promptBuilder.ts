@@ -36,14 +36,13 @@ export const promptBuilder = {
      * @returns {Promise<ChatCompletionMessageParam[]>} A Promise that resolves to a fully constructed chat completion message list.
      */
     async build(queryRequest: QueryRequestBody, llmClient: LlmClient): Promise<ChatCompletionMessageParam[]> {
-        let fullQuery = queryRequest.meta?
-            `${queryRequest.query}\nAdditional Info:\n${constructPageMeta(queryRequest.meta)}`
-            : queryRequest.query;
-
         let contextString = "No additional context available.";
         if (!queryRequest.skipContext) {
             try {
-                contextString = await getWebsiteContext(fullQuery, llmClient);
+                let queryToRewrite = queryRequest.meta?
+                    `${queryRequest.query}\nAdditional Info:\n${constructPageMeta(queryRequest.meta)}`
+                    : queryRequest.query;
+                contextString = await getWebsiteContext(queryToRewrite, llmClient);
             } catch (err) {
                 console.error("[promptBuilder] Chroma Error:", err);
             }
@@ -60,7 +59,7 @@ export const promptBuilder = {
             },
             {
                 role: "user",
-                content: fullQuery
+                content: queryRequest.query
             }
         ];
     },
@@ -99,7 +98,7 @@ export const promptBuilder = {
 
 async function getWebsiteContext(query: string, llmClient: LlmClient): Promise<string> {
     const queries = await rewriteQuery(query, llmClient);
-    const chromaResponse = await chromaClient.query({ queries });
+    const chromaResponse = await chromaClient.query({ queries, where: {type: {"$ne": "sample_component"}} });
     return JSON.stringify(chromaResponse);
 }
 

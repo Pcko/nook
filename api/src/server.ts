@@ -50,7 +50,7 @@ app.use(express.static(clientPath));
 app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
-app.use('/api/generation', ragRouter);
+app.use('/api/generation', authenticateToken, ragRouter);
 app.use('/api/publishPage', authenticateToken, publishingRouter)
 app.use('/api/published', publishedPageRouter)
 app.use('/api/stats', authenticateToken, statsRouter)
