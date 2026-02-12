@@ -12,7 +12,6 @@ import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
 import publishingRouter from './routes/publishing.js';
-import publishedPageRouter from './routes/publishedPage.js'
 import statsRouter from './routes/stats.js';
 
 //ENV variable check
@@ -48,8 +47,7 @@ app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', authenticateToken, ragRouter);
-app.use('/api/publishPage', authenticateToken, publishingRouter)
-app.use('/api/stats', authenticateToken, statsRouter)
+app.use('/api/stats', authenticateToken, statsRouter);
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 
