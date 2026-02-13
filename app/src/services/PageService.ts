@@ -1,4 +1,3 @@
-import baseAxios from "axios";
 import axios from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import PageDTO from "./interfaces/PageDTO.ts";
@@ -92,7 +91,10 @@ class PageService {
     }
 
     static async getPublishedPages(): Promise<PublishedPage[]> {
-        const response = await baseAxios.get<PublishedPage[]>((import.meta as any).env.VITE_PUBLISH_URL);
+        const response = await axios<PublishedPage[]>({
+            method: 'get',
+            url: (import.meta as any).env.VITE_PUBLISH_URL
+        });
         return response.data;
     }
 }

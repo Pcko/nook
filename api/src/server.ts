@@ -48,6 +48,7 @@ app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
 app.use('/api/generation', authenticateToken, ragRouter);
 app.use('/api/stats', authenticateToken, statsRouter);
+app.use('/api/publishPage', authenticateToken, publishingRouter)
 
 app.get('/api/health', (req: Request, res: Response) => res.send('✅ API is running!'));
 

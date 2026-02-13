@@ -129,7 +129,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
-            const url = `${publicBaseUrl}/api/published/${authorId}/${pageName}`;
+            const url = `${publicBaseUrl}/${authorId}/${pageName}`;
 
             setResultUrl(url);
             setPendingUrl(url);

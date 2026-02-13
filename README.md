@@ -24,7 +24,7 @@ npm run typecheck
 Start the development publisher server:
 ```bat
 npm install
-npm run publisherdev
+npm run publisherDev
 ```
 
 ### APP
@@ -64,7 +64,7 @@ npm run prod
 Start the production publisher server:
 ```bat
 npm install
-npm run publisherprod
+npm run publisherProd
 ```
 
 
