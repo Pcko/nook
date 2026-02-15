@@ -1,6 +1,6 @@
 {
   "selectors": [
-    "#ia25"        // Use a unique ID selector for each styled component
+    // CSS selectors go here (Example: "#componentId"), Use a unique ID selector for each styled component
   ],
   "style": {
     // CSS attributes go here
