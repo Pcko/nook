@@ -183,76 +183,83 @@ function Homepage() {
 
     return (
         <div className="h-full w-full bg-far-bg text-text">
-            <div className="mx-auto flex h-full w-[98%] flex-col py-3">
-                <div className="relative flex flex-1 overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-lg">
-                {/* Ambient brand glow */}
-                <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl"/>
-                <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-secondary/20 blur-3xl"/>
+            <div className="mx-auto box-border flex h-full w-[98%] min-h-0 flex-col py-3">
+                <div className="relative flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-lg">
+                    {/* Ambient brand glow */}
+                    <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl"/>
+                    <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-secondary/20 blur-3xl"/>
 
-                {/* Sidebar (app-like) */}
-                <aside className="hidden w-[280px] shrink-0 border-r border-ui-border bg-website-bg/80 lg:flex lg:flex-col">
-                    <div className="flex items-center gap-3 border-b border-ui-border px-5 py-4">
-                        <img src={slideshowIcon} alt="NOOK" className="h-9 w-9 rounded-md object-cover"/>
-                        <div>
-                            <p className="text-small text-text-subtle">Product page</p>
-                            <h6 className="font-semibold !text-text">NOOK</h6>
+                    {/* Sidebar (app-like) */}
+                    <aside className="hidden w-[280px] shrink-0 border-r border-ui-border bg-website-bg/80 lg:flex lg:flex-col">
+                        <div className="flex items-center gap-3 border-b border-ui-border px-5 py-4">
+                            <img src={slideshowIcon} alt="NOOK" className="h-9 w-9 rounded-md object-cover"/>
+                            <div>
+                                <p className="text-small text-text-subtle">Product page</p>
+                                <h6 className="font-semibold !text-text">NOOK</h6>
+                            </div>
                         </div>
-                    </div>
 
-                    <nav className="p-3">
-                        {sidebarItems.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <a
-                                    key={item.id}
-                                    href={`#${item.id}`}
-                                    className="mb-1 flex items-center gap-2 rounded-[8px] px-3 py-2 text-text-subtle transition-colors hover:bg-ui-bg-selected hover:text-text"
-                                >
-                                    <Icon className="h-5 w-5"/>
-                                    <span>{item.label}</span>
-                                </a>
-                            );
-                        })}
-                    </nav>
+                        <nav className="p-3">
+                            {sidebarItems.map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <a
+                                        key={item.id}
+                                        href={`#${item.id}`}
+                                        className="mb-1 flex items-center gap-2 rounded-[8px] px-3 py-2 text-text-subtle transition-colors hover:bg-ui-bg-selected hover:text-text"
+                                    >
+                                        <Icon className="h-5 w-5"/>
+                                        <span>{item.label}</span>
+                                    </a>
+                                );
+                            })}
+                        </nav>
 
-                    <div className="mt-auto border-t border-ui-border p-4">
-                        <Link
-                            to="/app"
-                            className="prim-btn !m-0 flex w-full items-center justify-center gap-2"
-                        >
-                            Try NOOK
-                            <ArrowUpTrayIcon className="h-4 w-4"/>
-                        </Link>
+                        <div className="mt-auto border-t border-ui-border p-4">
+                            <Link
+                                to="/app"
+                                className="prim-btn flex w-full items-center justify-center gap-2"
+                            >
+                                Try NOOK
+                                <ArrowUpTrayIcon className="h-4 w-4"/>
+                            </Link>
                         <Link
                             to="/login"
-                            className="btn !m-0 mt-2 block w-full text-center"
+                            className="btn btn-landing mt-2 block w-full text-center"
                         >
                             Sign in
                         </Link>
-                    </div>
-                </aside>
+                        </div>
+                    </aside>
 
-                {/* Main content */}
-                <main className="min-h-0 flex-1 overflow-y-auto">
-                    {/* Window top bar (app-feel) */}
-                    <div className="sticky top-0 z-20 border-b border-ui-border bg-ui-bg/90 backdrop-blur">
-                        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-                            <div className="flex items-center gap-2">
-                                <span className="h-2.5 w-2.5 rounded-full bg-ui-border-selected"/>
-                                <span className="h-2.5 w-2.5 rounded-full bg-ui-border"/>
-                                <span className="h-2.5 w-2.5 rounded-full bg-ui-border"/>
-                            </div>
+                    {/* Main content */}
+                    <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain scroll-pt-20">
+                        {/* Window top bar (app-feel) */}
+                        <div className="sticky top-0 z-20 border-b border-ui-border bg-ui-bg/95 supports-[backdrop-filter]:bg-ui-bg/70 supports-[backdrop-filter]:backdrop-blur">
+                            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-ui-border-selected"/>
+                                    <span className="h-2.5 w-2.5 rounded-full bg-ui-border"/>
+                                    <span className="h-2.5 w-2.5 rounded-full bg-ui-border"/>
+                                </div>
 
-                            <div className="flex items-center gap-2">
-                                <Link to="/register" className="btn !m-0 !px-3 !py-1.5">Sign up</Link>
-                                <Link to="/app" className="prim-btn !m-0 !px-3 !py-1.5">Try now</Link>
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <Link to="/register" className="btn btn-landing w-full text-center !px-3 !py-1.5 sm:w-auto">
+                                        Sign up
+                                    </Link>
+                                    <Link
+                                        to="/app"
+                                        className="prim-btn mt-2 w-full text-center !px-3 !py-1.5 sm:mt-0 sm:ml-2 sm:w-auto"
+                                    >
+                                        Try now
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
                         {/* Overview / Hero */}
-                        <section id="overview" className="grid gap-4 lg:grid-cols-12">
+                        <section id="overview" className="scroll-mt-20 grid gap-4 lg:grid-cols-12">
                             <div className="rounded-2xl border border-ui-border bg-website-bg p-5 lg:col-span-7 lg:p-7">
                                 <p className="text-small text-text-subtle">For potential users</p>
                                 <h1 className="mt-1 max-w-2xl">
@@ -265,7 +272,7 @@ function Homepage() {
 
                                 <div className="mt-6 flex flex-wrap gap-2">
                                     <Link to="/app" className="prim-btn !m-0">Try now</Link>
-                                    <a href="#trailer" className="btn !m-0">Watch trailer</a>
+                                    <a href="#trailer" className="btn btn-landing !m-0">Watch trailer</a>
                                 </div>
 
                                 <div className="mt-6 grid gap-2 sm:grid-cols-3">
@@ -327,7 +334,7 @@ function Homepage() {
                         </section>
 
                         {/* Trailer */}
-                        <section id="trailer" className="mt-6 rounded-2xl border border-ui-border bg-website-bg p-5">
+                        <section id="trailer" className="mt-6 scroll-mt-20 rounded-2xl border border-ui-border bg-website-bg p-5">
                             <div className="mb-3 flex items-center justify-between gap-3">
                                 <div>
                                     <h3>Trailer</h3>
@@ -335,7 +342,7 @@ function Homepage() {
                                         A short overview of the NOOK workflow.
                                     </p>
                                 </div>
-                                <a href="#examples" className="btn !m-0 !px-3 !py-1.5">Go to examples</a>
+                                <a href="#examples" className="btn btn-landing !m-0 !px-3 !py-1.5">Go to examples</a>
                             </div>
 
                             <div className="overflow-hidden rounded-xl border border-ui-border bg-ui-bg">
@@ -365,7 +372,7 @@ function Homepage() {
                         </section>
 
                         {/* Examples */}
-                        <section id="examples" className="mt-6">
+                        <section id="examples" className="mt-6 scroll-mt-20">
                             <div className="mb-3 flex items-center justify-between">
                                 <div>
                                     <h3>Examples</h3>
@@ -399,7 +406,7 @@ function Homepage() {
                         </section>
 
                         {/* FAQ + CTA */}
-                        <section id="faq" className="mt-6 grid gap-3 lg:grid-cols-12">
+                        <section id="faq" className="mt-6 scroll-mt-20 grid gap-3 lg:grid-cols-12">
                             <div className="rounded-2xl border border-ui-border bg-website-bg p-5 lg:col-span-8">
                                 <h4>Frequently asked questions</h4>
                                 <div className="mt-4 space-y-3">
@@ -423,14 +430,14 @@ function Homepage() {
                                 <p className="mt-2 text-small text-text-subtle">
                                     Watch the trailer, check the examples, and start in the builder.
                                 </p>
-                                <div className="mt-4 space-y-2">
-                                    <Link to="/app" className="prim-btn !m-0 block w-full text-center">Try NOOK</Link>
-                                    <Link to="/register" className="btn !m-0 block w-full text-center">Create account</Link>
+                                <div className="mt-4">
+                                    <Link to="/app" className="prim-btn block w-full text-center">Try NOOK</Link>
+                                    <Link to="/register" className="btn btn-landing mt-2 block w-full text-center">Create account</Link>
                                 </div>
                             </div>
                         </section>
                     </div>
-                </main>
+                    </main>
                 </div>
             </div>
         </div>
