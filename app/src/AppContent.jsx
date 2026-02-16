@@ -1,6 +1,6 @@
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import React from 'react';
-import Dashboard from "./components/dashboard/components/Dashboard"
+import Dashboard from "./components/dashboard/components/Dashboard";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRedirect from "./components/general/AuthRedirect";
@@ -8,10 +8,11 @@ import Login from "./components/auth/Login";
 import Settings from "./components/settings/Settings";
 import EditorHub from "./components/editor-hub/EditorHub";
 import Register from "./components/auth/Registration";
-import {MotionConfig,} from "framer-motion";
+import {MotionConfig} from "framer-motion";
 import NotificationOverlay from "./components/general/NotificationOverlay";
 import {useAnimation} from "./components/context/AnimationContext";
 import PublishedPageView from "./components/deployment/PublishedPageView";
+import Homepage from "./components/landing/Homepage"; // neu
 
 function AppContent() {
     const {animationEnabled} = useAnimation();
@@ -23,7 +24,9 @@ function AppContent() {
                 <div className="h-full">
                     <main className="h-full bg-far-bg text-text">
                         <Routes>
-                            <Route path="/" element={<AuthRedirect/>}/>
+                            <Route path="/" element={<Homepage/>}/>           
+                            <Route path="/app" element={<AuthRedirect/>}/>
+
                             <Route path="/login" element={<Login/>}/>
                             <Route path="/register" element={<Register/>}/>
 
@@ -31,7 +34,7 @@ function AppContent() {
                                 <Route path="/settings" element={<Settings/>}/>
                                 <Route path="/dashboard" element={<Dashboard/>}/>
                                 <Route path="/editor/:pageName" element={<EditorHub/>}/>
-                                <Route path="/pages/:authorId/:pageName" element={<PublishedPageView />} />
+                                <Route path="/pages/:authorId/:pageName" element={<PublishedPageView/>}/>
                             </Route>
                         </Routes>
                     </main>
