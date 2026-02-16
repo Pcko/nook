@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-sort-props */
-import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import React, {useMemo, useState} from "react";
 import {
     AiOutlineBorder,
@@ -15,7 +14,13 @@ import {
 import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
 import DeployModal from "../../../../deployment/DeployModal";
 import useErrorHandler from "../../../../logging/ErrorHandler";
-import {useMetaNotify} from "../../../../logging/MetaNotifyHook";
+import { useMetaNotify } from "../../../../logging/MetaNotifyHook";
+
+import CustomViewportInput from "./CustomViewportInput";
+import ToolbarButton from "./ToolbarButton";
+import TopActionButton from "./TopActionButton";
+import ZoomListbox from "./ZoomListbox";
+import { InfoTip } from "../../ui/TooltipSystem";
 import {
     exportWebsite,
     handleRedo,
@@ -23,12 +28,8 @@ import {
     setDesktop,
     setMobile,
     setTablet,
-    toggleOutlines,
-    togglePreview,
+    toggleOutlines, togglePreview
 } from "../../../utils/grapesActions";
-import ToolbarButton from './ToolbarButton';
-import ZoomListbox from './ZoomListbox';
-import TopActionButton from './TopActionButton';
 
 /**
  * TopPanel
@@ -190,37 +191,39 @@ function TopPanel({editorRef, page}) {
 
         if (lastAppliedCustomWidth && Number.isFinite(lastAppliedCustomWidth)) {
             ensureAndSetCustomDevice(lastAppliedCustomWidth);
+            // keep input prefilled (UX)
             if (!customViewport) setCustomViewport(String(lastAppliedCustomWidth));
         }
     };
 
     return (
-        <div
-            className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
-            {/* Left group: edit tools */}
-            <div className="flex items-center gap-2">
-                <ToolbarButton icon={<AiOutlineUndo size={18}/>} label="Str+Z" onClick={() => handleUndo(editorRef)}/>
-                <ToolbarButton icon={<AiOutlineRedo size={18}/>} label="Str+Y" onClick={() => handleRedo(editorRef)}/>
-                <ToolbarButton icon={<AiOutlineBorder size={18}/>} label="Alt+O"
-                               onClick={() => toggleOutlines(editorRef)}/>
-                <ToolbarButton icon={<AiOutlineEye size={18}/>} label="Alt+P" onClick={() => togglePreview(editorRef)}/>
-            </div>
+            <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+                {/* left group */}
+                <div className="flex items-center gap-2">
+                    <ToolbarButton icon={<AiOutlineUndo size={18} />} label="Str+Z" tooltip="Undo (Str+Z)" onClick={() => handleUndo(editorRef)} />
+                    <ToolbarButton icon={<AiOutlineRedo size={18} />} label="Str+Y" tooltip="Redo (Str+Y)" onClick={() => handleRedo(editorRef)} />
+                    <ToolbarButton icon={<AiOutlineBorder size={18} />} label="Alt+O" tooltip="Toggle outlines (Alt+O)" onClick={() => toggleOutlines(editorRef)} />
+                    <ToolbarButton icon={<AiOutlineEye size={18} />} label="Alt+P" tooltip="Toggle preview (Alt+P)" onClick={() => togglePreview(editorRef)} />
+                </div>
 
-            {/* Center group: devices + zoom */}
-            <div className="flex items-center justify-center gap-2">
-                <ToolbarButton icon={<AiOutlinePlus size={18}/>} onClick={handlePlus}/>
+                {/* center group */}
+                <div className="flex items-center justify-center gap-2">
+                    <ToolbarButton icon={<AiOutlinePlus size={18} />} tooltip="Custom viewport width" onClick={handlePlus} />
 
                 {showCustomViewport && (
                     <CustomViewportInput onApply={applyCustomViewport} onChange={setCustomViewport}
                                          value={customViewport}/>
                 )}
 
-                <ToolbarButton icon={<AiOutlineLaptop size={18}/>} onClick={handleDesktop}/>
-                <ToolbarButton icon={<AiOutlineTablet size={18}/>} onClick={handleTablet}/>
-                <ToolbarButton icon={<AiOutlineMobile size={18}/>} onClick={handleMobile}/>
+                    <ToolbarButton icon={<AiOutlineLaptop size={18} />} tooltip="Desktop viewport" onClick={handleDesktop} />
+                    <ToolbarButton icon={<AiOutlineTablet size={18} />} tooltip="Tablet viewport" onClick={handleTablet} />
+                    <ToolbarButton icon={<AiOutlineMobile size={18} />} tooltip="Mobile viewport" onClick={handleMobile} />
 
-                <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom}/>
-            </div>
+                    <div className="flex items-center gap-1" data-wb-tooltip="Zoom only changes the editor view (it does not affect export)." data-wb-tooltip-delay="650">
+                        <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom} />
+                        <InfoTip text="Zoom only changes the editor view (it does not affect export)." />
+                    </div>
+                </div>
 
             {/* Right group: save/export/publish */}
             <div className="flex items-center justify-end gap-2">

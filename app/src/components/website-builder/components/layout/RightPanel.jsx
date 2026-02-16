@@ -3,6 +3,8 @@ import TabSelector from "../TabSelector";
 import AIAssistantPanel from "../panels/AIAssistantPanel";
 import {useBuilder} from "../../hooks/UseBuilder";
 import HistoryPanel from "../panels/HistoryPanel";
+import PanelSearchBar from "../ui/PanelSearchBar";
+import {useDomTextFilter} from "../../hooks/useDomTextFilter";
 
 /**
  * RightPanel component
@@ -13,7 +15,27 @@ import HistoryPanel from "../panels/HistoryPanel";
  */
 function RightPanel() {
     const [activeTab, setActiveTab] = useState("editor");
+    const [search, setSearch] = useState("");
     const {selectedElement, aiBusy} = useBuilder();
+
+    // Search GrapesJS Traits and Styles (CSS properties)
+    useDomTextFilter({
+        rootSelector: ".traits-panel",
+        enabled: activeTab === "editor" && !!selectedElement,
+        query: search,
+        itemSelector: ".gjs-trt-trait",
+        itemTextSelector: ".gjs-label, label",
+    });
+
+    useDomTextFilter({
+        rootSelector: ".styles-panel",
+        enabled: activeTab === "editor" && !!selectedElement,
+        query: search,
+        itemSelector: ".gjs-sm-property",
+        itemTextSelector: ".gjs-sm-label, .gjs-label, label",
+        groupSelector: ".gjs-sm-sector",
+        groupTitleSelector: ".gjs-sm-sector-title, .gjs-title",
+    });
 
     const handleTabChange = (tab) => {
         if (aiBusy) return;
@@ -42,6 +64,15 @@ function RightPanel() {
                                         : "hidden h-full"
                             }
                     >
+                        <div className="mb-3">
+                            <PanelSearchBar
+                                value={search}
+                                onChange={setSearch}
+                                placeholder="Search traits / styles…"
+                                disabled={aiBusy}
+                            />
+                        </div>
+
                         <div className="mb-2">
                             <p className="font-semibold mb-1">Traits</p>
                             <div className="traits-panel"/>

@@ -1,5 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 
+const DESKTOP_PREVIEW_WIDTH = 1200;
+const DESKTOP_PREVIEW_VIRTUAL_HEIGHT = 2000;
+const FALLBACK_PREVIEW_SCALE = 0.25;
+
 function useElementWidth<T extends HTMLElement>() {
     const ref = useRef<T | null>(null);
     const [w, setW] = useState(0);
@@ -27,10 +31,8 @@ const Preview = ({
     iframeErr?: string;
     onClick?: () => void;
 }) => {
-    const DESKTOP_WIDTH = 1200;
-
     const {ref, w} = useElementWidth<HTMLDivElement>();
-    const scale = w ? Math.min(1, w / DESKTOP_WIDTH) : 0.25;
+    const scale = w ? Math.min(1, w / DESKTOP_PREVIEW_WIDTH) : FALLBACK_PREVIEW_SCALE;
 
     return (
         <div
@@ -50,8 +52,9 @@ const Preview = ({
                         position: "absolute",
                         top: 0,
                         left: "50%",
-                        width: `${DESKTOP_WIDTH}px`,
-                        height: "2000px",
+                        width: `${DESKTOP_PREVIEW_WIDTH}px`,
+                        // Virtual canvas height for downscaled preview pages.
+                        height: `${DESKTOP_PREVIEW_VIRTUAL_HEIGHT}px`,
                         transform: `translateX(-50%) scale(${scale})`,
                         transformOrigin: "top center",
                         border: 0,

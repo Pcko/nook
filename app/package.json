@@ -12,6 +12,7 @@
     "@coreui/react": "^5.4.1",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "@sentry/react": "^10.38.0",
     "axios": "^1.7.9",
     "bootstrap-icons": "^1.13.1",
     "framer-motion": "^12.5.0",
