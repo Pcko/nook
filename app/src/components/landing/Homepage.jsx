@@ -111,11 +111,6 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
                 />
             </div>
 
-            {canScroll && (
-                <div className="pointer-events-none absolute bottom-2 right-2 rounded-md border border-ui-border bg-website-bg/90 px-2 py-1 text-tiny text-text-subtle">
-                    Hover to auto-scroll
-                </div>
-            )}
         </div>
     );
 }
@@ -217,7 +212,7 @@ function Homepage() {
 
                         <div className="mt-auto border-t border-ui-border p-4">
                             <Link
-                                to="/app"
+                            to="/register"
                                 className="prim-btn flex w-full items-center justify-center gap-2"
                             >
                                 Try NOOK
@@ -248,7 +243,7 @@ function Homepage() {
                                         Sign up
                                     </Link>
                                     <Link
-                                        to="/app"
+                                    to="/register"
                                         className="prim-btn mt-2 w-full text-center !px-3 !py-1.5 sm:mt-0 sm:ml-2 sm:w-auto"
                                     >
                                         Try now
@@ -271,7 +266,7 @@ function Homepage() {
                                 </p>
 
                                 <div className="mt-6 flex flex-wrap gap-2">
-                                    <Link to="/app" className="prim-btn !m-0">Try now</Link>
+                                    <Link to="/register" className="prim-btn !m-0">Try now</Link>
                                     <a href="#trailer" className="btn btn-landing !m-0">Watch trailer</a>
                                 </div>
 
@@ -311,6 +306,40 @@ function Homepage() {
                                     <p className="mt-2 text-small text-text-subtle">{card.text}</p>
                                 </article>
                             ))}
+                        </section>
+
+                        {/* Examples */}
+                        <section id="examples" className="mt-6 scroll-mt-20">
+                            <div className="mb-3 flex items-center justify-between">
+                                <div>
+                                    <h3>Examples</h3>
+                                    <p className="text-small text-text-subtle">
+                                        Typical pages you can build quickly with NOOK.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid gap-3 md:grid-cols-3">
+                                {examples.map((example) => (
+                                    <article
+                                        key={example.title}
+                                        className="overflow-hidden rounded-[8px] border border-ui-border bg-website-bg"
+                                    >
+                                        <ExampleImagePreview
+                                            src={example.image}
+                                            alt={example.title}
+                                            fallbackSrc={slideshowIcon}
+                                        />
+                                        <div className="p-4">
+                                            <span className="inline-block rounded-[6px] border border-ui-border bg-ui-bg px-2 py-1 text-tiny text-text-subtle">
+                                                {example.tag}
+                                            </span>
+                                            <h6 className="mt-3 font-semibold">{example.title}</h6>
+                                            <p className="mt-2 text-small text-text-subtle">{example.description}</p>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
                         </section>
 
                         {/* Steps */}
@@ -371,40 +400,6 @@ function Homepage() {
                             </div>
                         </section>
 
-                        {/* Examples */}
-                        <section id="examples" className="mt-6 scroll-mt-20">
-                            <div className="mb-3 flex items-center justify-between">
-                                <div>
-                                    <h3>Examples</h3>
-                                    <p className="text-small text-text-subtle">
-                                        Typical pages you can build quickly with NOOK.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="grid gap-3 md:grid-cols-3">
-                                {examples.map((example) => (
-                                    <article
-                                        key={example.title}
-                                        className="overflow-hidden rounded-[8px] border border-ui-border bg-website-bg"
-                                    >
-                                        <ExampleImagePreview
-                                            src={example.image}
-                                            alt={example.title}
-                                            fallbackSrc={slideshowIcon}
-                                        />
-                                        <div className="p-4">
-                                            <span className="inline-block rounded-[6px] border border-ui-border bg-ui-bg px-2 py-1 text-tiny text-text-subtle">
-                                                {example.tag}
-                                            </span>
-                                            <h6 className="mt-3 font-semibold">{example.title}</h6>
-                                            <p className="mt-2 text-small text-text-subtle">{example.description}</p>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-                        </section>
-
                         {/* FAQ + CTA */}
                         <section id="faq" className="mt-6 scroll-mt-20 grid gap-3 lg:grid-cols-12">
                             <div className="rounded-2xl border border-ui-border bg-website-bg p-5 lg:col-span-8">
@@ -431,7 +426,7 @@ function Homepage() {
                                     Watch the trailer, check the examples, and start in the builder.
                                 </p>
                                 <div className="mt-4">
-                                    <Link to="/app" className="prim-btn block w-full text-center">Try NOOK</Link>
+                                    <Link to="/register" className="prim-btn block w-full text-center">Try NOOK</Link>
                                     <Link to="/register" className="btn btn-landing mt-2 block w-full text-center">Create account</Link>
                                 </div>
                             </div>
