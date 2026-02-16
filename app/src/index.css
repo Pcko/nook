@@ -139,6 +139,17 @@ body {
     @apply border-2 px-4 py-2 rounded-[5px] text-text hover:bg-ui-button-hover transition;
 }
 
+.btn-landing {
+    border-width: 1px;
+    border-color: var(--ui-border);
+    background: var(--ui-bg);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.btn-landing:hover {
+    background: var(--ui-bg-selected);
+}
+
 .btn-dropdown {
     @apply px-4 py-2 text-text font-medium;
 }
@@ -146,6 +157,7 @@ body {
 .prim-btn {
     @apply text-text-on-primary bg-primary border-secondary border-2 px-4 py-2 rounded-[5px] hover:bg-ui-subtle transition;
 }
+
 
 .form-field {
     @apply w-full h-10 mb-[20px] px-2 border-ui-border bg-ui-default focus:border-ui-border-selected
