@@ -12,6 +12,7 @@ import {
     toISODate,
     buildTopList,
 } from "../util/statsComputer.js";
+import {GetPageStatsParams} from "../types/requests/stats";
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ async function findPage(userId: string, pageId: string) {
     return Page.findOne({ _id: pageId, author: userId }).lean();
 }
 
-router.get("/pages/:pageId", async (req: Request, res: Response) => {
+router.get("/pages/:pageId", async (req: Request<GetPageStatsParams>, res: Response) => {
     try {
         const { userId } = req;
         const { pageId } = req.params;
