@@ -15,7 +15,7 @@ import ControlButton from "./ControlButton.tsx";
 import PrimaryButton from "./PrimaryButton.tsx";
 import DangerButton from "./DangerButton.tsx";
 
-const PREVIEW_SCALE = 0.3;
+const PREVIEW_SCALE = 0.65;
 
 /**
  * Builds a minimal HTML document string used as an iframe `srcDoc`.
@@ -121,7 +121,7 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
         if (!hiddenContainerRef.current) return;
         if (previewEditorRef.current) return;
 
-        const editor : Editor= grapesjs.init({
+        const editor: Editor = grapesjs.init({
             container: hiddenContainerRef.current,
             height: "0px",
             width: "0px",
@@ -241,7 +241,7 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
                 >
                     <motion.div
                         key="modal"
-                        className={"w-full max-w-6xl overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-2xl"}
+                        className="relative flex h-[min(92vh,900px)] w-[min(96vw,72rem)] flex-col overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-2xl"
                         initial={{opacity: 0, y: 12, scale: 0.985}}
                         animate={{opacity: 1, y: 0, scale: 1}}
                         exit={{opacity: 0, y: 12, scale: 0.985}}
@@ -288,9 +288,9 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-12 gap-0">
-                            <div className="col-span-3 border-r border-ui-border bg-website-bg">
-                                <div className="max-h-[74vh] overflow-y-auto p-3">
+                        <div className="grid min-h-0 flex-1 grid-cols-12 gap-0">
+                            <div className="col-span-12 min-h-0 border-r border-ui-border bg-website-bg lg:col-span-3">
+                                <div className="h-full overflow-y-auto p-3">
                                     <div className="space-y-2">
                                         {changes.map((c) => {
                                             const isActive = c.id === activeId;
@@ -331,10 +331,10 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
                                 </div>
                             </div>
 
-                            <div className="col-span-9">
-                                <div className="p-3">
+                            <div className="col-span-12 min-h-0 lg:col-span-9">
+                                <div className="h-full p-3">
                                     <div
-                                        className="overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-sm">
+                                        className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ui-border bg-ui-bg shadow-sm">
                                         <div
                                             className="flex items-center justify-between border-b border-ui-border px-4 py-2">
                                             <div className="text-small font-semibold text-text">Preview</div>
@@ -342,10 +342,10 @@ function AIChangeReviewPopup(props: AIChangeReviewPopupProps): JSX.Element {
                                                 updates with selection
                                             </div>
                                         </div>
-                                        <div className="w-full h-56 overflow-hidden rounded-lg border bg-gray-50">
+                                        <div className="min-h-[360px] flex-1 overflow-hidden rounded-lg border bg-gray-50">
                                             <iframe
-                                                title={`preview-${k}`}
-                                                srcDoc={buildSrcDoc(k.html,k.css)}
+                                                title={`preview-${activeId ?? "all"}`}
+                                                srcDoc={previewDoc || buildSrcDoc("", "")}
                                                 sandbox=""
                                                 style={{
                                                     width: `${100 / PREVIEW_SCALE}%`,
