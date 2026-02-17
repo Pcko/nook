@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Nook - Site Not Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --fg: #c9d1d9;
+            --muted: #8b949e;
+            --border: #30363d;
+            --accent: #58a6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Helvetica, Arial, sans-serif, "Apple Color Emoji",
+                "Segoe UI Emoji";
+            background-color: var(--bg);
+            color: var(--fg);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 720px;
+            padding: 48px 24px;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        code {
+            background: #161b22;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--fg);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 32px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>404 — Site not found</h1>
+
+        <div class="card">
+            <p>
+                The site you’re looking for doesn’t exist or hasn’t been deployed yet.
+            </p>
+
+            <p>
+                If you’re the owner of this site, make sure:
+            </p>
+
+            <ul>
+                <li>The project has been successfully deployed</li>
+                <li>The deployment URL is correct</li>
+                <li>Your custom domain (if any) is properly configured</li>
+            </ul>
+
+            <p>
+                You can deploy a site from your dashboard or CLI, then revisit this URL.
+            </p>
+
+            <p>
+                Need help? Check the documentation or contact support.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>
+                Served by <strong>NOOK</strong>
+            </p>
+        </div>
+    </main>
+</body>
+
+</html>

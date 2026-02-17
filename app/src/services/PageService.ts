@@ -1,7 +1,7 @@
 import axios from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import PageDTO from "./interfaces/PageDTO.ts";
-import type {PageMeta} from "./interfaces/PageMeta.ts";
+import type { PageMeta } from "./interfaces/PageMeta.ts";
 import PublishedPage from "./interfaces/PublishedPage.ts";
 
 class PageService {
@@ -57,7 +57,7 @@ class PageService {
      * @returns The newly created Page object
      */
     static async createPage(pageName: string, metadata: PageMeta = {} as PageMeta): Promise<Page> {
-        const response = await axios.post<PageDTO>("/api/pages", {pageName, metadata});
+        const response = await axios.post<PageDTO>("/api/pages", { pageName, metadata });
         return this.parsePage(response.data);
     }
 
@@ -91,7 +91,10 @@ class PageService {
     }
 
     static async getPublishedPages(): Promise<PublishedPage[]> {
-        const response = await axios.get<PublishedPage[]>("/api/published");
+        const response = await axios<PublishedPage[]>({
+            method: 'get',
+            url: (import.meta as any).env.VITE_PUBLISH_URL
+        });
         return response.data;
     }
 }

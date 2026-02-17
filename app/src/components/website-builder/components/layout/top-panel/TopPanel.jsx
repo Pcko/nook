@@ -237,7 +237,7 @@ function TopPanel({editorRef, page}) {
                 onClose={() => setDeployOpen(false)}
                 open={deployOpen}
                 page={page}
-                publicBaseUrl={import.meta.env.VITE_API_URL}
+                publicBaseUrl={import.meta.env.VITE_PUBLISH_URL}
             />
         </div>
     );

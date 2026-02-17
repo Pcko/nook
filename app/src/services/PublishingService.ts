@@ -1,5 +1,4 @@
 import axios from "../components/auth/AxiosInstance";
-import axiosInstance from "../components/auth/AxiosInstance";
 import Page from "./interfaces/Page.ts";
 import {grapesjsExportConfig} from "../components/website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../components/website-builder/utils/websiteExportSettings";
@@ -14,16 +13,16 @@ class PublishingService {
 
     static publish(page: Page, html: string) {
         return axios.post(
-            `/api/publishPage/${page.name}`,
+            `/api/publishPage/${page.name}/${page.name}`, //TODO[17.02.26]: change second pagename to published displayname
             {page: html},
             axiosConfig
         );
     }
 
     static open(authorId: string, pageName: string) {
-       return axiosInstance.get(`/api/published/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`, {
-            responseType: "text",
-            transformResponse: (r) => r, // keep raw string
+       return axios({
+           method: 'get',
+           url: `${(import.meta as any).env.VITE_PUBLISH_URL}/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`,
         })
     }
 

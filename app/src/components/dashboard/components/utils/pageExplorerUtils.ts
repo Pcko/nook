@@ -14,10 +14,7 @@ export function toDate(input?: Date | string): Date | undefined {
 export function getPublicUrl(page: PublishedPage): string {
     const safeAuthor = encodeURIComponent(page.author ?? "");
     const safeName = encodeURIComponent(page.name ?? "");
-    const path = `/api/published/${safeAuthor}/${safeName}`;
-
-    if (!PUBLIC_BASE_URL) return path;
-    return `${PUBLIC_BASE_URL.replace(/\/+$/, "")}${path}`;
+    return `${PUBLIC_BASE_URL}/${safeAuthor}/${safeName}`;
 }
 
 export function pageKey(page: PublishedPage): string {

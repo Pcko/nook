@@ -4,4 +4,5 @@ export interface PublishPageBody {
 
 export interface PublishPageParams {
     pageName: string;
+    displayPageName: string;
 }
