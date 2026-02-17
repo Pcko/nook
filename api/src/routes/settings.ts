@@ -4,6 +4,7 @@ import speakeasy from 'speakeasy';
 import { User } from '../util/internal.js';
 import IUser from '../types/IUser.js';
 import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
+import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) 
     res.sendStatus(200);
   }
   catch (err) {
-    console.error("❌ Alter settings error: ", err);
+    logger.error(err, "Alter settings error");
     res.sendStatus(500);
     return;
   }
@@ -66,7 +67,7 @@ router.delete('/delete-account', async (req: Request<{}, {}, DeleteAccountBody>,
     return res.sendStatus(200);
   }
   catch (err) {
-    console.error("❌ Account deletion error: ", err);
+    logger.error(err, "Account deletion error");
     return res.sendStatus(500);
   }
 });
@@ -93,7 +94,7 @@ router.get('/twoFactorAuth', async (req: Request, res: Response) => {
     return res.status(200).json({ qrCodeUrl: secret.otpauth_url });
   }
   catch (err) {
-    console.error("❌ Activate TwoFactorAuth error:", err);
+    logger.error(err, "Activate TwoFactorAuth error");
     return res.sendStatus(500);
   }
 });
@@ -133,7 +134,7 @@ router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBod
     return res.sendStatus(200);
   }
   catch (err) {
-    console.error("❌ Confirm TwoFactorAuth error:", err);
+    logger.error(err, "Confirm TwoFactorAuth error");
     return res.sendStatus(500);
   }
 })
@@ -157,7 +158,7 @@ router.post('/logout', async (req: Request, res: Response) => {
     return res.sendStatus(200);
   }
   catch (err) {
-    console.error("❌ Logout error:", err);
+    logger.error(err, "Logout error");
     return res.sendStatus(500);
   }
 });
