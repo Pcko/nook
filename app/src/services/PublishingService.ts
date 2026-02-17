@@ -13,7 +13,7 @@ class PublishingService {
 
     static publish(page: Page, html: string) {
         return axios.post(
-            `/api/publishPage/${page.name}/${page.name}`, //WIP: change second one to published displayname
+            `/api/publishPage/${page.name}/${page.name}`, //TODO[17.02.26]: change second pagename to published displayname
             {page: html},
             axiosConfig
         );
