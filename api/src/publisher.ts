@@ -67,7 +67,7 @@ app.get("/:authorId/:pageName", async (req: Request, res: Response) => {
 });
 
 app.get("/", async (req: Request, res: Response) => {
-    const pages = await PublishedPage.find({}) ?? [];
+    const pages = await PublishedPage.find({isPublic: true}) ?? [];
     return res.status(200).json(pages);
 });
 
