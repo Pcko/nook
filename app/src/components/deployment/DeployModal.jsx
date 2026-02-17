@@ -121,7 +121,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
             notify("info", "Publishing…", {stage: "deploy", mode: "api", env}, "deploy");
 
             const {html} = await PublishingService.buildStaticBundle(editor);
-            const res = await PublishingService.publish(page, html);
+            const res = await PublishingService.publish(page, html, destination === "preview");
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
