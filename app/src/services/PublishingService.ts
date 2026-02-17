@@ -11,10 +11,10 @@ const axiosConfig = {
 
 class PublishingService {
 
-    static publish(page: Page, html: string) {
+    static publish(page: Page, html: string, isPublic: boolean) {
         return axios.post(
             `/api/publishPage/${page.name}/${page.name}`, //TODO[17.02.26]: change second pagename to published displayname
-            {page: html},
+            {page: html, isPublic},
             axiosConfig
         );
     }

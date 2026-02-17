@@ -14,6 +14,7 @@ const router = express.Router();
  * @param {Request<PublishPageParams, {}, PublishPageBody>} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {string} req.body.page - Page as a html string
+ *      @property {string} req.body.isPublic - Boolean to determent the status of a page
  *      @property {string} req.params.pageName - Name of the to be published Page
  *      @property {string} req.params.displayPageName - Name used for public access
  *
@@ -23,7 +24,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
     try {
         const { userId } = req;
         const { pageName, displayPageName } = req.params;
-        const { page } = req.body;
+        const { page, isPublic } = req.body;
 
         const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
 
@@ -36,6 +37,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             name: displayPageName,
             html: page,
             author: userId,
+            isPublic: isPublic || false,
         }
 
         const pageDetails = await PublishedPage.findOneAndUpdate(

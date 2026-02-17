@@ -24,6 +24,10 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
             ref: "User",
             required: true,
         },
+        isPublic: {
+            type: Boolean,
+            default: false,
+        }
     },
     {
         timestamps: true,
