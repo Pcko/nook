@@ -48,7 +48,7 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     const messages = await promptBuilder.buildElementEditMessages(requestBody, llmClient);
     const queryResponseBody = await llmClient.getResponse(messages);
 
-    const parts: { styles: Object, component: Object, text: string } = JSON.parse(queryResponseBody.response);
+    const parts: { styles: Array<Object>, component: string, text: string } = JSON.parse(queryResponseBody.response);
     return res.status(200).send({
         think: queryResponseBody.think,
         text: parts.text,

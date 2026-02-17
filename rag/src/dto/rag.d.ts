@@ -54,15 +54,15 @@ export interface ElementEditRequestBody {
  *
  * @interface ElementEditResponseBody
  * @param {string} think - Reasoning of reasoning LLMs. (only qwen3 or gpt currently support this)
- * @param {Object} component - The element data that was edited.
- * @param {Object} styles - The website styles data that was edited.
+ * @param {string} component - The element data that was edited.
+ * @param {Array<Object} styles - The website styles data that was edited.
  * @param {number} total_duration - The time elapsed during the LLM request.
  */
 export interface ElementEditResponseBody {
     think: string;
     text: string;
-    component: Object;
-    styles: Object;
+    component: string;
+    styles: Array<Object>;
     total_duration: number;
 }
 
