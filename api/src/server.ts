@@ -1,16 +1,16 @@
-import express, { Request, Response } from 'express';
+import express, {Request, Response} from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import cors from 'cors';
-import pino from 'pino-http';
 
 //Connection and configuration files
 import 'dotenv/config';
 import './database/connection.js'; //<-- database connection script
+import {logger, httpLogger} from "./util/logger.js";
 
 //Express routes
 import authenticateToken from './routes/auth-token.js';
-import authRouter from './routes/authenticator.js'; //<-- account authenticator route (incl. registration)
+import authRouter from './routes/authenticator.js';
 import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
 import ragRouter from './routes/rag.js';
@@ -32,9 +32,8 @@ const requiredENV = [
     'RAG_API_KEY'
 ];
 const missingENV = requiredENV.filter((name) => !process.env[name]);
-if (missingENV.length) {
-
-    console.error(`⚠️ Missing environment variables: ${missingENV.join(", ")}`);
+if (missingENV.length){
+    logger.warn(`Missing environment variables: ${missingENV.join(", ")}`);
 }
 
 //Server settings
@@ -45,7 +44,7 @@ const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 app.use(cors({origin: allowedOrigins, credentials: true}));
 app.use(express.json({limit: '16mb'}));
-app.use(pino({transport: process.env.DEVENV ? {target: "pino-pretty"} : undefined}));
+app.use(httpLogger);
 
 //Routes
 app.use('/auth', authRouter);
@@ -62,7 +61,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 if (process.env.DEVENV) {
     app.listen(PORT, () => {
-        console.log('✅ Server deployed at: http://localhost:' + PORT);
+        logger.info('Server deployed at: http://localhost:' + PORT);
     });
 }
 
