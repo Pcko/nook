@@ -155,8 +155,6 @@ export default function PageExplorer() {
 
     return (
         <div className="w-full h-full flex flex-col gap-6 pt-6 px-6 md:px-10 lg:px-16">
-            <div ref={sandboxRef} style={{display: "none"}}/>
-
             <div className="rounded-2xl border border-ui-border bg-ui-bg px-5 py-4 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-col gap-1">
