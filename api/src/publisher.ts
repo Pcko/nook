@@ -12,7 +12,7 @@ import IPublishedPage from "./types/IPublishedPage.js";
 import { getReferrerUrl, getVisitorHash } from "./util/pageView.js";
 import { startOfDay, toISODate } from "./util/statsComputer.js";
 
-const allowedOrigins: string[] = [process.env.APP_URL, process.env.RAG_URL] as string[];
+const allowedOrigins: string[] = ['**'] as string[];
 
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
@@ -67,7 +67,7 @@ app.get("/:authorId/:pageName", async (req: Request, res: Response) => {
 });
 
 app.get("/", async (req: Request, res: Response) => {
-    const pages = await PublishedPage.find({}) ?? [];
+    const pages = await PublishedPage.find({isPublic: true}) ?? [];
     return res.status(200).json(pages);
 });
 

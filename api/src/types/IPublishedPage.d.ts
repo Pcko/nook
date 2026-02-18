@@ -5,6 +5,7 @@ export default interface IPublishedPage extends Document {
     name: string;
     html: string;
     author: string;
+    isPublic?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
