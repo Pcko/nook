@@ -4,6 +4,7 @@ import {isInvalidStringForURL} from "../util/FormChecks.js";
 import {Page} from '../util/internal.js';
 import IPage from '../types/IPage.js';
 import {CreatePageBody, PageNameParam, UpdatePageBody} from '../types/requests/pages.js';
+import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
@@ -52,7 +53,7 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
 
         return res.status(201).json(pageDetails);
     } catch (err) {
-        console.error('❌ Create page error: ', err);
+        logger.error(err, 'Create page error');
         return res.sendStatus(500);
     }
 });
@@ -74,7 +75,7 @@ router.get('/', async (req: Request, res: Response) => {
 
         return res.status(200).json(pages);
     } catch (err) {
-        console.error('❌ Get pages error: ', err);
+        logger.error(err, 'Get pages error');
         return res.sendStatus(500);
     }
 })
@@ -101,7 +102,7 @@ router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Respon
 
         return res.status(200).json(page);
     } catch (err) {
-        console.error('❌ Get page error: ', err);
+        logger.error(err, 'Get page error');
         return res.sendStatus(500);
     }
 });
@@ -173,7 +174,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
 
         return res.status(200).json({newPageName: updatedPageName});
     } catch (err) {
-        console.error('❌ Update page error: ', err);
+        logger.error(err, 'Update page error');
         return res.sendStatus(500);
     }
 });
@@ -200,7 +201,7 @@ router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Res
 
         return res.sendStatus(202);
     } catch (err) {
-        console.error('❌ Delete page error: ', err);
+        logger.error(err, 'Delete page error');
         return res.sendStatus(500);
     }
 });

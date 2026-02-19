@@ -4,6 +4,7 @@ import { PublishPageBody, PublishPageParams } from '../types/requests/publishing
 import { PublishedPage, Page } from '../util/internal.js';
 import IPublishedPage from '../types/IPublishedPage.js';
 import IPage from '../types/IPage.js';
+import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
@@ -48,7 +49,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
 
         return res.status(201).json(pageDetails);
     } catch (err) {
-        console.error('❌ Publish page error: ', err);
+        logger.error(err, 'Publish page error');
         return res.sendStatus(500);
     }
 });
@@ -80,7 +81,7 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
 
         return res.sendStatus(200);
     } catch (err) {
-        console.error('❌ Unpublish page error: ', err);
+        logger.error(err, 'Unpublish page error');
         return res.sendStatus(500);
     }
 })

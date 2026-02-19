@@ -7,6 +7,7 @@ import {
 } from "../types/requests/rag";
 import {Page} from "../database/models/page-schema.js";
 import IPage from "../types/IPage.js";
+import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ router.post('/query', async (req: Request<{}, {}, RAGQueryBody>, res: Response) 
             res.status(200).send(data);
         }
     } catch (err) {
-        console.error("❌ AI query error:", err);
+        logger.error(err, "AI query error");
         return res.sendStatus(500);
     }
 });
@@ -94,7 +95,7 @@ router.post('/editElement', async (req: Request<{}, {}, RAGElementEditRequestBod
         const body : RAGElementEditResponseBody = await response.json();
         res.status(200).send(body);
     } catch (err) {
-        console.error("❌ AI edit element error:",err);
+        logger.error(err, "AI edit element error");
         return res.sendStatus(500);
     }
 })

@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import express, { Request, Response } from 'express';
+import express, {Request, Response} from 'express';
 import speakeasy from 'speakeasy';
 import rateLimit from 'express-rate-limit';
 
-import { sendOTPEmail, User } from '../util/internal.js';
+import {sendOTPEmail, User} from '../util/internal.js';
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName,
@@ -20,6 +20,7 @@ import {
     VerifyEmailBody,
 } from '../types/requests/auth.js';
 import IUser from '../types/IUser.js';
+import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
@@ -36,17 +37,18 @@ const rateLimiter = rateLimit({
 /**
  * @route POST /auth/login
  * @summary Handles user login
- * 
+ *
  * @param {Request<{}, {}, LoginBody>} req
  *      @property {string} req.body.username - Username
  *      @property {string} req.body.password - User-password
  *      @property {string} [req.body.otp] - Optional 2FA One-Time-Password
- * 
+ *
  * @returns 200 - JSON{user<UserObject>, accessToken<string>, refreshToken<string>}
  */
 router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
     try {
-        const { username, password, otp } = req.body;
+        req.log.debug({body: req.body}, 'Login')
+        const {username, password, otp} = req.body;
 
         //make sure all parameters are valid
         const result =
@@ -59,11 +61,11 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
             });
         }
 
-        const user = await User.findOne({ _id: username }) as IUser | null;
+        const user = await User.findOne({_id: username}) as IUser | null;
 
         //make sure user exists
         if (!user) {
-            return res.status(400).send({ message: 'Username or password is invalid!' });
+            return res.status(400).send({message: 'Username or password is invalid!'});
         }
 
         /* done as soon as frontend exists
@@ -76,13 +78,13 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
         //validate password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(400).send({ message: 'Username or password is invalid!' });
+            return res.status(400).send({message: 'Username or password is invalid!'});
         }
 
         //check for twoFactorAuthentication
         if (user.twoFactorAuthOn) {
             if (!otp) {
-                return res.status(202).send({ message: 'Please send auth-passcode!' });
+                return res.status(202).send({message: 'Please send auth-passcode!'});
             }
 
             const userSecret = user.twoFactorAuthSecret;
@@ -92,7 +94,7 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
                 encoding: 'base32',
                 token: otp
             })) {
-                return res.status(400).send({ message: 'One time password is invalid!' })
+                return res.status(400).send({message: 'One time password is invalid!'})
             }
         }
 
@@ -100,9 +102,9 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
         await user.updateTokenVersion();
         const userid = user._id;
         const tokenVersion = Number(user.tokenVersion);
-        const tokenUser = { id: userid, version: tokenVersion };
+        const tokenUser = {id: userid, version: tokenVersion};
 
-        const { accessToken, refreshToken } = createTokens(tokenUser);
+        const {accessToken, refreshToken} = createTokens(tokenUser);
 
         //create new userobject to return for settings
         const newUser = {
@@ -113,9 +115,9 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
             twoFactorAuthOn: user.twoFactorAuthOn,
         }
 
-        return res.status(200).json({ user: newUser, accessToken, refreshToken });
+        return res.status(200).json({user: newUser, accessToken, refreshToken});
     } catch (err) {
-        console.error("❌ Login error: ", err);
+        logger.error(err, 'Login error');
         return res.sendStatus(500);
     }
 });
@@ -123,19 +125,19 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
 /**
  * @route POST /auth/register
  * @summary Handles user registration
- * 
+ *
  * @param {Request<{}, {}, RegisterBody>} req
  *      @property {string} req.body.username - Username
  *      @property {string} req.body.password - User-Password
  *      @property {string} req.body.firstName - User's first name
  *      @property {string} req.body.lastName - User's last name
  *      @property {string} req.body.email - User's email address
- * 
+ *
  * @returns 201
  */
 router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Response) => {
     try {
-        const { username, password, firstName, lastName, email } = req.body;
+        const {username, password, firstName, lastName, email} = req.body;
 
         //make sure all parameters are valid
         const result =
@@ -152,12 +154,12 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
         }
 
         //make sure username is not already used
-        const userExists = await User.findOne({ _id: username }).lean<IUser>();
+        const userExists = await User.findOne({_id: username}).lean<IUser>();
         if (userExists) {
-            return res.status(409).send({ message: 'This username is not available!' });
+            return res.status(409).send({message: 'This username is not available!'});
         }
 
-        const secret = speakeasy.generateSecret({ name: `NOOK: ${username}` });
+        const secret = speakeasy.generateSecret({name: `NOOK: ${username}`});
 
         //create new user and insert new user into database
         const user = await User.create({
@@ -174,7 +176,7 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 
         return res.sendStatus(202);
     } catch (err) {
-        console.error("❌ Registration error: ", err);
+        logger.error(err, 'Registration error');
         return res.sendStatus(500);
     }
 });
@@ -182,18 +184,18 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
 /**
  * @route PATCH /auth/verifyEmail
  * @summary Verifies the otp sent to a users email
- * 
+ *
  * @param {Request} req
  *      @property {string} req.body.username - Username
  *      @property {string} req.body.otp - One-time-password
- * 
+ *
  * @returns 200
  */
 router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: Response) => {
     try {
-        const { username, otp } = req.body;
+        const {username, otp} = req.body;
         if (!username || !otp) {
-            return res.status(400).json({ error: 'parameter-missing' });
+            return res.status(400).json({error: 'parameter-missing'});
         }
 
         const user = await User.findById(username) as IUser;
@@ -206,16 +208,15 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
             step: 600,
             window: 1
         })) {
-            return res.status(403).send({ message: 'One time password is invalid!' })
+            return res.status(403).send({message: 'One time password is invalid!'})
         }
 
         user.emailVerified = true;
         await user.save();
 
         return res.sendStatus(200);
-    }
-    catch (err) {
-        console.error("❌ Email verification error: ", err);
+    } catch (err) {
+        logger.error(err, 'Email verification error');
         return res.sendStatus(500);
     }
 })
@@ -223,15 +224,15 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
 /**
  * @route POST /auth/token
  * @summary Generates new tokens
- * 
+ *
  * @param {Request<{}, {}, TokenBody>} req
  *      @property {string} req.body.token - User's refreshToken
- * 
+ *
  * @returns 200 - JSON{accessToken<string>, refreshToken<string>}
  */
 router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     try {
-        const { token: refreshToken } = req.body;
+        const {token: refreshToken} = req.body;
 
         if (!refreshToken) {
             return res.sendStatus(400);
@@ -239,36 +240,36 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
 
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, async (err: any, tokenContent: any) => {
             if (err) {
-                return res.status(401).json({ error: 'invalid_token' });
+                return res.status(401).json({error: 'invalid_token'});
             }
 
-            const { id, version } = tokenContent;
-            const user = await User.findOne({ _id: id }) as IUser | null;
+            const {id, version} = tokenContent;
+            const user = await User.findOne({_id: id}) as IUser | null;
 
             if (!user) {
-                return res.status(404).json({ error: 'unknown_user' })
+                return res.status(404).json({error: 'unknown_user'})
             }
 
             if (user.tokenVersion !== version) {
-                return res.status(401).json({ error: 'old_token' });
+                return res.status(401).json({error: 'old_token'});
             }
 
             await user.updateTokenVersion();
-            const tokens = createTokens({ id, version: user.tokenVersion });
+            const tokens = createTokens({id, version: user.tokenVersion});
 
             return res.status(200).json(tokens);
         })
     } catch (err) {
-        console.error("❌ Refresh token error: ", err);
+        logger.error(err, 'Refresh token error');
         return res.sendStatus(500);
     }
 });
 
 function createTokens(tokenContent: TokenContent) {
-    const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15min' }); //valid for 15min after creation
-    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: '30d' }); //valid for 30 days after creation
+    const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: '15min'}); //valid for 15min after creation
+    const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET as string, {expiresIn: '30d'}); //valid for 30 days after creation
 
-    return { accessToken, refreshToken };
+    return {accessToken, refreshToken};
 }
 
 async function sendEmailVerificationEmail(user: IUser) {

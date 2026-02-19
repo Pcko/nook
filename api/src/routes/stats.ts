@@ -12,6 +12,7 @@ import {
     toISODate,
     buildTopList,
 } from "../util/statsComputer.js";
+import {logger} from "../util/logger.js";
 import {GetPageStatsParams} from "../types/requests/stats";
 
 const router = express.Router();
@@ -123,7 +124,7 @@ router.get("/pages/:pageId", async (req: Request<GetPageStatsParams>, res: Respo
             deployments,
         });
     } catch (err) {
-        console.error("❌ Stats error:", err);
+        logger.error(err, "Stats error");
         return res.sendStatus(500);
     }
 });
