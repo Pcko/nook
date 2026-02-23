@@ -30,4 +30,9 @@ chromaRouter.delete('/removeEntries', async (req: Request<{}, {}, { ids: string[
    res.sendStatus(202);
 });
 
+chromaRouter.delete('/clearCollection', async (req: Request, res: Response) => {
+   await chromaClient.clearCollection();
+   res.sendStatus(202);
+});
+
 export default chromaRouter;

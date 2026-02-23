@@ -12,7 +12,7 @@ const defaultDistanceCutoff = Number(process.env.CHROMADB_QUERY_DISTANCE_CUTOFF 
 
 const embedder = new OllamaEmbeddingFunction({
     url: 'http://localhost:11434',
-    model: 'nomic-embed-text',
+    model: process.env.EMBEDDING_MODEL!,
 });
 
 const client = new ChromaClient({
@@ -107,6 +107,20 @@ async function removeChromaDBEntries(ids: string[]): Promise<void> {
 }
 
 /**
+ * Removes all entries from the current ChromaDB collection.
+ *
+ * @async
+ * @function clearChromaDBCollection
+ * @returns {Promise<void>} A Promise that resolves when the collection has been cleared.
+ */
+async function clearChromaDBCollection(): Promise<void> {
+    const ids = (await collection.get({include:[]})).ids;
+    if(ids.length !== 0) {
+        await collection.delete({ids});
+    }
+}
+
+/**
  * Adds new documents and their associated metadata to the current ChromaDB collection.
  *
  * @async
@@ -115,7 +129,20 @@ async function removeChromaDBEntries(ids: string[]): Promise<void> {
  * @returns {Promise<void>} Resolves when the documents have been successfully added to the collection.
  */
 async function addChromaDBDocuments(chromaAddDocumentsBody: ChromaDBAddDocumentsRequestBody): Promise<void> {
-    await collection.add(chromaAddDocumentsBody);
+    if(chromaAddDocumentsBody.ids.length !== chromaAddDocumentsBody.documents.length ||
+        chromaAddDocumentsBody.ids.length !== chromaAddDocumentsBody.metadatas.length) {
+        throw Error("Ids, documents, and metadatas must have the same length.");
+    }
+
+    const stringsToEmbed: string[] = [];
+    for(let i = 0; i < chromaAddDocumentsBody.ids.length; i++) {
+        stringsToEmbed.push(`${chromaAddDocumentsBody.ids[i]}: ${chromaAddDocumentsBody.documents[i]}`);
+    }
+
+    await collection.add({
+        ...chromaAddDocumentsBody,
+        embeddings: await embedder.generate(stringsToEmbed)
+    });
 }
 
 export default {
@@ -123,4 +150,5 @@ export default {
     addDocuments: addChromaDBDocuments,
     getEntries: getChromaDBEntries,
     removeEntries: removeChromaDBEntries,
+    clearCollection: clearChromaDBCollection,
 };
