@@ -1,4 +1,4 @@
-import axios from "../components/auth/AxiosInstance";
+﻿import axios from "../shared/api/httpClient";
 import Page from "./interfaces/Page.ts";
 import PageDTO from "./interfaces/PageDTO.ts";
 import type { PageMeta } from "./interfaces/PageMeta.ts";

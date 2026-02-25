@@ -1,4 +1,4 @@
-import axios from "../components/auth/AxiosInstance";
+﻿import axios from "../shared/api/httpClient";
 import Page from "./interfaces/Page.ts";
 import {grapesjsExportConfig} from "../components/website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../components/website-builder/utils/websiteExportSettings";
@@ -90,3 +90,4 @@ class PublishingService {
 }
 
 export default PublishingService;
+

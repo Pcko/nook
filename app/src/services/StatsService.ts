@@ -1,4 +1,4 @@
-import axios from "../components/auth/AxiosInstance";
+﻿import axios from "../shared/api/httpClient";
 
 type StatsParams = {
     pageId: string;
@@ -19,3 +19,4 @@ class StatsService {
 }
 
 export default StatsService;
+

@@ -1,4 +1,4 @@
-import axios from "../components/auth/AxiosInstance";
+﻿import axios from "../shared/api/httpClient";
 import User from "./interfaces/User.ts";
 
 const axiosConfig = {

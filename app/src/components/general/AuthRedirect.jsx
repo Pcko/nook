@@ -1,6 +1,5 @@
-import {useEffect, useMemo, useState} from "react";
+﻿import {useEffect, useMemo, useState} from "react";
 import {Navigate} from "react-router-dom";
-import axios from "../auth/AxiosInstance";
 import LoadingScreen from "../general/LoadingScreen";
 import useErrorHandler from "../logging/ErrorHandler";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
