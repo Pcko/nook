@@ -23,7 +23,12 @@ const client = new ChromaClient({
 
 const collection = await client.getOrCreateCollection({
     name: "nook-page-generation",
-    embeddingFunction: embedder
+    embeddingFunction: embedder,
+    configuration: {
+        hnsw: {
+            space: "cosine"
+        }
+    }
 });
 
 /**
