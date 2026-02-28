@@ -1,9 +1,9 @@
 ﻿import React from "react";
 
-import Login from "../../components/auth/Login";
+import { LoginForm } from "../../features/auth";
 
 function LoginPage() {
-    return <Login />;
+    return <LoginForm />;
 }
 
 export default LoginPage;

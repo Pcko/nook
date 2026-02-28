@@ -8,7 +8,7 @@ import {
     ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-import DeploymentStats from "../../deployment/DeploymentStats";
+import { DeploymentStats } from "../../../features/publishing";
 import PageService from "../../../services/PageService";
 import StatsService from "../../../services/StatsService";
 import { LoadingBubble } from "../../general/LoadingScreen";

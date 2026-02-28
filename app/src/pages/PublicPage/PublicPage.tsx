@@ -1,6 +1,6 @@
 ﻿import React from "react";
 
-import PublishedPageView from "../../components/deployment/PublishedPageView";
+import { PublishedPageView } from "../../features/publishing";
 
 function PublicPage() {
     return <PublishedPageView />;

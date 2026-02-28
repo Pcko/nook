@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import LoadingScreen from "../../components/general/LoadingScreen";
 import useErrorHandler from "../../components/logging/ErrorHandler";
 import { useMetaNotify } from "../../components/logging/MetaNotifyHook";
-import AuthService from "../../services/AuthService";
+import { refreshAccessToken as refreshSessionAccessToken } from "../../features/auth/api/authApi";
 
 function AuthRedirect() {
     const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ function AuthRedirect() {
             }
 
             try {
-                const response = await AuthService.refreshAccessToken(refreshToken);
+                const response = await refreshSessionAccessToken(refreshToken);
 
                 const {
                     accessToken: newAccessToken,

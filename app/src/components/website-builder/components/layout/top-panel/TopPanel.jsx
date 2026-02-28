@@ -12,7 +12,7 @@ import {
 } from "react-icons/ai";
 
 import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
-import DeployModal from "../../../../deployment/DeployModal";
+import { DeployModal } from "../../../../../features/publishing";
 import useErrorHandler from "../../../../logging/ErrorHandler";
 import { useMetaNotify } from "../../../../logging/MetaNotifyHook";
 

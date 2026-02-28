@@ -1,9 +1,9 @@
 ﻿import React from "react";
 
-import Registration from "../../components/auth/Registration";
+import { RegistrationForm } from "../../features/auth";
 
 function RegisterPage() {
-    return <Registration />;
+    return <RegistrationForm />;
 }
 
 export default RegisterPage;

@@ -12,13 +12,11 @@ import {
     LinkIcon,
 } from "@heroicons/react/24/outline";
 
-import axiosInstance from "../../shared/api/httpClient";
 import useErrorHandler from "../logging/ErrorHandler";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 import {useBuilder} from "../website-builder/hooks/UseBuilder";
-import {grapesjsExportConfig} from "../website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../website-builder/utils/websiteExportSettings";
-import PublishingService from "../../services/PublishingService";
+import {buildStaticBundle, publishPage} from "../../features/publishing/api/publishingApi";
 
 function slugify(input) {
     return (
@@ -120,8 +118,8 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
             notify("info", "Publishingâ€¦", {stage: "deploy", mode: "api", env}, "deploy");
 
-            const {html} = await PublishingService.buildStaticBundle(editor);
-            const res = await PublishingService.publish(page, html, destination === "live");
+            const {html} = await buildStaticBundle(editor);
+            const res = await publishPage(page, html, destination === "live");
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
