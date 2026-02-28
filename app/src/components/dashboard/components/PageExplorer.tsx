@@ -206,7 +206,7 @@ export default function PageExplorer() {
             </div>
 
             {error && (
-                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-dangerous">
+                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-text-on-primary">
                     {error}
                 </div>
             )}
