@@ -1,14 +1,20 @@
-﻿import * as Sentry from "@sentry/react";
+import * as Sentry from "@sentry/react";
+
+export function isSentryEnabled() {
+    const env = import.meta.env;
+    const sentryDsn = env.VITE_SENTRY_DSN;
+    if (!sentryDsn) return false;
+
+    return !env.DEV;
+}
 
 export function initSentry() {
-    const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
-
-    if (!sentryDsn) {
+    if (!isSentryEnabled()) {
         return;
     }
 
     Sentry.init({
-        dsn: sentryDsn,
+        dsn: import.meta.env.VITE_SENTRY_DSN,
         environment: import.meta.env.MODE,
         sendDefaultPii: true,
         integrations: [
