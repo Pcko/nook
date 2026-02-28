@@ -96,7 +96,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
         try {
             setResultUrl("");
-            notify("info", "Preparing ZIPâ€¦", {stage: "deploy", mode: "zip"}, "deploy");
+            notify("info", "Preparing ZIP...", {stage: "deploy", mode: "zip"}, "deploy");
             editor.runCommand("gjs-export-zip");
         } catch (err) {
             handleError(err, {
@@ -116,7 +116,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
         try {
             syncWebsiteDataFromEditor();
 
-            notify("info", "Publishingâ€¦", {stage: "deploy", mode: "api", env}, "deploy");
+            notify("info", "Publishing...", {stage: "deploy", mode: "api", env}, "deploy");
 
             const {html} = await buildStaticBundle(editor);
             const res = await publishPage(page, html, destination === "live");
@@ -163,7 +163,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     }
 
     const primaryLabel =
-        busy ? "Workingâ€¦" : destination === "download" ? "Download ZIP" : "Publish";
+        busy ? "Working..." : destination === "download" ? "Download ZIP" : "Publish";
 
     return (
         <Transition show={open} as={Fragment}>
@@ -485,7 +485,7 @@ function SummaryRow({label, value, wide = false}) {
         <div
             className={`rounded-[6px] border border-ui-border bg-website-bg p-2 ${wide ? "sm:col-span-2" : ""}`}>
             <div className="text-tiny text-text-subtle">{label}</div>
-            <div className="text-small text-text break-words">{value || "â€”"}</div>
+            <div className="text-small text-text break-words">{value || "-"}</div>
         </div>
     );
 }

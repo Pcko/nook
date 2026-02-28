@@ -19,4 +19,3 @@ class StatsService {
 }
 
 export default StatsService;
-
