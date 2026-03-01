@@ -1,5 +1,28 @@
-import BackgroundText from '../general/NookBackground';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
+function usePrefersReducedMotion() {
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+
+        const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+
+        updatePreference();
+
+        if (typeof mediaQuery.addEventListener === "function") {
+            mediaQuery.addEventListener("change", updatePreference);
+            return () => mediaQuery.removeEventListener("change", updatePreference);
+        }
+
+        mediaQuery.addListener(updatePreference);
+        return () => mediaQuery.removeListener(updatePreference);
+    }, []);
+
+    return prefersReducedMotion;
+}
 
 export function LoadingBubble({
     className = "",
@@ -7,7 +30,7 @@ export function LoadingBubble({
     subtitle = "Hang tight while we pull everything together.",
     compact = false,
 }) {
-    const prefersReducedMotion = useReducedMotion();
+    const prefersReducedMotion = usePrefersReducedMotion();
     const ringSize = compact ? "h-16 w-16" : "h-20 w-20";
     const padding = compact ? "p-5" : "p-8";
     const titleClass = compact ? "text-h5" : "text-h4";
@@ -67,7 +90,7 @@ export function LoadingBubble({
                     <motion.div
                         className="absolute inset-0"
                         animate={spinAnimation}
-                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                        transition={prefersReducedMotion ? {} : { duration: 6, repeat: Infinity, ease: "linear" }}
                     >
                         <div className="absolute left-1/2 -top-1 h-2 w-2 -translate-x-1/2 rounded-full bg-primary/70 shadow-sm" />
                     </motion.div>

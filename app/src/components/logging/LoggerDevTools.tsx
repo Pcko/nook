@@ -136,7 +136,7 @@ export function LogVisualizer(): React.JSX.Element {
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Search in message, route, user, meta â€¦"
+                        placeholder="Search in message, route, user, meta ..."
                         className="w-full text-xs px-3 py-1.5 rounded-[6px] border border-ui-border
                                    bg-website-bg text-text placeholder:text-text-subtle
                                    focus:outline-none focus:ring-1 focus:ring-primary"

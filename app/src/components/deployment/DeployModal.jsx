@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-sort-props */
+﻿/* eslint-disable react/jsx-sort-props */
 import React, {Fragment, useEffect, useMemo, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import {Dialog, Transition, Disclosure, Switch} from "@headlessui/react";
@@ -12,13 +12,11 @@ import {
     LinkIcon,
 } from "@heroicons/react/24/outline";
 
-import axiosInstance from "../auth/AxiosInstance";
 import useErrorHandler from "../logging/ErrorHandler";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 import {useBuilder} from "../website-builder/hooks/UseBuilder";
-import {grapesjsExportConfig} from "../website-builder/utils/grapesExportConfig";
 import {getWebsiteExportSettings} from "../website-builder/utils/websiteExportSettings";
-import PublishingService from "../../services/PublishingService";
+import {buildStaticBundle, publishPage} from "../../features/publishing/api/publishingApi";
 
 function slugify(input) {
     return (
@@ -98,7 +96,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
 
         try {
             setResultUrl("");
-            notify("info", "Preparing ZIP…", {stage: "deploy", mode: "zip"}, "deploy");
+            notify("info", "Preparing ZIP...", {stage: "deploy", mode: "zip"}, "deploy");
             editor.runCommand("gjs-export-zip");
         } catch (err) {
             handleError(err, {
@@ -118,10 +116,10 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
         try {
             syncWebsiteDataFromEditor();
 
-            notify("info", "Publishing…", {stage: "deploy", mode: "api", env}, "deploy");
+            notify("info", "Publishing...", {stage: "deploy", mode: "api", env}, "deploy");
 
-            const {html} = await PublishingService.buildStaticBundle(editor);
-            const res = await PublishingService.publish(page, html, destination === "live");
+            const {html} = await buildStaticBundle(editor);
+            const res = await publishPage(page, html, destination === "live");
 
             const authorId = res?.data?.author;
             const pageName = res?.data?.name || page.name;
@@ -165,7 +163,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     }
 
     const primaryLabel =
-        busy ? "Working…" : destination === "download" ? "Download ZIP" : "Publish";
+        busy ? "Working..." : destination === "download" ? "Download ZIP" : "Publish";
 
     return (
         <Transition show={open} as={Fragment}>
@@ -487,7 +485,8 @@ function SummaryRow({label, value, wide = false}) {
         <div
             className={`rounded-[6px] border border-ui-border bg-website-bg p-2 ${wide ? "sm:col-span-2" : ""}`}>
             <div className="text-tiny text-text-subtle">{label}</div>
-            <div className="text-small text-text break-words">{value || "—"}</div>
+            <div className="text-small text-text break-words">{value || "-"}</div>
         </div>
     );
 }
+

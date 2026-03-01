@@ -54,6 +54,8 @@ export default function PageExplorer() {
     const [htmlLoadingKeys, setHtmlLoadingKeys] = useState<Set<string>>(new Set());
 
     const handleError = useErrorHandler({feature: "PageExplorer", component: "PageExplorer"});
+    const isPublisherUnavailableError = (err: any): boolean =>
+        typeof err?.message === "string" && err.message.includes("Publish service is unavailable");
 
     const initPages = async () => {
         setLoading(true);
@@ -63,7 +65,9 @@ export default function PageExplorer() {
             setInternalPages(Array.isArray(loaded) ? loaded : []);
         } catch (e: any) {
             setError(e?.message ?? "Failed to load pages");
-            handleError(e);
+            if (!isPublisherUnavailableError(e)) {
+                handleError(e);
+            }
             setInternalPages([]);
         } finally {
             setLoading(false);
@@ -202,7 +206,7 @@ export default function PageExplorer() {
             </div>
 
             {error && (
-                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-dangerous">
+                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-text-on-primary">
                     {error}
                 </div>
             )}

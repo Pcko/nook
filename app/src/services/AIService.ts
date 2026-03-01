@@ -1,6 +1,6 @@
-import {RAGQueryBody} from "./interfaces/RAGQueryBody.ts";
+﻿import {RAGQueryBody} from "./interfaces/RAGQueryBody.ts";
 import {RAGResponseDTO} from "./interfaces/RAGResponseDTO.ts";
-import axios from "../components/auth/AxiosInstance";
+import axios from "../shared/api/httpClient";
 import RAGElementEditResponseDTO from "./interfaces/RAGElementEditResponseBody.ts";
 import {ChatObject} from "./interfaces/ChatMessage.ts";
 

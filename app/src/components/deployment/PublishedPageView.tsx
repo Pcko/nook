@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import PublishingService from "../../services/PublishingService.ts";
+import {openPublishedPage} from "../../features/publishing/api/publishingApi";
 
 function PublishedPageView() {
     const {authorId, pageName} = useParams();
@@ -13,7 +13,7 @@ function PublishedPageView() {
         (async () => {
             try {
                 setErr("");
-                const res = await PublishingService.open(authorId, pageName);
+                const res = await openPublishedPage(authorId, pageName);
                 if (!mounted) return;
                 setHtml(res.data);
             } catch (e) {
