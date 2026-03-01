@@ -12,7 +12,7 @@ import IPublishedPage from "./types/IPublishedPage.js";
 import { getReferrerUrl, getVisitorHash } from "./util/pageView.js";
 import { startOfDay, toISODate } from "./util/statsComputer.js";
 
-const allowedOrigins: string[] = ['**'] as string[];
+const allowedOrigins: string[] = [process.env.APP_URL] as string[];
 
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
