@@ -48,7 +48,6 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             publishedPage,
             { new: true, upsert: true, setDefaultsOnInsert: true }
         ) as IPublishedPage;
-        await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus });
 
         return res.status(201).json(pageDetails);
     } catch (err) {
