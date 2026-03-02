@@ -12,11 +12,7 @@ export function replaceDefaultShortcuts(editorRef) {
   const km = editor.Keymaps;
 
   // Remove default key bindings (IDs may differ slightly depending on GrapesJS version)
-  km.remove('core:undo');
-  km.remove('core:redo');
-  km.remove('sw-visibility');
-  km.remove('core:preview');
-
+  ['core:undo', 'core:redo', 'sw-visibility', 'core:preview'].forEach(km.remove, km);
 
   // Add your custom bindings
   km.add('my:undo', 'ctrl+z', () => handleUndo(editorRef));
