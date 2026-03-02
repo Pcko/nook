@@ -62,12 +62,45 @@ function TopPanel({editorRef, page}) {
     const handleError = useErrorHandler(baseMeta);
 
     /**
+     * Timestamp of the last successful save action.
+     * Shown next to the Save button so users can verify that their latest changes are persisted.
+     */
+    const [lastSavedAt, setLastSavedAt] = useState(null);
+
+    const formatLastSavedAt = (dt) => {
+        if (!dt) return "";
+        const date = dt instanceof Date ? dt : new Date(dt);
+        if (Number.isNaN(date.getTime())) return "";
+
+        const now = new Date();
+        const sameDay =
+            date.getFullYear() === now.getFullYear() &&
+            date.getMonth() === now.getMonth() &&
+            date.getDate() === now.getDate();
+
+        const time = new Intl.DateTimeFormat("de-AT", {
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(date);
+
+        if (sameDay) return time;
+
+        const day = new Intl.DateTimeFormat("de-AT", {
+            day: "2-digit",
+            month: "2-digit",
+        }).format(date);
+
+        return `${day}, ${time}`;
+    };
+
+    /**
      * Persist the current editor state to the backend.
      * Uses WebsiteBuilderService.savePageState(editor, page).
      */
     function handleSave() {
         WebsiteBuilderService.savePageState(editorRef.current, page)
             .then(() => {
+                setLastSavedAt(new Date());
                 notify(
                     "info",
                     "Page was saved successfully.",
@@ -227,6 +260,20 @@ function TopPanel({editorRef, page}) {
 
             {/* Right group: save/export/publish */}
             <div className="flex items-center justify-end gap-2">
+                <div
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-ui-border bg-ui-default/40 text-[11px] leading-none text-text/70 whitespace-nowrap select-none"
+                    data-wb-tooltip="Letzter Speicherzeitpunkt (letzter erfolgreicher Save)."
+                    data-wb-tooltip-delay="650"
+                >
+                    {lastSavedAt ? (
+                        <>
+                            <span>Gespeichert</span>
+                            <span className="font-mono text-text/80">{formatLastSavedAt(lastSavedAt)}</span>
+                        </>
+                    ) : (
+                        <span className="text-text/60">Nicht gespeichert</span>
+                    )}
+                </div>
                 <TopActionButton label="Save" onClick={handleSave}/>
                 <TopActionButton label="Export" onClick={() => exportWebsite(editorRef)}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
