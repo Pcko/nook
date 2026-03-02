@@ -30,6 +30,7 @@ const PageSchema = new Schema<IPage>(
         deploymentStatus: {
             type: String,
             required: true,
+            enum: ["online", "inactive", "not deployed"],
             default: "not deployed",
         },
     },

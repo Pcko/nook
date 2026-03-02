@@ -26,6 +26,8 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
         const { userId } = req;
         const { pageName, displayPageName } = req.params;
         const { page, isPublic } = req.body;
+        const isPublicDeployment = isPublic === true;
+        const deploymentStatus = isPublicDeployment ? "online" : "inactive";
 
         const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
 
@@ -38,7 +40,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             name: displayPageName,
             html: page,
             author: userId,
-            isPublic: isPublic || false,
+            isPublic: isPublicDeployment,
         }
 
         const pageDetails = await PublishedPage.findOneAndUpdate(
@@ -78,6 +80,7 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         if (!deletedPage) {
             return res.status(404).json({ error: 'published_page_not_found' })
         }
+        await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus: "not deployed" });
 
         return res.sendStatus(200);
     } catch (err) {
