@@ -49,6 +49,29 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             { new: true, upsert: true, setDefaultsOnInsert: true }
         ) as IPublishedPage;
 
+        try {
+            const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
+                method: 'POST',
+                headers: {authorization: process.env.RAG_API_KEY || ''},
+                body: JSON.stringify({
+                    username: publishedPage.author,
+                    pageName: publishedPage.name,
+                    pageContent: publishedPage.html.replace(
+                        /src=["']data:image\/[^"']+["']/gi,
+                        'src="https://example.com/placeholder.png"'
+                    ),
+                })
+            });
+
+            if (!response.ok || !response.body) {
+                logger.error(await response.text());
+                return res.sendStatus(500);
+            }
+        } catch (err) {
+            logger.error(err, "page indexing error");
+            return res.sendStatus(500);
+        }
+
         return res.status(201).json(pageDetails);
     } catch (err) {
         logger.error(err, 'Publish page error');
@@ -93,7 +116,7 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
             });
 
             if (!response.ok || !response.body) {
-                console.error(await response.text());
+                logger.error(await response.text());
                 return res.sendStatus(500);
             }
 
