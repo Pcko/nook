@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import {
+    PageIndexRequestBody,
     RAGElementEditRequestBody,
     RAGElementEditResponseBody,
     RAGQueryBody,
@@ -8,6 +9,7 @@ import {
 import {Page} from "../database/models/page-schema.js";
 import IPage from "../types/IPage.js";
 import {logger} from "../util/logger.js";
+import {User} from "../database/models/user-schema.js";
 
 const router = express.Router();
 
@@ -98,6 +100,38 @@ router.post('/editElement', async (req: Request<{}, {}, RAGElementEditRequestBod
         logger.error(err, "AI edit element error");
         return res.sendStatus(500);
     }
-})
+});
+
+router.post('/indexPage', async (req: Request<{}, {}, PageIndexRequestBody>, res: Response) => {
+    if (!req.userId || !req.body.pageName || !req.body.pageContent) {
+        return res.sendStatus(400);
+    }
+
+    const user = await User.findOne({ _id: req.userId }).lean();
+    if (!user) {
+        return res.sendStatus(404);
+    }
+
+    try {
+        const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
+            method: 'POST',
+            headers: ragHeaders,
+            body: JSON.stringify({
+                ...req.body,
+                username: user.username,
+            })
+        });
+
+        if (!response.ok || !response.body) {
+            console.error(await response.text());
+            return res.sendStatus(500);
+        }
+
+        return res.sendStatus(201);
+    } catch (err) {
+        logger.error(err, "page indexing error");
+        return res.sendStatus(500);
+    }
+});
 
 export default router;

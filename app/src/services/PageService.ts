@@ -97,6 +97,36 @@ class PageService {
         });
         return response.data;
     }
+
+    /**
+     * Indexes a page based on its page name and content.
+     *
+     * @param pageName - The page's name.
+     * @param pageContent - The HTML content of the page.
+     */
+    static async indexPage(pageName: string, pageContent: string): Promise<void> {
+        await axios.post('/api/generation/indexPage', {
+            pageName,
+            pageContent: pageContent.replace(
+                /src=["']data:image\/[^"']+["']/gi,
+                'src="https://example.com/placeholder.png"'
+            ),
+        }, { timeout: 20000 });
+    }
+
+    /**
+     * Semantically searches for published pages based on the user's query.
+     *
+     * @param query - The user's query.
+     * @returns An array of Published Pages
+     */
+    static async searchPublishedPages(query: string): Promise<PublishedPage[]> {
+        const response = await axios<PublishedPage[]>({
+            method: 'get',
+            url: `${(import.meta as any).env.VITE_PUBLISH_URL}/search?searchQuery=${encodeURIComponent(query)}`
+        });
+        return response.data;
+    }
 }
 
 export default PageService;

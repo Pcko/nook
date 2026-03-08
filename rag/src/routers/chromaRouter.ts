@@ -1,7 +1,9 @@
 import {type Request, type Response, Router} from "express";
 
 import chromaClient from "../clients/chromadbClient.js";
-import type {ChromaDBAddDocumentsRequestBody, ChromaDBQuery} from "../dto/chroma.js";
+import type {ChromaDBAddDocumentsRequestBody, ChromaDBPageIndexRequestBody, ChromaDBQuery} from "../dto/chroma.js";
+import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
+import {llmClient} from "./ragRouter.js";
 
 const chromaRouter = Router();
 
@@ -33,6 +35,34 @@ chromaRouter.delete('/removeEntries', async (req: Request<{}, {}, { ids: string[
 chromaRouter.delete('/clearCollection', async (req: Request, res: Response) => {
    await chromaClient.clearCollection();
    res.sendStatus(202);
+});
+
+chromaRouter.post('/indexPage', async (req: Request<{}, {}, ChromaDBPageIndexRequestBody>, res: Response)=> {
+    if (!req.body.username || !req.body.pageName || !req.body.pageContent) {
+        return res.sendStatus(400);
+    }
+
+    const descriptionMessages = await promptBuilder.buildPageDescriptionMessages(
+        req.body.username, req.body.pageName, req.body.pageContent);
+
+    const description = (await llmClient.getResponse(descriptionMessages)).response;
+
+    return res.status(201).send(await chromaClient.indexPage(req.body.username, req.body.pageName, description));
+});
+
+chromaRouter.get('/search', async (req: Request<{}, {}, {}, {searchQuery: string}>, res: Response) => {
+    if (!req.query.searchQuery) {
+        return res.sendStatus(400);
+    }
+
+    const searchQuery = decodeURIComponent(req.query.searchQuery);
+
+    return res.status(200).send(await chromaClient.searchIndexedPages(searchQuery));
+});
+
+chromaRouter.delete('/deleteIndex', async (req: Request<{}, {}, { username: string, pageName: string }>, res: Response) => {
+    await chromaClient.deleteIndex(req.body.username, req.body.pageName);
+    return res.sendStatus(204);
 });
 
 export default chromaRouter;

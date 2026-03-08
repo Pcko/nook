@@ -58,4 +58,5 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     });
 });
 
+export const llmClient = clients[defaultClient];
 export default ragRouter;

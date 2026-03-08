@@ -82,7 +82,26 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         }
         await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus: "not deployed" });
 
-        return res.sendStatus(200);
+        try {
+            const response = await fetch(`${process.env.RAG_URL}/chroma/deleteIndex`, {
+                method: 'DELETE',
+                headers: { authorization: process.env.RAG_API_KEY || '' },
+                body: JSON.stringify({
+                    username: pageDocument.author,
+                    pageName: pageDocument.name,
+                })
+            });
+
+            if (!response.ok || !response.body) {
+                console.error(await response.text());
+                return res.sendStatus(500);
+            }
+
+            return res.sendStatus(200);
+        } catch (err) {
+            logger.error(err, "index deletion error");
+            return res.sendStatus(500);
+        }
     } catch (err) {
         logger.error(err, 'Unpublish page error');
         return res.sendStatus(500);
