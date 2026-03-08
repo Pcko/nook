@@ -11,7 +11,8 @@ if(
     process.env.API_URL &&
     process.env.GROQ_API_KEY &&
     process.env.GROQ_LLM_MODEL &&
-    process.env.LOCAL_LLM_MODEL)
+    process.env.LOCAL_LLM_MODEL &&
+    process.env.EMBEDDING_MODEL)
 ) {
     console.error("ERROR: At least one required .env variable is not set.");
     process.exit(1);
