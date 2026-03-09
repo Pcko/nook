@@ -5,6 +5,7 @@ import "grapesjs/dist/css/grapes.min.css";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 import ErrorHandler from "../../logging/ErrorHandler";
 import {loadCustomBlocks} from "../utils/grapesBlocks";
+import {initUserBloxUi, loadUserBloxBlocks} from "../utils/customBlox";
 import {replaceDefaultShortcuts} from "../utils/shortcuts";
 import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
 import {registerButtonTestTrait} from "../utils/grapesAnchorButton";
@@ -36,9 +37,11 @@ export function useGrapesEditor(config, page) {
         });
 
         editorRef.current = editor;
+        const cleanupUserBloxUi = initUserBloxUi(editor);
         editor.on('load', () => {
             replaceDefaultShortcuts(editorRef);
             loadCustomBlocks(editor);
+            loadUserBloxBlocks(editor);
 
             setIsReady(true);
         });
@@ -66,6 +69,7 @@ export function useGrapesEditor(config, page) {
 
 
         return () => {
+            cleanupUserBloxUi?.();
             editorRef.current?.destroy();
             editorRef.current = null;
         };

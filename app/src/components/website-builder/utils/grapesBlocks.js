@@ -105,6 +105,40 @@ const svg = {
       <path d="M12 3l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 18.8 6.2 21.8l1.1-6.5L2.6 9.8l6.5-.9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
     </svg>
   `,
+  grid: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="4" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="14" y="4" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="4" y="14" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="14" y="14" width="6" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+  `,
+  hero: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M7 10h10M7 13h7M7 16h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  `,
+  cards: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="7" width="5" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="9.5" y="7" width="5" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="15" y="7" width="5" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+  `,
+  quote: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8 9H5v4h3l-2 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M17 9h-3v4h3l-2 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `,
+  footer: `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M4 15h16" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M7 17.5h4M15 17.5h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  `,
 };
 
 function makeBlockLabel(title, iconSvg) {
@@ -364,6 +398,358 @@ export const interactiveBlocks = [
   },
 ];
 
+export const bloxBlocks = [
+  {
+    id: "blox-hero-section",
+    label: makeBlockLabel("Hero", svg.hero),
+    tooltip: "Reusable hero section template",
+    category: "Blox",
+    content: {
+      type: "section",
+      style: {
+        padding: "72px 24px",
+        "background-color": "#f8fafc",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "1120px",
+            margin: "0 auto",
+            display: "flex",
+            "flex-direction": "column",
+            gap: "20px",
+            "align-items": "flex-start",
+          },
+          components: [
+            {
+              type: "text",
+              tagName: "h1",
+              content: "A clear headline for your section",
+              style: {
+                margin: "0",
+                "font-size": "48px",
+                "line-height": "1.1",
+                "font-weight": "700",
+                color: "#111827",
+              },
+            },
+            {
+              type: "text",
+              content: "Use this reusable hero block to introduce a page, product, or important message with consistent spacing and hierarchy.",
+              style: {
+                margin: "0",
+                "font-size": "18px",
+                "line-height": "1.6",
+                color: "#4b5563",
+                "max-width": "720px",
+              },
+            },
+            {
+              type: "div",
+              style: {
+                display: "flex",
+                gap: "12px",
+                "flex-wrap": "wrap",
+              },
+              components: [
+                {
+                  type: "button",
+                  content: "Primary Action",
+                  style: {
+                    padding: "12px 20px",
+                    "background-color": "#111827",
+                    color: "#ffffff",
+                    border: "none",
+                    "border-radius": "8px",
+                    cursor: "pointer",
+                  },
+                },
+                {
+                  type: "link",
+                  content: "Secondary Link",
+                  attributes: { href: "#" },
+                  style: {
+                    display: "inline-flex",
+                    "align-items": "center",
+                    padding: "12px 0",
+                    color: "#111827",
+                    "text-decoration": "none",
+                    "font-weight": "600",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "blox-feature-grid",
+    label: makeBlockLabel("Features", svg.grid),
+    tooltip: "Reusable three-feature section template",
+    category: "Blox",
+    content: {
+      type: "section",
+      style: {
+        padding: "64px 24px",
+        "background-color": "#ffffff",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "1120px",
+            margin: "0 auto",
+            display: "flex",
+            "flex-direction": "column",
+            gap: "24px",
+          },
+          components: [
+            {
+              type: "text",
+              tagName: "h2",
+              content: "Feature section",
+              style: {
+                margin: "0",
+                "font-size": "32px",
+                "font-weight": "700",
+                color: "#111827",
+              },
+            },
+            {
+              type: "div",
+              style: {
+                display: "flex",
+                gap: "20px",
+                "flex-wrap": "wrap",
+              },
+              components: [
+                {
+                  type: "div",
+                  style: {
+                    flex: "1 1 240px",
+                    padding: "24px",
+                    border: "1px solid #e5e7eb",
+                    "border-radius": "12px",
+                    "background-color": "#f9fafb",
+                  },
+                  components: [
+                    { type: "text", tagName: "h3", content: "Feature one", style: { margin: "0 0 8px 0", "font-size": "20px", "font-weight": "600" } },
+                    { type: "text", content: "Describe a benefit or reusable content block here.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+                  ],
+                },
+                {
+                  type: "div",
+                  style: {
+                    flex: "1 1 240px",
+                    padding: "24px",
+                    border: "1px solid #e5e7eb",
+                    "border-radius": "12px",
+                    "background-color": "#f9fafb",
+                  },
+                  components: [
+                    { type: "text", tagName: "h3", content: "Feature two", style: { margin: "0 0 8px 0", "font-size": "20px", "font-weight": "600" } },
+                    { type: "text", content: "Keep layouts consistent by reusing this section across pages.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+                  ],
+                },
+                {
+                  type: "div",
+                  style: {
+                    flex: "1 1 240px",
+                    padding: "24px",
+                    border: "1px solid #e5e7eb",
+                    "border-radius": "12px",
+                    "background-color": "#f9fafb",
+                  },
+                  components: [
+                    { type: "text", tagName: "h3", content: "Feature three", style: { margin: "0 0 8px 0", "font-size": "20px", "font-weight": "600" } },
+                    { type: "text", content: "Replace the text, keep the structure, and build faster.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "blox-split-content",
+    label: makeBlockLabel("Split", svg.cols2),
+    tooltip: "Reusable content split section template",
+    category: "Blox",
+    content: {
+      type: "section",
+      style: {
+        padding: "64px 24px",
+        "background-color": "#ffffff",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "1120px",
+            margin: "0 auto",
+            display: "flex",
+            gap: "32px",
+            "align-items": "center",
+            "flex-wrap": "wrap",
+          },
+          components: [
+            {
+              type: "div",
+              style: { flex: "1 1 320px" },
+              components: [
+                { type: "text", tagName: "h2", content: "Text with supporting visual", style: { margin: "0 0 12px 0", "font-size": "32px", "font-weight": "700" } },
+                { type: "text", content: "Use this reusable split layout for product highlights, story sections, or explanatory content.", style: { margin: "0 0 16px 0", color: "#4b5563", "line-height": "1.7" } },
+                { type: "button", content: "Learn more", style: { padding: "12px 20px", "background-color": "#111827", color: "#fff", border: "none", "border-radius": "8px", cursor: "pointer" } },
+              ],
+            },
+            {
+              type: "div",
+              style: {
+                flex: "1 1 320px",
+                padding: "48px 24px",
+                "min-height": "240px",
+                border: "1px dashed #cbd5e1",
+                "border-radius": "16px",
+                display: "flex",
+                "align-items": "center",
+                "justify-content": "center",
+                "background-color": "#f8fafc",
+              },
+              components: [
+                { type: "text", content: "Image or media", style: { margin: "0", color: "#64748b", "font-weight": "600" } },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "blox-card-row",
+    label: makeBlockLabel("Cards", svg.cards),
+    tooltip: "Reusable card row section template",
+    category: "Blox",
+    content: {
+      type: "section",
+      style: {
+        padding: "64px 24px",
+        "background-color": "#f8fafc",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "1120px",
+            margin: "0 auto",
+            display: "flex",
+            gap: "20px",
+            "flex-wrap": "wrap",
+          },
+          components: [
+            {
+              type: "div",
+              style: { flex: "1 1 240px", padding: "24px", "border-radius": "16px", "background-color": "#ffffff", border: "1px solid #e5e7eb" },
+              components: [
+                { type: "text", tagName: "h3", content: "Card title", style: { margin: "0 0 10px 0", "font-size": "20px", "font-weight": "600" } },
+                { type: "text", content: "Use this as a repeated content card inside your page sections.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+              ],
+            },
+            {
+              type: "div",
+              style: { flex: "1 1 240px", padding: "24px", "border-radius": "16px", "background-color": "#ffffff", border: "1px solid #e5e7eb" },
+              components: [
+                { type: "text", tagName: "h3", content: "Card title", style: { margin: "0 0 10px 0", "font-size": "20px", "font-weight": "600" } },
+                { type: "text", content: "Duplicate and edit it to maintain a consistent layout system.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+              ],
+            },
+            {
+              type: "div",
+              style: { flex: "1 1 240px", padding: "24px", "border-radius": "16px", "background-color": "#ffffff", border: "1px solid #e5e7eb" },
+              components: [
+                { type: "text", tagName: "h3", content: "Card title", style: { margin: "0 0 10px 0", "font-size": "20px", "font-weight": "600" } },
+                { type: "text", content: "The structure stays stable while the content stays flexible.", style: { margin: "0", color: "#4b5563", "line-height": "1.6" } },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "blox-testimonial",
+    label: makeBlockLabel("Quote", svg.quote),
+    tooltip: "Reusable testimonial section template",
+    category: "Blox",
+    content: {
+      type: "section",
+      style: {
+        padding: "64px 24px",
+        "background-color": "#111827",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "860px",
+            margin: "0 auto",
+            display: "flex",
+            "flex-direction": "column",
+            gap: "16px",
+          },
+          components: [
+            { type: "text", content: '“A short testimonial or customer quote can live here.”', style: { margin: "0", color: "#ffffff", "font-size": "28px", "line-height": "1.5", "font-weight": "600" } },
+            { type: "text", content: "Name, role or company", style: { margin: "0", color: "#cbd5e1", "font-size": "16px" } },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: "blox-footer",
+    label: makeBlockLabel("Footer", svg.footer),
+    tooltip: "Reusable footer section template",
+    category: "Blox",
+    content: {
+      type: "footer",
+      style: {
+        padding: "32px 24px",
+        "background-color": "#0f172a",
+      },
+      components: [
+        {
+          type: "div",
+          style: {
+            "max-width": "1120px",
+            margin: "0 auto",
+            display: "flex",
+            gap: "16px",
+            "justify-content": "space-between",
+            "align-items": "center",
+            "flex-wrap": "wrap",
+          },
+          components: [
+            { type: "text", content: "Brand or project name", style: { margin: "0", color: "#ffffff", "font-weight": "600" } },
+            {
+              type: "div",
+              style: { display: "flex", gap: "16px", "flex-wrap": "wrap" },
+              components: [
+                { type: "link", content: "Privacy", attributes: { href: "#" }, style: { color: "#cbd5e1", "text-decoration": "none" } },
+                { type: "link", content: "Imprint", attributes: { href: "#" }, style: { color: "#cbd5e1", "text-decoration": "none" } },
+                { type: "link", content: "Contact", attributes: { href: "#" }, style: { color: "#cbd5e1", "text-decoration": "none" } },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  },
+];
+
 export const contentBlocks = [
   // Image Block
   {
@@ -409,7 +795,7 @@ export const grapesBlocks = [
   ...textBlocks,
   ...coreStructureBlocks,
   ...interactiveBlocks,
-  ...contentBlocks,
+  ...contentBlocks
 ];
 
 /**
