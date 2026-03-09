@@ -1,22 +1,20 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../util/internal.js';
 import { Request, Response, NextFunction } from 'express';
-import { TokenContent } from '../types/requests/auth.js';
+
+import { User } from '../util/internal.js';
 
 function authenticateToken(req: Request, res: Response, next: NextFunction) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
+    const token = req.cookies.accessToken;
     if (!token) {
-        return res.sendStatus(400);
+        return res.sendStatus(401);
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, async (err, tokenContent) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, async (err: any, tokenContent: any) => {
         if (err) {
             return res.status(401).json({ error: 'invalid_token' });
         }
 
-        const { id, version } = tokenContent as TokenContent;
+        const { id, version } = tokenContent;
         const user = await User.findOne({ _id: id }).lean();
 
         if (!user) {

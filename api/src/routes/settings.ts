@@ -155,6 +155,9 @@ router.post('/logout', async (req: Request, res: Response) => {
     const user = await User.findOne({ _id: userId }) as IUser;
     await user.updateTokenVersion();
 
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
     return res.sendStatus(200);
   }
   catch (err) {
