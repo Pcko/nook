@@ -12,15 +12,15 @@ import {
 } from "react-icons/ai";
 
 import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
-import { DeployModal } from "../../../../../features/publishing";
+import {DeployModal} from "../../../../../features/publishing";
 import useErrorHandler from "../../../../logging/ErrorHandler";
-import { useMetaNotify } from "../../../../logging/MetaNotifyHook";
+import {useMetaNotify} from "../../../../logging/MetaNotifyHook";
 
 import CustomViewportInput from "./CustomViewportInput";
 import ToolbarButton from "./ToolbarButton";
 import TopActionButton from "./TopActionButton";
 import ZoomListbox from "./ZoomListbox";
-import { InfoTip } from "../../ui/TooltipSystem";
+import {InfoTip} from "../../ui/TooltipSystem";
 import {
     exportWebsite,
     handleRedo,
@@ -30,6 +30,7 @@ import {
     setTablet,
     toggleOutlines, togglePreview
 } from "../../../utils/grapesActions";
+import {useNavigate} from "react-router-dom";
 
 /**
  * TopPanel
@@ -60,6 +61,7 @@ function TopPanel({editorRef, page}) {
 
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
+    const navigate = useNavigate();
 
     /**
      * Timestamp of the last successful save action.
@@ -230,33 +232,40 @@ function TopPanel({editorRef, page}) {
     };
 
     return (
-            <div className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
-                {/* left group */}
-                <div className="flex items-center gap-2">
-                    <ToolbarButton icon={<AiOutlineUndo size={18} />} label="Str+Z" tooltip="Undo (Str+Z)" onClick={() => handleUndo(editorRef)} />
-                    <ToolbarButton icon={<AiOutlineRedo size={18} />} label="Str+Y" tooltip="Redo (Str+Y)" onClick={() => handleRedo(editorRef)} />
-                    <ToolbarButton icon={<AiOutlineBorder size={18} />} label="Alt+O" tooltip="Toggle outlines (Alt+O)" onClick={() => toggleOutlines(editorRef)} />
-                    <ToolbarButton icon={<AiOutlineEye size={18} />} label="Alt+P" tooltip="Toggle preview (Alt+P)" onClick={() => togglePreview(editorRef)} />
-                </div>
+        <div
+            className="h-12 grid grid-cols-[1fr_auto_1fr] items-center px-4 border border-ui-border bg-ui-bg text-text font-sans gap-2">
+            {/* left group */}
+            <div className="flex items-center gap-2">
+                <ToolbarButton icon={<AiOutlineUndo size={18}/>} label="Str+Z" tooltip="Undo (Str+Z)"
+                               onClick={() => handleUndo(editorRef)}/>
+                <ToolbarButton icon={<AiOutlineRedo size={18}/>} label="Str+Y" tooltip="Redo (Str+Y)"
+                               onClick={() => handleRedo(editorRef)}/>
+                <ToolbarButton icon={<AiOutlineBorder size={18}/>} label="Alt+O" tooltip="Toggle outlines (Alt+O)"
+                               onClick={() => toggleOutlines(editorRef)}/>
+                <ToolbarButton icon={<AiOutlineEye size={18}/>} label="Alt+P" tooltip="Toggle preview (Alt+P)"
+                               onClick={() => togglePreview(editorRef)}/>
+            </div>
 
-                {/* center group */}
-                <div className="flex items-center justify-center gap-2">
-                    <ToolbarButton icon={<AiOutlinePlus size={18} />} tooltip="Custom viewport width" onClick={handlePlus} />
+            {/* center group */}
+            <div className="flex items-center justify-center gap-2">
+                <ToolbarButton icon={<AiOutlinePlus size={18}/>} tooltip="Custom viewport width" onClick={handlePlus}/>
 
                 {showCustomViewport && (
                     <CustomViewportInput onApply={applyCustomViewport} onChange={setCustomViewport}
                                          value={customViewport}/>
                 )}
 
-                    <ToolbarButton icon={<AiOutlineLaptop size={18} />} tooltip="Desktop viewport" onClick={handleDesktop} />
-                    <ToolbarButton icon={<AiOutlineTablet size={18} />} tooltip="Tablet viewport" onClick={handleTablet} />
-                    <ToolbarButton icon={<AiOutlineMobile size={18} />} tooltip="Mobile viewport" onClick={handleMobile} />
+                <ToolbarButton icon={<AiOutlineLaptop size={18}/>} tooltip="Desktop viewport" onClick={handleDesktop}/>
+                <ToolbarButton icon={<AiOutlineTablet size={18}/>} tooltip="Tablet viewport" onClick={handleTablet}/>
+                <ToolbarButton icon={<AiOutlineMobile size={18}/>} tooltip="Mobile viewport" onClick={handleMobile}/>
 
-                    <div className="flex items-center gap-1" data-wb-tooltip="Zoom only changes the editor view (it does not affect export)." data-wb-tooltip-delay="650">
-                        <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom} />
-                        <InfoTip text="Zoom only changes the editor view (it does not affect export)." />
-                    </div>
+                <div className="flex items-center gap-1"
+                     data-wb-tooltip="Zoom only changes the editor view (it does not affect export)."
+                     data-wb-tooltip-delay="650">
+                    <ZoomListbox onChange={(val) => setCanvasZoom(val)} options={[25, 50, 75, 100]} value={zoom}/>
+                    <InfoTip text="Zoom only changes the editor view (it does not affect export)."/>
                 </div>
+            </div>
 
             {/* Right group: save/export/publish */}
             <div className="flex items-center justify-end gap-2">
@@ -275,8 +284,8 @@ function TopPanel({editorRef, page}) {
                     )}
                 </div>
                 <TopActionButton label="Save" onClick={handleSave}/>
-                <TopActionButton label="Export" onClick={() => exportWebsite(editorRef)}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
+                <TopActionButton label="Back" onClick={() => navigate(-1)}/>
             </div>
 
             {/* Publish dialog */}
