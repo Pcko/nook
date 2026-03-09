@@ -8,6 +8,11 @@ import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
+const ragHeaders = {
+    authorization: process.env.RAG_API_KEY || '',
+    "Content-Type": "application/json"
+};
+
 /**
  * @route POST /api/publishPage/
  * @summary Publishes page and makes it reachable via the username. Can be called again for updating the deployment
@@ -49,27 +54,29 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             { new: true, upsert: true, setDefaultsOnInsert: true }
         ) as IPublishedPage;
 
-        try {
-            const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
-                method: 'POST',
-                headers: {authorization: process.env.RAG_API_KEY || ''},
-                body: JSON.stringify({
-                    username: publishedPage.author,
-                    pageName: publishedPage.name,
-                    pageContent: publishedPage.html.replace(
-                        /src=["']data:image\/[^"']+["']/gi,
-                        'src="https://example.com/placeholder.png"'
-                    ),
-                })
-            });
+        if(isPublicDeployment) {
+            try {
+                const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
+                    method: 'POST',
+                    headers: ragHeaders,
+                    body: JSON.stringify({
+                        username: publishedPage.author,
+                        pageName: publishedPage.name,
+                        pageContent: publishedPage.html.replace(
+                            /(?:src|href)=["']data:image\/[^"']+["']/gi,
+                            'src="https://example.com/placeholder.png"'
+                        ),
+                    })
+                });
 
-            if (!response.ok || !response.body) {
-                logger.error(await response.text());
+                if (!response.ok || !response.body) {
+                    logger.error(await response.text());
+                    return res.sendStatus(500);
+                }
+            } catch (err) {
+                logger.error(err, "page indexing error");
                 return res.sendStatus(500);
             }
-        } catch (err) {
-            logger.error(err, "page indexing error");
-            return res.sendStatus(500);
         }
 
         return res.status(201).json(pageDetails);
@@ -108,7 +115,7 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         try {
             const response = await fetch(`${process.env.RAG_URL}/chroma/deleteIndex`, {
                 method: 'DELETE',
-                headers: { authorization: process.env.RAG_API_KEY || '' },
+                headers: ragHeaders,
                 body: JSON.stringify({
                     username: pageDocument.author,
                     pageName: pageDocument.name,
