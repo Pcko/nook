@@ -31,7 +31,7 @@ function Login() {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
-    const closeLogin = (accessToken, refreshToken, user) => {
+    const closeLogin = (user) => {
         notify(
             "info",
             "Login successful.",
@@ -42,11 +42,11 @@ function Login() {
             "success"
         );
 
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("loggedIn", true);
         localStorage.setItem("user", JSON.stringify(user));
 
         setFormData({username: "", password: ""});
+        console.log('Sup bitch')
         navigate("/dashboard");
     };
 
@@ -90,8 +90,6 @@ function Login() {
                 );
             } else {
                 closeLogin(
-                    response.data.accessToken,
-                    response.data.refreshToken,
                     response.data.user
                 );
             }
@@ -133,8 +131,6 @@ function Login() {
             );
             setTwoFactorAuthenticationFormActive(false);
             closeLogin(
-                response.data.accessToken,
-                response.data.refreshToken,
                 response.data.user
             );
         } catch (err) {

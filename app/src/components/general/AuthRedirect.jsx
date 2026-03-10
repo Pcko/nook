@@ -22,36 +22,27 @@ function AuthRedirect() {
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            const accessToken = localStorage.getItem("accessToken");
-            const refreshToken = localStorage.getItem("refreshToken");
+            const loggedIn = localStorage.getItem("loggedIn");
 
-            if (!refreshToken) {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
+            if (!loggedIn) {
+                localStorage.removeItem("loggedIn");
                 setIsAuthenticated(false);
                 setLoading(false);
                 return;
             }
 
             try {
-                const response = await AuthService.refreshAccessToken(refreshToken);
+                const response = await AuthService.refreshAccessToken();
 
-                const {
-                    accessToken: newAccessToken,
-                    refreshToken: newRefreshToken
-                } = response.data || {};
-
-                if (response.status === 200 && newAccessToken && newRefreshToken) {
-                    localStorage.setItem("accessToken", newAccessToken);
-                    localStorage.setItem("refreshToken", newRefreshToken);
-
+                if (response.status === 200) {
+                    localStorage.setItem("loggedIn", true);
                     setIsAuthenticated(true);
 
                     notify(
                         "info",
                         "Session restored successfully.",
                         {
-                            hadAccessToken: Boolean(accessToken),
+                            wasLoggedIn: Boolean(loggedIn),
                             stage: "token-refresh"
                         },
                         "token-refresh"
@@ -68,8 +59,7 @@ function AuthRedirect() {
                     );
                 }
             } catch (err) {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("loggedIn");
                 setIsAuthenticated(false);
                 setError(err);
 
@@ -77,7 +67,7 @@ function AuthRedirect() {
                     fallbackMessage: "Your session has expired. Please log in again.",
                     meta: {
                         stage: "token-refresh",
-                        hadAccessToken: Boolean(accessToken)
+                        wasLoggedIn: Boolean(loggedIn)
                     },
                     redirectToLogin: true
                 });
