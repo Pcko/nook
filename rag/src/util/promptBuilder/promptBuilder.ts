@@ -96,7 +96,14 @@ export const promptBuilder = {
         ];
     },
 
-    async buildPageDescriptionMessages(username: string, pageName: string, pageContent: string): Promise<ChatCompletionMessageParam[]> {
+    /**
+     * Builds chat messages for creating a website description from the website data
+     *
+     * @param username - The website creator's username
+     * @param pageName - The page's published name
+     * @param pageContent - The page's HTML content
+     */
+    buildPageDescriptionMessages(username: string, pageName: string, pageContent: string): ChatCompletionMessageParam[] {
         return [
             {
                 role: "system",
@@ -104,7 +111,7 @@ export const promptBuilder = {
             },
             {
                 role: "user",
-                content: `username: ${username}\npageName: ${pageName}, content: ${pageContent}`
+                content: `username: ${username}\npageName: ${pageName}\n content: ${pageContent}`
             }
         ]
     }

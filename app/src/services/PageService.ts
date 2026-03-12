@@ -105,10 +105,14 @@ class PageService {
      * @returns An array of Published Pages
      */
     static async searchPublishedPages(query: string): Promise<PublishedPage[]> {
-        const response = await axios<PublishedPage[]>({
-            method: 'get',
-            url: `${(import.meta as any).env.VITE_PUBLISH_URL}/search?searchQuery=${encodeURIComponent(query)}`
-        });
+        const response = await axios.get<PublishedPage[]>(
+            `${(import.meta as any).env.VITE_PUBLISH_URL}/search`,
+            {
+                params: {
+                    searchQuery: query,
+                }
+            }
+        );
         return response.data;
     }
 }

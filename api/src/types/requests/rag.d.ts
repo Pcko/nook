@@ -69,14 +69,3 @@ export interface ChatCompletionMessageParam {
 export interface UserChatCompletionMessageParam extends ChatCompletionMessageParam {
     role: "user" | "assistant";
 }
-
-/**
- * Represents the page to be semantically indexed.
- *
- * @interface PageIndexRequestBody
- * @property {string} pageName - The name of the user's page
- */
-export interface PageIndexRequestBody {
-    pageName: string;
-    pageContent: string;
-}

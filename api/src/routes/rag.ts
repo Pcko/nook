@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import {
-    PageIndexRequestBody,
     RAGElementEditRequestBody,
     RAGElementEditResponseBody,
     RAGQueryBody,
@@ -9,7 +8,6 @@ import {
 import {Page} from "../database/models/page-schema.js";
 import IPage from "../types/IPage.js";
 import {logger} from "../util/logger.js";
-import {User} from "../database/models/user-schema.js";
 
 const router = express.Router();
 

@@ -42,7 +42,7 @@ chromaRouter.post('/indexPage', async (req: Request<{}, {}, ChromaDBPageIndexReq
         return res.sendStatus(400);
     }
 
-    const descriptionMessages = await promptBuilder.buildPageDescriptionMessages(
+    const descriptionMessages = promptBuilder.buildPageDescriptionMessages(
         req.body.username, req.body.pageName, req.body.pageContent);
 
     const description = (await llmClient.getResponse(descriptionMessages)).response;
@@ -55,9 +55,7 @@ chromaRouter.get('/search', async (req: Request<{}, {}, {}, {searchQuery: string
         return res.sendStatus(400);
     }
 
-    const searchQuery = decodeURIComponent(req.query.searchQuery);
-
-    return res.status(200).send(await chromaClient.searchIndexedPages(searchQuery));
+    return res.status(200).send(await chromaClient.searchIndexedPages(req.query.searchQuery));
 });
 
 chromaRouter.delete('/deleteIndex', async (req: Request<{}, {}, { username: string, pageName: string }>, res: Response) => {
