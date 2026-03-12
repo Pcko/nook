@@ -23,13 +23,8 @@ httpClient.interceptors.response.use(
             try {
                 const response = await httpClient.post("/auth/token");
 
-                if(response.status == 200){
-                    localStorage.setItem("loggedIn", true);
-                }
-
                 return httpClient(originalRequest);
             } catch {
-                localStorage.removeItem("loggedIn");
 
                 return Promise.reject({
                     ...error,

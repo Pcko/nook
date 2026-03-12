@@ -223,7 +223,7 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
  */
 router.post('/token', async (req: Request, res: Response) => {
     try {
-        const refreshToken = req.cookies.refreshToken;
+        const refreshToken = (req as any).cookies?.refreshToken;
 
         if (!refreshToken) {
             return res.sendStatus(400);

@@ -6,7 +6,6 @@ import { useAnimation } from "../../components/context/AnimationContext";
 import NotificationOverlay from "../../components/general/NotificationOverlay";
 import LoadingScreen from "../../components/general/LoadingScreen";
 
-import ProtectedRoute from "./ProtectedRoute";
 import AuthRedirect from "./AuthRedirect";
 
 const LandingPage = lazy(() => import("../../pages/LandingPage/LandingPage"));
@@ -34,12 +33,10 @@ function AppRouter() {
                                 <Route path="/login" element={<LoginPage />} />
                                 <Route path="/register" element={<RegisterPage />} />
 
-                                <Route element={<ProtectedRoute />}>
-                                    <Route path="/settings" element={<SettingsPage />} />
-                                    <Route path="/dashboard" element={<DashboardPage />} />
-                                    <Route path="/editor/:pageName" element={<EditorPage />} />
-                                    <Route path="/pages/:authorId/:pageName" element={<PublicPage />} />
-                                </Route>
+                                <Route path="/settings" element={<SettingsPage />} />
+                                <Route path="/dashboard" element={<DashboardPage />} />
+                                <Route path="/editor/:pageName" element={<EditorPage />} />
+                                <Route path="/pages/:authorId/:pageName" element={<PublicPage />} />
                             </Routes>
                         </Suspense>
                     </main>

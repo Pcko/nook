@@ -41,12 +41,9 @@ function Login() {
             },
             "success"
         );
-
-        localStorage.setItem("loggedIn", true);
         localStorage.setItem("user", JSON.stringify(user));
 
         setFormData({username: "", password: ""});
-        console.log('Sup bitch')
         navigate("/dashboard");
     };
 

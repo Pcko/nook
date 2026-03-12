@@ -2,9 +2,11 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 import { User } from '../util/internal.js';
+import {logger} from "../util/logger.js";
 
 function authenticateToken(req: Request, res: Response, next: NextFunction) {
-    const token = req.cookies.accessToken;
+    const token = (req as any).cookies?.accessToken;
+
     if (!token) {
         return res.sendStatus(401);
     }
