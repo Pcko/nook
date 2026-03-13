@@ -7,6 +7,7 @@ import {
     AiOutlineMobile,
     AiOutlinePlus,
     AiOutlineRedo,
+    AiOutlineSave,
     AiOutlineTablet,
     AiOutlineUndo,
 } from "react-icons/ai";
@@ -21,6 +22,8 @@ import ToolbarButton from "./ToolbarButton";
 import TopActionButton from "./TopActionButton";
 import ZoomListbox from "./ZoomListbox";
 import { InfoTip } from "../../ui/TooltipSystem";
+import {useBuilder} from "../../../hooks/UseBuilder";
+import {addUserBloxBlockToEditor, saveSelectedComponentAsUserBlox} from "../../../utils/customBlox";
 import {
     exportWebsite,
     handleRedo,
@@ -59,6 +62,7 @@ function TopPanel({editorRef, page}) {
     );
 
     const {notify} = useMetaNotify(baseMeta);
+    const {selectedElement} = useBuilder();
     const handleError = useErrorHandler(baseMeta);
 
     /**
@@ -114,6 +118,37 @@ function TopPanel({editorRef, page}) {
                     meta: {stage: "page-save", pageName: page?.name ?? null},
                 });
             });
+    }
+
+    function handleSaveBlox() {
+        if (!editorRef?.current || !selectedElement) {
+            notify(
+                "info",
+                "Select a section or element first.",
+                {stage: "save-blox", pageName: page?.name ?? null},
+                "submit"
+            );
+            return;
+        }
+
+        const name = window.prompt("Name for this reusable blox:", selectedElement.getName?.() || "My section");
+        if (name == null) return;
+
+        try {
+            const block = saveSelectedComponentAsUserBlox(editorRef.current, selectedElement, name);
+            addUserBloxBlockToEditor(editorRef.current, block);
+            notify(
+                "info",
+                `Saved reusable blox "${block.name}".`,
+                {stage: "save-blox", pageName: page?.name ?? null, bloxName: block.name},
+                "submit"
+            );
+        } catch (err) {
+            handleError(err, {
+                fallbackMessage: "Failed to save the reusable blox.",
+                meta: {stage: "save-blox", pageName: page?.name ?? null},
+            });
+        }
     }
 
     /**
@@ -275,6 +310,7 @@ function TopPanel({editorRef, page}) {
                     )}
                 </div>
                 <TopActionButton label="Save" onClick={handleSave}/>
+                <TopActionButton label="Save Blox" onClick={handleSaveBlox} icon={<AiOutlineSave size={16} />} disabled={!selectedElement}/>
                 <TopActionButton label="Export" onClick={() => exportWebsite(editorRef)}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
             </div>
