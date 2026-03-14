@@ -262,15 +262,15 @@ async function createTokenCookies(user: IUser, res: Response) {
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: !process.env.DEVENV,
+        sameSite: 'lax',
+        secure: process.env.DEVENV !== 'true',
         maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: !process.env.DEVENV,
+        sameSite: 'lax',
+        secure: process.env.DEVENV !== 'true',
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 }
