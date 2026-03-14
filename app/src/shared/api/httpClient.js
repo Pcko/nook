@@ -6,22 +6,6 @@ const httpClient = axios.create({
     timeout: 10000,
 });
 
-httpClient.interceptors.request.use(
-    (config) => {
-        const requestUrl = new URL(config.url, config.baseURL).pathname;
-
-        if (requestUrl.startsWith("/api")) {
-            const accessToken = localStorage.getItem("accessToken");
-            if (accessToken) {
-                config.headers.authorization = `Bearer ${accessToken}`;
-            }
-        }
-
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
 httpClient.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -37,23 +21,10 @@ httpClient.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshToken = localStorage.getItem("refreshToken");
-                if (!refreshToken) {
-                    throw error;
-                }
-
-                const response = await httpClient.post("/auth/token", { token: refreshToken });
-                const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-                localStorage.setItem("accessToken", accessToken);
-                localStorage.setItem("refreshToken", newRefreshToken);
-
-                originalRequest.headers.authorization = `Bearer ${accessToken}`;
+                const response = await httpClient.post("/auth/token");
 
                 return httpClient(originalRequest);
             } catch {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
 
                 return Promise.reject({
                     ...error,

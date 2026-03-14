@@ -17,10 +17,6 @@ export interface VerifyEmailBody {
     otp: string;
 }
 
-export interface TokenBody {
-    token: string;
-}
-
 export interface TokenContent {
     id: string;
     version: number;

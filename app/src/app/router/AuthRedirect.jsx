@@ -24,36 +24,16 @@ function AuthRedirect() {
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            const accessToken = localStorage.getItem("accessToken");
-            const refreshToken = localStorage.getItem("refreshToken");
-
-            if (!refreshToken) {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                setIsAuthenticated(false);
-                setLoading(false);
-                return;
-            }
-
             try {
-                const response = await refreshSessionAccessToken(refreshToken);
+                const response = await refreshSessionAccessToken();
 
-                const {
-                    accessToken: newAccessToken,
-                    refreshToken: newRefreshToken,
-                } = response.data || {};
-
-                if (response.status === 200 && newAccessToken && newRefreshToken) {
-                    localStorage.setItem("accessToken", newAccessToken);
-                    localStorage.setItem("refreshToken", newRefreshToken);
-
+                if (response.status === 200) {
                     setIsAuthenticated(true);
 
                     notify(
                         "info",
                         "Session restored successfully.",
                         {
-                            hadAccessToken: Boolean(accessToken),
                             stage: "token-refresh",
                         },
                         "token-refresh"
@@ -70,8 +50,6 @@ function AuthRedirect() {
                     );
                 }
             } catch (err) {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
                 setIsAuthenticated(false);
                 setError(err);
 
@@ -79,7 +57,6 @@ function AuthRedirect() {
                     fallbackMessage: "Your session has expired. Please log in again.",
                     meta: {
                         stage: "token-refresh",
-                        hadAccessToken: Boolean(accessToken),
                     },
                     redirectToLogin: true,
                 });
