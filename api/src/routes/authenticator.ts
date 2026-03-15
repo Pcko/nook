@@ -256,22 +256,23 @@ router.post('/token', async (req: Request, res: Response) => {
 });
 
 async function createTokenCookies(user: IUser, res: Response) {
-
     await user.updateTokenVersion();
-    const {accessToken, refreshToken} = getTokens({id: user._id, version: user.tokenVersion});
+    const { accessToken, refreshToken } = getTokens({ id: user._id, version: user.tokenVersion });
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: !process.env.DEVENV,
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        sameSite: 'none',
+        secure: true,
+        path: '/',
+        maxAge: 15 * 60 * 1000,
     });
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        sameSite: 'strict',
-        secure: !process.env.DEVENV,
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        sameSite: 'none',
+        secure: true,
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 }
 

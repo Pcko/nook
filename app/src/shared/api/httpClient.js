@@ -1,7 +1,25 @@
-﻿import axios from "axios";
+import axios from "axios";
+
+const envApiUrl = (import.meta.env.VITE_API_URL || "").trim();
+const useDevProxy = import.meta.env.DEV && import.meta.env.VITE_DISABLE_API_PROXY !== "true";
+const apiBaseURL = useDevProxy ? "" : envApiUrl;
+
+function getRequestPath(config = {}) {
+    const requestUrl = config.url || "/";
+
+    try {
+        if (config.baseURL) {
+            return new URL(requestUrl, config.baseURL).pathname;
+        }
+
+        return new URL(requestUrl, window.location.origin).pathname;
+    } catch {
+        return requestUrl;
+    }
+}
 
 const httpClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: apiBaseURL,
     withCredentials: true,
     timeout: 10000,
 });
@@ -9,8 +27,8 @@ const httpClient = axios.create({
 httpClient.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
-        const originalRequestUrl = new URL(originalRequest.url, originalRequest.baseURL).pathname;
+        const originalRequest = error.config || {};
+        const originalRequestUrl = getRequestPath(originalRequest);
 
         if (
             error.response &&
@@ -21,11 +39,9 @@ httpClient.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const response = await httpClient.post("/auth/token");
-
+                await httpClient.post("/auth/token");
                 return httpClient(originalRequest);
             } catch {
-
                 return Promise.reject({
                     ...error,
                     response: {
