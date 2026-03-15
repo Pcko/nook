@@ -3,16 +3,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
 
+//Connection and configuration files
 import 'dotenv/config';
-import './database/connection.js'; //<-- database
+import './database/connection.js';
 
+//Models and Types
 import { PublishedPage } from "./database/models/publishedPage-schema.js";
 import { PageView } from "./util/internal.js";
 import IPublishedPage from "./types/IPublishedPage.js";
 import { getReferrerUrl, getVisitorHash } from "./util/pageView.js";
 import { startOfDay, toISODate } from "./util/statsComputer.js";
 
-const allowedOrigins: string[] = ['**'] as string[];
 
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
@@ -20,7 +21,7 @@ const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors());
 app.use(express.json({ limit: '16mb' }));
 
 app.get('/health', (req: Request, res: Response) => res.send('✅ Publish-API is running!'));

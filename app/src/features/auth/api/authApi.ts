@@ -60,8 +60,8 @@ export function activateTwoFactorAuth(user: User, otp: string) {
     });
 }
 
-export function refreshAccessToken(refreshToken: string) {
-    return httpClient.post("/auth/token", { token: refreshToken });
+export function refreshAccessToken() {
+    return httpClient.post("/auth/token");
 }
 
 const authApi = {

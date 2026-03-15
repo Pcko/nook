@@ -44,8 +44,8 @@ class AuthService {
         return activateTwoFactorAuth(user, otp);
     }
 
-    static async refreshAccessToken(refreshToken: any) {
-        return refreshAuthAccessToken(refreshToken);
+    static async refreshAccessToken() {
+        return refreshAuthAccessToken();
     }
 }
 

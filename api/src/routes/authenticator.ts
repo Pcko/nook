@@ -15,7 +15,6 @@ import {
 import {
     LoginBody,
     RegisterBody,
-    TokenBody,
     TokenContent,
     VerifyEmailBody,
 } from '../types/requests/auth.js';
@@ -98,13 +97,8 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
             }
         }
 
-        //create tokens for authentication
-        await user.updateTokenVersion();
-        const userid = user._id;
-        const tokenVersion = Number(user.tokenVersion);
-        const tokenUser = {id: userid, version: tokenVersion};
-
-        const {accessToken, refreshToken} = createTokens(tokenUser);
+        //create and add tokens to cookies for authentication
+        await createTokenCookies(user, res);
 
         //create new userobject to return for settings
         const newUser = {
@@ -115,7 +109,7 @@ router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: 
             twoFactorAuthOn: user.twoFactorAuthOn,
         }
 
-        return res.status(200).json({user: newUser, accessToken, refreshToken});
+        return res.status(200).json({user: newUser});
     } catch (err) {
         logger.error(err, 'Login error');
         return res.sendStatus(500);
@@ -225,14 +219,11 @@ router.patch('/verifyEmail', async (req: Request<{}, {}, VerifyEmailBody>, res: 
  * @route POST /auth/token
  * @summary Generates new tokens
  *
- * @param {Request<{}, {}, TokenBody>} req
- *      @property {string} req.body.token - User's refreshToken
- *
  * @returns 200 - JSON{accessToken<string>, refreshToken<string>}
  */
-router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
+router.post('/token', async (req: Request, res: Response) => {
     try {
-        const {token: refreshToken} = req.body;
+        const refreshToken = (req as any).cookies?.refreshToken;
 
         if (!refreshToken) {
             return res.sendStatus(400);
@@ -254,10 +245,9 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
                 return res.status(401).json({error: 'old_token'});
             }
 
-            await user.updateTokenVersion();
-            const tokens = createTokens({id, version: user.tokenVersion});
+            await createTokenCookies(user, res);
 
-            return res.status(200).json(tokens);
+            return res.sendStatus(200);
         })
     } catch (err) {
         logger.error(err, 'Refresh token error');
@@ -265,7 +255,27 @@ router.post('/token', async (req: Request<{}, {}, TokenBody>, res) => {
     }
 });
 
-function createTokens(tokenContent: TokenContent) {
+async function createTokenCookies(user: IUser, res: Response) {
+
+    await user.updateTokenVersion();
+    const {accessToken, refreshToken} = getTokens({id: user._id, version: user.tokenVersion});
+
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: !process.env.DEVENV,
+        maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: !process.env.DEVENV,
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+}
+
+function getTokens(tokenContent: TokenContent) {
     const accessToken = jwt.sign(tokenContent, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: '15min'}); //valid for 15min after creation
     const refreshToken = jwt.sign(tokenContent, process.env.REFRESH_TOKEN_SECRET as string, {expiresIn: '30d'}); //valid for 30 days after creation
 
