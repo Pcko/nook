@@ -1,8 +1,9 @@
-﻿import axios from "../shared/api/httpClient";
-import Page from "./interfaces/Page.ts";
-import PageDTO from "./interfaces/PageDTO.ts";
-import type { PageMeta } from "./interfaces/PageMeta.ts";
-import PublishedPage from "./interfaces/PublishedPage.ts";
+import axios from '../shared/api/httpClient';
+import Page from './interfaces/Page.ts';
+import PageDTO from './interfaces/PageDTO.ts';
+import type { PageMeta } from './interfaces/PageMeta.ts';
+import PublishedPage from './interfaces/PublishedPage.ts';
+import { hydrateProjectDataForEditor, prepareProjectDataForPersistence } from './pageContentService.ts';
 
 class PageService {
     /**
@@ -12,14 +13,12 @@ class PageService {
      * @private
      */
     private static parsePage(requestPage: PageDTO): Page {
-        const data = !requestPage.data ? null : JSON.parse(requestPage.data);
-        // Backend field is `metadata` (object). Older frontend code used `pageMeta` (JSON string).
-        // Support both shapes to stay compatible.
-        const rawMeta = (requestPage as any).metadata ?? requestPage.pageMeta ?? null;
+        const data = hydrateProjectDataForEditor(requestPage.data, requestPage.dataEncoding);
+        const rawMeta = requestPage.metadata ?? requestPage.pageMeta ?? null;
         let pageMeta: PageMeta | null = null;
         try {
-            if (typeof rawMeta === "string") pageMeta = JSON.parse(rawMeta);
-            else if (rawMeta && typeof rawMeta === "object") pageMeta = rawMeta;
+            if (typeof rawMeta === 'string') pageMeta = JSON.parse(rawMeta);
+            else if (rawMeta && typeof rawMeta === 'object') pageMeta = rawMeta;
         } catch {
             pageMeta = null;
         }
@@ -36,8 +35,7 @@ class PageService {
      * @returns An array of Page objects
      */
     static async getPages(): Promise<Page[]> {
-        const response = await axios.get<PageDTO[]>("/api/pages");
-
+        const response = await axios.get<PageDTO[]>('/api/pages');
         return response.data.map(this.parsePage);
     }
 
@@ -57,7 +55,7 @@ class PageService {
      * @returns The newly created Page object
      */
     static async createPage(pageName: string, metadata: PageMeta = {} as PageMeta): Promise<Page> {
-        const response = await axios.post<PageDTO>("/api/pages", { pageName, metadata });
+        const response = await axios.post<PageDTO>('/api/pages', { pageName, metadata });
         return this.parsePage(response.data);
     }
 
@@ -67,10 +65,13 @@ class PageService {
      * @param newPageName - Optional new name for the page
      * @returns The updated Page object
      */
-    static async updatePage(page: Page, newPageName?: string): Promise<{ newPageName: string }> {
+    static async updatePage(page: Page, newPageName?: string, preparedContent?: Awaited<ReturnType<typeof prepareProjectDataForPersistence>>): Promise<{ newPageName: string }> {
+        const prepared = preparedContent ?? await prepareProjectDataForPersistence(page.name, page.data);
         const payload: any = {
             newPageName,
-            pageContent: JSON.stringify(page.data),
+            pageContent: prepared.encoded.content,
+            dataEncoding: prepared.encoded.encoding,
+            dataVersion: prepared.encoded.version,
         };
 
         // Only send metadata if present to avoid wiping it accidentally.
@@ -79,6 +80,7 @@ class PageService {
         }
 
         const response = await axios.patch(`/api/pages/${page.name}`, payload);
+        page.data = prepared.editorData;
         return response.data;
     }
 
@@ -93,7 +95,7 @@ class PageService {
     static async getPublishedPages(): Promise<PublishedPage[]> {
         const response = await axios<PublishedPage[]>({
             method: 'get',
-            url: (import.meta as any).env.VITE_PUBLISH_URL
+            url: (import.meta as any).env.VITE_PUBLISH_URL,
         });
         return response.data;
     }
@@ -110,8 +112,8 @@ class PageService {
             {
                 params: {
                     searchQuery: query,
-                }
-            }
+                },
+            },
         );
         return response.data;
     }

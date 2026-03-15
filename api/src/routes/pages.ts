@@ -1,10 +1,10 @@
-import express, {Request, Response} from 'express';
+import express, { Request, Response } from 'express';
 
-import {isInvalidStringForURL} from "../util/FormChecks.js";
-import {Page} from '../util/internal.js';
+import { isInvalidStringForURL } from '../util/FormChecks.js';
+import { Page } from '../util/internal.js';
 import IPage from '../types/IPage.js';
-import {CreatePageBody, PageNameParam, UpdatePageBody} from '../types/requests/pages.js';
-import {logger} from "../util/logger.js";
+import { CreatePageBody, PageNameParam, UpdatePageBody } from '../types/requests/pages.js';
+import { logger } from '../util/logger.js';
 
 const router = express.Router();
 
@@ -21,19 +21,18 @@ const router = express.Router();
  */
 router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => {
     try {
-        const {userId} = req;
-        const {pageName, folderName, metadata} = req.body;
+        const { userId } = req;
+        const { pageName, folderName, metadata } = req.body;
 
-        //make sure the pageName is valid
         if (isInvalidStringForURL(pageName)) {
-            return res.status(400).json({error: 'invalid_pageName'});
+            return res.status(400).json({ error: 'invalid_pageName' });
         }
 
         let updatedPageName = pageName;
         let duplicateNumber = 1;
         let pageExists = undefined;
         do {
-            pageExists = await Page.findOne({name: updatedPageName, author: userId}).lean<IPage>();
+            pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
             if (pageExists) {
                 duplicateNumber += 1;
@@ -69,9 +68,11 @@ router.post('/', async (req: Request<{}, {}, CreatePageBody>, res: Response) => 
  */
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const {userId} = req;
+        const { userId } = req;
 
-        const pages = await Page.find({author: userId}).lean<IPage>();
+        const pages = await Page.find({ author: userId })
+            .select({ data: 0, dataEncoding: 0, dataVersion: 0 })
+            .lean<IPage[]>();
 
         return res.status(200).json(pages);
     } catch (err) {
@@ -92,12 +93,12 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
     try {
-        const {userId} = req;
-        const {pageName} = req.params;
+        const { userId } = req;
+        const { pageName } = req.params;
 
-        const page = await Page.findOne({name: pageName, author: userId}).lean<IPage>();
+        const page = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
         if (!page) {
-            return res.status(404).send({message: 'Page not found!'});
+            return res.status(404).send({ message: 'Page not found!' });
         }
 
         return res.status(200).json(page);
@@ -122,21 +123,19 @@ router.get('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Respon
  */
 router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody>, res: Response) => {
     try {
-        const {userId} = req;
-        const {pageName} = req.params;
-        const {newPageName, newFolderName, pageContent, metadata} = req.body;
+        const { userId } = req;
+        const { pageName } = req.params;
+        const { newPageName, newFolderName, pageContent, dataEncoding, dataVersion, metadata } = req.body;
 
-        const page = await Page.findOne({name: pageName, author: userId}) as IPage;
+        const page = await Page.findOne({ name: pageName, author: userId }) as IPage;
         if (!page) {
-            return res.status(404).send({message: 'Page not found!'});
+            return res.status(404).send({ message: 'Page not found!' });
         }
 
-        //Rename
         let updatedPageName = pageName;
         if (newPageName) {
-            //make sure the pageName is valid
             if (isInvalidStringForURL(newPageName)) {
-                return res.status(400).json({error: 'invalid_pageName'});
+                return res.status(400).json({ error: 'invalid_pageName' });
             }
 
             updatedPageName = newPageName;
@@ -144,7 +143,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
             let duplicateNumber = 1;
             let pageExists;
             do {
-                pageExists = await Page.findOne({name: updatedPageName, author: userId}).lean<IPage>();
+                pageExists = await Page.findOne({ name: updatedPageName, author: userId }).lean<IPage>();
 
                 if (pageExists) {
                     duplicateNumber += 1;
@@ -157,8 +156,10 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         }
 
         //Save data
-        if (pageContent) {
+        if (pageContent !== undefined) {
             page.data = pageContent;
+            if (dataEncoding) page.dataEncoding = dataEncoding;
+            if (typeof dataVersion === 'number') page.dataVersion = dataVersion;
         }
 
         //Update Folder
@@ -166,13 +167,13 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
             page.folderName = newFolderName;
         }
 
-        if (metadata) {
+        if (metadata !== undefined) {
             page.metadata = metadata;
         }
 
         await page.save();
 
-        return res.status(200).json({newPageName: updatedPageName});
+        return res.status(200).json({ newPageName: updatedPageName });
     } catch (err) {
         logger.error(err, 'Update page error');
         return res.sendStatus(500);
@@ -191,12 +192,12 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
  */
 router.delete('/:pageName', async (req: Request<PageNameParam, {}, {}>, res: Response) => {
     try {
-        const {userId} = req;
-        const {pageName} = req.params;
+        const { userId } = req;
+        const { pageName } = req.params;
 
-        const page = await Page.findOneAndDelete({name: pageName, author: userId});
+        const page = await Page.findOneAndDelete({ name: pageName, author: userId });
         if (!page) {
-            return res.status(404).send({message: 'Page not found!'});
+            return res.status(404).send({ message: 'Page not found!' });
         }
 
         return res.sendStatus(202);

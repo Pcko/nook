@@ -6,7 +6,7 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
     {
         pageId: {
             type: Schema.Types.ObjectId,
-            ref: "Page",
+            ref: 'Page',
             required: true,
             index: true,
         },
@@ -19,20 +19,36 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
             type: String,
             required: true,
         },
+        htmlEncoding: {
+            type: String,
+            required: true,
+            enum: ['plain', 'deflate-base64'],
+            default: 'plain',
+        },
+        htmlVersion: {
+            type: Number,
+            required: true,
+            default: 1,
+        },
+        assetIds: {
+            type: [String],
+            required: true,
+            default: [],
+        },
         author: {
             type: String,
-            ref: "User",
+            ref: 'User',
             required: true,
         },
         isPublic: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     {
         timestamps: true,
         minimize: false,
-    }
+    },
 );
 
 async function handlePublishedPageDeletion(publishedPage: IPublishedPage | null) {

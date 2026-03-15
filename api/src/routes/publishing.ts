@@ -4,13 +4,15 @@ import { PublishPageBody, PublishPageParams } from '../types/requests/publishing
 import { PublishedPage, Page } from '../util/internal.js';
 import IPublishedPage from '../types/IPublishedPage.js';
 import IPage from '../types/IPage.js';
-import {logger} from "../util/logger.js";
+import { logger } from '../util/logger.js';
+import { decodeStoredString, encodeStoredString } from '../util/compression.js';
+import { externalizeInlineImagesInHtml, rewritePrivateAssetUrlsToPublic } from '../util/pageAssets.js';
 
 const router = express.Router();
 
 const ragHeaders = {
     authorization: process.env.RAG_API_KEY || '',
-    "Content-Type": "application/json"
+    'Content-Type': 'application/json',
 };
 
 /**
@@ -30,9 +32,9 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
     try {
         const { userId } = req;
         const { pageName, displayPageName } = req.params;
-        const { page, isPublic } = req.body;
+        const { page, pageEncoding, isPublic } = req.body;
         const isPublicDeployment = isPublic === true;
-        const deploymentStatus = isPublicDeployment ? "online" : "inactive";
+        const deploymentStatus = isPublicDeployment ? 'online' : 'inactive';
 
         const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
 
@@ -40,21 +42,41 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             return res.status(404).json({ error: 'page_missing' });
         }
 
+        const decodedHtml = decodeStoredString(page, pageEncoding);
+        if (decodedHtml == null) {
+            return res.status(400).json({ error: 'page_missing_html' });
+        }
+
+        const publicAssetHtml = rewritePrivateAssetUrlsToPublic(decodedHtml);
+        const externalizedInlineImages = await externalizeInlineImagesInHtml({
+            html: publicAssetHtml.html,
+            author: userId,
+        });
+
+        const finalHtml = externalizedInlineImages.html;
+        const encodedHtml = encodeStoredString(finalHtml);
+        const assetIds = [...new Set([...publicAssetHtml.assetIds, ...externalizedInlineImages.assetIds])];
+
         const publishedPage = {
             pageId: pageDocument._id,
             name: displayPageName,
-            html: page,
+            html: encodedHtml.content,
+            htmlEncoding: encodedHtml.encoding,
+            htmlVersion: encodedHtml.version,
+            assetIds,
             author: userId,
             isPublic: isPublicDeployment,
-        }
+        };
 
         const pageDetails = await PublishedPage.findOneAndUpdate(
             { pageId: pageDocument._id },
             publishedPage,
-            { new: true, upsert: true, setDefaultsOnInsert: true }
+            { new: true, upsert: true, setDefaultsOnInsert: true },
         ) as IPublishedPage;
 
-        if(isPublicDeployment) {
+        await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus });
+
+        if (isPublicDeployment) {
             try {
                 const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
                     method: 'POST',
@@ -62,11 +84,11 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
                     body: JSON.stringify({
                         username: publishedPage.author,
                         pageName: publishedPage.name,
-                        pageContent: publishedPage.html.replace(
+                        pageContent: finalHtml.replace(
                             /(?:src|href)=["']data:image\/[^"']+["']/gi,
-                            'src="https://example.com/placeholder.png"'
+                            'src="https://example.com/placeholder.png"',
                         ),
-                    })
+                    }),
                 });
 
                 if (!response.ok || !response.body) {
@@ -74,7 +96,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
                     return res.sendStatus(500);
                 }
             } catch (err) {
-                logger.error(err, "page indexing error");
+                logger.error(err, 'page indexing error');
                 return res.sendStatus(500);
             }
         }
@@ -103,14 +125,14 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
 
         const pageDocument = await Page.findOne({ name: pageName, author: userId }).lean<IPage>();
         if (!pageDocument) {
-            return res.status(404).json({ error: 'page_not_found' })
+            return res.status(404).json({ error: 'page_not_found' });
         }
 
         const deletedPage = await PublishedPage.findOneAndDelete({ pageId: pageDocument._id, author: pageDocument.author });
         if (!deletedPage) {
-            return res.status(404).json({ error: 'published_page_not_found' })
+            return res.status(404).json({ error: 'published_page_not_found' });
         }
-        await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus: "not deployed" });
+        await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus: 'not deployed' });
 
         try {
             const response = await fetch(`${process.env.RAG_URL}/chroma/deleteIndex`, {
@@ -119,7 +141,7 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
                 body: JSON.stringify({
                     username: pageDocument.author,
                     pageName: pageDocument.name,
-                })
+                }),
             });
 
             if (!response.ok || !response.body) {
@@ -129,13 +151,13 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
 
             return res.sendStatus(200);
         } catch (err) {
-            logger.error(err, "index deletion error");
+            logger.error(err, 'index deletion error');
             return res.sendStatus(500);
         }
     } catch (err) {
         logger.error(err, 'Unpublish page error');
         return res.sendStatus(500);
     }
-})
+});
 
 export default router;
