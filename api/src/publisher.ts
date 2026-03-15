@@ -72,6 +72,35 @@ app.get("/", async (req: Request, res: Response) => {
     return res.status(200).json(pages);
 });
 
+app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res: Response) => {
+    try{
+        const response = await fetch(`${process.env.RAG_URL}/chroma/search?searchQuery=${req.query.searchQuery}`, {
+            method: 'GET',
+            headers: {
+                authorization: process.env.RAG_API_KEY || ''
+            }
+        });
+
+        if (!response.ok || !response.body) {
+            console.error(await response.text());
+            return res.sendStatus(500);
+        }
+
+        const pageUIDs: string[] = await response.json();
+
+        const queries = pageUIDs.map(pageUID => {
+            const [author, name] = pageUID.split('/');
+            return { author, name };
+        });
+
+        const pages = await PublishedPage.find({ $or: queries }).lean<IPublishedPage[]>();
+
+        return res.status(200).send(pages);
+    } catch (err) {
+        console.log("page search error", err);
+        return res.sendStatus(500);
+    }
+});
 
 if (process.env.DEVENV) {
     app.listen(PORT, () => {

@@ -17,6 +17,7 @@ const componentsTemplate = readFileSync( path.resolve(__dirname, "components-for
 const stylesTemplate = readFileSync( path.resolve(__dirname, "styles-format.txt"), "utf-8");
 
 const promptTemplate = readFileSync( path.resolve(__dirname, "prompt.txt"), "utf-8");
+const pageDescriptionPrompt = readFileSync( path.resolve(__dirname, "page-description-prompt.txt"), "utf-8");
 
 const elementEditPrompt = readFileSync( path.resolve(__dirname, "elementEdit-prompt.txt"), "utf-8")
     .replace("{{component-rules}}", componentRules)
@@ -93,6 +94,26 @@ export const promptBuilder = {
             },
             ...elementEditRequestBody.messages
         ];
+    },
+
+    /**
+     * Builds chat messages for creating a website description from the website data
+     *
+     * @param username - The website creator's username
+     * @param pageName - The page's published name
+     * @param pageContent - The page's HTML content
+     */
+    buildPageDescriptionMessages(username: string, pageName: string, pageContent: string): ChatCompletionMessageParam[] {
+        return [
+            {
+                role: "system",
+                content: pageDescriptionPrompt,
+            },
+            {
+                role: "user",
+                content: `username: ${username}\npageName: ${pageName}\n content: ${pageContent}`
+            }
+        ]
     }
 };
 

@@ -8,6 +8,11 @@ import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
+const ragHeaders = {
+    authorization: process.env.RAG_API_KEY || '',
+    "Content-Type": "application/json"
+};
+
 /**
  * @route POST /api/publishPage/
  * @summary Publishes page and makes it reachable via the username. Can be called again for updating the deployment
@@ -49,6 +54,31 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             { new: true, upsert: true, setDefaultsOnInsert: true }
         ) as IPublishedPage;
 
+        if(isPublicDeployment) {
+            try {
+                const response = await fetch(`${process.env.RAG_URL}/chroma/indexPage`, {
+                    method: 'POST',
+                    headers: ragHeaders,
+                    body: JSON.stringify({
+                        username: publishedPage.author,
+                        pageName: publishedPage.name,
+                        pageContent: publishedPage.html.replace(
+                            /(?:src|href)=["']data:image\/[^"']+["']/gi,
+                            'src="https://example.com/placeholder.png"'
+                        ),
+                    })
+                });
+
+                if (!response.ok || !response.body) {
+                    logger.error(await response.text());
+                    return res.sendStatus(500);
+                }
+            } catch (err) {
+                logger.error(err, "page indexing error");
+                return res.sendStatus(500);
+            }
+        }
+
         return res.status(201).json(pageDetails);
     } catch (err) {
         logger.error(err, 'Publish page error');
@@ -82,7 +112,26 @@ router.delete('/:pageName', async (req: Request<PublishPageParams, {}, {}>, res:
         }
         await Page.updateOne({ _id: pageDocument._id }, { deploymentStatus: "not deployed" });
 
-        return res.sendStatus(200);
+        try {
+            const response = await fetch(`${process.env.RAG_URL}/chroma/deleteIndex`, {
+                method: 'DELETE',
+                headers: ragHeaders,
+                body: JSON.stringify({
+                    username: pageDocument.author,
+                    pageName: pageDocument.name,
+                })
+            });
+
+            if (!response.ok || !response.body) {
+                logger.error(await response.text());
+                return res.sendStatus(500);
+            }
+
+            return res.sendStatus(200);
+        } catch (err) {
+            logger.error(err, "index deletion error");
+            return res.sendStatus(500);
+        }
     } catch (err) {
         logger.error(err, 'Unpublish page error');
         return res.sendStatus(500);

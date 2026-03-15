@@ -33,6 +33,7 @@ import {
     setTablet,
     toggleOutlines, togglePreview
 } from "../../../utils/grapesActions";
+import {useNavigate} from "react-router-dom";
 
 /**
  * TopPanel
@@ -64,6 +65,7 @@ function TopPanel({editorRef, page}) {
     const {notify} = useMetaNotify(baseMeta);
     const {selectedElement} = useBuilder();
     const handleError = useErrorHandler(baseMeta);
+    const navigate = useNavigate();
 
     /**
      * Timestamp of the last successful save action.
@@ -309,10 +311,10 @@ function TopPanel({editorRef, page}) {
                         <span className="text-text/60">Nicht gespeichert</span>
                     )}
                 </div>
-                <TopActionButton label="Save" onClick={handleSave}/>
                 <TopActionButton label="Save Blox" onClick={handleSaveBlox} icon={<AiOutlineSave size={16} />} disabled={!selectedElement}/>
-                <TopActionButton label="Export" onClick={() => exportWebsite(editorRef)}/>
+                <TopActionButton label="Save" onClick={handleSave}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
+                <TopActionButton label="Back" onClick={() => navigate(-1)}/>
             </div>
 
             {/* Publish dialog */}

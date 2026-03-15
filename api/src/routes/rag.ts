@@ -98,6 +98,7 @@ router.post('/editElement', async (req: Request<{}, {}, RAGElementEditRequestBod
         logger.error(err, "AI edit element error");
         return res.sendStatus(500);
     }
-})
+});
+
 
 export default router;

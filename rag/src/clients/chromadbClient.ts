@@ -21,7 +21,7 @@ const client = new ChromaClient({
     ssl: false
 });
 
-const collection = await client.getOrCreateCollection({
+const generationCollection = await client.getOrCreateCollection({
     name: "nook-page-generation",
     embeddingFunction: embedder,
     configuration: {
@@ -30,6 +30,16 @@ const collection = await client.getOrCreateCollection({
         }
     }
 });
+
+const pageIndexCollection = await client.getOrCreateCollection({
+    name: "nook-page-indexing",
+    embeddingFunction: embedder,
+    configuration: {
+        hnsw: {
+            space: "cosine"
+        }
+    }
+})
 
 /**
  * Performs a similarity search using Chroma.
@@ -41,7 +51,7 @@ const collection = await client.getOrCreateCollection({
  * to an array of similar documents, sorted by their distances from Chroma.
  */
 async function getChromaDBQueryResponse(request: ChromaDBQuery): Promise<ChromaDBQueryResultItem[]> {
-    const queryResult = await collection.query({
+    const queryResult = await generationCollection.query({
         queryTexts: request.queries,
         nResults: request.nResults || defaultNResults,
         include: ["documents", "metadatas", "distances"],
@@ -82,14 +92,14 @@ async function getChromaDBQueryResponse(request: ChromaDBQuery): Promise<ChromaD
 }
 
 /**
- * Retrieves all entries from the current ChromaDB collection.
+ * Retrieves all entries from the current ChromaDB generationCollection.
  *
  * @async
  * @function getChromaDBEntries
  * @returns {Promise<ChromaDBGetResponseBody>} A promise that resolves to the Chroma Entries.
  */
 async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
-    const getResult = await collection.get();
+    const getResult = await generationCollection.get();
 
     return {
         ids: getResult.ids,
@@ -99,39 +109,39 @@ async function getChromaDBEntries(): Promise<ChromaDBGetResponseBody> {
 }
 
 /**
- * Removes one or more entries from the current ChromaDB collection.
+ * Removes one or more entries from the current ChromaDB generationCollection.
  *
  * @async
  * @function removeChromaDBEntries
- * @param {string[]} ids - An array of document IDs to delete from the collection.
+ * @param {string[]} ids - An array of document IDs to delete from the generationCollection.
  * If an id from this list does not exist in Chroma, it is skipped.
  * @returns {Promise<void>} A Promise that resolves when the specified entries have been removed.
  */
 async function removeChromaDBEntries(ids: string[]): Promise<void> {
-    await collection.delete({ids});
+    await generationCollection.delete({ids});
 }
 
 /**
- * Removes all entries from the current ChromaDB collection.
+ * Removes all entries from the current ChromaDB generationCollection.
  *
  * @async
  * @function clearChromaDBCollection
- * @returns {Promise<void>} A Promise that resolves when the collection has been cleared.
+ * @returns {Promise<void>} A Promise that resolves when the generationCollection has been cleared.
  */
 async function clearChromaDBCollection(): Promise<void> {
-    const ids = (await collection.get({include:[]})).ids;
+    const ids = (await generationCollection.get({include:[]})).ids;
     if(ids.length !== 0) {
-        await collection.delete({ids});
+        await generationCollection.delete({ids});
     }
 }
 
 /**
- * Adds new documents and their associated metadata to the current ChromaDB collection.
+ * Adds new documents and their associated metadata to the current ChromaDB generationCollection.
  *
  * @async
  * @function addChromaDBDocuments
  * @param {ChromaDBAddDocumentsRequestBody} chromaAddDocumentsBody - The documents, metadata, and IDs to add.
- * @returns {Promise<void>} Resolves when the documents have been successfully added to the collection.
+ * @returns {Promise<void>} Resolves when the documents have been successfully added to the generationCollection.
  */
 async function addChromaDBDocuments(chromaAddDocumentsBody: ChromaDBAddDocumentsRequestBody): Promise<void> {
     if(chromaAddDocumentsBody.ids.length !== chromaAddDocumentsBody.documents.length ||
@@ -144,10 +154,51 @@ async function addChromaDBDocuments(chromaAddDocumentsBody: ChromaDBAddDocuments
         stringsToEmbed.push(`${chromaAddDocumentsBody.ids[i]}: ${chromaAddDocumentsBody.documents[i]}`);
     }
 
-    await collection.add({
+    await generationCollection.add({
         ...chromaAddDocumentsBody,
         embeddings: await embedder.generate(stringsToEmbed)
     });
+}
+
+/**
+ * Semantically indexes a user-generated page using username+pageName to create a UID.
+ * Replaces the existing index of the page if it exists.
+ *
+ * @async
+ * @function indexPage
+ * @param {string} username - The username of the user who created the page.
+ * @param {string} pageName - The name of the user's page
+ * @param {string} description - The LLM-generated description of the page.
+ */
+async function indexPage(username: string, pageName: string, description: string): Promise<void> {
+    const pageUID = `${username}/${pageName}`;
+
+    await pageIndexCollection.upsert({
+        ids: [pageUID],
+        embeddings: await embedder.generate([description])
+    });
+}
+
+/**
+ * Retrieves page UIDs of relevant websites.
+ *
+ * @async
+ * @function searchIndexedPages
+ * @param {string} query - The website query string.
+ */
+async function searchIndexedPages(query: string): Promise<string[]> {
+    const results = await pageIndexCollection.query({queryTexts: [query], nResults: 10});
+    return results.ids[0] ?? [];
+}
+
+/**
+ * Removes the index of a page.
+ *
+ * @param {string} username - The user's name.
+ * @param {string} pageName - The name of the user's page.
+ */
+async function deleteIndex(username: string, pageName: string) {
+    await pageIndexCollection.delete({ids: [`${username}/${pageName}`]});
 }
 
 export default {
@@ -156,4 +207,7 @@ export default {
     getEntries: getChromaDBEntries,
     removeEntries: removeChromaDBEntries,
     clearCollection: clearChromaDBCollection,
+    indexPage,
+    searchIndexedPages,
+    deleteIndex
 };

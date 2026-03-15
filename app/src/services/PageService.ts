@@ -97,6 +97,24 @@ class PageService {
         });
         return response.data;
     }
+
+    /**
+     * Semantically searches for published pages based on the user's query.
+     *
+     * @param query - The user's query.
+     * @returns An array of Published Pages
+     */
+    static async searchPublishedPages(query: string): Promise<PublishedPage[]> {
+        const response = await axios.get<PublishedPage[]>(
+            `${(import.meta as any).env.VITE_PUBLISH_URL}/search`,
+            {
+                params: {
+                    searchQuery: query,
+                }
+            }
+        );
+        return response.data;
+    }
 }
 
 export default PageService;
