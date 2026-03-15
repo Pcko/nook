@@ -18,10 +18,6 @@ router.put('/:pageName/:assetHash', rawImageBodyParser, async (req: Request<{
     try {
         const {userId} = req;
 
-        if (!userId) {
-            return res.sendStatus(401);
-        }
-
         const {pageName} = req.params;
         const contentType = String(req.query.contentType || req.header('content-type') || 'application/octet-stream');
         const body = req.body;
@@ -36,7 +32,7 @@ router.put('/:pageName/:assetHash', rawImageBodyParser, async (req: Request<{
         }
 
         const asset = await upsertBinaryAsset({
-            author: userId,
+            author: userId!,
             buffer: body,
             contentType,
         });

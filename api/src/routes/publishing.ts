@@ -32,9 +32,6 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
     try {
         const { userId } = req;
 
-        if (!userId) {
-            return res.status(401);
-        }
         const { pageName, displayPageName } = req.params;
         const { page, pageEncoding, isPublic } = req.body;
         const isPublicDeployment = isPublic === true;
@@ -54,7 +51,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
         const publicAssetHtml = rewritePrivateAssetUrlsToPublic(decodedHtml);
         const externalizedInlineImages = await extractInlineImagesInHtml({
             html: publicAssetHtml.html,
-            author: userId,
+            author: userId!,
         });
 
         const finalHtml = externalizedInlineImages.html;
