@@ -88,10 +88,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
                     body: JSON.stringify({
                         username: publishedPage.author,
                         pageName: publishedPage.name,
-                        pageContent: finalHtml.replace(
-                            /(?:src|href)=["']data:image\/[^"']+["']/gi,
-                            'src="https://example.com/placeholder.png"',
-                        ),
+                        pageContent: finalHtml,
                     }),
                 });
 
