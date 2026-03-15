@@ -311,8 +311,8 @@ function TopPanel({editorRef, page}) {
                         <span className="text-text/60">Nicht gespeichert</span>
                     )}
                 </div>
-                <TopActionButton label="Save" onClick={handleSave}/>
                 <TopActionButton label="Save Blox" onClick={handleSaveBlox} icon={<AiOutlineSave size={16} />} disabled={!selectedElement}/>
+                <TopActionButton label="Save" onClick={handleSave}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
                 <TopActionButton label="Back" onClick={() => navigate(-1)}/>
             </div>
