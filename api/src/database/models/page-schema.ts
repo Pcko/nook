@@ -11,33 +11,44 @@ const PageSchema = new Schema<IPage>(
         },
         metadata: {
             type: Object,
-            default: {}
+            default: {},
         },
         data: {
             type: String,
             default: null,
         },
+        dataEncoding: {
+            type: String,
+            required: true,
+            enum: ['plain', 'deflate-base64'],
+            default: 'plain',
+        },
+        dataVersion: {
+            type: Number,
+            required: true,
+            default: 1,
+        },
         author: {
             type: String,
-            ref: "User",
+            ref: 'User',
             required: true,
         },
         folderName: {
             type: String,
             required: true,
-            default: "General",
+            default: 'General',
         },
         deploymentStatus: {
             type: String,
             required: true,
-            enum: ["online", "inactive", "not deployed"],
-            default: "not deployed",
+            enum: ['online', 'inactive', 'not deployed'],
+            default: 'not deployed',
         },
     },
     {
         timestamps: true,
         minimize: false,
-    }
+    },
 );
 
 async function handlePageDeletion(page: IPage | null) {

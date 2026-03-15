@@ -25,6 +25,15 @@ const STEPS = {
     AI_PREVIEW: "ai-preview",
 };
 
+const buildArtifactSnapshot = (formData, pageMeta) => ({
+    timestamp: Date.now(),
+    pageName: formData.pageName,
+    aiPrompt: formData.aiPrompt,
+    currentStep: formData.currentStep === STEPS.AI_PREVIEW ? STEPS.AI_CHAT : formData.currentStep,
+    pageMeta,
+});
+
+
 /**
  * PageCreationForm component handles multistep creation of pages,
  * including the choice between manual page-editing or ai-generation.
@@ -48,7 +57,7 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         return {
             pageName: fb.pageName || "",
             aiPrompt: fb.aiPrompt || "",
-            aiPages: fb.aiPages || [],
+            aiPages: Array.isArray(fb.aiPages) ? fb.aiPages : [],
             loading: false,
             loadingStep: 0,
             currentStep: fb.currentStep || STEPS.CHOOSE,
@@ -307,7 +316,7 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
             });
             sessionStorage.setItem(
                 `artifact`,
-                JSON.stringify({timestamp: Date.now(), ...formData, pageMeta: metaWizard.meta})
+                JSON.stringify(buildArtifactSnapshot(formData, metaWizard.meta))
             );
         } finally {
             updateFormData({loading: false});

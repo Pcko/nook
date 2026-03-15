@@ -1,9 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, {Request, Response} from 'express';
 import speakeasy from 'speakeasy';
 
-import { User } from '../util/internal.js';
+import {User} from '../util/internal.js';
 import IUser from '../types/IUser.js';
-import { DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody } from '../types/requests/settings.js';
+import {DeleteAccountBody, SaveSettingsBody, TwoFactorAuthToggleBody} from '../types/requests/settings.js';
 import {logger} from "../util/logger.js";
 
 const router = express.Router();
@@ -11,159 +11,165 @@ const router = express.Router();
 /**
  * @route PATCH /api/settings/
  * @summary Updates the user's settings based on the provided information
- * 
+ *
  * @param {Request<{}, {}, SaveSettingsBody>} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {Object} req.body.changes - An object containing all settings that should be changed (including new settings)
- * 
+ *
  * @returns 200
  */
 router.patch('/', async (req: Request<{}, {}, SaveSettingsBody>, res: Response) => {
-  try {
-    const { userId } = req;
-    const { account } = req.body.changes;
+    try {
+        const {userId} = req;
+        const {account} = req.body.changes;
 
-    if (account) {
-      //find user and alter the corresponding userdata
-      const user = await User.findOne({ _id: userId }) as IUser;
-      Object.keys(account).forEach(key => {
-        if (key !== 'username') {
-          (user as any)[key] = account[key];
+        if (account) {
+            //find user and alter the corresponding userdata
+            const user = await User.findOne({_id: userId}) as IUser;
+            Object.keys(account).forEach(key => {
+                if (key !== 'username') {
+                    (user as any)[key] = account[key];
+                }
+            });
+            await user.save();
         }
-      });
-      await user.save();
-    }
 
-    res.sendStatus(200);
-  }
-  catch (err) {
-    logger.error(err, "Alter settings error");
-    res.sendStatus(500);
-    return;
-  }
+        res.sendStatus(200);
+    } catch (err) {
+        logger.error(err, "Alter settings error");
+        res.sendStatus(500);
+        return;
+    }
 });
 
 /**
  * @route DELETE /api/settings/delete-account
  * @summary Deletes a user's account
- * 
+ *
  * @param {Request<{}, {}, DeleteAccountBody>} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {string} req.body.username - Username (for additional account deletion confirmation)
- * 
+ *
  * @returns 200
  */
 router.delete('/delete-account', async (req: Request<{}, {}, DeleteAccountBody>, res: Response) => {
-  try {
-    const { userId } = req;
-    const { username } = req.body;
+    try {
+        const {userId} = req;
+        const {username} = req.body;
 
-    if (userId !== username) {
-      return res.sendStatus(400);
+        if (userId !== username) {
+            return res.sendStatus(400);
+        }
+
+        await User.findOneAndDelete({_id: username});
+
+        return res.sendStatus(200);
+    } catch (err) {
+        logger.error(err, "Account deletion error");
+        return res.sendStatus(500);
     }
-
-    await User.findOneAndDelete({ _id: username });
-
-    return res.sendStatus(200);
-  }
-  catch (err) {
-    logger.error(err, "Account deletion error");
-    return res.sendStatus(500);
-  }
 });
 
 /**
  * @route GET /api/settings/twoFactorAuth
  * @summary Generates a QR-Code for setting up 2FA
- * 
+ *
  * @param {Request} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
- * 
+ *
  * @returns 200 - JSON{qrCodeUrl<string>}
  */
 router.get('/twoFactorAuth', async (req: Request, res: Response) => {
-  try {
-    const { userId } = req;
+    try {
+        const {userId} = req;
 
-    const user = await User.findById(userId) as IUser;
+        const user = await User.findById(userId) as IUser;
 
-    const secret = speakeasy.generateSecret({ name: `NOOK: ${userId}` });
-    user.twoFactorAuthSecret = secret.base32;
-    await user.save();
+        const secret = speakeasy.generateSecret({name: `NOOK: ${userId}`});
+        user.twoFactorAuthSecret = secret.base32;
+        await user.save();
 
-    return res.status(200).json({ qrCodeUrl: secret.otpauth_url });
-  }
-  catch (err) {
-    logger.error(err, "Activate TwoFactorAuth error");
-    return res.sendStatus(500);
-  }
+        return res.status(200).json({qrCodeUrl: secret.otpauth_url});
+    } catch (err) {
+        logger.error(err, "Activate TwoFactorAuth error");
+        return res.sendStatus(500);
+    }
 });
 
 /**
  * @route POST /api/settings/twoFactorAuth
  * @summary Sets 2FA on a user's account, if the correct One-Time-Password is provided
- * 
+ *
  * @param {Request<{}, {}, TwoFactorAuthToggleBody>} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
  *      @property {string} req.body.otp - One-Time-Password
  *      @property {boolean} req.body.isEnabled - To choose if 2FA should be switched on or off
- * 
+ *
  * @returns 200
  */
 router.post('/twoFactorAuth', async (req: Request<{}, {}, TwoFactorAuthToggleBody>, res: Response) => {
-  try {
-    const { userId } = req;
-    const { otp, isEnabled } = req.body;
+    try {
+        const {userId} = req;
+        const {otp, isEnabled} = req.body;
 
-    if (![otp, isEnabled].every(Boolean)) {
-      return res.sendStatus(400);
+        if (![otp, isEnabled].every(Boolean)) {
+            return res.sendStatus(400);
+        }
+
+        const user = await User.findById(userId) as IUser;
+        const userSecret = user.twoFactorAuthSecret as string;
+
+        if (!speakeasy.totp.verify({
+            secret: userSecret, encoding: 'base32', token: otp
+        })) {
+            return res.status(403).send({message: 'One time password is invalid!'})
+        }
+
+        user.twoFactorAuthOn = isEnabled;
+        await user.save();
+
+        return res.sendStatus(200);
+    } catch (err) {
+        logger.error(err, "Confirm TwoFactorAuth error");
+        return res.sendStatus(500);
     }
-
-    const user = await User.findById(userId) as IUser;
-    const userSecret = user.twoFactorAuthSecret as string;
-
-    if (!speakeasy.totp.verify({
-      secret: userSecret, encoding: 'base32', token: otp
-    })) {
-      return res.status(403).send({ message: 'One time password is invalid!' })
-    }
-
-    user.twoFactorAuthOn = isEnabled;
-    await user.save();
-
-    return res.sendStatus(200);
-  }
-  catch (err) {
-    logger.error(err, "Confirm TwoFactorAuth error");
-    return res.sendStatus(500);
-  }
 })
 
 /**
  * @route POST /api/settings/logout
  * @summary Handles user logout
- * 
+ *
  * @param {Request} req
  *      @property {string} req.userId - Authenticated user's ID (gets internally fetched from headers (auth-token.ts))
- * 
+ *
  * @returns 200
  */
 router.post('/logout', async (req: Request, res: Response) => {
-  try {
-    const { userId } = req;
+    try {
+        const {userId} = req;
 
-    const user = await User.findOne({ _id: userId }) as IUser;
-    await user.updateTokenVersion();
+        const user = await User.findOne({_id: userId}) as IUser;
+        await user.updateTokenVersion();
 
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true,
+            path: '/',
+        });
 
-    return res.sendStatus(200);
-  }
-  catch (err) {
-    logger.error(err, "Logout error");
-    return res.sendStatus(500);
-  }
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true,
+            path: '/',
+        });
+
+        return res.sendStatus(200);
+    } catch (err) {
+        logger.error(err, "Logout error");
+        return res.sendStatus(500);
+    }
 });
 
 export default router;

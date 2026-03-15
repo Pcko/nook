@@ -2,18 +2,19 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
+import mongoose from 'mongoose';
 
 //Connection and configuration files
 import 'dotenv/config';
 import './database/connection.js';
 
-//Models and Types
-import { PublishedPage } from "./database/models/publishedPage-schema.js";
-import { PageView } from "./util/internal.js";
-import IPublishedPage from "./types/IPublishedPage.js";
-import { getReferrerUrl, getVisitorHash } from "./util/pageView.js";
-import { startOfDay, toISODate } from "./util/statsComputer.js";
-
+import { PublishedPage, PageAsset } from './util/internal.js';
+import { PageView } from './util/internal.js';
+import IPublishedPage from './types/IPublishedPage.js';
+import type IPageAsset from './types/IPageAsset.js';
+import { getReferrerUrl, getVisitorHash } from './util/pageView.js';
+import { startOfDay, toISODate } from './util/statsComputer.js';
+import { decodeStoredString } from './util/compression.js';
 
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
@@ -34,7 +35,34 @@ app.get('/health', (req: Request, res: Response) => res.send('✅ Publish-API is
  * @property {string} req.params.pageName - Published page name
  * @returns 200 - JSON{ name, author, html } * @returns 404 - HTML{fileNotFoundErrorPage.html}
  */
-app.get("/:authorId/:pageName", async (req: Request, res: Response) => {
+app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Response) => {
+    try {
+        const { assetId } = req.params;
+        if (!mongoose.isValidObjectId(assetId)) {
+            return res.sendStatus(404);
+        }
+
+        const publishedPage = await PublishedPage.findOne({ isPublic: true, assetIds: assetId }).lean<IPublishedPage>();
+        if (!publishedPage) {
+            return res.sendStatus(404);
+        }
+
+        const asset = await PageAsset.findById(assetId).lean<IPageAsset>();
+        if (!asset) {
+            return res.sendStatus(404);
+        }
+
+        res.setHeader('Content-Type', asset.contentType || 'application/octet-stream');
+        res.setHeader('Content-Length', String(asset.byteSize || asset.data.length));
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        return res.status(200).send(asset.data.buffer);
+    } catch (err) {
+        console.error('❌ Get published asset error:', err);
+        return res.sendStatus(500);
+    }
+});
+
+app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName: string }>, res: Response) => {
     try {
         const { authorId, pageName } = req.params;
 
@@ -54,31 +82,39 @@ app.get("/:authorId/:pageName", async (req: Request, res: Response) => {
             viewedAt,
             visitorHash: getVisitorHash(req),
             referrer: getReferrerUrl(req),
-            userAgent: String(req.headers["user-agent"] || ""),
+            userAgent: String(req.headers['user-agent'] || ''),
         }).catch((err) => {
-            console.error("❌ Page view logging error:", err);
+            console.error('❌ Page view logging error:', err);
         });
 
-        res.setHeader("Content-Type", "text/html; charset=utf-8");
-        return res.status(200).send(published.html);
+        const html = decodeStoredString(published.html, published.htmlEncoding);
+        if (html == null) {
+            return res.sendStatus(500);
+        }
+
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(200).send(html);
     } catch (err) {
-        console.error("❌ Get published page error:", err);
+        console.error('❌ Get published page error:', err);
         return res.sendStatus(500);
     }
 });
 
-app.get("/", async (req: Request, res: Response) => {
-    const pages = await PublishedPage.find({isPublic: true}) ?? [];
-    return res.status(200).json(pages);
+app.get('/', async (req: Request, res: Response) => {
+    const pages = await PublishedPage.find({ isPublic: true }).lean<IPublishedPage[]>() ?? [];
+    return res.status(200).json(pages.map((page) => ({
+        ...page,
+        html: decodeStoredString(page.html, page.htmlEncoding),
+    })));
 });
 
 app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res: Response) => {
-    try{
+    try {
         const response = await fetch(`${process.env.RAG_URL}/chroma/search?searchQuery=${req.query.searchQuery}`, {
             method: 'GET',
             headers: {
-                authorization: process.env.RAG_API_KEY || ''
-            }
+                authorization: process.env.RAG_API_KEY || '',
+            },
         });
 
         if (!response.ok || !response.body) {
@@ -88,16 +124,19 @@ app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res
 
         const pageUIDs: string[] = await response.json();
 
-        const queries = pageUIDs.map(pageUID => {
+        const queries = pageUIDs.map((pageUID) => {
             const [author, name] = pageUID.split('/');
             return { author, name };
         });
 
         const pages = await PublishedPage.find({ $or: queries }).lean<IPublishedPage[]>();
 
-        return res.status(200).send(pages);
+        return res.status(200).send(pages.map((page) => ({
+            ...page,
+            html: decodeStoredString(page.html, page.htmlEncoding),
+        })));
     } catch (err) {
-        console.log("page search error", err);
+        console.log('page search error', err);
         return res.sendStatus(500);
     }
 });

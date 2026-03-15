@@ -27,17 +27,13 @@ router.get("/pages/:pageId", async (req: Request<GetPageStatsParams>, res: Respo
         const { userId } = req;
         const { pageId } = req.params;
 
-        if (!userId) {
-            return res.sendStatus(401);
-        }
-
         const segmentRaw = String(req.query.segment || "all");
         const segment = VALID_SEGMENTS.has(segmentRaw) ? segmentRaw : "all";
 
         const { dateFrom, dateTo, rangeDays } = getRange(req.query);
         const previousRange = getPreviousRange(dateFrom, rangeDays);
 
-        const page = await findPage(userId, pageId);
+        const page = await findPage(userId!, pageId);
         if (!page) {
             return res.status(404).json({ error: "page_not_found" });
         }

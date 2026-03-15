@@ -1,19 +1,18 @@
-import express, {Request, Response} from 'express';
-import path from 'path';
-import {fileURLToPath} from 'url';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 //Connection and configuration files
 import 'dotenv/config';
-import './database/connection.js'; //<-- database connection script
-import {logger, httpLogger} from "./util/logger.js";
+import './database/connection.js';
+import { logger, httpLogger } from './util/logger.js';
 
 //Express routes
 import authenticateToken from './middlewares/auth-token.js';
 import authRouter from './routes/authenticator.js';
 import settingsRouter from './routes/settings.js';
 import pageRouter from './routes/pages.js';
+import pageAssetsRouter from './routes/pageAssets.js';
 import ragRouter from './routes/rag.js';
 import publishingRouter from './routes/publishing.js';
 import statsRouter from './routes/stats.js';
@@ -30,21 +29,21 @@ const requiredENV = [
     'EMAIL_PASS',
     'APP_URL',
     'RAG_URL',
-    'RAG_API_KEY'
+    'RAG_API_KEY',
 ];
 const missingENV = requiredENV.filter((name) => !process.env[name]);
-if (missingENV.length){
-    logger.warn(`Missing environment variables: ${missingENV.join(", ")}`);
+if (missingENV.length) {
+    logger.warn(`Missing environment variables: ${missingENV.join(', ')}`);
 }
 
 //Server settings
-const allowedOrigins: string[] = [process.env.APP_URL, process.env.RAG_URL] as string[];
+const allowedOrigins: string[] = [process.env.APP_URL, process.env.RAG_URL].filter(Boolean) as string[];
 
 const app = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
-app.use(cors({origin: allowedOrigins, credentials: true}));
-app.use(express.json({limit: '16mb'}));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(express.json({ limit: '16mb' }));
 app.use(httpLogger);
 app.use(cookieParser());
 
@@ -52,9 +51,10 @@ app.use(cookieParser());
 app.use('/auth', authRouter);
 app.use('/api/settings', authenticateToken, settingsRouter);
 app.use('/api/pages', authenticateToken, pageRouter);
+app.use('/api/page-assets', authenticateToken, pageAssetsRouter);
 app.use('/api/generation', authenticateToken, ragRouter);
 app.use('/api/stats', authenticateToken, statsRouter);
-app.use('/api/publishPage', authenticateToken, publishingRouter)
+app.use('/api/publishPage', authenticateToken, publishingRouter);
 
 app.get('/api/health', (req: Request, res: Response) => {
     req.log.info('Health check successful');
