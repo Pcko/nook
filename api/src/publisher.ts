@@ -55,7 +55,7 @@ app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Respo
         res.setHeader('Content-Type', asset.contentType || 'application/octet-stream');
         res.setHeader('Content-Length', String(asset.byteSize || asset.data.length));
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        return res.status(200).send(asset.data);
+        return res.status(200).send(asset.data.buffer);
     } catch (err) {
         console.error('❌ Get published asset error:', err);
         return res.sendStatus(500);
