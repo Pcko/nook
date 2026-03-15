@@ -6,7 +6,7 @@ import IPublishedPage from '../types/IPublishedPage.js';
 import IPage from '../types/IPage.js';
 import { logger } from '../util/logger.js';
 import { decodeStoredString, encodeStoredString } from '../util/compression.js';
-import { externalizeInlineImagesInHtml, rewritePrivateAssetUrlsToPublic } from '../util/pageAssets.js';
+import { extractInlineImagesInHtml, rewritePrivateAssetUrlsToPublic } from '../util/pageAssets.js';
 
 const router = express.Router();
 
@@ -31,6 +31,10 @@ const ragHeaders = {
 router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams, {}, PublishPageBody>, res: Response) => {
     try {
         const { userId } = req;
+
+        if (!userId) {
+            return res.status(401);
+        }
         const { pageName, displayPageName } = req.params;
         const { page, pageEncoding, isPublic } = req.body;
         const isPublicDeployment = isPublic === true;
@@ -48,7 +52,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
         }
 
         const publicAssetHtml = rewritePrivateAssetUrlsToPublic(decodedHtml);
-        const externalizedInlineImages = await externalizeInlineImagesInHtml({
+        const externalizedInlineImages = await extractInlineImagesInHtml({
             html: publicAssetHtml.html,
             author: userId,
         });

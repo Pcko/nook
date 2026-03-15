@@ -60,7 +60,7 @@ export function rewritePrivateAssetUrlsToPublic(html: string): { html: string; a
     };
 }
 
-export async function externalizeInlineImagesInHtml(params: {
+export async function extractInlineImagesInHtml(params: {
     html: string;
     author: string;
 }): Promise<{ html: string; assetIds: string[] }> {
