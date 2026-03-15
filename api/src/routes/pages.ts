@@ -156,7 +156,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         }
 
         //Save data
-        if (pageContent !== undefined) {
+        if (pageContent) {
             page.data = pageContent;
             if (dataEncoding) page.dataEncoding = dataEncoding;
             if (typeof dataVersion === 'number') page.dataVersion = dataVersion;
@@ -167,7 +167,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
             page.folderName = newFolderName;
         }
 
-        if (metadata !== undefined) {
+        if (metadata) {
             page.metadata = metadata;
         }
 
