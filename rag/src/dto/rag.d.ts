@@ -9,6 +9,7 @@ import type ChatCompletionMessageParam from "../types/ChatCompletionMessageParam
  * @property {boolean} [skipContext=false] - If true, the LLM will skip ChromaDB context when generating the response.
  * @property {boolean} [stream=false] - If true, the response may be streamed in chunks rather than returned all at once.
  * @property {WebsiteMetadata} [meta] - Optional page-level metadata used for AI generation for branding/content consistency.
+ * @property {boolean} [disable2StepGeneration] - Disables 2-step generation.
  */
 export interface QueryRequestBody {
     query: string;
@@ -16,6 +17,7 @@ export interface QueryRequestBody {
     skipContext?: boolean;
     stream?: boolean;
     meta?: WebsiteMetadata;
+    disable2StepGeneration?: booleam
 }
 
 /**
