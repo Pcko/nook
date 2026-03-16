@@ -1,11 +1,8 @@
 const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i;
 
-function trimTrailingSlash(value) {
-    return String(value || '').replace(/\/+$/, '');
-}
 
 function getApiBaseUrl() {
-    return trimTrailingSlash((import.meta || {}).env?.VITE_API_URL || '');
+    return import.meta.env?.VITE_API_URL || '';
 }
 
 function dataUrlToBlob(dataUrl) {
@@ -19,7 +16,7 @@ function dataUrlToBlob(dataUrl) {
         bytes[i] = binary.charCodeAt(i);
     }
 
-    return new Blob([bytes], { type: contentType });
+    return new Blob([bytes], {type: contentType});
 }
 
 async function sha256Hex(blob) {
