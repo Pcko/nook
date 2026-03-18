@@ -100,7 +100,7 @@ app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName
     }
 });
 
-app.get('/:searchPageNumber/:searchPageAmount', async (req: Request, res: Response) => {
+app.get('/search/:searchPageNumber/:searchPageAmount', async (req: Request, res: Response) => {
     const { searchPageNumber, searchPageAmount } = req.params;
 
     if(!(searchPageNumber && searchPageAmount)) {
@@ -118,7 +118,7 @@ app.get('/:searchPageNumber/:searchPageAmount', async (req: Request, res: Respon
             .skip((pageNr - 1) * limit)
             .limit(limit)
             .lean<IPublishedPage[]>() ?? [],
-        PublishedPage.countDocuments(searchFilter)
+        PublishedPage.countDocuments(searchFilter),
     ]);
 
     return res.status(200).json({

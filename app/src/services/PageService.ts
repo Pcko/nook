@@ -3,6 +3,7 @@ import Page from './interfaces/Page.ts';
 import PageDTO from './interfaces/PageDTO.ts';
 import type { PageMeta } from './interfaces/PageMeta.ts';
 import PublishedPage from './interfaces/PublishedPage.ts';
+import PublishedPagePageable from './interfaces/PublishedPagePageable.ts';
 import { hydrateProjectDataForEditor, prepareProjectDataForPersistence } from './pageContentService.ts';
 
 class PageService {
@@ -93,11 +94,13 @@ class PageService {
     }
 
     static async getPublishedPages(): Promise<PublishedPage[]> {
-        const response = await axios<PublishedPage[]>({
+        const response = await axios<PublishedPagePageable>({
             method: 'get',
-            url: (import.meta as any).env.VITE_PUBLISH_URL,
+            url: (import.meta as any).env.VITE_PUBLISH_URL + '/search/1/25', //temporary, implement frontend paging
+            withCredentials: false,
         });
-        return response.data;
+
+        return response.data.data;
     }
 
     /**
@@ -113,6 +116,7 @@ class PageService {
                 params: {
                     searchQuery: query,
                 },
+                withCredentials: false,
             },
         );
         return response.data;
