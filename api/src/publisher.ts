@@ -14,7 +14,6 @@ import IPublishedPage from './types/IPublishedPage.js';
 import type IPageAsset from './types/IPageAsset.js';
 import { getReferrerUrl, getVisitorHash } from './util/pageView.js';
 import { startOfDay, toISODate } from './util/statsComputer.js';
-import { decodeStoredString } from './util/compression.js';
 
 //Server settings
 const allowedOrigins: string[] = [process.env.APP_URL].filter(Boolean) as string[];
@@ -89,13 +88,8 @@ app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName
             console.error('❌ Page view logging error:', err);
         });
 
-        const html = decodeStoredString(published.html, published.htmlEncoding);
-        if (html == null) {
-            return res.sendStatus(500);
-        }
-
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(html);
+        return res.status(200).send(published.html);
     } catch (err) {
         console.error('❌ Get published page error:', err);
         return res.sendStatus(500);
@@ -125,14 +119,9 @@ app.get('/search/:searchPageNumber/:searchPageAmount', async (req: Request, res:
 
     return res.status(200).json({
         pages: pages.map((page) => ({
-        _id: page._id,
-        pageId: page.pageId,
-        name: page.name,
-        author: page.author,
-        isPublic: page.isPublic,
-        createdAt: page.createdAt,
-        updatedAt: page.updatedAt,
-       })),
+            ...page,
+            html: page.html,
+        })),
         pagination: {
             total,
             totalPages: Math.ceil(total / limit),
@@ -163,17 +152,10 @@ app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res
 
         const pages = await PublishedPage.find({ $or: queries }).lean<IPublishedPage[]>();
 
-        return res.status(200).json(
-            pages.map((page) => ({
-                _id: page._id,
-                pageId: page.pageId,
-                name: page.name,
-                author: page.author,
-                isPublic: page.isPublic,
-                createdAt: page.createdAt,
-                updatedAt: page.updatedAt,
-        }))
-);
+        return res.status(200).send(pages.map((page) => ({
+            ...page,
+            html: page.html,
+        })));
     } catch (err) {
         console.log('page search error', err);
         return res.sendStatus(500);

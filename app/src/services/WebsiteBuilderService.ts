@@ -4,7 +4,7 @@ import PageService from './PageService.ts';
 import {
     prepareProjectDataForPersistence,
     restoreProjectDataFromCache,
-    writeCompressedPageCache,
+    writePageCache,
 } from './pageContentService.ts';
 
 class WebsiteBuilderService {
@@ -15,7 +15,7 @@ class WebsiteBuilderService {
             const storageKey = `page_${page.name}`;
 
             page.data = prepared.editorData;
-            writeCompressedPageCache(storageKey, prepared.normalizedData);
+            writePageCache(storageKey, prepared.normalizedData);
 
             await PageService.updatePage(page, undefined, prepared);
         } catch (err) {

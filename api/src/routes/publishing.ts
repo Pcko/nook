@@ -5,7 +5,6 @@ import { PublishedPage, Page } from '../util/internal.js';
 import IPublishedPage from '../types/IPublishedPage.js';
 import IPage from '../types/IPage.js';
 import { logger } from '../util/logger.js';
-import { decodeStoredString, encodeStoredString } from '../util/compression.js';
 import { extractInlineImagesInHtml, rewritePrivateAssetUrlsToPublic } from '../util/pageAssets.js';
 
 const router = express.Router();
@@ -33,7 +32,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
         const { userId } = req;
 
         const { pageName, displayPageName } = req.params;
-        const { page, pageEncoding, isPublic } = req.body;
+        const { page, isPublic } = req.body;
         const isPublicDeployment = isPublic === true;
         const deploymentStatus = isPublicDeployment ? 'online' : 'inactive';
 
@@ -43,27 +42,23 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             return res.status(404).json({ error: 'page_missing' });
         }
 
-        const decodedHtml = decodeStoredString(page, pageEncoding);
-        if (decodedHtml == null) {
+        if (!page) {
             return res.status(400).json({ error: 'page_missing_html' });
         }
 
-        const publicAssetHtml = rewritePrivateAssetUrlsToPublic(decodedHtml);
+        const publicAssetHtml = rewritePrivateAssetUrlsToPublic(page);
         const externalizedInlineImages = await extractInlineImagesInHtml({
             html: publicAssetHtml.html,
             author: userId!,
         });
 
         const finalHtml = externalizedInlineImages.html;
-        const encodedHtml = encodeStoredString(finalHtml);
         const assetIds = [...new Set([...publicAssetHtml.assetIds, ...externalizedInlineImages.assetIds])];
 
         const publishedPage = {
             pageId: pageDocument._id,
             name: displayPageName,
-            html: encodedHtml.content,
-            htmlEncoding: encodedHtml.encoding,
-            htmlVersion: encodedHtml.version,
+            html: finalHtml,
             assetIds,
             author: userId,
             isPublic: isPublicDeployment,encodeStoredString

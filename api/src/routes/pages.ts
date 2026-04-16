@@ -71,7 +71,7 @@ router.get('/', async (req: Request, res: Response) => {
         const { userId } = req;
 
         const pages = await Page.find({ author: userId })
-            .select({ data: 0, dataEncoding: 0, dataVersion: 0 })
+            .select({ data: 0 })
             .lean<IPage[]>();
 
         return res.status(200).json(pages);
@@ -125,7 +125,7 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
     try {
         const { userId } = req;
         const { pageName } = req.params;
-        const { newPageName, newFolderName, pageContent, dataEncoding, dataVersion, metadata } = req.body;
+        const { newPageName, newFolderName, pageContent, metadata } = req.body;
 
         const page = await Page.findOne({ name: pageName, author: userId }) as IPage;
         if (!page) {
@@ -156,10 +156,8 @@ router.patch('/:pageName', async (req: Request<PageNameParam, {}, UpdatePageBody
         }
 
         //Save data
-        if (pageContent) {
-            page.data = pageContent;
-            if (dataEncoding) page.dataEncoding = dataEncoding;
-            if (typeof dataVersion === 'number') page.dataVersion = dataVersion;
+        if (Object.prototype.hasOwnProperty.call(req.body, 'pageContent')) {
+            page.data = pageContent ?? null;
         }
 
         //Update Folder

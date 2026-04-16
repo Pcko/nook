@@ -7,7 +7,7 @@
  * @property {string} createdAt - ISO timestamp when the page was created
  * @property {string} updatedAt - ISO timestamp when the page was last updated
  * @property {string} deploymentStatus - Deployment status (e.g., 'draft', 'published', 'error')
- * @property {string} data - GrapesJS project data serialized as a JSON string
+ * @property {string} data - GrapesJS project data serialized as plain JSON
  * @property {any} [metadata] - page meta stored in the DB (object)
  * @property {string} [pageMeta] - legacy page meta JSON string (older frontend)
  */
@@ -17,8 +17,6 @@ class PageDTO {
     updatedAt: string;
     deploymentStatus: string;
     data: string | null;
-    dataEncoding?: string | null;
-    dataVersion?: number | null;
     metadata?: any;
     pageMeta: string | null;
 }
