@@ -100,7 +100,7 @@ class PageService {
             withCredentials: false,
         });
 
-        return response.data.data;
+        return response.data.pages;
     }
 
     /**

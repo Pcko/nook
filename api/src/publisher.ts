@@ -16,13 +16,15 @@ import { getReferrerUrl, getVisitorHash } from './util/pageView.js';
 import { startOfDay, toISODate } from './util/statsComputer.js';
 import { decodeStoredString } from './util/compression.js';
 
+//Server settings
+const allowedOrigins: string[] = [process.env.APP_URL].filter(Boolean) as string[];
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));
 
 app.get('/health', (req: Request, res: Response) => res.send('✅ Publish-API is running!'));
