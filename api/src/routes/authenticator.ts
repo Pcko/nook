@@ -261,7 +261,7 @@ async function createTokenCookies(user: IUser, res: Response) {
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.DEVENV ? 'strict' : 'none',
         secure: process.env.DEVENV !== "true",
         path: '/',
         maxAge: 15 * 60 * 1000,
@@ -269,7 +269,7 @@ async function createTokenCookies(user: IUser, res: Response) {
 
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.DEVENV ? 'strict' : 'none',
         secure: process.env.DEVENV !== "true",
         path: '/',
         maxAge: 30 * 24 * 60 * 60 * 1000,

@@ -16,25 +16,19 @@ import { getReferrerUrl, getVisitorHash } from './util/pageView.js';
 import { startOfDay, toISODate } from './util/statsComputer.js';
 import { decodeStoredString } from './util/compression.js';
 
+//Server settings
+const allowedOrigins: string[] = [process.env.APP_URL].filter(Boolean) as string[];
 const app = express();
 const PORT: number = parseInt(process.env.PUBLISH_PORT || '3001', 10);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '16mb' }));
 
 app.get('/health', (req: Request, res: Response) => res.send('✅ Publish-API is running!'));
 
-/**
- * @route GET /:username/:pageName
- * @summary Returns a published page (html) for rendering in the frontend
- * @param {Request<{ username: string; pageName: string }, {}, {}>} req
- * @property {string} req.params.username - Author username
- * @property {string} req.params.pageName - Published page name
- * @returns 200 - JSON{ name, author, html } * @returns 404 - HTML{fileNotFoundErrorPage.html}
- */
 app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Response) => {
     try {
         const { assetId } = req.params;
@@ -62,6 +56,14 @@ app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Respo
     }
 });
 
+/**
+ * @route GET /:username/:pageName
+ * @summary Returns a published page (html) for rendering in the frontend
+ * @param {Request<{ username: string; pageName: string }, {}, {}>} req
+ * @property {string} req.params.username - Author username
+ * @property {string} req.params.pageName - Published page name
+ * @returns 200 - JSON{ name, author, html } * @returns 404 - HTML{fileNotFoundErrorPage.html}
+ */
 app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName: string }>, res: Response) => {
     try {
         const { authorId, pageName } = req.params;
@@ -100,12 +102,37 @@ app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName
     }
 });
 
-app.get('/', async (req: Request, res: Response) => {
-    const pages = await PublishedPage.find({ isPublic: true }).lean<IPublishedPage[]>() ?? [];
-    return res.status(200).json(pages.map((page) => ({
-        ...page,
-        html: decodeStoredString(page.html, page.htmlEncoding),
-    })));
+app.get('/search/:searchPageNumber/:searchPageAmount', async (req: Request, res: Response) => {
+    const { searchPageNumber, searchPageAmount } = req.params;
+
+    if(!(searchPageNumber && searchPageAmount)) {
+        return res.sendStatus(400);
+    }
+
+    const pageNr = Math.max(1, parseInt(searchPageNumber) || 1);
+    const limit = Math.min(25, parseInt(searchPageAmount) || 10);
+
+    const searchFilter = { isPublic: true };
+
+    const [pages, total] = await Promise.all([
+        PublishedPage.find(searchFilter)
+            .sort({ createdAt: -1 })
+            .skip((pageNr - 1) * limit)
+            .limit(limit)
+            .lean<IPublishedPage[]>() ?? [],
+        PublishedPage.countDocuments(searchFilter),
+    ]);
+
+    return res.status(200).json({
+        data: pages.map((page) => ({
+            ...page,
+            html: decodeStoredString(page.html, page.htmlEncoding),
+        })),
+        pagination: {
+            total,
+            totalPages: Math.ceil(total / limit),
+        }
+    });
 });
 
 app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res: Response) => {
