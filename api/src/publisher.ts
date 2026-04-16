@@ -35,7 +35,7 @@ app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Respo
             return res.sendStatus(404);
         }
 
-        const publishedPage = await PublishedPage.findOne({ isPublic: true, assetIds: assetId }).lean<IPublishedPage>();
+        const publishedPage = await PublishedPage.findOne({ assetIds: assetId }).lean<IPublishedPage>();
         if (!publishedPage) {
             return res.sendStatus(404);
         }
