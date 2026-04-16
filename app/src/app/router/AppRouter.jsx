@@ -7,6 +7,7 @@ import NotificationOverlay from "../../components/general/NotificationOverlay";
 import LoadingScreen from "../../components/general/LoadingScreen";
 
 import AuthRedirect from "./AuthRedirect";
+import ProtectedRoute from "./ProtectedRoute";
 
 const LandingPage = lazy(() => import("../../pages/LandingPage/LandingPage"));
 const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage"));
@@ -27,15 +28,17 @@ function AppRouter() {
                     <main className="h-full bg-far-bg text-text">
                         <Suspense fallback={<LoadingScreen />}>
                             <Routes>
-                                <Route path="/" element={<LandingPage />} />
-                                <Route path="/app" element={<AuthRedirect />} />
-
+                                <Route path="/" element={<AuthRedirect />} />
+                                <Route path="/landing" element={<LandingPage />} />
                                 <Route path="/login" element={<LoginPage />} />
                                 <Route path="/register" element={<RegisterPage />} />
 
-                                <Route path="/settings" element={<SettingsPage />} />
-                                <Route path="/dashboard" element={<DashboardPage />} />
-                                <Route path="/editor/:pageName" element={<EditorPage />} />
+                                <Route element={<ProtectedRoute />}>
+                                    <Route path="/settings" element={<SettingsPage />} />
+                                    <Route path="/dashboard" element={<DashboardPage />} />
+                                    <Route path="/editor/:pageName" element={<EditorPage />} />
+                                </Route>
+
                                 <Route path="/pages/:authorId/:pageName" element={<PublicPage />} />
                             </Routes>
                         </Suspense>

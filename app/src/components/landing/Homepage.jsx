@@ -141,8 +141,8 @@ function Homepage() {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row sm:items-center">
-                                    <Link to="/register" className="btn btn-landing w-full text-center !px-3 !py-1.5 sm:w-auto">
-                                        Sign up
+                                    <Link to="/login" className="btn btn-landing w-full text-center !px-3 !py-1.5 sm:w-auto">
+                                        Sign in
                                     </Link>
                                     <Link
                                     to="/register"

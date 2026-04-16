@@ -1,15 +1,26 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+﻿import {useEffect, useMemo, useState} from "react";
+import {Navigate} from "react-router-dom";
 
 import LoadingScreen from "../../components/general/LoadingScreen";
+import {refreshAccessToken} from "../../features/auth";
 import useErrorHandler from "../../components/logging/ErrorHandler";
-import { useMetaNotify } from "../../components/logging/MetaNotifyHook";
-import { refreshAccessToken as refreshSessionAccessToken } from "../../features/auth/api/authApi";
+import {useMetaNotify} from "../../components/logging/MetaNotifyHook";
 
+function clearClientSession() {
+    localStorage.removeItem("user");
+    sessionStorage.clear();
+}
+
+/**
+ * Determines the correct entry route based on the user’s authentication state.
+ * It checks whether the session can be restored and redirects authenticated users
+ * to the dashboard and unauthenticated users to the login page.
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function AuthRedirect() {
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [error, setError] = useState(null);
 
     const baseMeta = useMemo(
         () => ({
@@ -19,17 +30,19 @@ function AuthRedirect() {
         []
     );
 
-    const { notify } = useMetaNotify(baseMeta);
+    const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
     useEffect(() => {
+        let isMounted = true;
+
         const checkAuthStatus = async () => {
             try {
-                const response = await refreshSessionAccessToken();
+                const response = await refreshAccessToken();
+                if (!isMounted) return;
 
                 if (response.status === 200) {
-                    setIsAuthenticated(true);
-
+                    setIsAuthenticated();
                     notify(
                         "info",
                         "Session restored successfully.",
@@ -38,21 +51,12 @@ function AuthRedirect() {
                         },
                         "token-refresh"
                     );
-                } else {
-                    setIsAuthenticated(false);
-                    notify(
-                        "error",
-                        "Could not refresh your session.",
-                        {
-                            stage: "token-refresh-invalid-response",
-                        },
-                        "token-refresh"
-                    );
                 }
             } catch (err) {
-                setIsAuthenticated(false);
-                setError(err);
+                if (!isMounted) return;
 
+                clearClientSession();
+                setIsAuthenticated(false);
                 handleError(err, {
                     fallbackMessage: "Your session has expired. Please log in again.",
                     meta: {
@@ -61,26 +65,24 @@ function AuthRedirect() {
                     redirectToLogin: true,
                 });
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
         checkAuthStatus();
-    }, [handleError, notify]);
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     if (loading) {
-        return <LoadingScreen />;
+        return <LoadingScreen/>;
     }
 
-    if (error) {
-        return <div>There was an error loading the page.</div>;
-    }
-
-    if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
-    }
-
-    return <Navigate to="/login" replace />;
+    return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace/>;
 }
 
 export default AuthRedirect;
