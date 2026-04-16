@@ -9,7 +9,7 @@ import GroqClient from "../clients/groqClient.js";
 
 const ragRouter = Router();
 
-const clients = {
+export const clients = {
     'groq': new GroqClient(),
     'local': new OpenAiClient(`http://localhost:${process.env.LLM_API_PORT || '11434'}/v1/chat/completions`),
 };
@@ -65,5 +65,4 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     });
 });
 
-export const llmClient = clients[defaultClient];
 export default ragRouter;

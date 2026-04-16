@@ -3,7 +3,7 @@ import {type Request, type Response, Router} from "express";
 import chromaClient from "../clients/chromadbClient.js";
 import type {ChromaDBAddDocumentsRequestBody, ChromaDBPageIndexRequestBody, ChromaDBQuery} from "../dto/chroma.js";
 import {promptBuilder} from "../util/promptBuilder/promptBuilder.js";
-import {llmClient} from "./ragRouter.js";
+import {clients} from "./ragRouter.js";
 
 const chromaRouter = Router();
 
@@ -42,12 +42,16 @@ chromaRouter.post('/indexPage', async (req: Request<{}, {}, ChromaDBPageIndexReq
         return res.sendStatus(400);
     }
 
-    const descriptionMessages = promptBuilder.buildPageDescriptionMessages(
-        req.body.username, req.body.pageName, req.body.pageContent);
+    (async () => {
+        const descriptionMessages = promptBuilder.buildPageDescriptionMessages(
+            req.body.username, req.body.pageName, req.body.pageContent);
 
-    const description = (await llmClient.getResponse(descriptionMessages)).response;
+        const description = (await clients['local'].getResponse(descriptionMessages)).response;
 
-    return res.status(201).send(await chromaClient.indexPage(req.body.username, req.body.pageName, description));
+        await chromaClient.indexPage(req.body.username, req.body.pageName, description)
+    })();
+
+    return res.sendStatus(202);
 });
 
 chromaRouter.get('/search', async (req: Request<{}, {}, {}, {searchQuery: string}>, res: Response) => {
