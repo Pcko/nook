@@ -17,6 +17,8 @@ class PageDTO {
     updatedAt: string;
     deploymentStatus: string;
     data: string | null;
+    dataEncoding?: string | null;
+    dataVersion?: number | null;
     metadata?: any;
     pageMeta: string | null;
 }

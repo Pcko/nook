@@ -12,6 +12,7 @@ import * as Sentry from "@sentry/react";
 import { LoggerContextValue } from "../logging/types/loggerContextValue";
 import { LogEntry } from "../logging/types/logEntry";
 import { LogLevel } from "../logging/types/logLevel";
+import { isSentryEnabled } from "../../app/bootstrap/sentry";
 
 const MAX_LOGS = 1500;        // in-memory
 const MAX_PERSISTED = 200;    // localStorage
@@ -31,9 +32,10 @@ const parseSentryMinLevel = (): LogLevel => {
     return VALID_LOG_LEVELS.includes(raw) ? raw : "warn";
 };
 const SENTRY_MIN_LEVEL = parseSentryMinLevel();
+const SENTRY_ENABLED = isSentryEnabled();
 
 const shouldForwardToSentry = (level: LogLevel): boolean => {
-    console.log(VALID_LOG_LEVELS)
+    if (!SENTRY_ENABLED) return false;
     return LOG_LEVEL_WEIGHT[level] >= LOG_LEVEL_WEIGHT[SENTRY_MIN_LEVEL];
 };
 
@@ -55,6 +57,8 @@ const toSentryLevel = (
 };
 
 const forwardEntryToSentry = (entry: LogEntry, originalMeta: unknown): void => {
+    if (!SENTRY_ENABLED) return;
+
     const sentryLevel = toSentryLevel(entry.level);
 
     Sentry.addBreadcrumb({

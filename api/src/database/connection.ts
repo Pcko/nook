@@ -1,22 +1,24 @@
 import mongoose from 'mongoose';
 
-import 'dotenv/config';
+import {logger} from '../util/logger.js';
 
 const uri: string | undefined = process.env.MONGODB_URI;
 const dbName: string | undefined = process.env.DB_NAME;
 if (!uri) {
-    throw new Error('❌ Environment variable (MONGODB_URI) missing!');
+    logger.fatal('Environment variable (MONGODB_URI) missing!');
+    process.exit(1);
 }
 if (!dbName) {
-    throw new Error('❌ Environment variable (DB_NAME) missing!');
+    logger.fatal('Environment variable (DB_NAME) missing!');
+    process.exit(1);
 }
 
 (async (): Promise<void> => {
     await mongoose.connect(uri, { dbName })
         .then(() => {
-            console.log('✅ Connected to database.');
+            logger.info('Connected to database.');
         })
         .catch((err) => {
-            throw new Error('❌ Database connection error: ', err);
+            logger.error('Database connection error: ', err);
         })
 })();

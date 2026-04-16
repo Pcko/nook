@@ -29,14 +29,6 @@ function EditorHub() {
     const [page, setPage] = useState(location.state?.page);
 
     /**
-     * Clears cache for the page so that the WebsiteBuilder doesn't load locally
-     * and fetches the actual state from DB
-     */
-    useEffect(() => {
-        localStorage.removeItem(`page_${page.name}`);
-    }, [])
-
-    /**
      * Redirects to the homepage if no page data is present.
      */
     useEffect(() => {

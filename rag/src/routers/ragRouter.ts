@@ -20,7 +20,14 @@ ragRouter.post('/query', async (req: Request<{}, {}, QueryRequestBody>, res: Res
 
     const llmClient: LlmClient = clients[queryRequest.provider || defaultClient];
 
-    const messages: ChatCompletionMessageParam[] = await promptBuilder.build(queryRequest, llmClient);
+    const messages: ChatCompletionMessageParam[] =
+        queryRequest.disable2StepGeneration
+            ? await promptBuilder.build(queryRequest, llmClient)
+            : await (async () => {
+                const planningMessages = await promptBuilder.buildPagePlannerPrompt(queryRequest, llmClient);
+                const planningResult = await llmClient.getResponse(planningMessages);
+                return promptBuilder.buildPageGeneratorPrompt(planningResult.response);
+            })();
 
     if(queryRequest.stream) {
         res.setHeader('Content-Type', 'text/event-stream');
@@ -58,4 +65,5 @@ ragRouter.post('/editElement', async (req: Request<{}, {}, ElementEditRequestBod
     });
 });
 
+export const llmClient = clients[defaultClient];
 export default ragRouter;

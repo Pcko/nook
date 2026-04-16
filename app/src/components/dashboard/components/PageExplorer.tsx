@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import PageService from "../../../services/PageService.ts";
 import PublishedPage from "../../../services/interfaces/PublishedPage.ts";
 import {LoadingBubble} from "../../general/LoadingScreen";
@@ -48,12 +48,17 @@ export default function PageExplorer() {
 
     const [search, setSearch] = useState("");
     const [sortByOption, setSortByOption] = useState<SortOption>(sortByOptions[0]);
+    const [searchedPages, setSearchedPages] = useState<PublishedPage[] | null>(null);
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const lastQueryRef = useRef("");
 
     const [htmlByKey, setHtmlByKey] = useState<Record<string, string>>({});
     const [htmlErrorByKey, setHtmlErrorByKey] = useState<Record<string, string>>({});
     const [htmlLoadingKeys, setHtmlLoadingKeys] = useState<Set<string>>(new Set());
 
     const handleError = useErrorHandler({feature: "PageExplorer", component: "PageExplorer"});
+    const isPublisherUnavailableError = (err: any): boolean =>
+        typeof err?.message === "string" && err.message.includes("Publish service is unavailable");
 
     const initPages = async () => {
         setLoading(true);
@@ -63,7 +68,9 @@ export default function PageExplorer() {
             setInternalPages(Array.isArray(loaded) ? loaded : []);
         } catch (e: any) {
             setError(e?.message ?? "Failed to load pages");
-            handleError(e);
+            if (!isPublisherUnavailableError(e)) {
+                handleError(e);
+            }
             setInternalPages([]);
         } finally {
             setLoading(false);
@@ -74,24 +81,59 @@ export default function PageExplorer() {
         void initPages();
     }, []);
 
-    const pages = useMemo(() => {
-        const q = search.trim().toLowerCase();
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            if (!search.trim()) lastQueryRef.current = "";
+        }, 300);
 
-        const filtered = q
-            ? internalPages.filter((p) => {
-                const name = (p.name ?? "").toLowerCase();
-                const author = (p.author ?? "").toLowerCase();
-                return name.includes(q) || author.includes(q);
-            })
-            : internalPages;
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const pages = useMemo(() => {
+        const filtered = searchedPages ?? internalPages;
 
         return [...filtered].sort((a, b) => {
-            if (sortByOption.id === "name") return (a.name ?? "").localeCompare(b.name ?? "");
-            const ad = sortByOption.id === "createdAt" ? toDate(a.createdAt) : toDate(a.updatedAt);
-            const bd = sortByOption.id === "createdAt" ? toDate(b.createdAt) : toDate(b.updatedAt);
+            if (sortByOption.id === "name")
+                return (a.name ?? "").localeCompare(b.name ?? "");
+
+            const ad = sortByOption.id === "createdAt"
+                ? toDate(a.createdAt)
+                : toDate(a.updatedAt);
+
+            const bd = sortByOption.id === "createdAt"
+                ? toDate(b.createdAt)
+                : toDate(b.updatedAt);
+
             return (bd?.getTime() ?? 0) - (ad?.getTime() ?? 0);
         });
-    }, [internalPages, search, sortByOption]);
+    }, [internalPages, searchedPages, sortByOption.id]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const run = async () => {
+            if (!debouncedSearch.trim()) {
+                setSearchedPages(null);
+                return;
+            }
+
+            if (debouncedSearch === lastQueryRef.current) return;
+            lastQueryRef.current = debouncedSearch;
+
+            try {
+                const results = await PageService.searchPublishedPages(debouncedSearch);
+                if (!cancelled) setSearchedPages(results);
+            } catch {
+                if (!cancelled) setSearchedPages([]);
+            }
+        };
+
+        void run();
+        return () => {
+            cancelled = true;
+        };
+    }, [debouncedSearch]);
 
     useEffect(() => {
         let cancelled = false;
@@ -151,7 +193,7 @@ export default function PageExplorer() {
         return () => {
             cancelled = true;
         };
-    }, [pages, htmlByKey, htmlErrorByKey]);
+    }, [pages]);
 
     return (
         <div className="w-full h-full flex flex-col gap-6 pt-6 px-6 md:px-10 lg:px-16">
@@ -185,6 +227,7 @@ export default function PageExplorer() {
                             <input
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
+                                type="search"
                                 placeholder="Search by name or author..."
                                 className="w-full pl-9 pr-3 py-2.5 rounded-[5px] border border-ui-border bg-website-bg text-sm focus:outline-none focus:ring-1 focus:ring-ui-border"
                             />
@@ -202,7 +245,7 @@ export default function PageExplorer() {
             </div>
 
             {error && (
-                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-dangerous">
+                <div className="p-3 rounded-lg border border-dangerous bg-dangerous text-text-on-primary">
                     {error}
                 </div>
             )}

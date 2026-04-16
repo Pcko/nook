@@ -62,3 +62,17 @@ export interface ChromaDBQueryResultItem {
     metadata: Metadata | null | undefined;
     distance: number | undefined;
 }
+
+/**
+ * Represents the page to be semantically indexed in ChromaDB.
+ *
+ * @interface ChromaDBPageIndexRequestBody
+ * @property {string} username - The username of the page's owner
+ * @property {string} pageName - The name of the user's page
+ * @property {string} pageContent - The page's HTML content
+ */
+export interface ChromaDBPageIndexRequestBody {
+    username: string;
+    pageName: string;
+    pageContent: string;
+}

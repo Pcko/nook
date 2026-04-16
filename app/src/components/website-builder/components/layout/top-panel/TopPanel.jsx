@@ -7,12 +7,13 @@ import {
     AiOutlineMobile,
     AiOutlinePlus,
     AiOutlineRedo,
+    AiOutlineSave,
     AiOutlineTablet,
     AiOutlineUndo,
 } from "react-icons/ai";
 
 import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
-import DeployModal from "../../../../deployment/DeployModal";
+import { DeployModal } from "../../../../../features/publishing";
 import useErrorHandler from "../../../../logging/ErrorHandler";
 import { useMetaNotify } from "../../../../logging/MetaNotifyHook";
 
@@ -21,6 +22,8 @@ import ToolbarButton from "./ToolbarButton";
 import TopActionButton from "./TopActionButton";
 import ZoomListbox from "./ZoomListbox";
 import { InfoTip } from "../../ui/TooltipSystem";
+import {useBuilder} from "../../../hooks/UseBuilder";
+import {addUserBloxBlockToEditor, saveSelectedComponentAsUserBlox} from "../../../utils/customBlox";
 import {
     exportWebsite,
     handleRedo,
@@ -30,6 +33,7 @@ import {
     setTablet,
     toggleOutlines, togglePreview
 } from "../../../utils/grapesActions";
+import {useNavigate} from "react-router-dom";
 
 /**
  * TopPanel
@@ -59,7 +63,41 @@ function TopPanel({editorRef, page}) {
     );
 
     const {notify} = useMetaNotify(baseMeta);
+    const {selectedElement} = useBuilder();
     const handleError = useErrorHandler(baseMeta);
+    const navigate = useNavigate();
+
+    /**
+     * Timestamp of the last successful save action.
+     * Shown next to the Save button so users can verify that their latest changes are persisted.
+     */
+    const [lastSavedAt, setLastSavedAt] = useState(null);
+
+    const formatLastSavedAt = (dt) => {
+        if (!dt) return "";
+        const date = dt instanceof Date ? dt : new Date(dt);
+        if (Number.isNaN(date.getTime())) return "";
+
+        const now = new Date();
+        const sameDay =
+            date.getFullYear() === now.getFullYear() &&
+            date.getMonth() === now.getMonth() &&
+            date.getDate() === now.getDate();
+
+        const time = new Intl.DateTimeFormat("de-AT", {
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(date);
+
+        if (sameDay) return time;
+
+        const day = new Intl.DateTimeFormat("de-AT", {
+            day: "2-digit",
+            month: "2-digit",
+        }).format(date);
+
+        return `${day}, ${time}`;
+    };
 
     /**
      * Persist the current editor state to the backend.
@@ -68,6 +106,7 @@ function TopPanel({editorRef, page}) {
     function handleSave() {
         WebsiteBuilderService.savePageState(editorRef.current, page)
             .then(() => {
+                setLastSavedAt(new Date());
                 notify(
                     "info",
                     "Page was saved successfully.",
@@ -81,6 +120,37 @@ function TopPanel({editorRef, page}) {
                     meta: {stage: "page-save", pageName: page?.name ?? null},
                 });
             });
+    }
+
+    function handleSaveBlox() {
+        if (!editorRef?.current || !selectedElement) {
+            notify(
+                "info",
+                "Select a section or element first.",
+                {stage: "save-blox", pageName: page?.name ?? null},
+                "submit"
+            );
+            return;
+        }
+
+        const name = window.prompt("Name for this reusable blox:", selectedElement.getName?.() || "My section");
+        if (name == null) return;
+
+        try {
+            const block = saveSelectedComponentAsUserBlox(editorRef.current, selectedElement, name);
+            addUserBloxBlockToEditor(editorRef.current, block);
+            notify(
+                "info",
+                `Saved reusable blox "${block.name}".`,
+                {stage: "save-blox", pageName: page?.name ?? null, bloxName: block.name},
+                "submit"
+            );
+        } catch (err) {
+            handleError(err, {
+                fallbackMessage: "Failed to save the reusable blox.",
+                meta: {stage: "save-blox", pageName: page?.name ?? null},
+            });
+        }
     }
 
     /**
@@ -227,9 +297,24 @@ function TopPanel({editorRef, page}) {
 
             {/* Right group: save/export/publish */}
             <div className="flex items-center justify-end gap-2">
+                <div
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-ui-border bg-ui-default/40 text-[11px] leading-none text-text/70 whitespace-nowrap select-none"
+                    data-wb-tooltip="Letzter Speicherzeitpunkt (letzter erfolgreicher Save)."
+                    data-wb-tooltip-delay="650"
+                >
+                    {lastSavedAt ? (
+                        <>
+                            <span>Gespeichert</span>
+                            <span className="font-mono text-text/80">{formatLastSavedAt(lastSavedAt)}</span>
+                        </>
+                    ) : (
+                        <span className="text-text/60">Nicht gespeichert</span>
+                    )}
+                </div>
+                <TopActionButton label="Save Blox" onClick={handleSaveBlox} icon={<AiOutlineSave size={16} />} disabled={!selectedElement}/>
                 <TopActionButton label="Save" onClick={handleSave}/>
-                <TopActionButton label="Export" onClick={() => exportWebsite(editorRef)}/>
                 <TopActionButton label="Publish" onClick={() => setDeployOpen(true)} primary/>
+                <TopActionButton label="Back" onClick={() => navigate(-1)}/>
             </div>
 
             {/* Publish dialog */}
