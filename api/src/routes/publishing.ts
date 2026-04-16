@@ -66,7 +66,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             htmlVersion: encodedHtml.version,
             assetIds,
             author: userId,
-            isPublic: isPublicDeployment,
+            isPublic: isPublicDeployment,encodeStoredString
         };
 
         const pageDetails = await PublishedPage.findOneAndUpdate(
@@ -97,14 +97,26 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
                 logger.error(err, 'page indexing error');
                 return res.sendStatus(500);
             }
-        }
+        }   
 
-        return res.status(201).json(pageDetails);
+        return res.status(201).json(toPublishedPageDto(pageDetails));    
     } catch (err) {
         logger.error(err, 'Publish page error');
         return res.sendStatus(500);
     }
 });
+
+function toPublishedPageDto(page: IPublishedPage) {
+    return {
+        _id: page._id,
+        pageId: page.pageId,
+        name: page.name,
+        author: page.author,
+        isPublic: page.isPublic,
+        createdAt: page.createdAt,
+        updatedAt: page.updatedAt,
+    };
+}
 
 /**
  * @route DELETE /api/publishPage/

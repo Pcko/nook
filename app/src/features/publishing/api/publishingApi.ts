@@ -28,6 +28,7 @@ export function openPublishedPage(authorId: string, pageName: string) {
     return httpClient({
         method: 'get',
         url: `${(import.meta as any).env.VITE_PUBLISH_URL}/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`,
+        responseType: 'text',
     });
 }
 

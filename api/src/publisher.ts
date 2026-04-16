@@ -124,10 +124,15 @@ app.get('/search/:searchPageNumber/:searchPageAmount', async (req: Request, res:
     ]);
 
     return res.status(200).json({
-        data: pages.map((page) => ({
-            ...page,
-            html: decodeStoredString(page.html, page.htmlEncoding),
-        })),
+        pages: pages.map((page) => ({
+        _id: page._id,
+        pageId: page.pageId,
+        name: page.name,
+        author: page.author,
+        isPublic: page.isPublic,
+        createdAt: page.createdAt,
+        updatedAt: page.updatedAt,
+       })),
         pagination: {
             total,
             totalPages: Math.ceil(total / limit),
@@ -158,10 +163,17 @@ app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res
 
         const pages = await PublishedPage.find({ $or: queries }).lean<IPublishedPage[]>();
 
-        return res.status(200).send(pages.map((page) => ({
-            ...page,
-            html: decodeStoredString(page.html, page.htmlEncoding),
-        })));
+        return res.status(200).json(
+            pages.map((page) => ({
+                _id: page._id,
+                pageId: page.pageId,
+                name: page.name,
+                author: page.author,
+                isPublic: page.isPublic,
+                createdAt: page.createdAt,
+                updatedAt: page.updatedAt,
+        }))
+);
     } catch (err) {
         console.log('page search error', err);
         return res.sendStatus(500);
