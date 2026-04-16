@@ -61,7 +61,7 @@ router.post('/:pageName/:displayPageName', async (req: Request<PublishPageParams
             html: finalHtml,
             assetIds,
             author: userId,
-            isPublic: isPublicDeployment,encodeStoredString
+            isPublic: isPublicDeployment
         };
 
         const pageDetails = await PublishedPage.findOneAndUpdate(
