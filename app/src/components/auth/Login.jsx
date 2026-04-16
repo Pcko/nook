@@ -1,5 +1,4 @@
 import {useMemo, useState} from "react";
-import {useNavigate} from "react-router-dom";
 import {isInvalidStringForPassword, isInvalidStringForUsername} from "../general/FormChecks";
 import TwoFactorAuthenticationCodeInputForm from "./TwoFactorAuthenticationCodeInputForm";
 import LoadingScreen from "../general/LoadingScreen";
@@ -9,6 +8,7 @@ import {FcGoogle} from "react-icons/fc";
 import Divider from "./FormDivider";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 import useErrorHandler from "../logging/ErrorHandler";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -19,6 +19,9 @@ function Login() {
     const [twoFactorAuthenticationFormActive, setTwoFactorAuthenticationFormActive] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const redirectTarget = location.state?.from?.pathname || "/dashboard";
 
     const baseMeta = useMemo(
         () => ({
@@ -41,10 +44,11 @@ function Login() {
             },
             "success"
         );
-        localStorage.setItem("user", JSON.stringify(user));
 
-        setFormData({username: "", password: ""});
-        navigate("/dashboard");
+        localStorage.setItem("user", JSON.stringify(user));
+        setFormData({ username: "", password: "" });
+
+        navigate(redirectTarget, { replace: true });
     };
 
     const handleSubmit = async (event) => {

@@ -42,12 +42,19 @@ httpClient.interceptors.response.use(
                 await httpClient.post("/auth/token");
                 return httpClient(originalRequest);
             } catch {
+                localStorage.removeItem("user");
+                sessionStorage.clear();
+
+                if (window.location.pathname !== "/login") {
+                    window.location.replace("/login");
+                }
+
                 return Promise.reject({
                     ...error,
                     response: {
                         ...error.response,
                         data: {
-                            ...error.response.data,
+                            ...error.response?.data,
                             message: "Your session has expired, please log in again.",
                         },
                     },

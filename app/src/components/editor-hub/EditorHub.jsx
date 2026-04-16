@@ -33,7 +33,7 @@ function EditorHub() {
      */
     useEffect(() => {
         if (!page) {
-            navigate('/');
+            navigate('/dashboard');
         }
     }, [page, pageName, navigate]);
 
