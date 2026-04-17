@@ -135,16 +135,18 @@ function PageHub() {
      * @returns {undefined|Object}
      */
     const handleFragment = () => {
-        if (!sessionStorage.getItem("artifact")) {
-            return undefined;
-        }
+        const raw = sessionStorage.getItem("artifact");
+        if (!raw) return undefined;
 
         try {
-            return JSON.parse(sessionStorage.getItem("artifact"));
-        } catch (err) {
+            const parsed = JSON.parse(raw);
+            sessionStorage.removeItem("artifact");
+            return parsed;
+        } catch {
+            sessionStorage.removeItem("artifact");
             return undefined;
         }
-    }
+    };
 
     const fallbackFormData = handleFragment();
 

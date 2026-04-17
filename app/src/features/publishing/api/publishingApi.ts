@@ -2,7 +2,6 @@ import type Page from '../../../services/interfaces/Page.ts';
 import httpClient from '../../../shared/api/httpClient';
 import { grapesjsExportConfig } from '../../../components/website-builder/utils/grapesExportConfig';
 import { getWebsiteExportSettings } from '../../../components/website-builder/utils/websiteExportSettings';
-import { encodeStoredString } from '../../../services/pageContentService.ts';
 
 const axiosConfig = {
     headers: { 'Content-Type': 'application/json' },
@@ -11,13 +10,10 @@ const axiosConfig = {
 };
 
 export function publishPage(page: Page, html: string, isPublic: boolean) {
-    const encodedHtml = encodeStoredString(html);
     return httpClient.post(
         `/api/publishPage/${page.name}/${page.name}`,
         {
-            page: encodedHtml.content,
-            pageEncoding: encodedHtml.encoding,
-            pageVersion: encodedHtml.version,
+            page: html,
             isPublic,
         },
         axiosConfig,
@@ -28,6 +24,7 @@ export function openPublishedPage(authorId: string, pageName: string) {
     return httpClient({
         method: 'get',
         url: `${(import.meta as any).env.VITE_PUBLISH_URL}/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`,
+        responseType: 'text',
     });
 }
 

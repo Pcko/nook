@@ -19,17 +19,6 @@ const PublishedPageSchema = new Schema<IPublishedPage>(
             type: String,
             required: true,
         },
-        htmlEncoding: {
-            type: String,
-            required: true,
-            enum: ['plain', 'deflate-base64'],
-            default: 'plain',
-        },
-        htmlVersion: {
-            type: Number,
-            required: true,
-            default: 1,
-        },
         assetIds: {
             type: [String],
             required: true,

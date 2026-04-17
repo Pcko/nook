@@ -1,9 +1,6 @@
-import pako from 'pako';
 import { buildAssetRef, buildEditorAssetUrl, uploadPageImageDataUrl } from './pageAssetService.ts';
 
-export const DEFAULT_STORED_STRING_ENCODING = 'deflate-base64';
-export const STORED_STRING_FORMAT_VERSION = 1;
-const PAGE_CACHE_FORMAT_VERSION = 1;
+const PAGE_CACHE_FORMAT_VERSION = 2;
 const MAX_LOCAL_PAGE_CACHE_BYTES = 1_500_000;
 const INLINE_IMAGE_DATA_URL_REGEX = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
 const HAS_INLINE_IMAGE_DATA_URL_REGEX = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/i;
@@ -15,25 +12,6 @@ function cloneValue(value) {
     if (value == null) return value;
     if (typeof structuredClone === 'function') return structuredClone(value);
     return JSON.parse(JSON.stringify(value));
-}
-
-function uint8ArrayToBase64(bytes) {
-    let binary = '';
-    for (let i = 0; i < bytes.length; i += 1) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-}
-
-function base64ToUint8Array(base64) {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i += 1) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-
-    return bytes;
 }
 
 function estimateByteSize(value) {
@@ -107,82 +85,42 @@ function resolveValueForEditor(value) {
     return value;
 }
 
-export function encodeStoredString(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
-    if (value == null) {
-        return {
-            content: null,
-            encoding,
-            version: STORED_STRING_FORMAT_VERSION,
-        };
-    }
-
-    if (encoding === 'plain') {
-        return {
-            content: value,
-            encoding,
-            version: STORED_STRING_FORMAT_VERSION,
-        };
-    }
-
-    const compressed = pako.deflate(value);
-    return {
-        content: uint8ArrayToBase64(compressed),
-        encoding,
-        version: STORED_STRING_FORMAT_VERSION,
-    };
+function serializeProjectData(value) {
+    return value == null ? null : JSON.stringify(value);
 }
 
-export function decodeStoredString(value, encoding) {
-    if (value == null) return null;
-    if (!encoding || encoding === 'plain') return value;
-    if (encoding === 'deflate-base64') {
-        return pako.inflate(base64ToUint8Array(value), { to: 'string' });
-    }
-    throw new Error(`Unsupported stored string encoding: ${String(encoding)}`);
+function deserializeProjectData(value) {
+    return value == null ? null : JSON.parse(value);
 }
 
-export function encodeStoredJson(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
-    return encodeStoredString(JSON.stringify(value), encoding);
-}
-
-export function decodeStoredJson(value, encoding) {
-    const json = decodeStoredString(value, encoding);
-    return json == null ? null : JSON.parse(json);
-}
-
-export function hydrateProjectDataForEditor(value, encoding) {
-    const normalizedData = decodeStoredJson(value, encoding);
+export function hydrateProjectDataForEditor(value) {
+    const normalizedData = deserializeProjectData(value);
     return normalizedData == null ? null : resolveValueForEditor(normalizedData);
 }
 
 export async function prepareProjectDataForPersistence(pageName, projectData) {
     if (projectData == null) {
-        const encoded = encodeStoredJson(null);
         return {
             normalizedData: null,
             editorData: null,
-            encoded,
+            serializedData: null,
         };
     }
 
     const clonedData = cloneValue(projectData);
     const normalizedData = await normalizeValueForStorage(clonedData, pageName, new Map());
-    const encoded = encodeStoredJson(normalizedData);
 
     return {
         normalizedData,
         editorData: resolveValueForEditor(cloneValue(normalizedData)),
-        encoded,
+        serializedData: serializeProjectData(normalizedData),
     };
 }
 
 export function buildPageCacheEntry(normalizedData) {
-    const encoded = encodeStoredJson(normalizedData);
     return JSON.stringify({
         cacheVersion: PAGE_CACHE_FORMAT_VERSION,
-        data: encoded.content,
-        dataEncoding: encoded.encoding,
-        dataVersion: encoded.version,
+        data: serializeProjectData(normalizedData),
     });
 }
 
@@ -193,14 +131,14 @@ export function restoreProjectDataFromCache(cacheValue) {
         const parsed = JSON.parse(cacheValue);
         if (!parsed || parsed.cacheVersion !== PAGE_CACHE_FORMAT_VERSION) return null;
 
-        const normalizedData = decodeStoredJson(parsed.data, parsed.dataEncoding);
+        const normalizedData = deserializeProjectData(parsed.data);
         return normalizedData == null ? null : resolveValueForEditor(normalizedData);
     } catch {
         return null;
     }
 }
 
-export function writeCompressedPageCache(storageKey, normalizedData) {
+export function writePageCache(storageKey, normalizedData) {
     if (normalizedData == null) {
         localStorage.removeItem(storageKey);
         return false;
