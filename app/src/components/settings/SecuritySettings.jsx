@@ -2,11 +2,11 @@ import {useMemo, useState} from "react";
 import HR from "./SettingsHR";
 import {isInvalidStringForPassword} from "../general/FormChecks";
 import QRCodeDisplay from "./QRCodeDisplay";
-import TwoFactorAuthenticationCodeInputForm from "../auth/TwoFactorAuthenticationCodeInputForm";
 import useErrorHandler from "../logging/ErrorHandler";
 import SettingsService from "../../services/SettingsService";
 import AuthService from "../../services/AuthService";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
+import {TwoFactorCodeForm} from "../../features/auth/index";
 
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState("");
@@ -240,7 +240,7 @@ function SecuritySettings({changeHandler}) {
             </form>
 
             {twoFactorAuthFormActive && (
-                <TwoFactorAuthenticationCodeInputForm
+                <TwoFactorCodeForm
                     submitForm={handle2FASubmit}
                 />
             )}
