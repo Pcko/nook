@@ -1,5 +1,14 @@
 import React from "react";
 
+/**
+ * Renders the example image preview component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.src - The src value.
+ * @param {any} props.alt - The alt value.
+ * @param {any} props.fallbackSrc - The fallback src value.
+ * @returns {JSX.Element} The rendered example image preview component.
+ */
 function ExampleImagePreview({src, alt, fallbackSrc}) {
     const containerRef = React.useRef(null);
     const rafRef = React.useRef(null);
@@ -10,12 +19,13 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         setImageSrc(src);
     }, [src]);
 
-    React.useEffect(() => {
-        return () => {
+    React.useEffect(() => () => {
             if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        };
-    }, []);
+        }, []);
 
+    /**
+ * Handles the stop animation operation.
+ */
     const stopAnimation = () => {
         if (rafRef.current) {
             cancelAnimationFrame(rafRef.current);
@@ -23,6 +33,11 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         }
     };
 
+    /**
+     *
+     * @param targetTop
+     * @param duration
+     */
     const animateScrollTo = (targetTop, duration = 4500) => {
         const el = containerRef.current;
         if (!el) return;
@@ -35,9 +50,17 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         if (Math.abs(distance) < 1) return;
 
         const startTime = performance.now();
+        /**
+         *
+         * @param t
+         */
         const easeInOutCubic = (t) =>
             t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
+        /**
+         *
+         * @param now
+         */
         const step = (now) => {
             const progress = Math.min((now - startTime) / duration, 1);
             el.scrollTop = startTop + distance * easeInOutCubic(progress);
@@ -52,6 +75,9 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         rafRef.current = requestAnimationFrame(step);
     };
 
+    /**
+ * Updates scrollable state.
+ */
     const updateScrollableState = () => {
         requestAnimationFrame(() => {
             const el = containerRef.current;
@@ -61,6 +87,9 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         });
     };
 
+    /**
+ * Handles the scroll to bottom operation.
+ */
     const scrollToBottom = () => {
         const el = containerRef.current;
         if (!el || !canScroll) return;
@@ -68,6 +97,9 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
         animateScrollTo(maxScroll, 5000);
     };
 
+    /**
+ * Handles the scroll to top operation.
+ */
     const scrollToTop = () => {
         const el = containerRef.current;
         if (!el) return;
@@ -77,21 +109,21 @@ function ExampleImagePreview({src, alt, fallbackSrc}) {
     return (
         <div className="relative">
             <div
-                ref={containerRef}
+                aria-label={`${alt} preview`}
                 className="h-56 overflow-y-auto border-b border-ui-border bg-ui-bg"
+                onBlur={scrollToTop}
+                onFocus={scrollToBottom}
                 onMouseEnter={scrollToBottom}
                 onMouseLeave={scrollToTop}
-                onFocus={scrollToBottom}
-                onBlur={scrollToTop}
+                ref={containerRef}
                 tabIndex={0}
-                aria-label={`${alt} preview`}
             >
                 <img
-                    src={imageSrc}
                     alt={alt}
                     className="block w-full h-auto"
-                    onLoad={updateScrollableState}
                     onError={() => setImageSrc(fallbackSrc)}
+                    onLoad={updateScrollableState}
+                    src={imageSrc}
                 />
             </div>
 

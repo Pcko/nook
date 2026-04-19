@@ -1,6 +1,10 @@
-import React from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
+import React from "react";
 
+/**
+ *
+ * @param option
+ */
 function renderOption(option) {
     return (
         <div className="flex items-center text-text-subtle">
@@ -13,7 +17,7 @@ function renderOption(option) {
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" d={option.svg}/>
+                    <path d={option.svg} strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             ) : null}
             <div className="my-auto">{option.option}</div>
@@ -21,6 +25,18 @@ function renderOption(option) {
     );
 }
 
+/**
+ * Renders the sort menu component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.value - The value value.
+ * @param {any} props.onChange - Callback fired for the on change action.
+ * @param {any} props.options - The options value.
+ * @param {any} props.buttonClassName - The button class name value.
+ * @param {any} props.optionsClassName - The options class name value.
+ * @param {any} props.title - The title value.
+ * @returns {JSX.Element} The rendered sort menu component.
+ */
 export default function SortMenu({
     value,
     onChange,
@@ -37,7 +53,7 @@ export default function SortMenu({
         "absolute z-10 mt-1 w-[180px] bg-ui-bg border-2 border-ui-border rounded-[5px] shadow-lg overflow-hidden text-text-subtle";
 
     return (
-        <Listbox value={value} onChange={onChange}>
+        <Listbox onChange={onChange} value={value}>
             <div className="relative">
                 <ListboxButton className={buttonClass}>
                     {renderOption(value)}

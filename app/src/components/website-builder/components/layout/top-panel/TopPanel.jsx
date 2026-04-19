@@ -11,17 +11,12 @@ import {
     AiOutlineTablet,
     AiOutlineUndo,
 } from "react-icons/ai";
+import {useNavigate} from "react-router-dom";
 
-import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
 import { DeployModal } from "../../../../../features/publishing";
+import WebsiteBuilderService from "../../../../../services/WebsiteBuilderService";
 import useErrorHandler from "../../../../logging/ErrorHandler";
 import { useMetaNotify } from "../../../../logging/MetaNotifyHook";
-
-import CustomViewportInput from "./CustomViewportInput";
-import ToolbarButton from "./ToolbarButton";
-import TopActionButton from "./TopActionButton";
-import ZoomListbox from "./ZoomListbox";
-import { InfoTip } from "../../ui/TooltipSystem";
 import {useBuilder} from "../../../hooks/UseBuilder";
 import {addUserBloxBlockToEditor, saveSelectedComponentAsUserBlox} from "../../../utils/customBlox";
 import {
@@ -33,7 +28,14 @@ import {
     setTablet,
     toggleOutlines, togglePreview
 } from "../../../utils/grapesActions";
-import {useNavigate} from "react-router-dom";
+import { InfoTip } from "../../ui/TooltipSystem";
+
+import CustomViewportInput from "./CustomViewportInput";
+import ToolbarButton from "./ToolbarButton";
+import TopActionButton from "./TopActionButton";
+import ZoomListbox from "./ZoomListbox";
+
+
 
 /**
  * TopPanel
@@ -73,6 +75,10 @@ function TopPanel({editorRef, page}) {
      */
     const [lastSavedAt, setLastSavedAt] = useState(null);
 
+    /**
+     *
+     * @param dt
+     */
     const formatLastSavedAt = (dt) => {
         if (!dt) return "";
         const date = dt instanceof Date ? dt : new Date(dt);
@@ -122,6 +128,9 @@ function TopPanel({editorRef, page}) {
             });
     }
 
+    /**
+ * Handles save blox.
+ */
     function handleSaveBlox() {
         if (!editorRef?.current || !selectedElement) {
             notify(
@@ -241,11 +250,17 @@ function TopPanel({editorRef, page}) {
         setDesktop(editorRef);
     };
 
+    /**
+ * Handles tablet.
+ */
     const handleTablet = () => {
         setShowCustomViewport(false);
         setTablet(editorRef);
     };
 
+    /**
+ * Handles mobile.
+ */
     const handleMobile = () => {
         setShowCustomViewport(false);
         setMobile(editorRef);
@@ -281,7 +296,8 @@ function TopPanel({editorRef, page}) {
                     <ToolbarButton icon={<AiOutlinePlus size={18} />} tooltip="Custom viewport width" onClick={handlePlus} />
 
                 {showCustomViewport && (
-                    <CustomViewportInput onApply={applyCustomViewport} onChange={setCustomViewport}
+                    <CustomViewportInput onApply={applyCustomViewport}
+onChange={setCustomViewport}
                                          value={customViewport}/>
                 )}
 

@@ -1,12 +1,3 @@
-import React, {useMemo, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import useErrorHandler from "../../logging/ErrorHandler";
-import PageHub from "./PageHub";
-import Settings from "../../settings/Settings";
-import {LoadingBubble} from "../../general/LoadingScreen";
-import UserIcon from "./ui/UserIcon";
-import SidebarItem from "./layout/SidebarItem";
-import AuthService from "../../../services/AuthService";
 import {
     ArrowUpTrayIcon,
     ChartBarIcon,
@@ -19,12 +10,27 @@ import {
     BookOpenIcon
 } from "@heroicons/react/24/outline";
 import {AnimatePresence, motion} from "framer-motion";
+import React, {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
+
+import AuthService from "../../../services/AuthService";
+import {LoadingBubble} from "../../general/LoadingScreen";
+import useErrorHandler from "../../logging/ErrorHandler";
 import {LogVisualizer} from "../../logging/LoggerDevTools";
 import {useMetaNotify} from "../../logging/MetaNotifyHook";
-import StatsHub from "./StatsHub";
-import UserGuide from "./UserGuide";
-import PageExplorer from "./PageExplorer";
+import Settings from "../../settings/Settings";
 
+import SidebarItem from "./layout/SidebarItem";
+import PageExplorer from "./PageExplorer";
+import PageHub from "./PageHub";
+import StatsHub from "./StatsHub";
+import UserIcon from "./ui/UserIcon";
+import UserGuide from "./UserGuide";
+
+/**
+ * Renders the dashboard component.
+ * @returns {JSX.Element} The rendered dashboard component.
+ */
 function Dashboard() {
     const [activeTab, setActiveTab] = useState("pages");
 
@@ -39,6 +45,10 @@ function Dashboard() {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
+    /**
+ * Handles logout.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handleLogout = async () => {
         try {
             await AuthService.logout();
@@ -57,6 +67,9 @@ function Dashboard() {
         }
     };
 
+    /**
+ * Handles the render tab content operation.
+ */
     const renderTabContent = () => {
         switch (activeTab) {
             case "pages":
@@ -102,56 +115,56 @@ function Dashboard() {
                     <div className="flex flex-col space-y-2">
                         <h6 className="!text-text">Dashboard</h6>
                         <SidebarItem
-                            label="Pages"
-                            icon={FolderOpenIcon}
                             active={activeTab === "pages"}
+                            icon={FolderOpenIcon}
+                            label="Pages"
                             onClick={() => setActiveTab("pages")}
                         />
                         <SidebarItem
-                            label="Explorer"
-                            icon={GlobeAltIcon}
                             active={activeTab === "explorer"}
+                            icon={GlobeAltIcon}
+                            label="Explorer"
                             onClick={() => setActiveTab("explorer")}
                         />
                         <h6 className="!text-text">Settings</h6>
                         <SidebarItem
-                            label="Account"
-                            icon={UserCircleIcon}
                             active={activeTab === "accountSettings"}
+                            icon={UserCircleIcon}
+                            label="Account"
                             onClick={() => setActiveTab("accountSettings")}
                         />
                         <SidebarItem
-                            label="Appearence"
-                            icon={PaintBrushIcon}
                             active={activeTab === "appearanceSettings"}
+                            icon={PaintBrushIcon}
+                            label="Appearence"
                             onClick={() => setActiveTab("appearanceSettings")}
                         />
                         <SidebarItem
-                            label="Security"
-                            icon={ShieldCheckIcon}
                             active={activeTab === "securitySettings"}
+                            icon={ShieldCheckIcon}
+                            label="Security"
                             onClick={() => setActiveTab("securitySettings")}
                         />
                         <SidebarItem
-                            label="Statistics"
-                            icon={ChartBarIcon}
                             active={activeTab === "stats"}
+                            icon={ChartBarIcon}
+                            label="Statistics"
                             onClick={() => setActiveTab("stats")}
                         />
                         <h6 className="!text-text">Help</h6>
                         <SidebarItem
-                            label="User Guide"
-                            icon={BookOpenIcon}
                             active={activeTab === "userGuide"}
+                            icon={BookOpenIcon}
+                            label="User Guide"
                             onClick={() => setActiveTab("userGuide")}
                         />
 
                         {import.meta.env.VITE_ENV?.toLowerCase() === "dev" && (<>
                             <h6 className="!text-text">Admin</h6>
                             <SidebarItem
-                                label="Logging"
-                                icon={CodeBracketIcon}
                                 active={activeTab === "logging"}
+                                icon={CodeBracketIcon}
+                                label="Logging"
                                 onClick={() => setActiveTab("logging")}
                             />
                         </>)}
@@ -160,10 +173,10 @@ function Dashboard() {
                         <div className="border-t-2 border-ui-border my-4"/>
                         <SidebarItem
                             className="text-dangerous"
-                            label="Log Out"
-                            svgClass="rotate-[-90deg] stroke-dangerous"
                             icon={ArrowUpTrayIcon}
+                            label="Log Out"
                             onClick={handleLogout}
+                            svgClass="rotate-[-90deg] stroke-dangerous"
                         />
                     </div>
                 </nav>
@@ -173,10 +186,10 @@ function Dashboard() {
             <main className="flex-1 m-2 p-5 bg-website-bg border-ui-border border-2 rounded-[10px] overflow-y-auto">
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={activeTab}
-                        initial={{opacity: 0, y: 10}}
                         animate={{opacity: 1, y: 0}}
                         exit={{opacity: 0, y: -10}}
+                        initial={{opacity: 0, y: 10}}
+                        key={activeTab}
                         transition={{duration: 0.25}}
                     >
                         {renderTabContent()}

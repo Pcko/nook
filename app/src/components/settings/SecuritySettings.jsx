@@ -1,13 +1,22 @@
 import {useMemo, useState} from "react";
-import HR from "./SettingsHR";
-import {isInvalidStringForPassword} from "../general/FormChecks";
-import QRCodeDisplay from "./QRCodeDisplay";
-import useErrorHandler from "../logging/ErrorHandler";
-import SettingsService from "../../services/SettingsService";
-import AuthService from "../../services/AuthService";
-import {useMetaNotify} from "../logging/MetaNotifyHook";
-import {TwoFactorCodeForm} from "../../features/auth/index";
 
+import {TwoFactorCodeForm} from "../../features/auth/index";
+import AuthService from "../../services/AuthService";
+import SettingsService from "../../services/SettingsService";
+import {isInvalidStringForPassword} from "../general/FormChecks";
+import useErrorHandler from "../logging/ErrorHandler";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
+
+import QRCodeDisplay from "./QRCodeDisplay";
+import HR from "./SettingsHR";
+
+/**
+ * Renders the security settings component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.changeHandler - The change handler value.
+ * @returns {JSX.Element} The rendered security settings component.
+ */
 function SecuritySettings({changeHandler}) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -25,6 +34,12 @@ function SecuritySettings({changeHandler}) {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+ * Handles the send password change request operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const sendPasswordChangeRequest = async (e) => {
         e.preventDefault();
 
@@ -72,6 +87,12 @@ function SecuritySettings({changeHandler}) {
         }
     };
 
+    /**
+ * Handles 2 fatoggle button click.
+ *
+ * @param {any} event - The event payload for the current interaction.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handle2FAToggleButtonClick = async (event) => {
         event.preventDefault();
 
@@ -116,6 +137,10 @@ function SecuritySettings({changeHandler}) {
         }
     };
 
+    /**
+     *
+     * @param otp
+     */
     const handle2FASubmit = async (otp) => {
         if (!otp) {
             setTwoFactorAuthFormActive(false);
@@ -177,49 +202,49 @@ function SecuritySettings({changeHandler}) {
                     <h6>Change password</h6>
 
                     <input
-                        type="submit"
                         className="w-[55%] ml-auto mr-0 mb-[7px] p-1 rounded-[5px] text-text-on-primary text-center bg-primary border-2 border-primary cursor-pointer hover:bg-primary-hover transition-colors"
+                        type="submit"
                         value="Update Password"
                     />
 
                     <div>
                         {/* Current Password Field */}
                         <label
-                            htmlFor="currentPassword"
                             className="block my-auto"
+                            htmlFor="currentPassword"
                         >
                             Current password
                         </label>
                         <input
-                            type="password"
-                            id="currentPassword"
-                            name="currentPassword"
-                            placeholder="************"
-                            required
-                            minLength="10"
                             className="settings-pw-input mb-3"
+                            id="currentPassword"
+                            minLength="10"
+                            name="currentPassword"
                             onChange={(e) =>
                                 setCurrentPassword(e.target.value)
                             }
+                            placeholder="************"
+                            required
+                            type="password"
                         />
 
                         {/* New Password Field */}
                         <label
-                            htmlFor="newPassword"
                             className="block my-auto"
+                            htmlFor="newPassword"
                         >
                             New password
                         </label>
                         <input
-                            type="password"
+                            autoComplete="off"
+                            className="settings-pw-input"
                             id="newPassword"
+                            minLength="10"
                             name="newPassword"
+                            onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="************"
                             required
-                            autoComplete="off"
-                            minLength="10"
-                            className="settings-pw-input"
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            type="password"
                         />
                     </div>
                     {/* filler */}

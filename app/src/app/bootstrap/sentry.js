@@ -1,5 +1,8 @@
 import * as Sentry from "@sentry/react";
 
+/**
+ * Checks whether is sentry enabled.
+ */
 export function isSentryEnabled() {
     const env = import.meta.env;
     const sentryDsn = env.VITE_SENTRY_DSN;
@@ -8,6 +11,9 @@ export function isSentryEnabled() {
     return !env.DEV;
 }
 
+/**
+ * Handles the init sentry operation.
+ */
 export function initSentry() {
     if (!isSentryEnabled()) {
         return;

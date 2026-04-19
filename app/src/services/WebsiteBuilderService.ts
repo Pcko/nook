@@ -4,28 +4,38 @@ import PageService from './PageService.ts';
 import {
     prepareProjectDataForPersistence,
     restoreProjectDataFromCache,
-    writeCompressedPageCache,
+    writePageCache,
 } from './pageContentService.ts';
 
 class WebsiteBuilderService {
     static async savePageState(editor: Editor, page: Page): Promise<void> {
+        const storageKey = `page_${page.name}`;
+
         try {
             const latestProjectData = editor.getProjectData();
             const prepared = await prepareProjectDataForPersistence(page.name, latestProjectData);
-            const storageKey = `page_${page.name}`;
 
             page.data = prepared.editorData;
-            writeCompressedPageCache(storageKey, prepared.normalizedData);
-
             await PageService.updatePage(page, undefined, prepared);
+            localStorage.removeItem(storageKey);
         } catch (err) {
+            const latestProjectData = editor.getProjectData();
+            const prepared = await prepareProjectDataForPersistence(page.name, latestProjectData);
+            writePageCache(storageKey, prepared.normalizedData);
             throw { ...err, redirectToLogin: true };
         }
     }
 
     static async loadPageState(editor: Editor, page: Page): Promise<void> {
+        const storageKey = `page_${page.name}`;
+
         try {
-            const storageKey = `page_${page.name}`;
+            const { data } = await PageService.getPage(page.name);
+            if (data !== null) {
+                page.data = data;
+                editor.loadProjectData(data);
+            }
+        } catch (err) {
             const cached = localStorage.getItem(storageKey);
             if (cached !== null) {
                 const restored = restoreProjectDataFromCache(cached);
@@ -38,12 +48,6 @@ class WebsiteBuilderService {
                 localStorage.removeItem(storageKey);
             }
 
-            const { data } = await PageService.getPage(page.name);
-            if (data === null) return;
-
-            page.data = data;
-            editor.loadProjectData(data);
-        } catch (err) {
             throw { ...err, redirectToLogin: true };
         }
     }

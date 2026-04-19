@@ -2,6 +2,9 @@ import React, { useEffect, useRef } from "react";
 
 const STYLE_ID = "wb-tooltip-styles";
 
+/**
+ * Handles the ensure styles operation.
+ */
 function ensureStyles() {
   if (typeof document === "undefined") return;
   if (document.getElementById(STYLE_ID)) return;
@@ -52,22 +55,43 @@ function ensureStyles() {
   document.head.appendChild(style);
 }
 
+/**
+ *
+ * @param startEl
+ */
 function closestTooltipTarget(startEl) {
   if (!startEl || !(startEl instanceof Element)) return null;
   return startEl.closest?.("[data-wb-tooltip]") || null;
 }
 
+/**
+ * Returns delay ms.
+ *
+ * @param {any} el - The el value.
+ * @returns {any} The computed result of the operation.
+ */
 function getDelayMs(el) {
   const raw = el?.getAttribute?.("data-wb-tooltip-delay");
   const ms = raw ? parseInt(raw, 10) : NaN;
   return Number.isFinite(ms) ? ms : 650;
 }
 
+/**
+ * Returns placement.
+ *
+ * @param {any} el - The el value.
+ * @returns {any} The computed result of the operation.
+ */
 function getPlacement(el) {
   const p = (el?.getAttribute?.("data-wb-tooltip-placement") || "bottom").toLowerCase();
   return p === "top" ? "top" : "bottom";
 }
 
+/**
+ *
+ * @param bubbleEl
+ * @param anchorEl
+ */
 function positionTooltip(bubbleEl, anchorEl) {
   if (!bubbleEl || !anchorEl) return;
 
@@ -101,6 +125,10 @@ function positionTooltip(bubbleEl, anchorEl) {
   bubbleEl.style.top = `${Math.round(top)}px`;
 }
 
+/**
+ * Renders the tooltip host component.
+ * @returns {JSX.Element} The rendered tooltip host component.
+ */
 export function TooltipHost() {
   const bubbleRef = useRef(null);
   const activeElRef = useRef(null);
@@ -119,6 +147,9 @@ export function TooltipHost() {
     document.body.appendChild(bubble);
     bubbleRef.current = bubble;
 
+    /**
+ * Clears timer.
+ */
     const clearTimer = () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -126,6 +157,9 @@ export function TooltipHost() {
       }
     };
 
+    /**
+ * Handles the hide operation.
+ */
     const hide = () => {
       clearTimer();
       openRef.current = false;
@@ -136,6 +170,11 @@ export function TooltipHost() {
       bubbleRef.current.textContent = "";
     };
 
+    /**
+ * Handles the show for operation.
+ *
+ * @param {any} el - The el value.
+ */
     const showFor = (el) => {
       if (!el || !bubbleRef.current) return;
       const text = el.getAttribute("data-wb-tooltip");
@@ -148,6 +187,11 @@ export function TooltipHost() {
       openRef.current = true;
     };
 
+    /**
+ * Handles the schedule show operation.
+ *
+ * @param {any} el - The el value.
+ */
     const scheduleShow = (el) => {
       clearTimer();
       const delay = getDelayMs(el);
@@ -157,6 +201,11 @@ export function TooltipHost() {
       }, delay);
     };
 
+    /**
+ * Handles the on pointer over operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ */
     const onPointerOver = (e) => {
       const target = closestTooltipTarget(e.target);
       if (!target) return;
@@ -166,6 +215,11 @@ export function TooltipHost() {
       scheduleShow(target);
     };
 
+    /**
+ * Handles the on pointer out operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ */
     const onPointerOut = (e) => {
       const currentTarget = activeElRef.current;
       if (!currentTarget) return;
@@ -176,6 +230,11 @@ export function TooltipHost() {
       hide();
     };
 
+    /**
+ * Handles the on focus in operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ */
     const onFocusIn = (e) => {
       const target = closestTooltipTarget(e.target);
       if (!target) return;
@@ -183,8 +242,14 @@ export function TooltipHost() {
       scheduleShow(target);
     };
 
+    /**
+ * Handles the on focus out operation.
+ */
     const onFocusOut = () => hide();
 
+    /**
+ * Handles the on scroll or resize operation.
+ */
     const onScrollOrResize = () => {
       if (!openRef.current) return;
       if (!bubbleRef.current || !activeElRef.current) return;
@@ -217,15 +282,25 @@ export function TooltipHost() {
   return null;
 }
 
+/**
+ * Renders the info tip component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.text - The text value.
+ * @param {any} props.delay - The delay value.
+ * @param {any} props.placement - The placement value.
+ * @param {any} props.className - The class name value.
+ * @returns {JSX.Element} The rendered info tip component.
+ */
 export function InfoTip({ text, delay = 650, placement = "top", className = "" }) {
   return (
     <span
-      className={`wb-infotip ${className}`}
-      role="img"
       aria-label="Info"
+      className={`wb-infotip ${className}`}
       data-wb-tooltip={text}
       data-wb-tooltip-delay={String(delay)}
       data-wb-tooltip-placement={placement}
+      role="img"
       tabIndex={0}
     >
       i

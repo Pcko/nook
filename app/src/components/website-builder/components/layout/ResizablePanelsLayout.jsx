@@ -2,6 +2,17 @@
 import React, { useRef } from "react";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 
+/**
+ * Renders the resizable panels layout component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.left - The left value.
+ * @param {any} props.editor - The editor value.
+ * @param {any} props.right - The right value.
+ * @param {any} props.autoSaveId - The auto save id value.
+ * @param {any} props.onLayout - Callback fired for the on layout action.
+ * @returns {JSX.Element} The rendered resizable panels layout component.
+ */
 export default function ResizablePanelsLayout({
   left,
   editor,
@@ -20,6 +31,11 @@ export default function ResizablePanelsLayout({
   const snapped  = useRef/** @type {'left'|'right'|null} */(null);
 
 
+  /**
+ * Handles the maybe snap operation.
+ *
+ * @param {any} [L0, E0, R0] - The [l0, e0, r0] value.
+ */
   const maybeSnap = ([L0, E0, R0]) => {
     if (!dragging.current || !active.current) return;
 
@@ -29,6 +45,9 @@ export default function ResizablePanelsLayout({
     const target = SZ[side];
     const dist   = Math.abs(curr - target);
 
+    /**
+ * Handles the pin operation.
+ */
     const pin = () => {
       if (side === "left") L = target; else R = target;
       E = 100 - L - R;
@@ -40,6 +59,10 @@ export default function ResizablePanelsLayout({
     if (snapped.current === side && Math.abs(curr - target) > 0.001) pin();
   };
 
+  /**
+   *
+   * @param side
+   */
   const onDrag = (side) => (isDragging) => {
     dragging.current = isDragging;
     active.current   = isDragging ? side : null;

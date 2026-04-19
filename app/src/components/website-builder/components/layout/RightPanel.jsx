@@ -1,10 +1,11 @@
 import React, {useState} from "react";
-import TabSelector from "../TabSelector";
-import AIAssistantPanel from "../panels/AIAssistantPanel";
+
 import {useBuilder} from "../../hooks/UseBuilder";
-import HistoryPanel from "../panels/HistoryPanel";
-import PanelSearchBar from "../ui/PanelSearchBar";
 import {useDomTextFilter} from "../../hooks/useDomTextFilter";
+import AIAssistantPanel from "../panels/AIAssistantPanel";
+import HistoryPanel from "../panels/HistoryPanel";
+import TabSelector from "../TabSelector";
+import PanelSearchBar from "../ui/PanelSearchBar";
 
 /**
  * RightPanel component
@@ -37,6 +38,10 @@ function RightPanel() {
         groupTitleSelector: ".gjs-sm-sector-title, .gjs-title",
     });
 
+    /**
+     *
+     * @param tab
+     */
     const handleTabChange = (tab) => {
         if (aiBusy) return;
         setActiveTab(tab);
@@ -66,10 +71,10 @@ function RightPanel() {
                     >
                         <div className="mb-3">
                             <PanelSearchBar
-                                value={search}
+                                disabled={aiBusy}
                                 onChange={setSearch}
                                 placeholder="Search traits / styles…"
-                                disabled={aiBusy}
+                                value={search}
                             />
                         </div>
 

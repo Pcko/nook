@@ -2,6 +2,13 @@ import React, {createContext, useContext, useEffect, useState} from "react";
 
 const AnimationContext = createContext();
 
+/**
+ * Renders the animation provider component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.children - Nested content rendered inside the component.
+ * @returns {JSX.Element} The rendered animation provider component.
+ */
 export function AnimationProvider({children}) {
     const [animationEnabled, setAnimationEnabled] = useState(true);
 
@@ -10,6 +17,9 @@ export function AnimationProvider({children}) {
         setAnimationEnabled(stored !== "off"); // apply user's settings or default to true if not set
     }, []);
 
+    /**
+ * Toggles animation.
+ */
     const toggleAnimation = () => {
         const newValue = !animationEnabled;
         setAnimationEnabled(newValue);
@@ -23,6 +33,9 @@ export function AnimationProvider({children}) {
     );
 }
 
+/**
+ * Provides the use animation hook.
+ */
 export function useAnimation() {
     return useContext(AnimationContext);
 }

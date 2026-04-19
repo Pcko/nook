@@ -4,17 +4,18 @@ import {Navigate, Outlet, useLocation} from "react-router-dom";
 import LoadingScreen from "../../components/general/LoadingScreen";
 import {refreshAccessToken} from "../../features/auth";
 
+/**
+ * Removes persisted client-side session data after logout or token invalidation.
+ */
 function clearClientSession() {
     localStorage.removeItem("user");
     sessionStorage.clear();
 }
 
 /**
- *  Determines the correct entry route based on the user’s authentication state.
- *  It checks whether the session can be restored and redirects authenticated
- *  users to the dashboard and unauthenticated users to the login page.
- * @returns {JSX.Element}
- * @constructor
+ * Guards private routes by validating the current session before rendering them.
+ *
+ * @returns {JSX.Element} The protected route content or a redirect to the login page.
  */
 function ProtectedRoute() {
     const [loading, setLoading] = useState(true);
@@ -24,6 +25,11 @@ function ProtectedRoute() {
     useEffect(() => {
         let isMounted = true;
 
+        /**
+         * Validates the current session before rendering the protected route.
+         *
+         * @returns {Promise<void>} Resolves after the session check finishes.
+         */
         const checkSession = async () => {
             try {
                 const response = await refreshAccessToken();
@@ -54,7 +60,7 @@ function ProtectedRoute() {
     }
 
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace state={{from: location}}/>;
+        return <Navigate replace state={{from: location}} to="/login"/>;
     }
 
     return <Outlet/>;

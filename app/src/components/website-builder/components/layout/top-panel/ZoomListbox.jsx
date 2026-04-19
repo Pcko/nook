@@ -1,10 +1,19 @@
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
 import React from "react";
 
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
 
+/**
+ * Renders the zoom listbox component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.value - The value value.
+ * @param {any} props.onChange - Callback fired for the on change action.
+ * @param {any} props.options - The options value.
+ * @returns {JSX.Element} The rendered zoom listbox component.
+ */
 function ZoomListbox({ value, onChange, options }) {
     return (
-            <Listbox value={value} onChange={onChange}>
+            <Listbox onChange={onChange} value={value}>
                 <div className="relative">
                     <ListboxButton
                             className={[

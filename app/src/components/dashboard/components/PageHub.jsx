@@ -1,18 +1,20 @@
-﻿import React, {Fragment, useEffect, useMemo, useState} from "react";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
+import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
+import React, {Fragment, useEffect, useMemo, useState} from "react";
+import {BsThreeDots} from "react-icons/bs";
+import {useNavigate} from "react-router-dom";
+
+import DateTimeService from "../../../services/DateTimeService";
+import PageService from "../../../services/PageService";
+import CenteredWindowWithBackgroundBlur from "../../general/CenteredWindowWithBackgroundBlur";
+import useErrorHandler from "../../logging/ErrorHandler";
+import {useMetaNotify} from "../../logging/MetaNotifyHook";
+import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "../resources/DashboardIcons";
 
 import PageCreationForm from "./PageCreationForm";
 import PageEditForm from "./PageEditForm";
-import useErrorHandler from "../../logging/ErrorHandler";
-import PageService from "../../../services/PageService";
-import {InactiveIcon, NotDeployedIcon, OnlineIcon} from "../resources/DashboardIcons";
-import CenteredWindowWithBackgroundBlur from "../../general/CenteredWindowWithBackgroundBlur";
-import {BsThreeDots} from "react-icons/bs";
-import {MagnifyingGlassIcon} from "@heroicons/react/24/outline";
-import {useNavigate} from "react-router-dom";
-import {useMetaNotify} from "../../logging/MetaNotifyHook";
 import SortMenu from "./ui/SortMenu";
-import DateTimeService from "../../../services/DateTimeService";
+
 
 /**
  * All Options that the user can sort by
@@ -54,6 +56,10 @@ const dateFormat = {
     year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false
 };
 
+/**
+ * Renders the page hub component.
+ * @returns {JSX.Element} The rendered page hub component.
+ */
 function PageHub() {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortByOption, setSortByOption] = useState(sortByOptions[0]);
@@ -87,10 +93,20 @@ function PageHub() {
             });
     }, [handleError]);
 
+    /**
+     *
+     * @param page
+     */
     const onPageClick = (page) => {
         navigate(`/editor/${page.name}`, {state: {page}});
     };
 
+    /**
+ * Handles the compare table entries operation.
+ *
+ * @param {any} [keyA, valueA] - The [key a, value a] value.
+ * @param {any} [keyB, valueB] - The [key b, value b] value.
+ */
     const compareTableEntries = ([keyA, valueA], [keyB, valueB]) => {
         switch (sortByOption) {
             case sortByOptions[0]:
@@ -109,6 +125,10 @@ function PageHub() {
         }
     };
 
+    /**
+     *
+     * @param pageName
+     */
     const handlePageDelete = async (pageName) => {
         try {
             await PageService.deletePage(pageName);
@@ -131,17 +151,22 @@ function PageHub() {
     };
 
     /**
-     *  Handles leftover Pages that
-     * @returns {undefined|Object}
+     * Restores the temporary page-creation artifact after a failed creation flow.
+     *
+     * @returns {Object | undefined} The restored artifact data when available.
      */
     const handleFragment = () => {
-        if (!sessionStorage.getItem("artifact")) {
+        const rawArtifact = sessionStorage.getItem("artifact");
+        if (!rawArtifact) {
             return undefined;
         }
 
         try {
-            return JSON.parse(sessionStorage.getItem("artifact"));
-        } catch (err) {
+            const parsedArtifact = JSON.parse(rawArtifact);
+            sessionStorage.removeItem("artifact");
+            return parsedArtifact;
+        } catch {
+            sessionStorage.removeItem("artifact");
             return undefined;
         }
     }
@@ -157,39 +182,39 @@ function PageHub() {
                     <div className="flex w-1/3 p-2 border border-ui-border rounded-[5px]">
                         <MagnifyingGlassIcon className="h-5 mr-1 !text-text-subtle"/>
                         <input
-                            type="text"
-                            placeholder="Search"
-                            onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full my-auto bg-inherit focus:outline-none placeholder:text-text-subtle"
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search"
+                            type="text"
                         />
                     </div>
 
                     {/* Sorting + New Page */}
                     <div className="flex ml-auto space-x-4">
                         <SortMenu
-                            value={sortByOption}
                             onChange={setSortByOption}
                             options={sortByOptions}
+                            value={sortByOption}
                         />
 
                         <button
-                            type="button"
                             className="prim-btn w-[180px] h-[42px] rounded-[5px] !text-text-on-primary !border border-secondary flex items-center justify-center gap-2"
                             onClick={() => setPageCreationFormActive(true)}
+                            type="button"
                         >
                             <svg
                                 className="icon"
-                                width="14"
+                                fill="none"
                                 height="13"
                                 viewBox="0 0 18 17"
-                                fill="none"
+                                width="14"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
                                 <path
                                     d="M8.56115 1.23145V15.8758M16.0862 8.55364H1.03613"
-                                    strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
+                                    strokeWidth="2"
                                 />
                             </svg>
                             New Page
@@ -245,16 +270,16 @@ function PageHub() {
                                                     className="absolute right-0 mt-2 w-40 bg-ui-bg border border-ui-border rounded-md shadow- [5px] text-text z-50">
                                                     <ListboxOption value="editPage">
                                                         {({active}) => (<button
-                                                            onClick={() => setPageNameToEdit(name)}
                                                             className={`w-full text-left px-4 py-2 text-sm rounded transition-colors ${active ? "bg-ui-bg-selected" : ""}`}
+                                                            onClick={() => setPageNameToEdit(name)}
                                                         >
                                                             Edit Page
                                                         </button>)}
                                                     </ListboxOption>
                                                     <ListboxOption value="deletePage">
                                                         {({active}) => (<button
-                                                            onClick={() => handlePageDelete(name)}
                                                             className={`w-full text-left px-4 py-2 text-sm rounded text-dangerous transition-colors ${active ? "bg-red-100" : ""}`}
+                                                            onClick={() => handlePageDelete(name)}
                                                         >
                                                             Delete Page
                                                         </button>)}
@@ -287,17 +312,17 @@ function PageHub() {
                 {/* Forms */}
                 {pageCreationFormActive && (<CenteredWindowWithBackgroundBlur>
                     <PageCreationForm
-                        pages={pages}
-                        setPages={setPages}
                         closeForm={() => setPageCreationFormActive(false)}
                         fallbackFormData={fallbackFormData}
+                        pages={pages}
+                        setPages={setPages}
                     />
                 </CenteredWindowWithBackgroundBlur>)}
 
                 {pageNameToEdit && (<CenteredWindowWithBackgroundBlur>
                     <PageEditForm
-                        pageName={pageNameToEdit}
                         closeForm={() => setPageNameToEdit(undefined)}
+                        pageName={pageNameToEdit}
                         pages={pages}
                     />
                 </CenteredWindowWithBackgroundBlur>)}

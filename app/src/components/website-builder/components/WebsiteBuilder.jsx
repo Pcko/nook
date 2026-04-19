@@ -1,17 +1,27 @@
 import React from "react";
 
-import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
 import {useGrapesEditor} from "../hooks/useGrapesEditor";
-import ResizablePanelsLayout from "./layout/ResizablePanelsLayout";
+import {grapesjsExportConfig, grapesjsExportPlugin} from "../utils/grapesExportConfig";
+
+import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
 import LeftPanel from "./layout/LeftPanel";
+import ResizablePanelsLayout from "./layout/ResizablePanelsLayout";
 import RightPanel from "./layout/RightPanel";
 import TopPanel from "./layout/top-panel/TopPanel";
+
 import "./WebsiteBuilder.css";
 import {LoadingBubble} from "../../general/LoadingScreen";
 import {BuilderProvider} from "../hooks/UseBuilder";
-import AIAssistantOverlay from "./AI/AIChangeReviewPopup";
+
 import {TooltipHost} from "./ui/TooltipSystem";
 
+/**
+ * Renders the website builder component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.page - The page value.
+ * @returns {JSX.Element} The rendered website builder component.
+ */
 function WebsiteBuilder({page}) {
     const {editorRef, containerRef, isReady} = useGrapesEditor({
         height: "100%",
@@ -34,13 +44,16 @@ function WebsiteBuilder({page}) {
         },
     }, page);
 
+    /**
+ * Handles layout.
+ */
     const handleLayout = () => editorRef.current?.refresh?.();
 
     return (
         <BuilderProvider
+            editorReady={isReady}
             editorRef={editorRef}
             initialPage={page}
-            editorReady={isReady}
         >
             <div className="flex flex-col h-screen w-screen">
                 <TooltipHost/>

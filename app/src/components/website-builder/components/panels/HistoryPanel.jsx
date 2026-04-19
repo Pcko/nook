@@ -1,6 +1,6 @@
 ﻿import React, {useMemo} from "react";
-import DateTimeService from "../../../../services/DateTimeService";
 
+import DateTimeService from "../../../../services/DateTimeService";
 import {useBuilder} from "../../hooks/UseBuilder";
 
 
@@ -42,16 +42,16 @@ function HistoryPanel() {
 
                         return (
                             <button
-                                key={it.id}
-                                type="button"
-                                onClick={() => goToHistory(idx)}
                                 className={
                                     "w-full text-left rounded border border-ui-border px-2 py-1 transition " +
                                     (isActive
                                         ? "bg-ui-bg-selected text-text"
                                         : "bg-ui-bg text-text-subtle hover:bg-ui-button-hover")
                                 }
+                                key={it.id}
+                                onClick={() => goToHistory(idx)}
                                 title={DateTimeService.formatTime(it.ts)}
+                                type="button"
                             >
                                 <div className="flex items-center justify-between gap-2">
                                     <span className={"text-tiny font-semibold " + (isActive ? "text-text" : "text-text-subtle")}

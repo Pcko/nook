@@ -1,5 +1,6 @@
-import {CrossIcon} from "../../resources/DashboardIcons";
 import React from "react";
+
+import {CrossIcon} from "../../resources/DashboardIcons";
 
 /**
  * Top bar used for forms, containing a title and a close button.
@@ -15,9 +16,9 @@ function FormTopBar({onClick, title}) {
         <div className="flex items-center pb-3 border-b-2 border-ui-border mb-5">
             <h4 className="font-semibold">{title}</h4>
             <button
-                onClick={onClick}
-                className="ml-auto hover:text-primary transition-colors"
                 aria-label="Close form"
+                className="ml-auto hover:text-primary transition-colors"
+                onClick={onClick}
             >
                 <CrossIcon/>
             </button>

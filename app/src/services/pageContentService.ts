@@ -1,9 +1,9 @@
 import pako from 'pako';
 import { buildAssetRef, buildEditorAssetUrl, uploadPageImageDataUrl } from './pageAssetService.ts';
 
-export const DEFAULT_STORED_STRING_ENCODING = 'deflate-base64';
+export const DEFAULT_STORED_STRING_ENCODING = 'plain';
 export const STORED_STRING_FORMAT_VERSION = 1;
-const PAGE_CACHE_FORMAT_VERSION = 1;
+const PAGE_CACHE_FORMAT_VERSION = 2;
 const MAX_LOCAL_PAGE_CACHE_BYTES = 1_500_000;
 const INLINE_IMAGE_DATA_URL_REGEX = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
 const HAS_INLINE_IMAGE_DATA_URL_REGEX = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/i;
@@ -107,6 +107,16 @@ function resolveValueForEditor(value) {
     return value;
 }
 
+/**
+ * Encodes a persisted string using the configured storage format.
+ *
+ * Plain strings are used by default, while legacy compressed payloads remain supported
+ * for backwards compatibility.
+ *
+ * @param {string | null} value - The value that should be persisted.
+ * @param {string} [encoding=DEFAULT_STORED_STRING_ENCODING] - The storage encoding to use.
+ * @returns {{content: string | null, encoding: string, version: number}} The encoded payload metadata.
+ */
 export function encodeStoredString(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
     if (value == null) {
         return {
@@ -132,6 +142,13 @@ export function encodeStoredString(value, encoding = DEFAULT_STORED_STRING_ENCOD
     };
 }
 
+/**
+ * Decodes a persisted string from either the current plain format or the legacy compressed format.
+ *
+ * @param {string | null} value - The stored value.
+ * @param {string | null | undefined} encoding - The encoding associated with the stored value.
+ * @returns {string | null} The decoded string value.
+ */
 export function decodeStoredString(value, encoding) {
     if (value == null) return null;
     if (!encoding || encoding === 'plain') return value;
@@ -141,20 +158,48 @@ export function decodeStoredString(value, encoding) {
     throw new Error(`Unsupported stored string encoding: ${String(encoding)}`);
 }
 
+/**
+ * Serializes and encodes JSON data for persistence.
+ *
+ * @param {any} value - The JSON-serializable value to encode.
+ * @param {string} [encoding=DEFAULT_STORED_STRING_ENCODING] - The storage encoding to use.
+ * @returns {{content: string | null, encoding: string, version: number}} The encoded JSON payload metadata.
+ */
 export function encodeStoredJson(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
     return encodeStoredString(JSON.stringify(value), encoding);
 }
 
+/**
+ * Decodes and parses persisted JSON data.
+ *
+ * @param {string | null} value - The stored JSON payload.
+ * @param {string | null | undefined} encoding - The encoding associated with the payload.
+ * @returns {any} The parsed JSON value.
+ */
 export function decodeStoredJson(value, encoding) {
     const json = decodeStoredString(value, encoding);
     return json == null ? null : JSON.parse(json);
 }
 
+/**
+ * Restores persisted project data into the format expected by the editor.
+ *
+ * @param {string | null} value - The stored project data payload.
+ * @param {string | null | undefined} encoding - The encoding associated with the payload.
+ * @returns {any} The hydrated project data ready for the editor.
+ */
 export function hydrateProjectDataForEditor(value, encoding) {
     const normalizedData = decodeStoredJson(value, encoding);
     return normalizedData == null ? null : resolveValueForEditor(normalizedData);
 }
 
+/**
+ * Normalizes editor project data and prepares it for persistence.
+ *
+ * @param {string} pageName - The page name used when uploading inline assets.
+ * @param {any} projectData - The GrapesJS project data to persist.
+ * @returns {Promise<{normalizedData: any, editorData: any, encoded: {content: string | null, encoding: string, version: number}}>} The normalized persistence payload.
+ */
 export async function prepareProjectDataForPersistence(pageName, projectData) {
     if (projectData == null) {
         const encoded = encodeStoredJson(null);
@@ -176,6 +221,12 @@ export async function prepareProjectDataForPersistence(pageName, projectData) {
     };
 }
 
+/**
+ * Builds the serialized cache payload for editor recovery data.
+ *
+ * @param {any} normalizedData - The normalized project data stored in the cache.
+ * @returns {string} The serialized cache entry.
+ */
 export function buildPageCacheEntry(normalizedData) {
     const encoded = encodeStoredJson(normalizedData);
     return JSON.stringify({
@@ -186,6 +237,12 @@ export function buildPageCacheEntry(normalizedData) {
     });
 }
 
+/**
+ * Restores editor project data from the local recovery cache.
+ *
+ * @param {string | null} cacheValue - The serialized cache entry.
+ * @returns {any} The restored project data or null when the cache is invalid.
+ */
 export function restoreProjectDataFromCache(cacheValue) {
     if (!cacheValue) return null;
 
@@ -200,7 +257,14 @@ export function restoreProjectDataFromCache(cacheValue) {
     }
 }
 
-export function writeCompressedPageCache(storageKey, normalizedData) {
+/**
+ * Writes the local recovery cache entry for the editor.
+ *
+ * @param {string} storageKey - The local storage key used for the page.
+ * @param {any} normalizedData - The normalized project data to cache.
+ * @returns {boolean} True when the cache entry was written successfully.
+ */
+export function writePageCache(storageKey, normalizedData) {
     if (normalizedData == null) {
         localStorage.removeItem(storageKey);
         return false;
@@ -220,3 +284,5 @@ export function writeCompressedPageCache(storageKey, normalizedData) {
         return false;
     }
 }
+
+export const writeCompressedPageCache = writePageCache;

@@ -4,10 +4,10 @@ import faviconDark from "../../../../../assets/resources/favicon-dark.png";
 import faviconLight from "../../../../../assets/resources/favicon-light.png";
 import frameDark from "../../../../../assets/resources/frame-dark.png";
 import frameLight from "../../../../../assets/resources/frame-light.png";
+import {useBuilder} from "../../../hooks/UseBuilder";
 import {useWebsiteExportSettings} from "../../../utils/websiteExportSettings";
 
 import FaviconPreviewThemes from "./FaviconPreviewThemes";
-import {useBuilder} from "../../../hooks/UseBuilder";
 
 
 const LANGUAGES = [

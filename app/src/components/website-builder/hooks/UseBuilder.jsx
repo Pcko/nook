@@ -6,6 +6,7 @@ import React, {
     useMemo,
     useState,
 } from "react";
+
 import {useBuilderHistory} from "../utils/useBuilderHistory";
 
 /**
@@ -31,10 +32,14 @@ import {useBuilderHistory} from "../utils/useBuilderHistory";
 const BuilderContext = createContext(null);
 
 /**
- * BuilderProvider
+ * Renders the builder provider component.
  *
- * WebsiteBuilder runtime state. Metadata is sourced from the page (DB) and held
- * in memory only (no localStorage, no wizard UI in the builder).
+ * @param {Object} props - Component props.
+ * @param {any} props.editorRef - The editor ref value.
+ * @param {any} props.initialPage - The initial page value.
+ * @param {any} props.editorReady - The editor ready value.
+ * @param {any} props.children - Nested content rendered inside the component.
+ * @returns {JSX.Element} The rendered builder provider component.
  */
 export function BuilderProvider({editorRef, initialPage, editorReady, children}) {
     const pageName = initialPage?.name ?? null;
@@ -59,8 +64,17 @@ export function BuilderProvider({editorRef, initialPage, editorReady, children})
         const editor = editorRef.current;
         if (!editor) return;
 
+        /**
+         *
+         * @param cmp
+         */
         const onSelect = (cmp) => setSelectedElement(cmp || null);
 
+        /**
+ * Handles the event handler operation.
+ *
+ * @param {any} event - The event payload for the current interaction.
+ */
         const eventHandler = (event) => {
             if (event.key === "Escape") {
                 editor.select(null);

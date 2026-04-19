@@ -4,6 +4,10 @@ const envApiUrl = (import.meta.env.VITE_API_URL || "").trim();
 const useDevProxy = import.meta.env.DEV && import.meta.env.VITE_DISABLE_API_PROXY !== "true";
 const apiBaseURL = useDevProxy ? "" : envApiUrl;
 
+/**
+ *
+ * @param config
+ */
 function getRequestPath(config = {}) {
     const requestUrl = config.url || "/";
 

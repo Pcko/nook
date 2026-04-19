@@ -1,5 +1,3 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import {
     ArrowUpTrayIcon,
     BookOpenIcon,
@@ -8,14 +6,17 @@ import {
     GlobeAltIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import ExampleImagePreview from "./ExampleImagePreview";
+import React from "react";
+import { Link } from "react-router-dom";
+
 
 import slideshowIcon from "../../assets/resources/frontpage/slideshow-icon.png";
 import slideshowSlogan from "../../assets/resources/frontpage/slideshow-slogan.png";
 
-import cvImage from "./assets/cv.png";
 import companyImage from "./assets/company.png";
+import cvImage from "./assets/cv.png";
 import eventsImage from "./assets/events.png";
+import ExampleImagePreview from "./ExampleImagePreview";
 
 const sidebarItems = [
     { id: "overview", label: "Overview", icon: FolderOpenIcon },
@@ -75,6 +76,10 @@ const examples = [
     },
 ];
 
+/**
+ * Renders the homepage component.
+ * @returns {JSX.Element} The rendered homepage component.
+ */
 function Homepage() {
     const trailerEmbedUrl = import.meta.env.VITE_TRAILER_EMBED_URL?.trim();
     const mainRef = React.useRef(null);
@@ -122,7 +127,7 @@ function Homepage() {
                     {/* Sidebar (app-like) */}
                     <aside className="hidden w-[280px] shrink-0 border-r border-ui-border bg-website-bg/80 lg:flex lg:flex-col">
                         <div className="flex items-center gap-3 border-b border-ui-border px-5 py-4">
-                            <img src={slideshowIcon} alt="NOOK" className="h-9 w-9 rounded-md object-cover" />
+                            <img alt="NOOK" className="h-9 w-9 rounded-md object-cover" src={slideshowIcon} />
                             <div>
                                 <p className="text-small text-text-subtle">Product page</p>
                                 <h6 className="font-semibold !text-text">NOOK</h6>
@@ -135,10 +140,10 @@ function Homepage() {
 
                                 return (
                                     <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => scrollToSection(item.id)}
                                         className="mb-1 flex w-full items-center gap-2 rounded-[8px] px-3 py-2 text-left text-text-subtle transition-colors hover:bg-ui-bg-selected hover:text-text"
+                                        key={item.id}
+                                        onClick={() => scrollToSection(item.id)}
+                                        type="button"
                                     >
                                         <Icon className="h-5 w-5" />
                                         <span>{item.label}</span>
@@ -148,11 +153,11 @@ function Homepage() {
                         </nav>
 
                         <div className="mt-auto border-t border-ui-border p-4">
-                            <Link to="/register" className="prim-btn flex w-full items-center justify-center gap-2">
+                            <Link className="prim-btn flex w-full items-center justify-center gap-2" to="/register">
                                 Try NOOK
                                 <ArrowUpTrayIcon className="h-4 w-4" />
                             </Link>
-                            <Link to="/login" className="btn btn-landing mt-2 block w-full text-center">
+                            <Link className="btn btn-landing mt-2 block w-full text-center" to="/login">
                                 Sign in
                             </Link>
                         </div>
@@ -160,13 +165,13 @@ function Homepage() {
 
                     {/* Main content */}
                     <main
-                        ref={mainRef}
                         className="min-h-0 flex-1 overflow-y-auto overscroll-contain scroll-smooth"
+                        ref={mainRef}
                     >
                         {/* Window top bar (app-feel) */}
                         <div
-                            data-topbar
                             className="sticky top-0 z-20 border-b border-ui-border bg-ui-bg/95 supports-[backdrop-filter]:bg-ui-bg/70 supports-[backdrop-filter]:backdrop-blur"
+                            data-topbar
                         >
                             <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                                 <div className="flex items-center gap-2">
@@ -176,12 +181,12 @@ function Homepage() {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row sm:items-center">
-                                    <Link to="/login" className="btn btn-landing w-full text-center !px-3 !py-1.5 sm:w-auto">
+                                    <Link className="btn btn-landing w-full text-center !px-3 !py-1.5 sm:w-auto" to="/login">
                                         Sign in
                                     </Link>
                                     <Link
-                                        to="/register"
                                         className="prim-btn mt-2 w-full text-center !px-3 !py-1.5 sm:mt-0 sm:ml-2 sm:w-auto"
+                                        to="/register"
                                     >
                                         Try now
                                     </Link>
@@ -191,7 +196,7 @@ function Homepage() {
 
                         <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
                             {/* Overview / Hero */}
-                            <section id="overview" className="grid gap-4 lg:grid-cols-12">
+                            <section className="grid gap-4 lg:grid-cols-12" id="overview">
                                 <div className="rounded-2xl border border-ui-border bg-website-bg p-5 lg:col-span-7 lg:p-7">
                                     <p className="text-small text-text-subtle">For potential users</p>
                                     <h1 className="mt-1 max-w-2xl">
@@ -203,13 +208,13 @@ function Homepage() {
                                     </p>
 
                                     <div className="mt-6 flex flex-wrap gap-2">
-                                        <Link to="/register" className="prim-btn !m-0">
+                                        <Link className="prim-btn !m-0" to="/register">
                                             Try now
                                         </Link>
                                         <button
-                                            type="button"
-                                            onClick={() => scrollToSection("trailer")}
                                             className="btn btn-landing !m-0"
+                                            onClick={() => scrollToSection("trailer")}
+                                            type="button"
                                         >
                                             Watch trailer
                                         </button>
@@ -233,9 +238,9 @@ function Homepage() {
 
                                 <div className="rounded-2xl border border-ui-border bg-website-bg p-4 lg:col-span-5">
                                     <img
-                                        src={slideshowSlogan}
                                         alt="NOOK preview"
                                         className="h-64 w-full rounded-xl border border-ui-border object-cover lg:h-full"
+                                        src={slideshowSlogan}
                                     />
                                 </div>
                             </section>
@@ -244,8 +249,8 @@ function Homepage() {
                             <section className="mt-6 grid gap-3 md:grid-cols-3">
                                 {valueCards.map((card) => (
                                     <article
-                                        key={card.title}
                                         className="rounded-[8px] border border-ui-border bg-website-bg p-4"
+                                        key={card.title}
                                     >
                                         <h6 className="font-semibold">{card.title}</h6>
                                         <p className="mt-2 text-small text-text-subtle">{card.text}</p>
@@ -254,7 +259,7 @@ function Homepage() {
                             </section>
 
                             {/* Examples */}
-                            <section id="examples" className="mt-6">
+                            <section className="mt-6" id="examples">
                                 <div className="mb-3 flex items-center justify-between">
                                     <div>
                                         <h3>Examples</h3>
@@ -267,13 +272,13 @@ function Homepage() {
                                 <div className="grid gap-3 md:grid-cols-3">
                                     {examples.map((example) => (
                                         <article
-                                            key={example.title}
                                             className="overflow-hidden rounded-[8px] border border-ui-border bg-website-bg"
+                                            key={example.title}
                                         >
                                             <ExampleImagePreview
-                                                src={example.image}
                                                 alt={example.title}
                                                 fallbackSrc={slideshowIcon}
+                                                src={example.image}
                                             />
                                             <div className="p-4">
                                                 <span className="inline-block rounded-[6px] border border-ui-border bg-ui-bg px-2 py-1 text-tiny text-text-subtle">
@@ -299,8 +304,8 @@ function Homepage() {
                                 <div className="grid gap-3 md:grid-cols-3">
                                     {steps.map((step, index) => (
                                         <div
-                                            key={step.title}
                                             className="rounded-[8px] border border-ui-border bg-ui-bg p-4"
+                                            key={step.title}
                                         >
                                             <div className="mb-3 flex h-7 w-7 items-center justify-center rounded-full border border-ui-border text-small font-semibold">
                                                 {index + 1}
@@ -314,8 +319,8 @@ function Homepage() {
 
                             {/* Trailer */}
                             <section
-                                id="trailer"
                                 className="mt-6 rounded-2xl border border-ui-border bg-website-bg p-5"
+                                id="trailer"
                             >
                                 <div className="mb-3 flex items-center justify-between gap-3">
                                     <div>
@@ -325,9 +330,9 @@ function Homepage() {
                                         </p>
                                     </div>
                                     <button
-                                        type="button"
-                                        onClick={() => scrollToSection("examples")}
                                         className="btn btn-landing !m-0 !px-3 !py-1.5"
+                                        onClick={() => scrollToSection("examples")}
+                                        type="button"
                                     >
                                         Go to examples
                                     </button>
@@ -337,20 +342,20 @@ function Homepage() {
                                     {trailerEmbedUrl ? (
                                         <div className="aspect-video w-full">
                                             <iframe
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowFullScreen
                                                 className="h-full w-full"
+                                                referrerPolicy="strict-origin-when-cross-origin"
                                                 src={trailerEmbedUrl}
                                                 title="NOOK Trailer"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                referrerPolicy="strict-origin-when-cross-origin"
-                                                allowFullScreen
                                             />
                                         </div>
                                     ) : (
                                         <video
                                             className="h-full w-full"
                                             controls
-                                            preload="metadata"
                                             poster={slideshowSlogan}
+                                            preload="metadata"
                                         >
                                             <source src="/videos/nook-trailer.mp4" type="video/mp4" />
                                             Your browser does not support HTML5 video.
@@ -360,7 +365,7 @@ function Homepage() {
                             </section>
 
                             {/* FAQ + CTA */}
-                            <section id="faq" className="mt-6 grid gap-3 lg:grid-cols-12">
+                            <section className="mt-6 grid gap-3 lg:grid-cols-12" id="faq">
                                 <div className="rounded-2xl border border-ui-border bg-website-bg p-5 lg:col-span-8">
                                     <h4>Frequently asked questions</h4>
                                     <div className="mt-4 space-y-3">
@@ -385,10 +390,10 @@ function Homepage() {
                                         Watch the trailer, check the examples, and start in the builder.
                                     </p>
                                     <div className="mt-4">
-                                        <Link to="/register" className="prim-btn block w-full text-center">
+                                        <Link className="prim-btn block w-full text-center" to="/register">
                                             Try NOOK
                                         </Link>
-                                        <Link to="/register" className="btn btn-landing mt-2 block w-full text-center">
+                                        <Link className="btn btn-landing mt-2 block w-full text-center" to="/register">
                                             Create account
                                         </Link>
                                     </div>

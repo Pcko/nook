@@ -71,8 +71,6 @@ class PageService {
         const payload: any = {
             newPageName,
             pageContent: prepared.encoded.content,
-            dataEncoding: prepared.encoded.encoding,
-            dataVersion: prepared.encoded.version,
         };
 
         // Only send metadata if present to avoid wiping it accidentally.
@@ -100,7 +98,7 @@ class PageService {
             withCredentials: false,
         });
 
-        return response.data.pages;
+        return response.data.pages ?? response.data.data ?? [];
     }
 
     /**

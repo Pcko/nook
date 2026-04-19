@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-sort-props */
-import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
     ChevronDownIcon,
@@ -7,12 +6,17 @@ import {
     XMarkIcon,
     ChartBarIcon,
 } from "@heroicons/react/24/outline";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 
 import { DeploymentStats } from "../../../features/publishing";
 import PageService from "../../../services/PageService";
 import StatsService from "../../../services/StatsService";
 import { LoadingBubble } from "../../general/LoadingScreen";
 
+/**
+ * Renders the stats hub component.
+ * @returns {JSX.Element} The rendered stats hub component.
+ */
 export default function StatsHub() {
     const [pagePickerOpen, setPagePickerOpen] = useState(false);
     const [pageQuery, setPageQuery] = useState("");

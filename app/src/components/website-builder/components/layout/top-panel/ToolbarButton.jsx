@@ -1,5 +1,17 @@
 import React from "react";
 
+/**
+ * Renders the toolbar button component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.icon - The icon value.
+ * @param {any} props.label - The label value.
+ * @param {any} props.tooltip - The tooltip value.
+ * @param {any} props.tooltipDelay - The tooltip delay value.
+ * @param {any} props.tooltipPlacement - The tooltip placement value.
+ * @param {any} props.onClick - Callback fired for the on click action.
+ * @returns {JSX.Element} The rendered toolbar button component.
+ */
 function ToolbarButton({ icon, label, tooltip, tooltipDelay = 650, tooltipPlacement = "bottom", onClick }) {
     const hasLabel = !!label;
 

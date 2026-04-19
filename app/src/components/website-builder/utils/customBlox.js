@@ -1,5 +1,9 @@
 const STORAGE_KEY = "website-builder-user-blox";
 
+/**
+ *
+ * @param raw
+ */
 function safeParse(raw) {
   try {
     const parsed = JSON.parse(raw);
@@ -9,16 +13,29 @@ function safeParse(raw) {
   }
 }
 
+/**
+ * Returns stored user blox.
+ * @returns {any} The computed result of the operation.
+ */
 export function getStoredUserBlox() {
   if (typeof window === "undefined") return [];
   return safeParse(window.localStorage.getItem(STORAGE_KEY));
 }
 
+/**
+ *
+ * @param items
+ */
 function setStoredUserBlox(items) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
 
+/**
+ * Handles the slugify operation.
+ *
+ * @param {any} input - The input value to process.
+ */
 function slugify(input) {
   return String(input || "blox")
     .trim()
@@ -27,10 +44,21 @@ function slugify(input) {
     .replace(/^-+|-+$/g, "") || "blox";
 }
 
+/**
+ *
+ * @param name
+ */
 function toBlockId(name) {
   return `user-blox-${slugify(name)}`;
 }
 
+/**
+ * Returns scoped html.
+ *
+ * @param {any} editor - The editor value.
+ * @param {any} component - The component value.
+ * @returns {any} The computed result of the operation.
+ */
 function getScopedHtml(editor, component) {
   try {
     if (typeof editor?.getHtml === "function") {
@@ -45,6 +73,13 @@ function getScopedHtml(editor, component) {
   }
 }
 
+/**
+ * Returns scoped css.
+ *
+ * @param {any} editor - The editor value.
+ * @param {any} component - The component value.
+ * @returns {any} The computed result of the operation.
+ */
 function getScopedCss(editor, component) {
   try {
     if (typeof editor?.getCss === "function") {
@@ -55,6 +90,11 @@ function getScopedCss(editor, component) {
   return "";
 }
 
+/**
+ *
+ * @param html
+ * @param css
+ */
 function buildBlockContent(html, css) {
   const trimmedHtml = String(html || "").trim();
   const trimmedCss = String(css || "").trim();
@@ -68,6 +108,10 @@ function buildBlockContent(html, css) {
   return `${trimmedHtml}<style>${trimmedCss}</style>`;
 }
 
+/**
+ *
+ * @param html
+ */
 function stripStylesAndScripts(html) {
   return String(html || "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
@@ -75,6 +119,10 @@ function stripStylesAndScripts(html) {
     .replace(/\son[a-z]+=("[^"]*"|'[^']*')/gi, "");
 }
 
+/**
+ *
+ * @param value
+ */
 function escapeHtmlAttr(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -83,6 +131,11 @@ function escapeHtmlAttr(value) {
     .replace(/>/g, "&gt;");
 }
 
+/**
+ *
+ * @param html
+ * @param css
+ */
 function buildPreviewDocument(html, css) {
   const safeHtml = stripStylesAndScripts(html);
   const safeCss = String(css || "").replace(/<\/style>/gi, "");
@@ -193,6 +246,13 @@ function buildPreviewDocument(html, css) {
 </html>`;
 }
 
+/**
+ *
+ * @param name
+ * @param html
+ * @param css
+ * @param id
+ */
 function makeUserBloxLabel(name, html, css, id) {
   const previewDoc = escapeHtmlAttr(buildPreviewDocument(html, css));
   const escapedName = escapeHtmlAttr(name);
@@ -215,12 +275,22 @@ function makeUserBloxLabel(name, html, css, id) {
   `;
 }
 
+/**
+ *
+ * @param blockId
+ */
 function removeStoredUserBlox(blockId) {
   const existing = getStoredUserBlox();
   const next = existing.filter((item) => item?.id !== blockId);
   setStoredUserBlox(next);
 }
 
+/**
+ * Handles the delete user blox operation.
+ *
+ * @param {any} editor - The editor value.
+ * @param {any} blockId - The block id value.
+ */
 export function deleteUserBlox(editor, blockId) {
   if (!blockId) return;
   removeStoredUserBlox(blockId);
@@ -230,9 +300,19 @@ export function deleteUserBlox(editor, blockId) {
   }
 }
 
+/**
+ * Handles the init user blox ui operation.
+ *
+ * @param {any} editor - The editor value.
+ */
 export function initUserBloxUi(editor) {
   if (!editor || typeof document === "undefined") return () => {};
 
+  /**
+ * Handles document click.
+ *
+ * @param {any} event - The event payload for the current interaction.
+ */
   const handleDocumentClick = (event) => {
     const deleteButton = event.target?.closest?.("[data-wb-blox-delete]");
     if (!deleteButton) return;
@@ -253,6 +333,13 @@ export function initUserBloxUi(editor) {
   };
 }
 
+/**
+ * Saves selected component as user blox.
+ *
+ * @param {any} editor - The editor value.
+ * @param {any} component - The component value.
+ * @param {any} name - The name value.
+ */
 export function saveSelectedComponentAsUserBlox(editor, component, name) {
   if (!editor || !component) throw new Error("No component selected.");
 
@@ -280,6 +367,11 @@ export function saveSelectedComponentAsUserBlox(editor, component, name) {
   return entry;
 }
 
+/**
+ * Loads user blox blocks.
+ *
+ * @param {any} editor - The editor value.
+ */
 export function loadUserBloxBlocks(editor) {
   if (!editor) return;
   getStoredUserBlox().forEach((block) => {
@@ -287,6 +379,12 @@ export function loadUserBloxBlocks(editor) {
   });
 }
 
+/**
+ * Handles the add user blox block to editor operation.
+ *
+ * @param {any} editor - The editor value.
+ * @param {any} block - The block value.
+ */
 export function addUserBloxBlockToEditor(editor, block) {
   if (!editor || !block) return;
 

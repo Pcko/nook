@@ -1,5 +1,17 @@
 import React from "react";
 
+/**
+ * Renders the sidebar item component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.label - The label value.
+ * @param {any} props.icon - The icon value.
+ * @param {any} props.active - The active value.
+ * @param {any} props.onClick - Callback fired for the on click action.
+ * @param {any} props.className - The class name value.
+ * @param {any} props.svgClass - The svg class value.
+ * @returns {JSX.Element} The rendered sidebar item component.
+ */
 function SidebarItem({ label, icon: Icon, active, onClick, className = "", svgClass = ""}) {
     return (
         <div

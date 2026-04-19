@@ -4,12 +4,12 @@ import {useEffect, useRef, useState} from "react";
 import "grapesjs/dist/css/grapes.min.css";
 import WebsiteBuilderService from "../../../services/WebsiteBuilderService";
 import ErrorHandler from "../../logging/ErrorHandler";
-import {loadCustomBlocks} from "../utils/grapesBlocks";
 import {initUserBloxUi, loadUserBloxBlocks} from "../utils/customBlox";
-import {replaceDefaultShortcuts} from "../utils/shortcuts";
-import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
 import {registerButtonTestTrait} from "../utils/grapesAnchorButton";
+import {loadCustomBlocks} from "../utils/grapesBlocks";
 import {generateUniqueHtmlId} from "../utils/idGenerationUtil";
+import {removeGlobalTitleTrait} from "../utils/removeDefaultTitleTrait";
+import {replaceDefaultShortcuts} from "../utils/shortcuts";
 
 /**
  * Custom React hook to initialize and manage a GrapesJS editor instance.

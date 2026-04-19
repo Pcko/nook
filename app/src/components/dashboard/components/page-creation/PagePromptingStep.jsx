@@ -1,22 +1,26 @@
-import React from "react";
 import {motion, AnimatePresence} from "framer-motion";
+import React from "react";
+
 import LoadingCircleSpinner from "../../../general/LoadingCircleSpinner";
+import { LoadingBubble } from "../../../general/LoadingScreen";
+import PromptingTextArea from "../../../general/PromptingTextArea";
+
 import FormTopBar from "./FormTopBar";
 import GrapesPagePreview from "./GrapesPagePreview";
-import PromptingTextArea from "../../../general/PromptingTextArea";
-import { LoadingBubble } from "../../../general/LoadingScreen";
+
 
 /**
- * PagePromptingStep
+ * Renders the page prompting step component.
  *
- * Step in the page creation flow that:
- * - collects an AI prompt from the user
- * - triggers AI generation
- * - shows loading skeletons while AI-generated layouts are being fetched
- * - shows GrapesJS-based previews once layouts are available
- *
- * This component is intentionally UI-focused and does not handle any
- * API calls directly; it delegates actions to the callbacks passed in via props.
+ * @param {Object} props - Component props.
+ * @param {any} props.closeForm - The close form value.
+ * @param {any} props.aiPrompt - The ai prompt value.
+ * @param {any} props.setAiPrompt - The set ai prompt value.
+ * @param {any} props.loading - The loading value.
+ * @param {any} props.handleAiPromptSubmit - The handle ai prompt submit value.
+ * @param {any} props.aiPages - The ai pages value.
+ * @param {any} props.handleSelectAiPage - The handle select ai page value.
+ * @returns {JSX.Element} The rendered page prompting step component.
  */
 function PagePromptingStep({
     closeForm,
@@ -33,12 +37,19 @@ function PagePromptingStep({
     // Step 2 is prompt input. Step 3 is preview selection.
     const step = loading || hasPages ? 3 : 2;
 
+    /**
+ * Handles submit.
+ */
     const handleSubmit = () => {
         if (!loading && aiPrompt.trim()) {
             handleAiPromptSubmit();
         }
     };
 
+    /**
+ * Renders the skeleton preview card component.
+ * @returns {JSX.Element} The rendered skeleton preview card component.
+ */
     const SkeletonPreviewCard = () => (
         <div className="relative overflow-hidden rounded-md border border-ui-border bg-ui-bg animate-pulse">
             <div className="h-[250px] w-full bg-website-bg"/>
@@ -67,10 +78,10 @@ function PagePromptingStep({
 
                 <div className="relative">
                     <PromptingTextArea
-                        prompt={aiPrompt}
                         handleSubmit={handleSubmit}
                         loading={loading}
                         placeholder={"e.g. A clean portfolio landing page for a minimalist architect..."}
+                        prompt={aiPrompt}
                         setPrompt={setAiPrompt}
                     />
                 </div>
@@ -110,8 +121,8 @@ function PagePromptingStep({
                               <LoadingBubble
                                             className="w-full rounded-[8px] bg-website-bg"
                                             compact
-                                            title="Loading pages"
                                             subtitle="Generating your pages..."
+                                            title="Loading pages"
                                         />
                         )}
 
@@ -127,8 +138,8 @@ function PagePromptingStep({
                                     >
                                         <GrapesPagePreview
                                             index={i}
-                                            page={page}
                                             onSelect={() => handleSelectAiPage(page)}
+                                            page={page}
                                         />
                                     </motion.div>
                                 ))}

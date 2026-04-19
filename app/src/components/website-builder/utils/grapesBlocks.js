@@ -141,6 +141,11 @@ const svg = {
   `,
 };
 
+/**
+ *
+ * @param title
+ * @param iconSvg
+ */
 function makeBlockLabel(title, iconSvg) {
   return `
     <div class="wb-block-label">

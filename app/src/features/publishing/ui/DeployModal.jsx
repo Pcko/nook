@@ -1,6 +1,4 @@
 /* eslint-disable react/jsx-sort-props */
-import React, {Fragment, useEffect, useMemo, useState} from "react";
-import {AnimatePresence, motion} from "framer-motion";
 import {Dialog, Transition, Disclosure, Switch} from "@headlessui/react";
 import {
     ArrowDownTrayIcon,
@@ -10,6 +8,8 @@ import {
     XMarkIcon,
     LinkIcon,
 } from "@heroicons/react/24/outline";
+import {AnimatePresence, motion} from "framer-motion";
+import React, {Fragment, useEffect, useMemo, useState} from "react";
 
 import useErrorHandler from "../../../components/logging/ErrorHandler";
 import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
@@ -17,6 +17,12 @@ import {useBuilder} from "../../../components/website-builder/hooks/UseBuilder";
 import {getWebsiteExportSettings} from "../../../components/website-builder/utils/websiteExportSettings";
 import {buildStaticBundle, publishPage} from "../api";
 
+/**
+ * Converts a user-provided page label into a URL-safe slug.
+ *
+ * @param {string} input - The source value that should become a slug.
+ * @returns {string} A normalized slug safe for URLs.
+ */
 function slugify(input) {
     return (
         String(input || "")
@@ -53,6 +59,17 @@ const DESTINATIONS = [
     },
 ];
 
+/**
+ * Renders the deployment modal for publishing or exporting the current page.
+ *
+ * @param {Object} props - Component props.
+ * @param {boolean} props.open - Whether the modal is currently visible.
+ * @param {() => void} props.onClose - Called when the modal should close.
+ * @param {import("../../../services/interfaces/Page").default} props.page - The page that is being published or exported.
+ * @param {() => void} [props.onOpenSettings] - Opens the related settings view when available.
+ * @param {string} [props.publicBaseUrl] - Base URL of the public publishing server.
+ * @returns {JSX.Element} The deployment modal UI.
+ */
 export default function DeployModal({open, onClose, page, onOpenSettings, publicBaseUrl}) {
     const baseMeta = useMemo(() => ({feature: "builder", component: "DeployModal"}), []);
     const {notify} = useMetaNotify(baseMeta);
@@ -83,12 +100,19 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     const editorReady = !!editorRef?.current;
     const canRun = editorReady && !busy && !aiBusy;
 
+    const normalizedSlug = useMemo(() => slugify(slug), [slug]);
+
     const urlPreview = useMemo(() => {
         if (!publicBaseUrl) return "";
         const base = String(publicBaseUrl).replace(/\/+$/, "");
-        return `${base}/../${slug}/`;
-    }, [publicBaseUrl, slug]);
+        return `${base}/<author-id>/${normalizedSlug}`;
+    }, [publicBaseUrl, normalizedSlug]);
 
+    /**
+     * Triggers a ZIP export of the current editor state.
+     *
+     * @returns {Promise<void>} Resolves after the export command has been dispatched.
+     */
     async function downloadZip() {
         const editor = editorRef?.current;
         if (!editor) return;
@@ -105,6 +129,12 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
         }
     }
 
+    /**
+     * Publishes the current editor state to the publishing API.
+     *
+     * @param {string} env - The target environment label used for notifications.
+     * @returns {Promise<void>} Resolves after the publish request completes.
+     */
     async function publishToApi(env) {
         const editor = editorRef?.current;
         if (!editor) return;
@@ -118,11 +148,12 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
             notify("info", "Publishing...", {stage: "deploy", mode: "api", env}, "deploy");
 
             const {html} = await buildStaticBundle(editor);
-            const res = await publishPage(page, html, destination === "live");
+            const res = await publishPage(page, html, destination === "live", normalizedSlug);
 
             const authorId = res?.data?.author;
-            const pageName = res?.data?.name || page.name;
-            const url = `${publicBaseUrl}/${authorId}/${pageName}`;
+            const pageName = res?.data?.name || normalizedSlug || page.name;
+            const base = String(publicBaseUrl || "").replace(/\/+$/, "");
+            const url = authorId ? `${base}/${authorId}/${pageName}` : "";
 
             setResultUrl(url);
             setPendingUrl(url);
@@ -145,18 +176,29 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
         }
     }
 
+    /**
+     * Starts the selected deployment action.
+     *
+     * @returns {Promise<void>} Resolves after the selected action has been triggered.
+     */
     async function handlePrimary() {
         if (destination === "download") return downloadZip();
         const def = DESTINATIONS.find(d => d.value === destination);
         return publishToApi(def?.env || "production");
     }
 
+    /**
+     * Opens the newly published page in a separate browser tab.
+     */
     function confirmOpenNow() {
         if (!pendingUrl) return;
         window.open(pendingUrl, "_blank", "noopener,noreferrer");
         setOpenPrompt(false);
     }
 
+    /**
+     * Closes the post-publish prompt dialog.
+     */
     function closeOpenPrompt() {
         setOpenPrompt(false);
     }
@@ -167,17 +209,23 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     return (
         <Transition show={open} as={Fragment}>
             <Dialog as="div" className="relative z-[60]" onClose={onClose}>
-                <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0"
-                                  enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100"
+                <Transition.Child as={Fragment}
+enter="ease-out duration-200"
+enterFrom="opacity-0"
+                                  enterTo="opacity-100"
+leave="ease-in duration-150"
+leaveFrom="opacity-100"
                                   leaveTo="opacity-0">
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm"/>
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4">
-                        <Transition.Child as={Fragment} enter="ease-out duration-200"
+                        <Transition.Child as={Fragment}
+enter="ease-out duration-200"
                                           enterFrom="opacity-0 translate-y-2 scale-95"
-                                          enterTo="opacity-100 translate-y-0 scale-100" leave="ease-in duration-150"
+                                          enterTo="opacity-100 translate-y-0 scale-100"
+leave="ease-in duration-150"
                                           leaveFrom="opacity-100 translate-y-0 scale-100"
                                           leaveTo="opacity-0 translate-y-2 scale-95">
                             <Dialog.Panel className="w-full max-w-2xl">
@@ -210,8 +258,11 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                                 </button>
                                             ) : null}
 
-                                            <button onClick={onClose} className="hover:text-primary transition-colors"
-                                                    aria-label="Close" disabled={busy} type="button">
+                                            <button onClick={onClose}
+className="hover:text-primary transition-colors"
+                                                    aria-label="Close"
+disabled={busy}
+type="button">
                                                 <XMarkIcon className="h-5 w-5"/>
                                             </button>
                                         </div>
@@ -258,7 +309,7 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
                                                         className="mt-1 w-full h-[44px] px-3 pt-1 border-2 border-ui-border rounded-[6px] bg-website-bg text-small text-text placeholder-text-subtle
                                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                                                         value={slug}
-                                                        onChange={(e) => setSlug(e.target.value)}
+                                                        onChange={(e) => setSlug(slugify(e.target.value))}
                                                         placeholder="my-page"
                                                         disabled={destination === "download"}
                                                     />
@@ -447,6 +498,17 @@ export default function DeployModal({open, onClose, page, onOpenSettings, public
     );
 }
 
+/**
+ * Renders one publish destination option inside the deployment modal.
+ *
+ * @param {Object} props - Component props.
+ * @param {boolean} props.active - Whether the destination is currently selected.
+ * @param {() => void} props.onClick - Called when the destination is selected.
+ * @param {string} props.title - Main title for the destination.
+ * @param {string} props.subtitle - Supporting text for the destination.
+ * @param {React.ComponentType<any>} props.Icon - Icon component displayed for the destination.
+ * @returns {JSX.Element} The destination option card.
+ */
 function DestinationCard({active, onClick, title, subtitle, Icon}) {
     return (
         <motion.div
@@ -479,6 +541,15 @@ function DestinationCard({active, onClick, title, subtitle, Icon}) {
     );
 }
 
+/**
+ * Renders the summary row component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.label - The label value.
+ * @param {any} props.value - The value value.
+ * @param {any} props.wide - The wide value.
+ * @returns {JSX.Element} The rendered summary row component.
+ */
 function SummaryRow({label, value, wide = false}) {
     return (
         <div

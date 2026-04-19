@@ -1,7 +1,7 @@
 ﻿import ReactDOM from "react-dom/client";
 
-import App from "./App.jsx";
 import initSentry from "./app/bootstrap/sentry";
+import App from "./App.jsx";
 import "./index.css";
 import "./assets/styles/global.css";
 

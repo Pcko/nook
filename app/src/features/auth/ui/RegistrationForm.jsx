@@ -1,19 +1,26 @@
 import {useMemo, useState} from "react";
+import {FcGoogle} from "react-icons/fc";
 import {useNavigate} from "react-router-dom";
-import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
-import useErrorHandler from "../../../components/logging/ErrorHandler";
+
 import {
     isInvalidStringForEmail,
     isInvalidStringForFirstName, isInvalidStringForLastName,
     isInvalidStringForPassword,
     isInvalidStringForUsername
 } from "../../../components/general/FormChecks";
-import {registerUser} from "../api";
 import LoadingScreen from "../../../components/general/LoadingScreen";
-import {FcGoogle} from "react-icons/fc";
-import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+import useErrorHandler from "../../../components/logging/ErrorHandler";
+import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
 import FormDivider from "../../../features/auth/ui/FormDivider";
+import {registerUser} from "../api";
 
+import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+
+
+/**
+ * Renders the registration form component.
+ * @returns {JSX.Element} The rendered registration form component.
+ */
 function RegistrationForm() {
     const [formData, setFormData] = useState({
         username: "",
@@ -37,6 +44,11 @@ function RegistrationForm() {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+ * Handles change.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ */
     const handleChange = (e) => {
         setFormData((prev) => ({
             ...prev,
@@ -44,6 +56,12 @@ function RegistrationForm() {
         }));
     };
 
+    /**
+ * Handles submit.
+ *
+ * @param {any} event - The event payload for the current interaction.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -122,86 +140,86 @@ function RegistrationForm() {
                     </p>
 
                     <div className="w-[60%]">
-                        <form onSubmit={handleSubmit} className="mt-2">
+                        <form className="mt-2" onSubmit={handleSubmit}>
 
                             {/* Username */}
-                            <label htmlFor="username" className="block mb-1">Username</label>
+                            <label className="block mb-1" htmlFor="username">Username</label>
                             <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                required
-                                minLength={2}
                                 autoComplete="username"
-                                placeholder="Username"
                                 className="form-field"
+                                id="username"
+                                minLength={2}
+                                name="username"
                                 onChange={handleChange}
+                                placeholder="Username"
+                                required
+                                type="text"
                                 value={formData.username}
                             />
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="firstName" className="block mb-1">First Name</label>
+                                    <label className="block mb-1" htmlFor="firstName">First Name</label>
                                     <input
-                                        type="text"
-                                        id="firstName"
-                                        name="firstName"
-                                        required
-                                        minLength={2}
-                                        placeholder="First Name"
                                         className="form-field"
+                                        id="firstName"
+                                        minLength={2}
+                                        name="firstName"
                                         onChange={handleChange}
+                                        placeholder="First Name"
+                                        required
+                                        type="text"
                                         value={formData.firstName}
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="lastName" className="block mb-1">Last Name</label>
+                                    <label className="block mb-1" htmlFor="lastName">Last Name</label>
                                     <input
-                                        type="text"
-                                        id="lastName"
-                                        name="lastName"
-                                        required
-                                        minLength="2"
-                                        placeholder="Last Name"
                                         className="form-field"
+                                        id="lastName"
+                                        minLength="2"
+                                        name="lastName"
                                         onChange={handleChange}
+                                        placeholder="Last Name"
+                                        required
+                                        type="text"
                                         value={formData.lastName}
                                     />
                                 </div>
                             </div>
 
                             {/* Email */}
-                            <label htmlFor="email" className="block mb-1">Email</label>
+                            <label className="block mb-1" htmlFor="email">Email</label>
                             <input
-                                type="email"
+                                autoComplete="email"
+                                className="form-field"
                                 id="email"
                                 name="email"
-                                required
-                                autoComplete="email"
-                                placeholder="Email"
-                                className="form-field"
                                 onChange={handleChange}
+                                placeholder="Email"
+                                required
+                                type="email"
                                 value={formData.email}
                             />
 
                             {/* Password */}
-                            <label htmlFor="password" className="block mb-1">Password</label>
+                            <label className="block mb-1" htmlFor="password">Password</label>
                             <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                required
-                                minLength={10}
                                 autoComplete="new-password"
-                                placeholder="Password"
                                 className="form-field"
+                                id="password"
+                                minLength={10}
+                                name="password"
                                 onChange={handleChange}
+                                placeholder="Password"
+                                required
+                                type="password"
                                 value={formData.password}
                             />
 
                             <input
-                                type="submit"
                                 className={`prim-btn w-full ${loading ? 'animate-pulse' : ''}`}
+                                type="submit"
                                 value="Register"
                             />
 

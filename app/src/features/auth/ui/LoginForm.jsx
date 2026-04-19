@@ -1,15 +1,22 @@
 import {useMemo, useState} from "react";
-import TwoFactorCodeForm from "./TwoFactorCodeForm";
-import LoadingScreen from "../../../components/general/LoadingScreen";
-import {loginUser, loginWith2FA} from "../api/index";
-import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
 import {FcGoogle} from "react-icons/fc";
-import FormDivider from "./FormDivider";
-import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
-import useErrorHandler from "../../../components/logging/ErrorHandler";
 import {useLocation, useNavigate} from "react-router-dom";
-import {isInvalidStringForPassword, isInvalidStringForUsername} from "../../../components/general/FormChecks";
 
+import {isInvalidStringForPassword, isInvalidStringForUsername} from "../../../components/general/FormChecks";
+import LoadingScreen from "../../../components/general/LoadingScreen";
+import useErrorHandler from "../../../components/logging/ErrorHandler";
+import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
+import {loginUser, loginWith2FA} from "../api/index";
+
+import AuthScreenDesktopIcon from "./AuthScreenDesktopIcon";
+import FormDivider from "./FormDivider";
+import TwoFactorCodeForm from "./TwoFactorCodeForm";
+
+/**
+ * Renders the login form, including the optional two-factor authentication step.
+ *
+ * @returns {JSX.Element} The login screen for the application.
+ */
 function LoginForm() {
     const [formData, setFormData] = useState({
         username: "",
@@ -34,6 +41,11 @@ function LoginForm() {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+     * Finalizes a successful login and redirects the user to the intended destination.
+     *
+     * @param {Object} user - The authenticated user returned by the API.
+     */
     const closeLogin = (user) => {
         notify(
             "info",
@@ -51,6 +63,12 @@ function LoginForm() {
         navigate(redirectTarget, {replace: true});
     };
 
+    /**
+     * Submits the login form and starts the optional two-factor authentication flow when required.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
+     * @returns {Promise<void>} Resolves after the login attempt completes.
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -106,6 +124,12 @@ function LoginForm() {
         }
     };
 
+    /**
+     * Submits the entered two-factor authentication code to complete the login flow.
+     *
+     * @param {string} twoFactorAuthenticationCode - The one-time code entered by the user.
+     * @returns {Promise<void>} Resolves after the verification request completes.
+     */
     const handle2FASubmit = async (twoFactorAuthenticationCode) => {
         const {username, password} = formData;
 
@@ -146,6 +170,11 @@ function LoginForm() {
         }
     };
 
+    /**
+     * Updates the form state when the user edits a login field.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+     */
     const handleChange = (e) => {
         setFormData((prev) => ({
             ...prev,
@@ -160,8 +189,8 @@ function LoginForm() {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <div
-                id="Window"
                 className="flex w-[98%] h-[96%] text-text bg-ui-bg border border-ui-border rounded-2xl shadow-lg overflow-hidden z-10"
+                id="Window"
             >
                 <div className="bg-blue w-[45%] flex flex-col justify-center items-center">
                     <h1>Welcome Back</h1>
@@ -175,53 +204,53 @@ function LoginForm() {
                         </a>
                     </p>
                     <div className="w-[60%]">
-                        <form onSubmit={handleSubmit} className="mt-2">
-                            <label htmlFor="username" className="block mb-1">
+                        <form className="mt-2" onSubmit={handleSubmit}>
+                            <label className="block mb-1" htmlFor="username">
                                 Username
                             </label>
 
                             <input
-                                type="text"
-                                id="username"
-                                name="username"
                                 autoComplete="username"
+                                className="form-field mb-5"
+                                id="username"
+                                minLength={2}
+                                name="username"
+                                onChange={handleChange}
                                 placeholder="Username"
                                 required
-                                minLength={2}
-                                className="form-field mb-5"
-                                onChange={handleChange}
+                                type="text"
                                 value={formData.username}
                             />
 
-                            <label htmlFor="password" className="block">
+                            <label className="block" htmlFor="password">
                                 Password
                                 <a
                                     className="text-ui-subtle hover:cursor-pointer ml-3 mt-6"
-                                    onClick={() => navigate("/register")}
+                                    onClick={() => notify("info", "Password reset is not available yet.", { stage: "password-reset-placeholder" }, "auth") }
                                 >
                                     Forgot your password?
                                 </a>
                             </label>
 
                             <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Password"
                                 autoComplete="current-password"
-                                required
-                                minLength={10}
                                 className="form-field"
+                                id="password"
+                                minLength={10}
+                                name="password"
                                 onChange={handleChange}
+                                placeholder="Password"
+                                required
+                                type="password"
                                 value={formData.password}
                             />
 
                             <input
-                                type="submit"
-                                id="sign-up"
                                 className={`prim-btn w-full ${
                                     loading ? "animate-pulse" : ""
                                 }`}
+                                id="sign-up"
+                                type="submit"
                                 value="Login"
                             />
 

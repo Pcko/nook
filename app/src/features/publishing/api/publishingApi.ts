@@ -2,7 +2,6 @@ import type Page from '../../../services/interfaces/Page.ts';
 import httpClient from '../../../shared/api/httpClient';
 import { grapesjsExportConfig } from '../../../components/website-builder/utils/grapesExportConfig';
 import { getWebsiteExportSettings } from '../../../components/website-builder/utils/websiteExportSettings';
-import { encodeStoredString } from '../../../services/pageContentService.ts';
 
 const axiosConfig = {
     headers: { 'Content-Type': 'application/json' },
@@ -10,20 +9,34 @@ const axiosConfig = {
     timeoutErrorMessage: 'Server did not respond.',
 };
 
-export function publishPage(page: Page, html: string, isPublic: boolean) {
-    const encodedHtml = encodeStoredString(html);
+/**
+ * Publishes the current page HTML to the backend publish endpoint.
+ *
+ * @param {Page} page The source page that is being published.
+ * @param {string} html The generated static HTML for the published page.
+ * @param {boolean} isPublic Controls whether the deployment is public or preview-only.
+ * @param {string} slug The published page slug used in the deployment URL.
+ * @returns {Promise<any>} The HTTP request promise for the publish action.
+ */
+export function publishPage(page: Page, html: string, isPublic: boolean, slug: string = page.name) {
+    const resolvedSlug = encodeURIComponent(slug || page.name);
     return httpClient.post(
-        `/api/publishPage/${page.name}/${page.name}`,
+        `/api/publishPage/${encodeURIComponent(page.name)}/${resolvedSlug}`,
         {
-            page: encodedHtml.content,
-            pageEncoding: encodedHtml.encoding,
-            pageVersion: encodedHtml.version,
+            page: html,
             isPublic,
         },
         axiosConfig,
     );
 }
 
+/**
+ * Requests a published page from the public publishing server.
+ *
+ * @param {string} authorId The author identifier of the published page.
+ * @param {string} pageName The published page slug.
+ * @returns {Promise<any>} The HTTP request promise for the public page.
+ */
 export function openPublishedPage(authorId: string, pageName: string) {
     return httpClient({
         method: 'get',
@@ -31,6 +44,12 @@ export function openPublishedPage(authorId: string, pageName: string) {
     });
 }
 
+/**
+ * Builds a static HTML bundle from the current GrapesJS editor state.
+ *
+ * @param {any} editor - The active GrapesJS editor instance.
+ * @returns {Promise<{html: string, projectData: any, exportSettings: any}>} The generated HTML bundle and export metadata.
+ */
 export async function buildStaticBundle(editor: any) {
     const htmlFn = grapesjsExportConfig?.root?.['index.html'];
     const cssFn = grapesjsExportConfig?.root?.css?.['style.css'];

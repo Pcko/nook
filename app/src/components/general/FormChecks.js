@@ -1,5 +1,9 @@
 import { isEmail } from 'validator';
 
+/**
+ *
+ * @param pageName
+ */
 export function isInvalidStringForURL(pageName){
   const regex = /^[a-zA-Z0-9_]+$/;
 
@@ -8,6 +12,10 @@ export function isInvalidStringForURL(pageName){
   }
 }
 
+/**
+ *
+ * @param username
+ */
 export function isInvalidStringForUsername(username){
   const regex = /^[a-zA-Z0-9_]+$/;
 
@@ -20,6 +28,10 @@ export function isInvalidStringForUsername(username){
   }
 }
 
+/**
+ *
+ * @param password
+ */
 export function isInvalidStringForPassword(password){
   if (!password) {
     return 'Password is required';
@@ -30,6 +42,10 @@ export function isInvalidStringForPassword(password){
   }
 }
 
+/**
+ *
+ * @param firstName
+ */
 export function isInvalidStringForFirstName(firstName){
   if (!firstName) {
     return 'First name is required';
@@ -40,6 +56,10 @@ export function isInvalidStringForFirstName(firstName){
   }
 }
 
+/**
+ *
+ * @param lastName
+ */
 export function isInvalidStringForLastName(lastName){
   if (!lastName) {
     return 'Last name is required';
@@ -50,6 +70,11 @@ export function isInvalidStringForLastName(lastName){
   }
 }
 
+/**
+ * Checks whether is invalid string for email.
+ *
+ * @param {any} email - The email value.
+ */
 export function isInvalidStringForEmail(email){
   if (!email) {
     return 'Email is required';

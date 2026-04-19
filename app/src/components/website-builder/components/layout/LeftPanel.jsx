@@ -1,9 +1,10 @@
 import React, {useState} from "react";
-import TabSelector from "../TabSelector";
+
 import {useBuilder} from "../../hooks/UseBuilder";
-import ConfigPanel from "../panels/config-panel/ConfigPanel";
-import PanelSearchBar from "../ui/PanelSearchBar";
 import {useDomTextFilter} from "../../hooks/useDomTextFilter";
+import ConfigPanel from "../panels/config-panel/ConfigPanel";
+import TabSelector from "../TabSelector";
+import PanelSearchBar from "../ui/PanelSearchBar";
 
 /**
  * LeftPanel component
@@ -45,17 +46,17 @@ function LeftPanel() {
             {activeTab === "blocks" && (
                 <div className="mb-2">
                     <PanelSearchBar
-                        value={search}
+                        disabled={aiBusy}
                         onChange={setSearch}
                         placeholder="Search blocks…"
-                        disabled={aiBusy}
+                        value={search}
                     />
                 </div>
             )}
 
             {/* Both exist at load; visibility only */}
-            <div id="gjs-layers" className={activeTab === "layers" ? "" : "hidden"}/>
-            <div id="gjs-blocks" className={activeTab === "blocks" ? "" : "hidden"}/>
+            <div className={activeTab === "layers" ? "" : "hidden"} id="gjs-layers"/>
+            <div className={activeTab === "blocks" ? "" : "hidden"} id="gjs-blocks"/>
 
       {activeTab === "config" && <ConfigPanel/>}
     </div>

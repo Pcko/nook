@@ -1,22 +1,23 @@
-﻿import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Navigate} from "react-router-dom";
 
 import LoadingScreen from "../../components/general/LoadingScreen";
-import {refreshAccessToken} from "../../features/auth";
 import useErrorHandler from "../../components/logging/ErrorHandler";
 import {useMetaNotify} from "../../components/logging/MetaNotifyHook";
+import {refreshAccessToken} from "../../features/auth";
 
+/**
+ * Removes persisted client-side session data after logout or token invalidation.
+ */
 function clearClientSession() {
     localStorage.removeItem("user");
     sessionStorage.clear();
 }
 
 /**
- * Determines the correct entry route based on the user’s authentication state.
- * It checks whether the session can be restored and redirects authenticated users
- * to the dashboard and unauthenticated users to the login page.
- * @returns {JSX.Element}
- * @constructor
+ * Redirects users from the app entry route based on the current session state.
+ *
+ * @returns {JSX.Element} The loading screen or a redirect to the appropriate route.
  */
 function AuthRedirect() {
     const [loading, setLoading] = useState(true);
@@ -36,13 +37,18 @@ function AuthRedirect() {
     useEffect(() => {
         let isMounted = true;
 
+        /**
+         * Restores the current session and updates the redirect target.
+         *
+         * @returns {Promise<void>} Resolves after the session check completes.
+         */
         const checkAuthStatus = async () => {
             try {
                 const response = await refreshAccessToken();
                 if (!isMounted) return;
 
                 if (response.status === 200) {
-                    setIsAuthenticated();
+                    setIsAuthenticated(true);
                     notify(
                         "info",
                         "Session restored successfully.",
@@ -76,13 +82,13 @@ function AuthRedirect() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [handleError, notify]);
 
     if (loading) {
         return <LoadingScreen/>;
     }
 
-    return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace/>;
+    return <Navigate replace to={isAuthenticated ? "/dashboard" : "/login"}/>;
 }
 
 export default AuthRedirect;
