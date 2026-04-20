@@ -1,8 +1,5 @@
-import pako from 'pako';
 import { buildAssetRef, buildEditorAssetUrl, uploadPageImageDataUrl } from './pageAssetService.ts';
 
-export const DEFAULT_STORED_STRING_ENCODING = 'plain';
-export const STORED_STRING_FORMAT_VERSION = 1;
 const PAGE_CACHE_FORMAT_VERSION = 2;
 const MAX_LOCAL_PAGE_CACHE_BYTES = 1_500_000;
 const INLINE_IMAGE_DATA_URL_REGEX = /data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
@@ -11,45 +8,68 @@ const ASSET_REF_REGEX = /asset:\/\/([a-f0-9]{24})/gi;
 const PRIVATE_ASSET_URL_REGEX = /(?:https?:\/\/[^"'()\s]+)?\/api\/page-assets\/([a-f0-9]{24})\/content/gi;
 const PUBLIC_ASSET_URL_REGEX = /(?:https?:\/\/[^"'()\s]+)?\/assets\/([a-f0-9]{24})/gi;
 
+/**
+ * Deep-clones a value so downstream normalization can safely mutate nested data.
+ *
+ * Uses `structuredClone` when available and falls back to JSON serialization for
+ * plain serializable data.
+ *
+ * @template T
+ * @param {T} value - The value to clone.
+ * @returns {T} A deep clone of the input value.
+ */
 function cloneValue(value) {
     if (value == null) return value;
     if (typeof structuredClone === 'function') return structuredClone(value);
     return JSON.parse(JSON.stringify(value));
 }
 
-function uint8ArrayToBase64(bytes) {
-    let binary = '';
-    for (let i = 0; i < bytes.length; i += 1) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-}
-
-function base64ToUint8Array(base64) {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i += 1) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-
-    return bytes;
-}
-
+/**
+ * Estimates the UTF-8 byte size of a value after string coercion.
+ *
+ * @param {unknown} value - The value to measure.
+ * @returns {number} Estimated byte size in UTF-8.
+ */
 function estimateByteSize(value) {
     return new TextEncoder().encode(String(value || '')).length;
 }
 
+/**
+ * Rewrites private and public asset URLs into canonical `asset://<id>` references.
+ *
+ * This keeps persisted project data environment-agnostic by storing asset refs
+ * instead of concrete server URLs.
+ *
+ * @param {unknown} value - A string-like value that may contain asset URLs.
+ * @returns {string} The normalized string containing asset references.
+ */
 function canonicalizeAssetUrlsToRefs(value) {
     return String(value)
         .replace(PRIVATE_ASSET_URL_REGEX, (_match, assetId) => buildAssetRef(assetId))
         .replace(PUBLIC_ASSET_URL_REGEX, (_match, assetId) => buildAssetRef(assetId));
 }
 
+/**
+ * Rewrites canonical `asset://<id>` references into editor-consumable asset URLs.
+ *
+ * @param {unknown} value - A string-like value that may contain asset references.
+ * @returns {string} The resolved string containing editor asset URLs.
+ */
 function resolveAssetRefsToEditorUrls(value) {
     return String(value).replace(ASSET_REF_REGEX, (_match, assetId) => buildEditorAssetUrl(assetId));
 }
 
+/**
+ * Uploads inline base64 image data URLs and replaces them with canonical asset refs.
+ *
+ * Duplicate inline images are deduplicated through the provided upload cache so
+ * the same data URL is only uploaded once per normalization pass.
+ *
+ * @param {unknown} value - A string-like value that may contain inline image data URLs.
+ * @param {string} pageName - The page name associated with uploaded assets.
+ * @param {Map<string, Promise<string>>} uploadCache - Cache of data URL to asset ID promise.
+ * @returns {Promise<string>} A string with inline image data replaced by asset refs.
+ */
 async function replaceInlineDataUrlsWithAssetRefs(value, pageName, uploadCache) {
     const matches = [...new Set(String(value).match(INLINE_IMAGE_DATA_URL_REGEX) || [])];
     if (!matches.length) return value;
@@ -70,6 +90,19 @@ async function replaceInlineDataUrlsWithAssetRefs(value, pageName, uploadCache) 
     return nextValue;
 }
 
+/**
+ * Recursively normalizes project data for persistence.
+ *
+ * Normalization includes:
+ * - converting asset URLs into canonical asset refs
+ * - uploading inline image data URLs and replacing them with asset refs
+ * - traversing arrays and plain objects recursively
+ *
+ * @param {unknown} value - The value to normalize.
+ * @param {string} pageName - The page name associated with uploaded assets.
+ * @param {Map<string, Promise<string>>} uploadCache - Cache of data URL to asset ID promise.
+ * @returns {Promise<unknown>} The normalized value ready for storage.
+ */
 async function normalizeValueForStorage(value, pageName, uploadCache) {
     if (typeof value === 'string') {
         const canonical = canonicalizeAssetUrlsToRefs(value);
@@ -91,6 +124,12 @@ async function normalizeValueForStorage(value, pageName, uploadCache) {
     return value;
 }
 
+/**
+ * Recursively resolves canonical asset refs into editor URLs for display/editing.
+ *
+ * @param {unknown} value - The value to resolve.
+ * @returns {unknown} The resolved value suitable for editor use.
+ */
 function resolveValueForEditor(value) {
     if (typeof value === 'string') {
         return resolveAssetRefsToEditorUrls(value);
@@ -108,140 +147,94 @@ function resolveValueForEditor(value) {
 }
 
 /**
- * Encodes a persisted string using the configured storage format.
+ * Serializes normalized project data for persistence.
  *
- * Plain strings are used by default, while legacy compressed payloads remain supported
- * for backwards compatibility.
- *
- * @param {string | null} value - The value that should be persisted.
- * @param {string} [encoding=DEFAULT_STORED_STRING_ENCODING] - The storage encoding to use.
- * @returns {{content: string | null, encoding: string, version: number}} The encoded payload metadata.
+ * @param {unknown} value - The value to serialize.
+ * @returns {string | null} JSON string output, or `null` when input is nullish.
  */
-export function encodeStoredString(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
-    if (value == null) {
-        return {
-            content: null,
-            encoding,
-            version: STORED_STRING_FORMAT_VERSION,
-        };
-    }
-
-    if (encoding === 'plain') {
-        return {
-            content: value,
-            encoding,
-            version: STORED_STRING_FORMAT_VERSION,
-        };
-    }
-
-    const compressed = pako.deflate(value);
-    return {
-        content: uint8ArrayToBase64(compressed),
-        encoding,
-        version: STORED_STRING_FORMAT_VERSION,
-    };
+function serializeProjectData(value) {
+    return value == null ? null : JSON.stringify(value);
 }
 
 /**
- * Decodes a persisted string from either the current plain format or the legacy compressed format.
+ * Deserializes persisted project data.
  *
- * @param {string | null} value - The stored value.
- * @param {string | null | undefined} encoding - The encoding associated with the stored value.
- * @returns {string | null} The decoded string value.
+ * @param {string | null | undefined} value - Serialized project data.
+ * @returns {unknown | null} Parsed project data, or `null` when input is nullish.
  */
-export function decodeStoredString(value, encoding) {
-    if (value == null) return null;
-    if (!encoding || encoding === 'plain') return value;
-    if (encoding === 'deflate-base64') {
-        return pako.inflate(base64ToUint8Array(value), { to: 'string' });
-    }
-    throw new Error(`Unsupported stored string encoding: ${String(encoding)}`);
+function deserializeProjectData(value) {
+    return value == null ? null : JSON.parse(value);
 }
 
 /**
- * Serializes and encodes JSON data for persistence.
+ * Hydrates persisted project data into editor-ready data by resolving asset refs.
  *
- * @param {any} value - The JSON-serializable value to encode.
- * @param {string} [encoding=DEFAULT_STORED_STRING_ENCODING] - The storage encoding to use.
- * @returns {{content: string | null, encoding: string, version: number}} The encoded JSON payload metadata.
+ * @param {string | null | undefined} value - Serialized normalized project data.
+ * @returns {unknown | null} Editor-ready project data, or `null` when absent.
  */
-export function encodeStoredJson(value, encoding = DEFAULT_STORED_STRING_ENCODING) {
-    return encodeStoredString(JSON.stringify(value), encoding);
-}
-
-/**
- * Decodes and parses persisted JSON data.
- *
- * @param {string | null} value - The stored JSON payload.
- * @param {string | null | undefined} encoding - The encoding associated with the payload.
- * @returns {any} The parsed JSON value.
- */
-export function decodeStoredJson(value, encoding) {
-    const json = decodeStoredString(value, encoding);
-    return json == null ? null : JSON.parse(json);
-}
-
-/**
- * Restores persisted project data into the format expected by the editor.
- *
- * @param {string | null} value - The stored project data payload.
- * @param {string | null | undefined} encoding - The encoding associated with the payload.
- * @returns {any} The hydrated project data ready for the editor.
- */
-export function hydrateProjectDataForEditor(value, encoding) {
-    const normalizedData = decodeStoredJson(value, encoding);
+export function hydrateProjectDataForEditor(value) {
+    const normalizedData = deserializeProjectData(value);
     return normalizedData == null ? null : resolveValueForEditor(normalizedData);
 }
 
 /**
- * Normalizes editor project data and prepares it for persistence.
+ * Prepares project data for persistence and editor reuse.
  *
- * @param {string} pageName - The page name used when uploading inline assets.
- * @param {any} projectData - The GrapesJS project data to persist.
- * @returns {Promise<{normalizedData: any, editorData: any, encoded: {content: string | null, encoding: string, version: number}}>} The normalized persistence payload.
+ * The returned object includes:
+ * - `normalizedData`: canonical storage form
+ * - `editorData`: normalized data with editor URLs resolved
+ * - `serializedData`: JSON string for database persistence
+ *
+ * @param {string} pageName - The page name associated with uploaded assets.
+ * @param {unknown} projectData - Raw project data from the editor.
+ * @returns {Promise<{
+ *   normalizedData: unknown | null,
+ *   editorData: unknown | null,
+ *   serializedData: string | null
+ * }>} Persistable and editor-ready representations of the project data.
  */
 export async function prepareProjectDataForPersistence(pageName, projectData) {
     if (projectData == null) {
-        const encoded = encodeStoredJson(null);
         return {
             normalizedData: null,
             editorData: null,
-            encoded,
+            serializedData: null,
         };
     }
 
     const clonedData = cloneValue(projectData);
     const normalizedData = await normalizeValueForStorage(clonedData, pageName, new Map());
-    const encoded = encodeStoredJson(normalizedData);
 
     return {
         normalizedData,
         editorData: resolveValueForEditor(cloneValue(normalizedData)),
-        encoded,
+        serializedData: serializeProjectData(normalizedData),
     };
 }
 
 /**
- * Builds the serialized cache payload for editor recovery data.
+ * Builds the local-storage cache payload for normalized page data.
  *
- * @param {any} normalizedData - The normalized project data stored in the cache.
- * @returns {string} The serialized cache entry.
+ * The payload includes a cache format version so stale cache entries can be rejected
+ * after format changes.
+ *
+ * @param {unknown} normalizedData - Canonical normalized project data.
+ * @returns {string} Serialized cache entry.
  */
 export function buildPageCacheEntry(normalizedData) {
-    const encoded = encodeStoredJson(normalizedData);
     return JSON.stringify({
         cacheVersion: PAGE_CACHE_FORMAT_VERSION,
-        data: encoded.content,
-        dataEncoding: encoded.encoding,
-        dataVersion: encoded.version,
+        data: serializeProjectData(normalizedData),
     });
 }
 
 /**
- * Restores editor project data from the local recovery cache.
+ * Restores editor-ready project data from a cached local-storage payload.
  *
- * @param {string | null} cacheValue - The serialized cache entry.
- * @returns {any} The restored project data or null when the cache is invalid.
+ * Invalid, outdated, or malformed cache entries are ignored and return `null`.
+ *
+ * @param {string | null | undefined} cacheValue - Raw local-storage cache payload.
+ * @returns {unknown | null} Restored editor-ready data, or `null` if cache is unusable.
  */
 export function restoreProjectDataFromCache(cacheValue) {
     if (!cacheValue) return null;
@@ -250,7 +243,7 @@ export function restoreProjectDataFromCache(cacheValue) {
         const parsed = JSON.parse(cacheValue);
         if (!parsed || parsed.cacheVersion !== PAGE_CACHE_FORMAT_VERSION) return null;
 
-        const normalizedData = decodeStoredJson(parsed.data, parsed.dataEncoding);
+        const normalizedData = deserializeProjectData(parsed.data);
         return normalizedData == null ? null : resolveValueForEditor(normalizedData);
     } catch {
         return null;
@@ -258,11 +251,13 @@ export function restoreProjectDataFromCache(cacheValue) {
 }
 
 /**
- * Writes the local recovery cache entry for the editor.
+ * Writes normalized project data to local storage when it fits within the cache limit.
  *
- * @param {string} storageKey - The local storage key used for the page.
- * @param {any} normalizedData - The normalized project data to cache.
- * @returns {boolean} True when the cache entry was written successfully.
+ * If the data is nullish, too large, or local storage fails, the cache entry is removed.
+ *
+ * @param {string} storageKey - The local-storage key to write to.
+ * @param {unknown} normalizedData - Canonical normalized project data to cache.
+ * @returns {boolean} `true` when cache write succeeds, otherwise `false`.
  */
 export function writePageCache(storageKey, normalizedData) {
     if (normalizedData == null) {
@@ -284,5 +279,3 @@ export function writePageCache(storageKey, normalizedData) {
         return false;
     }
 }
-
-export const writeCompressedPageCache = writePageCache;
