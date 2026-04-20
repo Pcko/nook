@@ -1,4 +1,3 @@
-import pako from 'pako';
 import { buildAssetRef, buildEditorAssetUrl, uploadPageImageDataUrl } from './pageAssetService.ts';
 
 export const DEFAULT_STORED_STRING_ENCODING = 'plain';
