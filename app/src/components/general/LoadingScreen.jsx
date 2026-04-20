@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
+/**
+ * Provides the use prefers reduced motion hook.
+ */
 function usePrefersReducedMotion() {
     const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -8,6 +11,9 @@ function usePrefersReducedMotion() {
         if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
 
         const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        /**
+ * Updates preference.
+ */
         const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
 
         updatePreference();
@@ -24,6 +30,16 @@ function usePrefersReducedMotion() {
     return prefersReducedMotion;
 }
 
+/**
+ * Renders the loading bubble component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.className - The class name value.
+ * @param {any} props.title - The title value.
+ * @param {any} props.subtitle - The subtitle value.
+ * @param {any} props.compact - The compact value.
+ * @returns {JSX.Element} The rendered loading bubble component.
+ */
 export function LoadingBubble({
     className = "",
     title = "Loading your workspace",
@@ -63,19 +79,19 @@ export function LoadingBubble({
 
     return (
         <motion.div
-            className={`relative overflow-hidden rounded-[16px] border border-ui-border bg-ui-bg shadow-sm ${padding} ${className}`}
+            animate={floatAnimation}
             aria-busy="true"
             aria-live="polite"
+            className={`relative overflow-hidden rounded-[16px] border border-ui-border bg-ui-bg shadow-sm ${padding} ${className}`}
             role="status"
-            animate={floatAnimation}
             transition={floatTransition}
         >
             <div className="pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full bg-primary opacity-10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 left-8 h-40 w-40 rounded-full bg-ui-border opacity-30 blur-3xl" />
             <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-ui-border/40 via-transparent to-transparent" />
             <motion.div
-                className="pointer-events-none absolute -left-1/2 top-14 h-8 w-[200%] bg-gradient-to-r from-transparent via-primary/10 to-transparent"
                 animate={sweepAnimation}
+                className="pointer-events-none absolute -left-1/2 top-14 h-8 w-[200%] bg-gradient-to-r from-transparent via-primary/10 to-transparent"
                 transition={sweepTransition}
             />
 
@@ -83,25 +99,25 @@ export function LoadingBubble({
                 <div className={`relative ${ringSize}`}>
                     <div className="absolute inset-0 rounded-full border border-ui-border opacity-60" />
                     <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent"
                         animate={spinAnimation}
+                        className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent"
                         transition={spinTransition}
                     />
                     <motion.div
-                        className="absolute inset-0"
                         animate={spinAnimation}
+                        className="absolute inset-0"
                         transition={prefersReducedMotion ? {} : { duration: 6, repeat: Infinity, ease: "linear" }}
                     >
                         <div className="absolute left-1/2 -top-1 h-2 w-2 -translate-x-1/2 rounded-full bg-primary/70 shadow-sm" />
                     </motion.div>
                     <motion.div
-                        className="absolute inset-3 rounded-full border border-ui-border opacity-50"
                         animate={pulseAnimation}
+                        className="absolute inset-3 rounded-full border border-ui-border opacity-50"
                         transition={pulseTransition}
                     />
                     <motion.div
-                        className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-sm"
                         animate={dotPulseAnimation}
+                        className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary shadow-sm"
                         transition={dotPulseTransition}
                     />
                 </div>
@@ -113,6 +129,7 @@ export function LoadingBubble({
                     <div className="relative h-1.5 overflow-hidden rounded-full bg-ui-border">
                         <div className="absolute inset-0 bg-primary/15" />
                         <motion.div
+                            animate={barAnimation}
                             className="absolute inset-0 z-10"
                             style={{
                                 color: "var(--primary)",
@@ -120,7 +137,6 @@ export function LoadingBubble({
                                 backgroundSize: "200% 100%",
                                 backgroundRepeat: "repeat",
                             }}
-                            animate={barAnimation}
                             transition={barTransition}
                         />
                     </div>
@@ -130,13 +146,21 @@ export function LoadingBubble({
     );
 }
 
+/**
+ * Renders the loading screen component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.title - The title value.
+ * @param {any} props.subtitle - The subtitle value.
+ * @returns {JSX.Element} The rendered loading screen component.
+ */
 function LoadingScreen({ title, subtitle }) {
     return (
         <div className="flex items-center justify-center bg-website-bg h-full w-full">
             <LoadingBubble
                 className="w-[520px] max-w-[92%] z-10"
-                title={title}
                 subtitle={subtitle}
+                title={title}
             />
         </div>
     );

@@ -1,17 +1,18 @@
+import grapesjs from "grapesjs";
 import React, {useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import useErrorHandler from "../../logging/ErrorHandler";
+
+import AIService from "../../../services/AIService";
+import PageService from "../../../services/PageService";
 import {isInvalidStringForURL} from "../../general/FormChecks";
+import useErrorHandler from "../../logging/ErrorHandler";
+import {useMetaNotify} from "../../logging/MetaNotifyHook";
+import {useMetaWizardState} from "../../meta-wizard/useMetaWizard";
 
 import PageCreationChooseStep from "./page-creation/PageCreationChooseStep";
-import PagePromptingStep from "./page-creation/PagePromptingStep";
 import PageCreationMetaStep from "./page-creation/PageCreationMetaStep";
+import PagePromptingStep from "./page-creation/PagePromptingStep";
 
-import PageService from "../../../services/PageService";
-import AIService from "../../../services/AIService";
-import {useMetaNotify} from "../../logging/MetaNotifyHook";
-import grapesjs from "grapesjs";
-import {useMetaWizardState} from "../../meta-wizard/useMetaWizard";
 
 /**
  * All steps of the AI-Page-Creation process.
@@ -25,6 +26,11 @@ const STEPS = {
     AI_PREVIEW: "ai-preview",
 };
 
+/**
+ *
+ * @param formData
+ * @param pageMeta
+ */
 const buildArtifactSnapshot = (formData, pageMeta) => ({
     timestamp: Date.now(),
     pageName: formData.pageName,
@@ -35,8 +41,13 @@ const buildArtifactSnapshot = (formData, pageMeta) => ({
 
 
 /**
- * PageCreationForm component handles multistep creation of pages,
- * including the choice between manual page-editing or ai-generation.
+ * Renders the page creation form component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.closeForm - The close form value.
+ * @param {any} props.setPages - The set pages value.
+ * @param {any} props.fallbackFormData - The fallback form data value.
+ * @returns {JSX.Element} The rendered page creation form component.
  */
 function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
     /**
@@ -83,10 +94,18 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
 
     const GENERATED_PAGE_AMOUNT = 2;
 
+    /**
+     *
+     * @param updates
+     */
     const updateFormData = (updates) => {
         setFormData((prev) => ({...prev, ...updates}));
     };
 
+    /**
+ * Handles the ensure page created operation.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const ensurePageCreated = async () => {
         if (formData.createdPage) return formData.createdPage;
 
@@ -110,6 +129,11 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         return created;
     };
 
+    /**
+     *
+     * @param cause
+     * @param metaOverride
+     */
     const handleFormSubmit = async (cause, metaOverride = undefined) => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result) {
@@ -158,6 +182,9 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         }
     };
 
+    /**
+ * Handles the start ai flow operation.
+ */
     const startAiFlow = () => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result || formData.pageName.length < 2) {
@@ -173,6 +200,9 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         updateFormData({aiPrompt: "", aiPages: [], currentStep: STEPS.META});
     };
 
+    /**
+ * Handles the start manual flow operation.
+ */
     const startManualFlow = () => {
         const result = isInvalidStringForURL(formData.pageName);
         if (result || formData.pageName.length < 2) {
@@ -188,6 +218,11 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         updateFormData({aiPrompt: "", aiPages: [], currentStep: STEPS.META});
     };
 
+    /**
+     *
+     * @param reason
+     * @param incoming
+     */
     const handleMetaStepClose = async (reason, incoming) => {
         const nextMeta = metaWizard.applyClose(reason, incoming || {});
 
@@ -209,6 +244,10 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         setMetaFlow({mode: null, returnStep: STEPS.CHOOSE});
     };
 
+    /**
+     *
+     * @param pageNameForMeta
+     */
     const generateAIPages = async (pageNameForMeta) => {
         const generatedPages = [];
 
@@ -238,6 +277,10 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         return generatedPages;
     };
 
+    /**
+ * Handles ai prompt submit.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handleAiPromptSubmit = async () => {
         if (!formData.aiPrompt.trim()) {
             return notify(
@@ -275,6 +318,10 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         }
     };
 
+    /**
+     *
+     * @param selectedPage
+     */
     const handleSelectAiPage = async (selectedPage) => {
         if (formData.submitted || formData.loading) return;
         updateFormData({submitted: true, loading: true});
@@ -323,16 +370,19 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
         }
     };
 
+    /**
+ * Handles the render step operation.
+ */
     const renderStep = () => {
         switch (formData.currentStep) {
             case STEPS.CHOOSE:
                 return (
                     <PageCreationChooseStep
                         closeForm={closeForm}
+                        onChooseAi={startAiFlow}
+                        onChooseManual={startManualFlow}
                         pageName={formData.pageName}
                         setPageName={(name) => updateFormData({pageName: name})}
-                        onChooseManual={startManualFlow}
-                        onChooseAi={startAiFlow}
                     />
                 );
 
@@ -340,12 +390,12 @@ function PageCreationForm({closeForm, setPages, fallbackFormData = undefined}) {
                 return (
                     <PageCreationMetaStep
                         closeForm={closeForm}
+                        initialValue={metaWizard.meta}
                         onBack={() => {
                             updateFormData({currentStep: metaFlow.returnStep || STEPS.CHOOSE});
                             setMetaFlow({mode: null, returnStep: STEPS.CHOOSE});
                         }}
                         onWizardClose={handleMetaStepClose}
-                        initialValue={metaWizard.meta}
                         stepLabel={"Step 1 of 3"}
                     />
                 );

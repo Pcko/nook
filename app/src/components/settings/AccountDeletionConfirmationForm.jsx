@@ -1,9 +1,17 @@
 import {useMemo} from "react";
 import {useNavigate} from "react-router-dom";
-import SettingsService from "../../services/SettingsService";
-import {useMetaNotify} from "../logging/MetaNotifyHook";
-import useErrorHandler from "../logging/ErrorHandler";
 
+import SettingsService from "../../services/SettingsService";
+import useErrorHandler from "../logging/ErrorHandler";
+import {useMetaNotify} from "../logging/MetaNotifyHook";
+
+/**
+ * Renders the account deletion confirmation form component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.onCancel - Callback fired for the on cancel action.
+ * @returns {JSX.Element} The rendered account deletion confirmation form component.
+ */
 function AccountDeletionConfirmationForm({onCancel}) {
     const navigate = useNavigate();
 
@@ -14,6 +22,10 @@ function AccountDeletionConfirmationForm({onCancel}) {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+ * Handles account deletion.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handleAccountDeletion = async () => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -33,6 +45,9 @@ function AccountDeletionConfirmationForm({onCancel}) {
         }
     };
 
+    /**
+ * Handles cancel.
+ */
     const handleCancel = () => {
         notify("info", "Account deletion cancelled.", {
             stage: "delete-account-cancel"
@@ -55,16 +70,16 @@ function AccountDeletionConfirmationForm({onCancel}) {
             </p>
             <div className="flex">
                 <input
-                    type="button"
-                    value="Cancel"
                     className="btn hover:bg-ui-button-hover bg-ui-button border-ui-border border w-[35%] ml-[25%]"
                     onClick={handleCancel}
+                    type="button"
+                    value="Cancel"
                 />
                 <input
-                    type="button"
-                    value="Delete"
                     className="btn bg-dangerous !text-text-on-primary hover:bg-dangerous hover:animate-pulse w-[35%] mr-0"
                     onClick={handleAccountDeletion}
+                    type="button"
+                    value="Delete"
                 />
             </div>
         </div>

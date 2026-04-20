@@ -1,0 +1,17 @@
+/**
+ * Renders the divider component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.dividerText - The divider text value.
+ * @param {any} props.className - The class name value.
+ * @returns {JSX.Element} The rendered divider component.
+ */
+export default function Divider({dividerText, className = ""}) {
+    return (
+        <div className={`flex items-center w-full ${className}`}>
+            <div className="flex-1 border-t border-gray-300"/>
+            <span className="mx-4 text-gray-400 select-none">{dividerText}</span>
+            <div className="flex-1 border-t border-gray-300"/>
+        </div>
+    );
+}

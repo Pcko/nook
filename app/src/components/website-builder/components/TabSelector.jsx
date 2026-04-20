@@ -17,13 +17,13 @@ function TabSelector({ options, active, onChange }) {
           const isActive = active === opt.value;
           return (
             <button
-              key={opt.value}
-              type="button"
-              onClick={() => onChange(opt.value)}
               className={
                 "cursor-pointer rounded-md px-2 py-1 text-center text-text " +
                 (isActive ? "bg-ui-bg-selected" : "")
               }
+              key={opt.value}
+              onClick={() => onChange(opt.value)}
+              type="button"
             >
               {opt.label}
             </button>

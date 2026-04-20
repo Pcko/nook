@@ -1,4 +1,7 @@
-﻿export function initThemeFromStorage() {
+/**
+ * Handles the init theme from storage operation.
+ */
+export function initThemeFromStorage() {
     const accessibilityMode = localStorage.getItem("accessibility");
     let theme = localStorage.getItem("theme");
 

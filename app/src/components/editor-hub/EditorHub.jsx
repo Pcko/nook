@@ -10,9 +10,10 @@
  * - Updating the page when the URL parameter changes
  */
 
-import WebsiteBuilder from "../website-builder/components/WebsiteBuilder";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
+
+import WebsiteBuilder from "../website-builder/components/WebsiteBuilder";
 
 /**
  * EditorHub Component
@@ -33,7 +34,7 @@ function EditorHub() {
      */
     useEffect(() => {
         if (!page) {
-            navigate('/');
+            navigate('/dashboard');
         }
     }, [page, pageName, navigate]);
 

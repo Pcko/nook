@@ -14,7 +14,7 @@ class PageService {
      * @private
      */
     private static parsePage(requestPage: PageDTO): Page {
-        const data = hydrateProjectDataForEditor(requestPage.data);
+        const data = hydrateProjectDataForEditor(requestPage.data, requestPage.dataEncoding);
         const rawMeta = requestPage.metadata ?? requestPage.pageMeta ?? null;
         let pageMeta: PageMeta | null = null;
         try {
@@ -70,7 +70,7 @@ class PageService {
         const prepared = preparedContent ?? await prepareProjectDataForPersistence(page.name, page.data);
         const payload: any = {
             newPageName,
-            pageContent: prepared.serializedData,
+            pageContent: prepared.encoded.content,
         };
 
         // Only send metadata if present to avoid wiping it accidentally.
@@ -85,6 +85,7 @@ class PageService {
 
     /**
      * Deletes a page from the API by its name.
+     * @param pageName - The name of the page to delete
      */
     static async deletePage(pageName: string): Promise<void> {
         await axios.delete(`/api/pages/${pageName}`);
@@ -97,7 +98,7 @@ class PageService {
             withCredentials: false,
         });
 
-        return response.data.pages;
+        return response.data.pages ?? response.data.data ?? [];
     }
 
     /**

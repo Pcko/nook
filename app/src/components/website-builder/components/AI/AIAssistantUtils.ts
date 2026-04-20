@@ -69,16 +69,14 @@ function walkComponents(root: any, cb: (cmp: any) => boolean): boolean {
 }
 
 /**
- * Attempts to locate a GrapesJS component by multiple id representations:
- * 1) CSS lookup by rendered HTML `id` (wrapper.find("#id"))
- * 2) Tree traversal comparing:
- *    - attributes.id
- *    - model id (cmp.getId() / cmp.get("id"))
- *    - cid
+ * Handles the find component by any id operation.
  *
- * @param editor - GrapesJS editor instance.
- * @param targetId - The id to find.
- * @returns The matching component model, or null if not found.
+ * @param {any} editor - The editor value.
+ * @param {any} targetId: string): any | null {
+    const wrapper = editor?.getWrapper?.();
+    if (!wrapper || !targetId - The target id: string): any | null {
+    const wrapper = editor?.get wrapper?.();
+    if (!wrapper || !target id value.
  */
 function findComponentByAnyId(editor: any, targetId: string): any | null {
     const wrapper = editor?.getWrapper?.();
@@ -155,16 +153,26 @@ function styleObjToCss(style: Record<string, any>): string {
 }
 
 /**
- * Applies a style object to a selector primarily via GrapesJS CssComposer rules.
- * Falls back to `editor.addStyle()` injection, and finally to inline `setStyle` on matched components.
+ * Handles the apply css rule operation.
  *
- * Rationale:
- * - Backend typically returns selector-based style changes (not always mappable to a single component).
- * - CssComposer rules are more robust than inline styles when selectors are global/class-based.
- *
- * @param editor - GrapesJS editor instance.
- * @param selector - CSS selector (e.g. ".btn.primary", "#hero h1").
- * @param style - Style object (JS-style keys are supported).
+ * @param {any} editor - The editor value.
+ * @param {any} selector - The selector value.
+ * @param {any} style - The style value.
+ * @param {any} any>): void {
+    if (!editor || !selector) return;
+
+    const cc = editor.CssComposer;
+
+    try {
+        // Preferred API
+        if (cc?.setRule - The any>): void {
+    if (!editor || !selector) return;
+
+    const cc = editor.css composer;
+
+    try {
+        // preferred api
+        if (cc?.set rule value.
  */
 function applyCssRule(editor: Editor, selector: string, style: Record<string, any>): void {
     if (!editor || !selector) return;
@@ -283,19 +291,16 @@ export function applyAIChanges(editor: any, changes: AIChange[]): void {
 }
 
 /**
- * Applies a single AI change to the GrapesJS editor.
+ * Handles the apply aichange operation.
  *
- * Component change:
- * - Finds target component by id
- * - Removes it
- * - Inserts new component JSON at the same index in the parent
- * - Forces the new root component to keep the original target id (stability for future selections)
- *
- * Style change:
- * - Applies each selector as a CSS rule (preferred) with fallbacks
- *
- * @param editor - GrapesJS editor instance.
- * @param change - AIChange to apply.
+ * @param {any} editor - The editor value.
+ * @param {any} change: AIChange): void {
+    if (!editor) return;
+
+    if (change.type - The change: aichange): void {
+    if (!editor) return;
+
+    if (change.type value.
  */
 export function applyAIChange(editor: any, change: AIChange): void {
     if (!editor) return;

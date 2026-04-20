@@ -1,9 +1,19 @@
 import {useMemo, useState} from "react";
-import {isInvalidStringForURL} from "../../general/FormChecks";
+
 import PageService from "../../../services/PageService";
+import {isInvalidStringForURL} from "../../general/FormChecks";
 import useErrorHandler from "../../logging/ErrorHandler";
 import {useMetaNotify} from "../../logging/MetaNotifyHook";
 
+/**
+ * Renders the page edit form component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.closeForm - The close form value.
+ * @param {any} props.pageName - The page name value.
+ * @param {any} props.pages - The pages value.
+ * @returns {JSX.Element} The rendered page edit form component.
+ */
 function PageEditForm({closeForm, pageName, pages}) {
     const [newPageName, setNewPageName] = useState(pageName);
     const [newFolderName, setNewFolderName] = useState(pages[pageName].folderName);
@@ -15,6 +25,12 @@ function PageEditForm({closeForm, pageName, pages}) {
     const {notify} = useMetaNotify(baseMeta);
     const handleError = useErrorHandler(baseMeta);
 
+    /**
+ * Handles form submit.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
@@ -75,57 +91,57 @@ function PageEditForm({closeForm, pageName, pages}) {
             <div className="flex px-2 py-3 border-b-[1px] border-ui-border">
                 <h5 className="font-semibold">Edit Page "{pageName}"</h5>
                 <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
                     className="size-5 ml-auto mr-1 hover:cursor-pointer"
+                    fill="none"
                     onClick={() => closeForm()}
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                    <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="m-3 mt-4">
-                <label htmlFor="newPageName" className="block mb-1">
+            <form className="m-3 mt-4" onSubmit={handleFormSubmit}>
+                <label className="block mb-1" htmlFor="newPageName">
                     Page Name
                 </label>
                 <input
-                    type="text"
-                    id="newPageName"
-                    name="newPageName"
-                    minLength={2}
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
+                    id="newPageName"
+                    minLength={2}
+                    name="newPageName"
                     onChange={(e) => setNewPageName(e.target.value)}
-                    value={newPageName}
                     placeholder="Default: keep previous"
+                    type="text"
+                    value={newPageName}
                 />
-                <label htmlFor="folderName" className="block mb-1">
+                <label className="block mb-1" htmlFor="folderName">
                     Folder
                 </label>
                 <input
-                    type="text"
-                    id="newFolderName"
-                    name="newFolderName"
-                    minLength={2}
                     className="w-full h-8 px-2 border-ui-border focus:border-ui-border-selected focus:outline-none border rounded bg-ui-bg mb-3"
+                    id="newFolderName"
+                    minLength={2}
+                    name="newFolderName"
                     onChange={(e) => setNewFolderName(e.target.value)}
-                    value={newFolderName}
                     placeholder="Default: keep previous"
+                    type="text"
+                    value={newFolderName}
                 />
                 <div className="flex mt-2">
                     <div className="mr-0 ml-auto">
                         <input
+                            className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"
+                            onClick={() => closeForm()}
                             type="button"
                             value="Cancel"
-                            onClick={() => closeForm()}
-                            className="py-1 px-4 bg-ui-button rounded-lg mr-3 hover:cursor-pointer"
                         />
                         <input
+                            className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"
                             type="submit"
                             value="Edit Page"
-                            className="py-1 px-4 bg-primary text-text-on-primary rounded-lg hover:cursor-pointer"
                         />
                     </div>
                 </div>

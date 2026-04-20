@@ -1,5 +1,3 @@
-export { LoginForm, RegistrationForm, TwoFactorCodeForm } from "./ui";
-
 export {
     loginUser,
     registerUser,
@@ -8,4 +6,5 @@ export {
     toggleTwoFactorAuth,
     activateTwoFactorAuth,
     refreshAccessToken,
-} from "./api/authApi";
+    default as authApi,
+} from "./authApi";

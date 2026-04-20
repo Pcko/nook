@@ -1,65 +1,121 @@
 // SVG Paths
 
-import React from "react";
 import {ArrowRightIcon} from "@heroicons/react/24/outline";
+import React from "react";
 
+/**
+ * Renders the online icon component.
+ * @returns {JSX.Element} The rendered online icon component.
+ */
 export const OnlineIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" clipRule="evenodd"
-              d="M8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM11.857 6.191C11.9149 6.11129 11.9566 6.02095 11.9796 5.92514C12.0026 5.82933 12.0065 5.72994 11.991 5.63262C11.9756 5.5353 11.9412 5.44198 11.8897 5.35797C11.8382 5.27396 11.7707 5.20091 11.691 5.143C11.6113 5.08509 11.5209 5.04344 11.4251 5.02044C11.3293 4.99744 11.2299 4.99354 11.1326 5.00895C11.0353 5.02437 10.942 5.0588 10.858 5.11028C10.774 5.16176 10.7009 5.22929 10.643 5.309L7.16 10.099L5.28 8.219C5.21078 8.1474 5.128 8.0903 5.03647 8.05104C4.94495 8.01178 4.84653 7.99114 4.74694 7.99032C4.64736 7.9895 4.54861 8.00852 4.45646 8.04628C4.3643 8.08403 4.28059 8.13976 4.2102 8.21021C4.13982 8.28066 4.08417 8.36443 4.0465 8.45662C4.00883 8.54881 3.9899 8.64758 3.99081 8.74716C3.99173 8.84674 4.01246 8.94515 4.05181 9.03663C4.09116 9.12812 4.14834 9.21085 4.22 9.28L6.72 11.78C6.79663 11.8567 6.88896 11.9158 6.99065 11.9534C7.09233 11.9909 7.20094 12.006 7.30901 11.9975C7.41708 11.9891 7.52203 11.9573 7.61663 11.9044C7.71123 11.8515 7.79324 11.7787 7.857 11.691L11.857 6.191Z"
-              fill="#26A644"/>
+    <svg fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+        <path clipRule="evenodd"
+d="M8 16C10.1217 16 12.1566 15.1571 13.6569 13.6569C15.1571 12.1566 16 10.1217 16 8C16 5.87827 15.1571 3.84344 13.6569 2.34315C12.1566 0.842855 10.1217 0 8 0C5.87827 0 3.84344 0.842855 2.34315 2.34315C0.842855 3.84344 0 5.87827 0 8C0 10.1217 0.842855 12.1566 2.34315 13.6569C3.84344 15.1571 5.87827 16 8 16ZM11.857 6.191C11.9149 6.11129 11.9566 6.02095 11.9796 5.92514C12.0026 5.82933 12.0065 5.72994 11.991 5.63262C11.9756 5.5353 11.9412 5.44198 11.8897 5.35797C11.8382 5.27396 11.7707 5.20091 11.691 5.143C11.6113 5.08509 11.5209 5.04344 11.4251 5.02044C11.3293 4.99744 11.2299 4.99354 11.1326 5.00895C11.0353 5.02437 10.942 5.0588 10.858 5.11028C10.774 5.16176 10.7009 5.22929 10.643 5.309L7.16 10.099L5.28 8.219C5.21078 8.1474 5.128 8.0903 5.03647 8.05104C4.94495 8.01178 4.84653 7.99114 4.74694 7.99032C4.64736 7.9895 4.54861 8.00852 4.45646 8.04628C4.3643 8.08403 4.28059 8.13976 4.2102 8.21021C4.13982 8.28066 4.08417 8.36443 4.0465 8.45662C4.00883 8.54881 3.9899 8.64758 3.99081 8.74716C3.99173 8.84674 4.01246 8.94515 4.05181 9.03663C4.09116 9.12812 4.14834 9.21085 4.22 9.28L6.72 11.78C6.79663 11.8567 6.88896 11.9158 6.99065 11.9534C7.09233 11.9909 7.20094 12.006 7.30901 11.9975C7.41708 11.9891 7.52203 11.9573 7.61663 11.9044C7.71123 11.8515 7.79324 11.7787 7.857 11.691L11.857 6.191Z"
+              fill="#26A644"
+              fillRule="evenodd"/>
     </svg>
 );
 
+/**
+ * Renders the inactive icon component.
+ * @returns {JSX.Element} The rendered inactive icon component.
+ */
 export const InactiveIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg fill="none" height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg">
         <path
             d="M3.37498 1.12512C2.77825 1.12512 2.20596 1.36217 1.784 1.78413C1.36205 2.20608 1.125 2.77837 1.125 3.3751V14.625C1.125 15.2218 1.36205 15.794 1.784 16.216C2.20596 16.638 2.77825 16.875 3.37498 16.875H14.6249C15.2216 16.875 15.7939 16.638 16.2159 16.216C16.6378 15.794 16.8749 15.2218 16.8749 14.625V3.3751C16.8749 2.77837 16.6378 2.20608 16.2159 1.78413C15.7939 1.36217 15.2216 1.12512 14.6249 1.12512H3.37498ZM7.7782 4.5001H9.73343L9.56244 10.8023H7.9537L7.7782 4.5001ZM9.81331 12.5595C9.80981 12.8383 9.69751 13.1047 9.50037 13.3018C9.30322 13.499 9.03685 13.6113 8.75807 13.6148C8.61726 13.6194 8.47697 13.5956 8.34553 13.5449C8.21409 13.4942 8.09419 13.4176 7.99296 13.3196C7.89173 13.2217 7.81123 13.1043 7.75625 12.9746C7.70128 12.8449 7.67295 12.7055 7.67295 12.5646C7.67295 12.4237 7.70128 12.2843 7.75625 12.1546C7.81123 12.0249 7.89173 11.9075 7.99296 11.8096C8.09419 11.7116 8.21409 11.635 8.34553 11.5843C8.47697 11.5336 8.61726 11.5098 8.75807 11.5144C9.32056 11.5144 9.80881 11.9835 9.81331 12.5595Z"
             fill="#F2994A"/>
     </svg>
 );
 
+/**
+ * Renders the not deployed icon component.
+ * @returns {JSX.Element} The rendered not deployed icon component.
+ */
 export const NotDeployedIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg fill="none" height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg">
         <path
             d="M3.37498 1.12512C2.77825 1.12512 2.20596 1.36217 1.784 1.78413C1.36205 2.20608 1.125 2.77837 1.125 3.3751V14.625C1.125 15.2218 1.36205 15.794 1.784 16.216C2.20596 16.638 2.77825 16.875 3.37498 16.875H14.6249C15.2216 16.875 15.7939 16.638 16.2159 16.216C16.6378 15.794 16.8749 15.2218 16.8749 14.625V3.3751C16.8749 2.77837 16.6378 2.20608 16.2159 1.78413C15.7939 1.36217 15.2216 1.12512 14.6249 1.12512H3.37498ZM7.7782 4.5001H9.73343L9.56244 10.8023H7.9537L7.7782 4.5001ZM9.81331 12.5595C9.80981 12.8383 9.69751 13.1047 9.50037 13.3018C9.30322 13.499 9.03685 13.6113 8.75807 13.6148C8.61726 13.6194 8.47697 13.5956 8.34553 13.5449C8.21409 13.4942 8.09419 13.4176 7.99296 13.3196C7.89173 13.2217 7.81123 13.1043 7.75625 12.9746C7.70128 12.8449 7.67295 12.7055 7.67295 12.5646C7.67295 12.4237 7.70128 12.2843 7.75625 12.1546C7.81123 12.0249 7.89173 11.9075 7.99296 11.8096C8.09419 11.7116 8.21409 11.635 8.34553 11.5843C8.47697 11.5336 8.61726 11.5098 8.75807 11.5144C9.32056 11.5144 9.80881 11.9835 9.81331 12.5595Z"
             fill="#858699"/>
     </svg>
 );
 
+/**
+ * Renders the editor page creation icon component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.className - The class name value.
+ * @returns {JSX.Element} The rendered editor page creation icon component.
+ */
 export const EditorPageCreationIcon = ({className}) => (
-    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"
-         className={className}>
-        <circle cx="30" cy="30" r="28.75" className={"fill-primary stroke-text-on-primary"} strokeWidth="2.5"/>
+    <svg className={className}
+fill="none"
+height="60"
+viewBox="0 0 60 60"
+width="60"
+         xmlns="http://www.w3.org/2000/svg">
+        <circle className={"fill-primary stroke-text-on-primary"} cx="30" cy="30" r="28.75" strokeWidth="2.5"/>
         <path
             d="M38.961 19.2216L41.3903 16.7909C41.8967 16.2845 42.5835 16 43.2997 16C44.0158 16 44.7027 16.2845 45.2091 16.7909C45.7155 17.2973 46 17.9842 46 18.7003C46 19.4165 45.7155 20.1033 45.2091 20.6097L29.9179 35.9009C29.1567 36.6617 28.2178 37.221 27.1863 37.5281L23.3199 38.6801L24.4719 34.8137C24.779 33.7822 25.3383 32.8433 26.0991 32.0821L38.961 19.2216ZM38.961 19.2216L42.7597 23.0203M40.5997 32.9201V39.76C40.5997 40.6193 40.2584 41.4434 39.6508 42.051C39.0431 42.6586 38.219 43 37.3598 43H22.24C21.3807 43 20.5566 42.6586 19.949 42.051C19.3414 41.4434 19 40.6193 19 39.76V24.6402C19 23.781 19.3414 22.9569 19.949 22.3492C20.5566 21.7416 21.3807 21.4003 22.24 21.4003H29.0799"
-            stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            stroke="white"
+strokeLinecap="round"
+strokeLinejoin="round"
+strokeWidth="2.5"/>
     </svg>
 );
 
+/**
+ * Renders the aipage creation icon component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.className - The class name value.
+ * @returns {JSX.Element} The rendered aipage creation icon component.
+ */
 export const AIPageCreationIcon = ({className}) => (
-    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"
-         className={className}>
-        <circle cx="30" cy="30" r="28.75" className={"fill-primary stroke-text-on-primary"} strokeWidth="2.5"/>
+    <svg className={className}
+fill="none"
+height="60"
+viewBox="0 0 60 60"
+width="60"
+         xmlns="http://www.w3.org/2000/svg">
+        <circle className={"fill-primary stroke-text-on-primary"} cx="30" cy="30" r="28.75" strokeWidth="2.5"/>
         <path
             d="M26.0232 35.7064L24.7308 40.2308L23.4383 35.7064C23.1043 34.5377 22.4779 33.4734 21.6185 32.6139C20.759 31.7544 19.6947 31.1281 18.526 30.7941L14 29.5L18.5244 28.2075C19.6931 27.8735 20.7574 27.2472 21.6169 26.3877C22.4764 25.5282 23.1027 24.4639 23.4367 23.2952L24.7308 18.7692L26.0232 23.2936C26.3573 24.4623 26.9836 25.5266 27.8431 26.3861C28.7026 27.2456 29.7669 27.8719 30.9355 28.2059L35.4615 29.5L30.9371 30.7925C29.7684 31.1265 28.7041 31.7528 27.8447 32.6123C26.9852 33.4718 26.3589 34.5361 26.0248 35.7048L26.0232 35.7064ZM39.4502 24.2777L39.0385 25.9231L38.6267 24.2777C38.391 23.3343 37.9034 22.4727 37.216 21.785C36.5286 21.0973 35.6672 20.6093 34.7239 20.3733L33.0769 19.9615L34.7239 19.5498C35.6672 19.3137 36.5286 18.8258 37.216 18.1381C37.9034 17.4503 38.391 16.5888 38.6267 15.6454L39.0385 14L39.4502 15.6454C39.686 16.589 40.1739 17.4507 40.8616 18.1384C41.5493 18.8261 42.411 19.314 43.3546 19.5498L45 19.9615L43.3546 20.3733C42.411 20.6091 41.5493 21.0969 40.8616 21.7847C40.1739 22.4724 39.686 23.3341 39.4502 24.2777ZM37.2802 43.1193L36.6538 45L36.0275 43.1193C35.8519 42.5925 35.556 42.1139 35.1634 41.7212C34.7707 41.3286 34.2921 41.0327 33.7653 40.8571L31.8846 40.2308L33.7653 39.6044C34.2921 39.4288 34.7707 39.133 35.1634 38.7403C35.556 38.3477 35.8519 37.869 36.0275 37.3422L36.6538 35.4615L37.2802 37.3422C37.4558 37.869 37.7516 38.3477 38.1443 38.7403C38.5369 39.133 39.0156 39.4288 39.5424 39.6044L41.4231 40.2308L39.5424 40.8571C39.0156 41.0327 38.5369 41.3286 38.1443 41.7212C37.7516 42.1139 37.4558 42.5925 37.2802 43.1193Z"
-            stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            stroke="white"
+strokeLinecap="round"
+strokeLinejoin="round"
+strokeWidth="2.5"/>
     </svg>
 );
 
+/**
+ * Renders the cross icon component.
+ * @returns {JSX.Element} The rendered cross icon component.
+ */
 export const CrossIcon = () => (
     <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
         className="w-6 h-6 stroke-2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
     >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );
 
+/**
+ * Renders the dep aiicon component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.size - The size value.
+ * @param {any} props.colorStart - The color start value.
+ * @param {any} props.colorMid - The color mid value.
+ * @param {any} props.colorEnd - The color end value.
+ * @param {any} props.radius - The radius value.
+ * @returns {JSX.Element} The rendered dep aiicon component.
+ */
 export const DepAIIcon = ({
                               size = 31,
                               colorStart = "#D071D5",
@@ -68,72 +124,84 @@ export const DepAIIcon = ({
                               radius = 10,
                           }) => (
     <svg
-        width={size}
+        fill="none"
         height={size}
         viewBox="0 0 31 31"
-        fill="none"
+        width={size}
         xmlns="http://www.w3.org/2000/svg"
     >
         <defs>
-            <linearGradient id="diamondGradient" x1="0" y1="0" x2="500" y2="500" gradientUnits="userSpaceOnUse">
+            <linearGradient gradientUnits="userSpaceOnUse" id="diamondGradient" x1="0" x2="500" y1="0" y2="500">
                 <stop offset="0" stopColor={colorStart}/>
                 <stop offset="0.43" stopColor={colorMid}/>
                 <stop offset="1" stopColor={colorEnd}/>
             </linearGradient>
 
             <clipPath id="diamondClip">
-                <rect x="0" y="0" width="31" height="31" rx={radius}/>
+                <rect height="31" rx={radius} width="31" x="0" y="0"/>
             </clipPath>
         </defs>
 
         <g clipPath="url(#diamondClip)">
             <g transform="matrix(-0.0272396 0.0215121 -0.0215121 -0.0285764 22.287 7.13939)">
-                <rect width="967.032" height="713.95" fill="url(#diamondGradient)"/>
+                <rect fill="url(#diamondGradient)" height="713.95" width="967.032"/>
                 <rect
-                    width="967.032"
+                    fill="url(#diamondGradient)"
                     height="713.95"
                     transform="scale(1 -1)"
-                    fill="url(#diamondGradient)"
+                    width="967.032"
                 />
                 <rect
-                    width="967.032"
+                    fill="url(#diamondGradient)"
                     height="713.95"
                     transform="scale(-1 1)"
-                    fill="url(#diamondGradient)"
+                    width="967.032"
                 />
                 <rect
-                    width="967.032"
+                    fill="url(#diamondGradient)"
                     height="713.95"
                     transform="scale(-1)"
-                    fill="url(#diamondGradient)"
+                    width="967.032"
                 />
             </g>
             <g transform="translate(9.5, 8.5)">
                 <ArrowRightIcon
+                    className={"h-8"}
                     color="#FFFFFF"
                     style={{
                         transform: "translate(-50%, -50%) scale(0.8)",
                         transformBox: "fill-box",
                         transformOrigin: "center",
                     }}
-                    className={"h-8"}
                 />
             </g>
         </g>
 
         <rect
-            x="0.75"
-            y="0.75"
-            width="29.5"
+            fill="none"
             height="29.5"
             rx={radius - 0.75}
             stroke={colorEnd}
             strokeWidth="1.5"
-            fill="none"
+            width="29.5"
+            x="0.75"
+            y="0.75"
         />
     </svg>
 );
 
+/**
+ * Renders the aiicon component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.size - The size value.
+ * @param {any} props.colorStart - The color start value.
+ * @param {any} props.colorMid - The color mid value.
+ * @param {any} props.colorEnd - The color end value.
+ * @param {any} props.strokeColor - The stroke color value.
+ * @param {any} props.radius - The radius value.
+ * @returns {JSX.Element} The rendered aiicon component.
+ */
 export function AIIcon({
                            size = 34,
                            colorStart = "#D071D5",
@@ -148,25 +216,25 @@ export function AIIcon({
 
     return (
         <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={size}
-            height={size}
-            viewBox="0 0 34 34"
-            fill="none"
-            role="img"
             aria-label="AI icon"
             className="block"
+            fill="none"
+            height={size}
+            role="img"
             shapeRendering="geometricPrecision"
+            viewBox="0 0 34 34"
+            width={size}
+            xmlns="http://www.w3.org/2000/svg"
         >
             <defs>
                 {/* main gradient, same direction as before */}
                 <linearGradient
+                    gradientUnits="userSpaceOnUse"
                     id={gradId}
                     x1="0"
-                    y1="0"
                     x2="34"
+                    y1="0"
                     y2="34"
-                    gradientUnits="userSpaceOnUse"
                 >
                     <stop offset="0" stopColor={colorStart} />
                     <stop offset="0.430146" stopColor={colorMid} />
@@ -175,12 +243,12 @@ export function AIIcon({
 
                 {/* soft top-left highlight */}
                 <radialGradient
-                    id={glossId}
                     cx="0"
                     cy="0"
-                    r="1"
-                    gradientUnits="userSpaceOnUse"
                     gradientTransform="translate(10 6) rotate(45) scale(18)"
+                    gradientUnits="userSpaceOnUse"
+                    id={glossId}
+                    r="1"
                 >
                     <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.8" />
                     <stop offset="0.4" stopColor="#FFFFFF" stopOpacity="0.25" />
@@ -190,22 +258,22 @@ export function AIIcon({
 
             {/* background rounded square with gradient */}
             <rect
-                x="1.5"
-                y="1.5"
-                width="31"
+                fill={`url(#${gradId})`}
                 height="31"
                 rx={radius}
-                fill={`url(#${gradId})`}
+                width="31"
+                x="1.5"
+                y="1.5"
             />
             {/* subtle gloss overlay */}
             <rect
+                fill={`url(#${glossId})`}
+                height="16"
+                opacity="0.5"
+                rx={radius}
+                width="31"
                 x="1.5"
                 y="1.5"
-                width="31"
-                height="16"
-                rx={radius}
-                fill={`url(#${glossId})`}
-                opacity="0.5"
             />
 
             {/* white arrow + accents (unchanged geometry) */}
@@ -228,14 +296,14 @@ export function AIIcon({
 
             {/* outer stroke */}
             <rect
-                x="1.5"
-                y="1.5"
-                width="31"
+                fill="none"
                 height="31"
                 rx={radius}
                 stroke={strokeColor}
                 strokeWidth="1.5"
-                fill="none"
+                width="31"
+                x="1.5"
+                y="1.5"
             />
         </svg>
     );

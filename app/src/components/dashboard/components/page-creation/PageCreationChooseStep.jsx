@@ -1,8 +1,10 @@
-import React from "react";
 import {motion} from "framer-motion";
+import React from "react";
+
 import {AIPageCreationIcon, EditorPageCreationIcon} from "../../resources/DashboardIcons";
-import FormTopBar from "./FormTopBar";
+
 import {CreationOption} from "./CreationOption";
+import FormTopBar from "./FormTopBar";
 
 /**
  * PageCreationChooseStep component
@@ -37,7 +39,8 @@ function PageCreationChooseStep({
         >
             <FormTopBar onClick={closeForm} title="Create a new page"/>
 
-            <form className="mt-3" onSubmit={(e) => {
+            <form className="mt-3"
+onSubmit={(e) => {
                 e.preventDefault();
                 onChooseManual();
             }}>

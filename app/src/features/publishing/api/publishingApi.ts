@@ -9,9 +9,19 @@ const axiosConfig = {
     timeoutErrorMessage: 'Server did not respond.',
 };
 
-export function publishPage(page: Page, html: string, isPublic: boolean) {
+/**
+ * Publishes the current page HTML to the backend publish endpoint.
+ *
+ * @param {Page} page The source page that is being published.
+ * @param {string} html The generated static HTML for the published page.
+ * @param {boolean} isPublic Controls whether the deployment is public or preview-only.
+ * @param {string} slug The published page slug used in the deployment URL.
+ * @returns {Promise<any>} The HTTP request promise for the publish action.
+ */
+export function publishPage(page: Page, html: string, isPublic: boolean, slug: string = page.name) {
+    const resolvedSlug = encodeURIComponent(slug || page.name);
     return httpClient.post(
-        `/api/publishPage/${page.name}/${page.name}`,
+        `/api/publishPage/${encodeURIComponent(page.name)}/${resolvedSlug}`,
         {
             page: html,
             isPublic,
@@ -20,14 +30,26 @@ export function publishPage(page: Page, html: string, isPublic: boolean) {
     );
 }
 
+/**
+ * Requests a published page from the public publishing server.
+ *
+ * @param {string} authorId The author identifier of the published page.
+ * @param {string} pageName The published page slug.
+ * @returns {Promise<any>} The HTTP request promise for the public page.
+ */
 export function openPublishedPage(authorId: string, pageName: string) {
     return httpClient({
         method: 'get',
         url: `${(import.meta as any).env.VITE_PUBLISH_URL}/${encodeURIComponent(authorId)}/${encodeURIComponent(pageName)}`,
-        responseType: 'text',
     });
 }
 
+/**
+ * Builds a static HTML bundle from the current GrapesJS editor state.
+ *
+ * @param {any} editor - The active GrapesJS editor instance.
+ * @returns {Promise<{html: string, projectData: any, exportSettings: any}>} The generated HTML bundle and export metadata.
+ */
 export async function buildStaticBundle(editor: any) {
     const htmlFn = grapesjsExportConfig?.root?.['index.html'];
     const cssFn = grapesjsExportConfig?.root?.css?.['style.css'];

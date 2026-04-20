@@ -1,15 +1,20 @@
-import React from "react";
 import {motion} from "framer-motion";
+import React from "react";
 
-import FormTopBar from "./FormTopBar";
 import MetaWizard from "../../../meta-wizard/MetaWizard";
 
+import FormTopBar from "./FormTopBar";
+
 /**
- * PageCreationMetaStep
+ * Renders the page creation meta step component.
  *
- * Optional, skippable step that collects metadata before page creation.
- * This step does not persist anything by itself; the parent decides when to
- * send metadata to the API (e.g. on POST /api/pages).
+ * @param {Object} props - Component props.
+ * @param {any} props.closeForm - The close form value.
+ * @param {any} props.onBack - Callback fired for the on back action.
+ * @param {any} props.onWizardClose - Callback fired for the on wizard close action.
+ * @param {any} props.initialValue - The initial value value.
+ * @param {any} props.stepLabel - The step label value.
+ * @returns {JSX.Element} The rendered page creation meta step component.
  */
 function PageCreationMetaStep({
     closeForm,
@@ -30,9 +35,9 @@ function PageCreationMetaStep({
 
             <div className="mt-4 flex items-center justify-between">
                 <button
-                    type="button"
-                    onClick={onBack}
                     className="text-small px-3 py-1.5 rounded-[6px] border border-ui-border bg-ui-bg text-text hover:border-primary hover:text-primary transition-colors"
+                    onClick={onBack}
+                    type="button"
                 >
                     Back
                 </button>

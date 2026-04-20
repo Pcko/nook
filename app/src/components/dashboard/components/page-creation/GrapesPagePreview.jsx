@@ -1,6 +1,6 @@
 import "grapesjs/dist/css/grapes.min.css";
-import React, { useEffect, useRef } from "react";
 import grapesjs from "grapesjs";
+import React, { useEffect, useRef } from "react";
 
 /**
  * Preview renderer for AI-generated pages using GrapesJS.
@@ -92,13 +92,13 @@ function GrapesPagePreview({ page, onSelect, index }) {
         <div
             className="border-2 border-ui-border rounded-[5px] overflow-hidden relative cursor-pointer group hover:border-ui-border-selected hover:shadow-xl transition"
             onClick={onSelect}
-            role="button"
-            tabIndex={0}
             onKeyDown={(e) => {
                 if (e.key === "Enter") {
                     onSelect?.();
                 }
             }}
+            role="button"
+            tabIndex={0}
         >
             <div
                 ref={containerRef}

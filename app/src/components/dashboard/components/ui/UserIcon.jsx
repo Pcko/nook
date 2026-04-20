@@ -1,5 +1,9 @@
 import React from "react";
 
+/**
+ * Renders the user icon component.
+ * @returns {JSX.Element} The rendered user icon component.
+ */
 function UserIcon(){
     const user = JSON.parse(localStorage.getItem('user'));
 

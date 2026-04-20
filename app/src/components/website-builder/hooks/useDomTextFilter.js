@@ -1,9 +1,18 @@
 import {useEffect} from "react";
 
+/**
+ *
+ * @param q
+ */
 function normalizeQuery(q) {
     return (q || "").trim().toLowerCase();
 }
 
+/**
+ *
+ * @param itemEl
+ * @param itemTextSelector
+ */
 function getItemText(itemEl, itemTextSelector) {
     if (!itemEl) return "";
 
@@ -20,6 +29,12 @@ function getItemText(itemEl, itemTextSelector) {
     return (itemEl.textContent || "").trim();
 }
 
+/**
+ * Sets visible.
+ *
+ * @param {any} el - The el value.
+ * @param {any} visible - The visible value.
+ */
 function setVisible(el, visible) {
     if (!el) return;
 
@@ -35,6 +50,12 @@ function setVisible(el, visible) {
     }
 }
 
+/**
+ *
+ * @param rootEl
+ * @param query
+ * @param opts
+ */
 function applyFilter(rootEl, query, opts) {
     const {
         itemSelector,
@@ -89,8 +110,16 @@ function applyFilter(rootEl, query, opts) {
 }
 
 /**
- * DOM-based text filter for GrapesJS-rendered panels.
- * Uses MutationObserver to keep filtering while GrapesJS re-renders.
+ * Provides the use dom text filter hook.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.rootSelector - The root selector value.
+ * @param {any} props.enabled - The enabled value.
+ * @param {any} props.query - The query value.
+ * @param {any} props.itemSelector - The item selector value.
+ * @param {any} props.itemTextSelector - The item text selector value.
+ * @param {any} props.groupSelector - The group selector value.
+ * @param {any} props.groupTitleSelector - The group title selector value.
  */
 export function useDomTextFilter({
     rootSelector,
@@ -118,6 +147,9 @@ export function useDomTextFilter({
         }
 
         let raf = 0;
+        /**
+ * Handles the run operation.
+ */
         const run = () => {
             if (raf) cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => {

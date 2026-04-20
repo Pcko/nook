@@ -2,6 +2,9 @@ import React, {createContext, useCallback, useContext, useEffect, useRef, useSta
 
 const NotificationContext = createContext(null);
 
+/**
+ * Provides the use notifications hook.
+ */
 export const useNotifications = () => {
     const ctx = useContext(NotificationContext);
     if (!ctx) {
@@ -10,6 +13,13 @@ export const useNotifications = () => {
     return ctx;
 };
 
+/**
+ * Renders the notification provider component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.children - Nested content rendered inside the component.
+ * @returns {JSX.Element} The rendered notification provider component.
+ */
 export const NotificationProvider = ({children}) => {
     const [notifications, setNotifications] = useState([]);
     const timeoutsRef = useRef(new Map());
@@ -43,12 +53,10 @@ export const NotificationProvider = ({children}) => {
         return key;
     }, [removeNotification]);
 
-    useEffect(() => {
-        return () => {
+    useEffect(() => () => {
             timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
             timeoutsRef.current.clear();
-        };
-    }, []);
+        }, []);
 
     const value = {
         notifications,

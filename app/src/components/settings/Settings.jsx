@@ -1,8 +1,6 @@
-import AppearanceSettings from "./AppearanceSettings";
-import AccountSettings from "./AccountSettings";
-import SecuritySettings from "./SecuritySettings";
+import {AnimatePresence, motion} from "framer-motion";
 import React, {useMemo, useState} from "react";
-import useErrorHandler from "../logging/ErrorHandler";
+
 import SettingsService from "../../services/SettingsService";
 import {
     isInvalidStringForEmail,
@@ -11,9 +9,22 @@ import {
     isInvalidStringForPassword,
     isInvalidStringForUsername
 } from "../general/FormChecks";
-import {AnimatePresence, motion} from "framer-motion";
+import useErrorHandler from "../logging/ErrorHandler";
 import {useMetaNotify} from "../logging/MetaNotifyHook";
 
+import AccountSettings from "./AccountSettings";
+import AppearanceSettings from "./AppearanceSettings";
+import SecuritySettings from "./SecuritySettings";
+
+
+
+/**
+ * Renders the settings component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.activeTab - The active tab value.
+ * @returns {JSX.Element} The rendered settings component.
+ */
 function Settings({activeTab}) {
     const [changes, setChanges] = useState({});
 
@@ -31,6 +42,12 @@ function Settings({activeTab}) {
     const originalSettings = loadSettings();
     const settingsHaveChanges = Object.keys(changes).length > 0;
 
+    /**
+     *
+     * @param category
+     * @param setting
+     * @param data
+     */
     const handleSettingsChange = (category, setting, data) => {
         setChanges((prev) => ({
             ...prev,
@@ -41,6 +58,12 @@ function Settings({activeTab}) {
         }));
     };
 
+    /**
+ * Handles the apply changes operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ * @returns {Promise<any>} A promise that resolves when the operation completes.
+ */
     const applyChanges = async (e) => {
         e.preventDefault();
 
@@ -138,6 +161,9 @@ function Settings({activeTab}) {
         }
     };
 
+    /**
+ * Loads settings.
+ */
     function loadSettings() {
         return {
             account: JSON.parse(localStorage.getItem("user")),
@@ -150,21 +176,17 @@ function Settings({activeTab}) {
 
     return (
         <div className="h-full pt-8 px-[200px] bg-website-bg text-text">
-            <form onSubmit={applyChanges} className="h-full relative">
+            <form className="h-full relative" onSubmit={applyChanges}>
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={activeTab}
-                        initial={{opacity: 0, y: 10}}
                         animate={{opacity: 1, y: 0}}
                         exit={{opacity: 0, y: -10}}
+                        initial={{opacity: 0, y: 10}}
+                        key={activeTab}
                         transition={{duration: 0.25}}
                     >
                         {activeTab === "account" && (
                             <AccountSettings
-                                options={{
-                                    ...originalSettings.account,
-                                    ...changes.account
-                                }}
                                 changeHandler={(setting, data) =>
                                     handleSettingsChange(
                                         "account",
@@ -172,11 +194,14 @@ function Settings({activeTab}) {
                                         data
                                     )
                                 }
+                                options={{
+                                    ...originalSettings.account,
+                                    ...changes.account
+                                }}
                             />
                         )}
                         {activeTab === "appearance" && (
                             <AppearanceSettings
-                                options={originalSettings.appearance}
                                 changeHandler={(setting, data) =>
                                     handleSettingsChange(
                                         "appearance",
@@ -184,6 +209,7 @@ function Settings({activeTab}) {
                                         data
                                     )
                                 }
+                                options={originalSettings.appearance}
                             />
                         )}
                         {activeTab === "security" && (
@@ -206,8 +232,8 @@ function Settings({activeTab}) {
                             You have unsaved changes!
                         </div>
                         <button
-                            type="submit"
                             className="prim-btn h-3/4 my-auto flex items-center justify-center !text-text-on-primary"
+                            type="submit"
                         >
                             Save
                         </button>

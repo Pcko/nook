@@ -1,9 +1,120 @@
-import React from "react";
+import {useState} from "react";
 
-import TwoFactorAuthenticationCodeInputForm from "../../../components/auth/TwoFactorAuthenticationCodeInputForm";
+import CenteredWindowWithBackgroundBlur from "../../../components/general/CenteredWindowWithBackgroundBlur";
+import {useMetaNotify} from "../../../components/logging/MetaNotifyHook";
 
-function TwoFactorCodeForm({ submitForm }) {
-    return <TwoFactorAuthenticationCodeInputForm submitForm={submitForm} />;
+/**
+ * Renders the two factor code form component.
+ *
+ * @param {Object} props - Component props.
+ * @param {(code?: string) => void} props.submitForm - Submits the current 2FA code or cancels the flow when omitted.
+ * @returns {JSX.Element} The rendered two factor code form component.
+ */
+function TwoFactorCodeForm({submitForm}) {
+    const [authenticationCode, setAuthenticationCode] = useState("");
+
+    const {notify} = useMetaNotify({
+        feature: "auth",
+        component: "TwoFactorCodeForm",
+    });
+
+    /**
+     * Handles submission of the entered two-factor authentication code.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} event - The form submission event.
+     */
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
+
+        if (authenticationCode.length !== 6) {
+            notify(
+                "error",
+                "Authentication code must be exactly 6 characters long.",
+                {
+                    currentLength: authenticationCode.length
+                },
+                "validation"
+            );
+            return;
+        }
+
+        notify(
+            "info",
+            "Submitting 2FA code.",
+            undefined,
+            "submit"
+        );
+
+        submitForm(authenticationCode);
+        setAuthenticationCode("");
+    };
+
+    /**
+     * Cancels the two-factor authentication flow and returns control to the login form.
+     */
+    const handleFormCancel = () => {
+        notify(
+            "info",
+            "Two-factor authentication cancelled by user.",
+            {},
+            "cancel"
+        );
+        submitForm();
+    };
+
+    /**
+     * Updates the current 2FA input value.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+     */
+    const handleChange = (e) => {
+        setAuthenticationCode(
+            e.target.value.replace(/\D/g, "").slice(0, 6)
+        );
+    };
+
+    return (
+        <CenteredWindowWithBackgroundBlur>
+            <div className="p-5 bg-ui-bg border-[1px] border-ui-border rounded-lg w-[500px]">
+                <form onSubmit={handleFormSubmit}>
+                    <h1 className="text-2xl mb-1">Enter verification code:</h1>
+                    <h2 className="text-sm text-text-subtle">
+                        Enter 6-digit code from your authenticator
+                    </h2>
+
+                    <input
+                        autoComplete="off"
+                        className="w-full h-8 mt-4 px-2 tracking-wide border-ui-border focus:border-ui-border-selected focus:outline-none border-[1px] rounded bg-ui-bg mb-3"
+                        id="authenticationCode"
+                        maxLength={6}
+                        minLength={6}
+                        name="authenticationCode"
+                        onChange={handleChange}
+                        placeholder="XXXXXX"
+                        required
+                        type="text"
+                        value={authenticationCode}
+                    />
+                    <div className="w-full flex mt-5">
+                        <button
+                            className="w-[40%] py-1 text-text px-4 bg-ui-button rounded-lg ml-0 mr-auto hover:cursor-pointer hover:bg-ui-button-hover btn"
+                            onClick={handleFormCancel}
+                            type="button"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="w-[40%] py-1 px-4 mr-0 ml-auto bg-primary rounded-lg hover:cursor-pointer hover:bg-primary-hover prim-btn disabled:text-text-subtle disabled:bg-ui-button"
+                            disabled={authenticationCode.length !== 6}
+                            type="submit"
+                        >
+                            Confirm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </CenteredWindowWithBackgroundBlur>
+    );
 }
 
 export default TwoFactorCodeForm;

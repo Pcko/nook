@@ -1,6 +1,15 @@
-import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
+/**
+ * Renders the accessibility dropdown component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.options - The options value.
+ * @param {any} props.selected - The selected value.
+ * @param {any} props.onChange - Callback fired for the on change action.
+ * @returns {JSX.Element} The rendered accessibility dropdown component.
+ */
 function AccessibilityDropdown({ options, selected, onChange }) {
     const optionLabels = {
         "normal": "Normal",
@@ -9,7 +18,7 @@ function AccessibilityDropdown({ options, selected, onChange }) {
 
     return (
         <div className="w-1/2 ml-auto mr-0 relative">
-            <Listbox value={selected} onChange={onChange}>
+            <Listbox onChange={onChange} value={selected}>
                 <div className="relative">
                     <Listbox.Button className="w-full py-1 rounded-[5px] text-text text-center bg-ui-bg border-2 border-ui-border cursor-pointer">
                         {optionLabels[selected]}
@@ -24,13 +33,13 @@ function AccessibilityDropdown({ options, selected, onChange }) {
                         <Listbox.Options className="absolute mt-1 w-full bg-ui-bg border border-ui-border rounded-md shadow-lg z-10">
                             {options.map((option) => (
                                 <Listbox.Option
-                                    key={option}
-                                    value={option}
                                     className={({ active }) =>
                                         `cursor-pointer select-none p-2 text-text first:rounded-t-[5px] last:rounded-b-[5px] ${
                                             active ? "bg-ui-bg-selected" : ""
                                         }`
                                     }
+                                    key={option}
+                                    value={option}
                                 >
                                     {optionLabels[option]}
                                 </Listbox.Option>

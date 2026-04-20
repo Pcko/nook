@@ -112,6 +112,9 @@ export function registerButtonTestTrait(editor) {
         // Scroll is enabled if:
         // - we're on an exported/live page (no data-gjs-preview attribute), OR
         // - we're in editor and data-gjs-preview === "1"
+        /**
+ * Checks whether is scroll enabled.
+ */
         function isScrollEnabled() {
           var body = document.body;
           if (!body) return true;
@@ -127,6 +130,11 @@ export function registerButtonTestTrait(editor) {
           return previewState === "1";
         }
 
+        /**
+ * Handles the on click operation.
+ *
+ * @param {any} e - The event payload for the current interaction.
+ */
         function onClick(e) {
           // In editor: do nothing unless preview is active
           if (!isScrollEnabled()) return;
@@ -182,6 +190,10 @@ export function registerButtonTestTrait(editor) {
   });
 
   // mark preview state inside the canvas document
+  /**
+   *
+   * @param on
+   */
   const setPreviewFlag = (on) => {
     const doc = editor.Canvas.getDocument();
     if (!doc || !doc.body) {

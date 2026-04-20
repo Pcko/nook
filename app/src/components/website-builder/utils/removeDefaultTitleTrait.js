@@ -1,5 +1,14 @@
 // removeDefaultTitleTrait.js
+/**
+ * Removes global title trait.
+ *
+ * @param {any} editor - The editor value.
+ */
 export function removeGlobalTitleTrait(editor) {
+  /**
+   *
+   * @param comp
+   */
   const stripTitle = (comp) => {
     if (!comp || !comp.removeTrait) return;
     // Only try if there are traits at all
@@ -8,7 +17,7 @@ export function removeGlobalTitleTrait(editor) {
 
     try {
       comp.removeTrait('title'); // Official API
-    } catch (e) {
+    } catch {
       // ignore if trait not present
     }
   };

@@ -34,88 +34,88 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
     }, [historyState]);
 
     const captureHistory = useCallback(
-            (reason = "Edit") => {
-                const editor = editorRef.current;
-                if (!editor) return;
+        (reason = "Edit") => {
+            const editor = editorRef.current;
+            if (!editor) return;
 
-                const data = editor.getProjectData();
-                let hash = null;
-                let snapshotData = data;
-                try {
-                    hash = JSON.stringify(data);
-                    // Store a deep copy so older snapshots don't get mutated by later editor changes.
-                    snapshotData = JSON.parse(hash);
-                } catch (e) {
-                    // If serialization fails for any reason, still store a snapshot.
-                    hash = String(Date.now());
-                    snapshotData = data;
+            const data = editor.getProjectData();
+            let hash = null;
+            let snapshotData = data;
+            try {
+                hash = JSON.stringify(data);
+                // Store a deep copy so older snapshots don't get mutated by later editor changes.
+                snapshotData = JSON.parse(hash);
+            } catch {
+                // If serialization fails for any reason, still store a snapshot.
+                hash = String(Date.now());
+                snapshotData = data;
+            }
+
+            if (hash && hash === lastSnapshotHashRef.current) return;
+            lastSnapshotHashRef.current = hash;
+
+            setHistoryState((prev) => {
+                const base = prev.items.slice(0, prev.index + 1);
+                const entry = {
+                    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                    ts: Date.now(),
+                    reason,
+                    data: snapshotData,
+                };
+
+                let nextItems = [...base, entry];
+                let nextIndex = nextItems.length - 1;
+
+                if (nextItems.length > MAX_HISTORY) {
+                    const overflow = nextItems.length - MAX_HISTORY;
+                    nextItems = nextItems.slice(overflow);
+                    nextIndex = Math.max(0, nextIndex - overflow);
                 }
 
-                if (hash && hash === lastSnapshotHashRef.current) return;
-                lastSnapshotHashRef.current = hash;
-
-                setHistoryState((prev) => {
-                    const base = prev.items.slice(0, prev.index + 1);
-                    const entry = {
-                        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                        ts: Date.now(),
-                        reason,
-                        data: snapshotData,
-                    };
-
-                    let nextItems = [...base, entry];
-                    let nextIndex = nextItems.length - 1;
-
-                    if (nextItems.length > MAX_HISTORY) {
-                        const overflow = nextItems.length - MAX_HISTORY;
-                        nextItems = nextItems.slice(overflow);
-                        nextIndex = Math.max(0, nextIndex - overflow);
-                    }
-
-                    return {items: nextItems, index: nextIndex};
-                });
-            },
-            [editorRef]
+                return {items: nextItems, index: nextIndex};
+            });
+        },
+        [editorRef]
     );
 
     const goToHistory = useCallback(
-            (index) => {
-                const editor = editorRef.current;
-                const hs = historyStateRef.current;
-                if (!editor) return;
-                if (!hs?.items?.length) return;
-                if (index < 0 || index >= hs.items.length) return;
+        (index) => {
+            const editor = editorRef.current;
+            const hs = historyStateRef.current;
+            if (!editor) return;
+            if (!hs?.items?.length) return;
+            if (index < 0 || index >= hs.items.length) return;
 
-                const snap = hs.items[index];
-                restoringRef.current = true;
+            const snap = hs.items[index];
+            restoringRef.current = true;
 
-                try {
-                    if (typeof editor.loadProjectData === "function") {
-                        editor.loadProjectData(snap.data);
-                    } else {
-                        // Fallback: keep UI selection consistent at least
-                        editor.select(null);
-                    }
-                } finally {
-                    // prevent immediate re-snapshot from restore-triggered updates
-                    setTimeout(() => {
-                        restoringRef.current = false;
-                    }, 300);
+            try {
+                if (typeof editor.loadProjectData === "function") {
+                    editor.loadProjectData(snap.data);
+                } else {
+                    // Fallback: keep UI selection consistent at least
+                    editor.select(null);
                 }
+            } finally {
+                // prevent immediate re-snapshot from restore-triggered updates
+                setTimeout(() => {
+                    restoringRef.current = false;
+                }, 300);
+            }
 
-                // keep local page data aligned with the restored state
-                setPage(snap.data);
+            // keep local page data aligned with the restored state
+            setPage(snap.data);
 
-                // keep the duplicate filter aligned with the restored snapshot
-                try {
-                    lastSnapshotHashRef.current = JSON.stringify(snap.data);
-                } catch (e) {
-                    lastSnapshotHashRef.current = String(Date.now());
-                }
+            // keep the duplicate filter aligned with the restored snapshot
+            try {
+                lastSnapshotHashRef.current = JSON.stringify(snap.data);
+            } catch {
+                lastSnapshotHashRef.current = String(Date.now());
+            }
 
-                setHistoryState((prev) => ({...prev, index}));
-            },
-            [editorRef, setPage]
+            setHistoryState((prev) => ({...prev, index}));
+        },
+        [editorRef, setPage]
     );
 
     useEffect(() => {
@@ -123,6 +123,10 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
         const editor = editorRef.current;
         if (!editor) return;
 
+        /**
+         *
+         * @param val
+         */
         const toPlainText = (val) => {
             if (val == null) return "";
             let s = "";
@@ -147,6 +151,10 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             return s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
         };
 
+        /**
+         *
+         * @param cmp
+         */
         const getCmpLabel = (cmp) => {
             if (!cmp) return "component";
             const name = cmp.get?.("name") || cmp.getName?.();
@@ -155,6 +163,11 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             return toPlainText(name || type || "component") || "component";
         };
 
+        /**
+         *
+         * @param reason
+         * @param prio
+         */
         const setPendingReason = (reason, prio) => {
             if (!reason) return;
             const cur = pendingReasonRef.current;
@@ -165,6 +178,11 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
 
         // Capture snapshots on edits (throttled).
         // We keep the "most specific" reason observed during the throttle window.
+        /**
+         *
+         * @param reason
+         * @param prio
+         */
         const scheduleSnapshot = (reason, prio = 10) => {
             if (restoringRef.current) return;
             setPendingReason(reason, prio);
@@ -178,6 +196,10 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             }, 450);
         };
 
+        /**
+         *
+         * @param block
+         */
         const getBlockLabel = (block) => {
             if (!block) return "";
             const attrs = block.get?.("attributes");
@@ -190,10 +212,18 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
         };
 
         // Track block dragging to avoid misclassifying add/move.
+        /**
+ * Handles the on block drag start operation.
+ */
         const onBlockDragStart = () => {
             isBlockDraggingRef.current = true;
         };
 
+        /**
+         *
+         * @param component
+         * @param block
+         */
         const onBlockDragStop = (component, block) => {
             isBlockDraggingRef.current = false;
             if (!component) return;
@@ -205,6 +235,10 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             scheduleSnapshot(`Added ${label}`, 95);
         };
 
+        /**
+         *
+         * @param cmp
+         */
         const onAdd = (cmp) => {
             // GrapesJS might trigger component:add also when moving components (known issue),
             // therefore we only treat it as a creation when no drag is in progress.
@@ -218,12 +252,24 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             scheduleSnapshot(`Added ${getCmpLabel(cmp)}`, 40);
         };
 
+        /**
+         *
+         * @param cmp
+         */
         const onClone = (cmp) => {
             scheduleSnapshot(`Duplicated ${getCmpLabel(cmp)}`, 85);
         };
 
+        /**
+         *
+         * @param cmp
+         */
         const onRemove = (cmp) => scheduleSnapshot(`Removed ${getCmpLabel(cmp)}`, 90);
 
+        /**
+         *
+         * @param data
+         */
         const onDragStart = (data) => {
             if (isBlockDraggingRef.current) return;
 
@@ -238,6 +284,10 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             };
         };
 
+        /**
+         *
+         * @param data
+         */
         const onDragEnd = (data) => {
             if (isBlockDraggingRef.current) return;
 
@@ -252,20 +302,27 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
 
             // Don't create noise if nothing actually changed.
             const moved =
-                    start.active &&
-                    (start.startParent !== endParent ||
-                            (start.startIndex != null && endIndex != null && start.startIndex !== endIndex));
+                start.active &&
+                (start.startParent !== endParent ||
+                    (start.startIndex != null && endIndex != null && start.startIndex !== endIndex));
 
             if (moved) {
                 scheduleSnapshot(`Moved ${getCmpLabel(target)}`, 100);
             }
         };
 
+        /**
+ * Handles the on style update operation.
+ */
         const onStyleUpdate = () => {
             // GrapesJS doesn't expose which exact property changed here by default.
             scheduleSnapshot("Style changed", 70);
         };
 
+        /**
+         *
+         * @param payload
+         */
         const onTraitValue = (payload) => {
             const trait = payload?.trait;
             const component = payload?.component;
@@ -273,6 +330,9 @@ export function useBuilderHistory({editorRef, editorReady, setPage}) {
             scheduleSnapshot(`Trait changed: ${name || getCmpLabel(component)}`, 60);
         };
 
+        /**
+ * Handles the on update operation.
+ */
         const onUpdate = () => scheduleSnapshot("Edited", 10);
 
         // Block-drag is the most reliable way to detect "Added" from the block manager.

@@ -1,3 +1,11 @@
+/**
+ * Renders the theme preview component.
+ *
+ * @param {Object} props - Component props.
+ * @param {any} props.theme - The theme value.
+ * @param {any} props.isSelected - The is selected value.
+ * @returns {JSX.Element} The rendered theme preview component.
+ */
 function ThemePreview({theme, isSelected}) {
     let appliedClass = theme;
 
@@ -33,7 +41,7 @@ function ThemePreview({theme, isSelected}) {
                             <div className="rounded-lg h-2 w-4 bg-ui-button m-1"/>
                         </div>
                         <div
-                            className="rounded-sm h-[70%] w-[80%] mx-auto bg-gradient-to-b from-ui-button to-ui-bg-selected"></div>
+                            className="rounded-sm h-[70%] w-[80%] mx-auto bg-gradient-to-b from-ui-button to-ui-bg-selected" />
                     </div>
                 </div>
             </div>

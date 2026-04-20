@@ -9,19 +9,18 @@ import {
 
 class WebsiteBuilderService {
     static async savePageState(editor: Editor, page: Page): Promise<void> {
-        const latestProjectData = editor.getProjectData();
-        const prepared = await prepareProjectDataForPersistence(page.name, latestProjectData);
         const storageKey = `page_${page.name}`;
 
-        page.data = prepared.editorData;
-
         try {
-            await PageService.updatePage(page, undefined, prepared);
+            const latestProjectData = editor.getProjectData();
+            const prepared = await prepareProjectDataForPersistence(page.name, latestProjectData);
 
-            // save was successful no draft should survive refresh
+            page.data = prepared.editorData;
+            await PageService.updatePage(page, undefined, prepared);
             localStorage.removeItem(storageKey);
         } catch (err) {
-            // keep a recovery draft only when save failed
+            const latestProjectData = editor.getProjectData();
+            const prepared = await prepareProjectDataForPersistence(page.name, latestProjectData);
             writePageCache(storageKey, prepared.normalizedData);
             throw { ...err, redirectToLogin: true };
         }
@@ -31,12 +30,12 @@ class WebsiteBuilderService {
         const storageKey = `page_${page.name}`;
 
         try {
-            const serverPage = await PageService.getPage(page.name);
-
-            page.data = serverPage.data;
-            editor.loadProjectData(serverPage.data ?? {});
+            const { data } = await PageService.getPage(page.name);
+            if (data !== null) {
+                page.data = data;
+                editor.loadProjectData(data);
+            }
         } catch (err) {
-            // fallback only if server load fails
             const cached = localStorage.getItem(storageKey);
             if (cached !== null) {
                 const restored = restoreProjectDataFromCache(cached);

@@ -1,8 +1,16 @@
 import React, { useEffect } from 'react';
 
+/**
+ * Renders the nook background component.
+ * @returns {JSX.Element} The rendered nook background component.
+ */
 const NookBackground = () => {
 
     useEffect(() => {
+        /**
+ * Creates background text.
+ * @returns {any} The computed result of the operation.
+ */
         const createBackgroundText = () => {
             // Create a container for the "nook" text
             const container = document.createElement('div');

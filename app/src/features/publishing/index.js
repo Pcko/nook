@@ -1,6 +1,4 @@
-export { default as DeployModal } from "./ui/DeployModal";
-export { default as DeploymentStats } from "./ui/DeploymentStats";
-export { default as PublishedPageView } from "./ui/PublishedPageView";
+export { DeployModal, DeploymentStats, PublishedPageView } from "./ui";
 
 export {
     publishPage,

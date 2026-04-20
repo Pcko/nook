@@ -1,4 +1,3 @@
-import React from "react";
 import {
     ArrowUpCircleIcon,
     BookOpenIcon,
@@ -9,6 +8,7 @@ import {
     PencilSquareIcon,
     SparklesIcon,
 } from "@heroicons/react/24/outline";
+import React from "react";
 
 const GOOD_EXAMPLES = [
     "I need a website for my small coffee shop in Vienna.",
@@ -88,6 +88,10 @@ const EXAMPLE_PROMPT = [
     "I want a simple, clean website that shows what we offer and how to contact us.",
 ].join("\n");
 
+/**
+ * Renders the user guide component.
+ * @returns {JSX.Element} The rendered user guide component.
+ */
 function UserGuide() {
     return (
         <div className="space-y-8">
@@ -149,8 +153,8 @@ function UserGuide() {
                         const Icon = feature.icon;
                         return (
                             <div
-                                key={feature.title}
                                 className="flex items-start gap-3 rounded-[10px] border border-ui-border bg-ui-bg p-4"
+                                key={feature.title}
                             >
                                 <span
                                     className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-ui-border bg-website-bg text-primary">
@@ -223,7 +227,7 @@ function UserGuide() {
                     </p>
                     <ul className="mt-4 space-y-2 text-sm text-text-subtle">
                         {GOOD_EXAMPLES.map((example) => (
-                            <li key={example} className="flex items-start gap-2">
+                            <li className="flex items-start gap-2" key={example}>
                                 <CheckCircleIcon className="mt-[3px] h-4 w-4 text-primary"/>
                                 {example}
                             </li>
@@ -234,7 +238,7 @@ function UserGuide() {
                     </p>
                     <ul className="mt-3 space-y-2 text-sm text-text-subtle">
                         {AVOID_EXAMPLES.map((example) => (
-                            <li key={example} className="flex items-start gap-2">
+                            <li className="flex items-start gap-2" key={example}>
                                 <span className="mt-[6px] h-2 w-2 rounded-full bg-text-subtle"/>
                                 {example}
                             </li>
@@ -253,7 +257,7 @@ function UserGuide() {
                     </p>
                     <ul className="mt-4 space-y-2 text-sm text-text">
                         {HIGHLIGHTS.map((item) => (
-                            <li key={item} className="flex items-start gap-2">
+                            <li className="flex items-start gap-2" key={item}>
                                 <CheckCircleIcon className="mt-[3px] h-4 w-4 text-primary"/>
                                 {item}
                             </li>
@@ -270,7 +274,7 @@ function UserGuide() {
                     </p>
                     <ul className="mt-4 space-y-2 text-sm text-text">
                         {REFINE_EXAMPLES.map((item) => (
-                            <li key={item} className="flex items-start gap-2">
+                            <li className="flex items-start gap-2" key={item}>
                                 <CheckCircleIcon className="mt-[3px] h-4 w-4 text-primary"/>
                                 {item}
                             </li>
@@ -287,7 +291,7 @@ function UserGuide() {
                         </p>
                         <ul className="mt-4 grid gap-2 text-sm text-text-subtle lg:grid-cols-2">
                             {BEST_PRACTICES.map((item) => (
-                                <li key={item} className="flex items-start gap-2">
+                                <li className="flex items-start gap-2" key={item}>
                                     <CheckCircleIcon className="mt-[3px] h-4 w-4 text-primary"/>
                                     {item}
                                 </li>

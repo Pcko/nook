@@ -2,8 +2,9 @@
 import { handleUndo, handleRedo, toggleOutlines, togglePreview } from './grapesActions';
 
 /**
- * Replace default GrapesJS keyboard shortcuts with custom ones.
- * @param editorRef - React ref containing the GrapesJS editor instance.
+ * Replaces default shortcuts.
+ *
+ * @param {any} editorRef - The editor ref value.
  */
 export function replaceDefaultShortcuts(editorRef) {
   const editor = editorRef?.current;
