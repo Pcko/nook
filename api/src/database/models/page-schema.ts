@@ -17,17 +17,6 @@ const PageSchema = new Schema<IPage>(
             type: String,
             default: null,
         },
-        dataEncoding: {
-            type: String,
-            required: true,
-            enum: ['plain', 'deflate-base64'],
-            default: 'plain',
-        },
-        dataVersion: {
-            type: Number,
-            required: true,
-            default: 1,
-        },
         author: {
             type: String,
             ref: 'User',

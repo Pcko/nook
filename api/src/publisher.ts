@@ -14,7 +14,6 @@ import IPublishedPage from './types/IPublishedPage.js';
 import type IPageAsset from './types/IPageAsset.js';
 import { getReferrerUrl, getVisitorHash } from './util/pageView.js';
 import { startOfDay, toISODate } from './util/statsComputer.js';
-import { decodeStoredString } from './util/compression.js';
 
 //Server settings
 const allowedOrigins: string[] = [process.env.APP_URL].filter(Boolean) as string[];
@@ -36,7 +35,7 @@ app.get('/assets/:assetId', async (req: Request<{ assetId: string }>, res: Respo
             return res.sendStatus(404);
         }
 
-        const publishedPage = await PublishedPage.findOne({ isPublic: true, assetIds: assetId }).lean<IPublishedPage>();
+        const publishedPage = await PublishedPage.findOne({ assetIds: assetId }).lean<IPublishedPage>();
         if (!publishedPage) {
             return res.sendStatus(404);
         }
@@ -89,13 +88,8 @@ app.get('/:authorId/:pageName', async (req: Request<{ authorId: string; pageName
             console.error('❌ Page view logging error:', err);
         });
 
-        const html = decodeStoredString(published.html, published.htmlEncoding);
-        if (html == null) {
-            return res.sendStatus(500);
-        }
-
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.status(200).send(html);
+        return res.status(200).send(published.html);
     } catch (err) {
         console.error('❌ Get published page error:', err);
         return res.sendStatus(500);
@@ -124,9 +118,9 @@ app.get('/search/:searchPageNumber/:searchPageAmount', async (req: Request, res:
     ]);
 
     return res.status(200).json({
-        data: pages.map((page) => ({
+        pages: pages.map((page) => ({
             ...page,
-            html: decodeStoredString(page.html, page.htmlEncoding),
+            html: page.html,
         })),
         pagination: {
             total,
@@ -160,7 +154,7 @@ app.get('/search', async (req: Request<{}, {}, {}, { searchQuery: string }>, res
 
         return res.status(200).send(pages.map((page) => ({
             ...page,
-            html: decodeStoredString(page.html, page.htmlEncoding),
+            html: page.html,
         })));
     } catch (err) {
         console.log('page search error', err);
