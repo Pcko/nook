@@ -23,16 +23,6 @@ import {logger} from "../util/logger.js";
 
 const router = express.Router();
 
-const rateLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 15,
-    message: {
-        message: 'Too many attempts. Please try again in 5 minutes.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
 /**
  * @route POST /auth/login
  * @summary Handles user login
@@ -44,7 +34,7 @@ const rateLimiter = rateLimit({
  *
  * @returns 200 - JSON{user<UserObject>, accessToken<string>, refreshToken<string>}
  */
-router.post('/login', rateLimiter, async (req: Request<{}, {}, LoginBody>, res: Response) => {
+router.post('/login', async (req: Request<{}, {}, LoginBody>, res: Response) => {
     try {
         req.log.debug({body: req.body}, 'Login')
         const {username, password, otp} = req.body;
@@ -166,7 +156,7 @@ router.post('/register', async (req: Request<{}, {}, RegisterBody>, res: Respons
             twoFactorAuthSecret: secret.base32,
         });
 
-        await sendEmailVerificationEmail(user);
+        //await sendEmailVerificationEmail(user);
 
         return res.sendStatus(202);
     } catch (err) {
