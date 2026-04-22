@@ -6,6 +6,15 @@ import ConfigPanel from "../panels/config-panel/ConfigPanel";
 import TabSelector from "../TabSelector";
 import PanelSearchBar from "../ui/PanelSearchBar";
 
+const TAB_OPTIONS = [
+    {value: "layers", label: "Layers"},
+    {value: "blocks", label: "Blocks"},
+    {value: "config", label: "Config"},
+];
+
+const PANEL_CLASS = "left-panel h-full min-w-[200px] overflow-y-auto bg-ui-bg p-2";
+const DISABLED_PANEL_CLASS = "pointer-events-none opacity-60";
+
 /**
  * LeftPanel component
  *
@@ -27,20 +36,14 @@ function LeftPanel() {
         groupTitleSelector: ".gjs-title",
     });
 
+    const panelClassName = `${PANEL_CLASS} ${aiBusy ? DISABLED_PANEL_CLASS : ""}`.trim();
+
     return (
-        <div
-            className={
-                "left-panel h-full min-w-[200px] bg-ui-bg p-2 overflow-y-auto " +
-                (aiBusy ? "pointer-events-none opacity-60" : "")
-            }>
+        <div className={panelClassName}>
             <TabSelector
                 active={activeTab}
                 onChange={setActiveTab}
-                options={[
-                    {value: "layers", label: "Layers"},
-                    {value: "blocks", label: "Blocks"},
-                    {value: "config", label: "Config"},
-                ]}
+                options={TAB_OPTIONS}
             />
 
             {activeTab === "blocks" && (
@@ -58,9 +61,9 @@ function LeftPanel() {
             <div className={activeTab === "layers" ? "" : "hidden"} id="gjs-layers"/>
             <div className={activeTab === "blocks" ? "" : "hidden"} id="gjs-blocks"/>
 
-      {activeTab === "config" && <ConfigPanel/>}
-    </div>
-  );
+            {activeTab === "config" && <ConfigPanel/>}
+        </div>
+    );
 }
 
 export default LeftPanel;

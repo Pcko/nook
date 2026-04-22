@@ -1,6 +1,19 @@
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
+import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import React from "react";
 
+const BUTTON_CLASS = [
+    "flex items-center gap-1.5 rounded border border-ui-border transition",
+    "bg-ui-bg px-2 py-1 text-tiny font-medium text-text-subtle hover:bg-ui-button-hover",
+    "focus:outline-none",
+].join(" ");
+
+const OPTIONS_CLASS = [
+    "absolute right-0 z-10 mt-0.5 min-w-[3.7rem] overflow-hidden rounded-[5px] border border-ui-border bg-ui-bg py-1 shadow-lg",
+    "focus:outline-none",
+].join(" ");
+
+const VALUE_CLASS = "flex h-6 items-center rounded bg-ui-bg-selected px-1.5 font-mono text-micro leading-none tracking-tight text-text";
+const CARET_CLASS = "inline-block translate-y-[1px] border-x-4 border-x-transparent border-t-4 border-t-text-subtle";
 
 /**
  * Renders the zoom listbox component.
@@ -11,55 +24,34 @@ import React from "react";
  * @param {any} props.options - The options value.
  * @returns {JSX.Element} The rendered zoom listbox component.
  */
-function ZoomListbox({ value, onChange, options }) {
+function ZoomListbox({value, onChange, options}) {
     return (
-            <Listbox onChange={onChange} value={value}>
-                <div className="relative">
-                    <ListboxButton
-                            className={[
-                                "flex items-center rounded border border-ui-border transition",
-                                "bg-ui-bg hover:bg-ui-button-hover text-text-subtle font-medium",
-                                "py-1 px-2 gap-1.5 text-tiny",
-                                "focus:outline-none",
-                            ].join(" ")}
-                    >
-          <span className="flex items-center h-6 bg-ui-bg-selected text-text px-1.5 rounded font-mono text-micro tracking-tight leading-none">
-            {value}%
-          </span>
-                        <span
-                                aria-hidden
-                                className="inline-block border-x-4 border-x-transparent border-t-4 border-t-text-subtle translate-y-[1px]"
-                        />
-                    </ListboxButton>
+        <Listbox onChange={onChange} value={value}>
+            <div className="relative">
+                <ListboxButton className={BUTTON_CLASS}>
+                    <span className={VALUE_CLASS}>{value}%</span>
+                    <span aria-hidden className={CARET_CLASS}/>
+                </ListboxButton>
 
-                    <ListboxOptions
-                            className={[
-                                "absolute right-0 z-10 mt-0.5",
-                                "bg-ui-bg border border-ui-border rounded-[5px]",
-                                "shadow-lg overflow-hidden",
-                                "py-1",
-                                "focus:outline-none",
-                                "min-w-[3.7rem]",
-                            ].join(" ")}
-                    >
-                        {options.map((opt) => (
-                                <ListboxOption key={opt} value={opt}>
-                                    {({ active, selected }) => (
-                                            <div
-                                                    className={[
-                                                        "w-full text-left px-2 py-1 text-tiny transition-colors",
-                                                        active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
-                                                        selected ? "font-semibold text-text" : "font-normal",
-                                                    ].join(" ")}
-                                            >
-                                                {opt}%
-                                            </div>
-                                    )}
-                                </ListboxOption>
-                        ))}
-                    </ListboxOptions>
-                </div>
-            </Listbox>
+                <ListboxOptions className={OPTIONS_CLASS}>
+                    {options.map((option) => (
+                        <ListboxOption key={option} value={option}>
+                            {({active, selected}) => (
+                                <div
+                                    className={[
+                                        "w-full px-2 py-1 text-left text-tiny transition-colors",
+                                        active ? "bg-ui-bg-selected text-text" : "bg-ui-bg text-text-subtle",
+                                        selected ? "font-semibold text-text" : "font-normal",
+                                    ].join(" ")}
+                                >
+                                    {option}%
+                                </div>
+                            )}
+                        </ListboxOption>
+                    ))}
+                </ListboxOptions>
+            </div>
+        </Listbox>
     );
 }
 
