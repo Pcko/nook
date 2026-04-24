@@ -11,15 +11,24 @@ import React from "react";
  * @param {any} props.icon - The icon value.
  * @returns {JSX.Element} The rendered top action button component.
  */
-function TopActionButton({ label, primary = false, onClick, disabled = false, icon = null }) {
+function TopActionButton({label, primary = false, onClick, disabled = false, icon = null}) {
+    const className = [
+        "btn-wb",
+        primary ? "btn-wb--primary" : "",
+        disabled ? "cursor-not-allowed opacity-50" : "",
+    ].join(" ").trim();
+
     return (
-            <button
-                className={["btn-wb", primary ? "btn-wb--primary" : "", disabled ? "opacity-50 cursor-not-allowed" : ""].join(" ")}
-                disabled={disabled}
-                onClick={onClick}
-            >
-                <span className="py-0.5 font-mono flex items-center gap-1.5">{icon}{label}</span>
-            </button>
+        <button
+            className={className}
+            disabled={disabled}
+            onClick={onClick}
+        >
+            <span className="flex items-center gap-1.5 py-0.5 font-mono">
+                {icon}
+                {label}
+            </span>
+        </button>
     );
 }
 

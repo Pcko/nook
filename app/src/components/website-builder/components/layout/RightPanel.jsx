@@ -7,6 +7,16 @@ import HistoryPanel from "../panels/HistoryPanel";
 import TabSelector from "../TabSelector";
 import PanelSearchBar from "../ui/PanelSearchBar";
 
+const TAB_OPTIONS = [
+    {value: "editor", label: "Editor"},
+    {value: "assistant", label: "Assistant"},
+    {value: "history", label: "History"},
+];
+
+const EDITOR_TAB_CLASS = "h-full overflow-y-auto";
+const DISABLED_EDITOR_TAB_CLASS = "pointer-events-none opacity-60";
+const HIDDEN_CLASS = "hidden h-full";
+
 /**
  * RightPanel component
  *
@@ -47,28 +57,22 @@ function RightPanel() {
         setActiveTab(tab);
     };
 
+    const editorTabClassName = [
+        activeTab === "editor" && selectedElement ? EDITOR_TAB_CLASS : HIDDEN_CLASS,
+        aiBusy ? DISABLED_EDITOR_TAB_CLASS : "",
+    ].join(" ").trim();
+
     return (
         <div className="right-panel h-full min-w-[200px] bg-ui-bg p-2">
             <div className="flex h-full flex-col">
                 <TabSelector
                     active={activeTab}
                     onChange={handleTabChange}
-                    options={[
-                        {value: "editor", label: "Editor"},
-                        {value: "assistant", label: "Assistant"},
-                        {value: "history", label: "History"},
-                    ]}
+                    options={TAB_OPTIONS}
                 />
 
-                <div className="mt-2 flex-1 min-h-0">
-                    {/* Editor-Tab */}
-                    <div
-                            className={
-                                activeTab === "editor" && selectedElement
-                                        ? `h-full overflow-y-auto ${aiBusy ? "pointer-events-none opacity-60" : ""}`
-                                        : "hidden h-full"
-                            }
-                    >
+                <div className="mt-2 min-h-0 flex-1">
+                    <div className={editorTabClassName}>
                         <div className="mb-3">
                             <PanelSearchBar
                                 disabled={aiBusy}
@@ -79,23 +83,21 @@ function RightPanel() {
                         </div>
 
                         <div className="mb-2">
-                            <p className="font-semibold mb-1">Traits</p>
+                            <p className="mb-1 font-semibold">Traits</p>
                             <div className="traits-panel"/>
                         </div>
 
                         <div className="mt-2">
-                            <p className="font-semibold mb-1">Styles</p>
+                            <p className="mb-1 font-semibold">Styles</p>
                             <div className="styles-panel"/>
                         </div>
                     </div>
 
-                    {/* Assistant-Tab */}
-                    <div className={activeTab === "assistant" ? "h-full" : "hidden h-full"}>
+                    <div className={activeTab === "assistant" ? "h-full" : HIDDEN_CLASS}>
                         <AIAssistantPanel/>
                     </div>
 
-                    {/* History-Tab */}
-                    <div className={activeTab === "history" ? "h-full" : "hidden h-full"}>
+                    <div className={activeTab === "history" ? "h-full" : HIDDEN_CLASS}>
                         <HistoryPanel/>
                     </div>
                 </div>
